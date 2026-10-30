@@ -1,0 +1,1637 @@
+{
+  "padded": [],
+  "unresolved": [
+    {
+      "asset": "mods/dbz/a/000665.png",
+      "actual": [
+        528,
+        87
+      ],
+      "required": [
+        1759,
+        608
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000987.png",
+      "actual": [
+        783,
+        382
+      ],
+      "required": [
+        782,
+        763
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000988.png",
+      "actual": [
+        1000,
+        200
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000989.png",
+      "actual": [
+        900,
+        720
+      ],
+      "required": [
+        899,
+        1259
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000992.png",
+      "actual": [
+        559,
+        80
+      ],
+      "required": [
+        799,
+        80
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000970.png",
+      "actual": [
+        605,
+        183
+      ],
+      "required": [
+        603,
+        365
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000971.png",
+      "actual": [
+        2800,
+        1600
+      ],
+      "required": [
+        4009,
+        1599
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000933.png",
+      "actual": [
+        1,
+        1
+      ],
+      "required": [
+        5,
+        1
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000934.png",
+      "actual": [
+        1000,
+        200
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000935.png",
+      "actual": [
+        900,
+        810
+      ],
+      "required": [
+        899,
+        1259
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000908.png",
+      "actual": [
+        2800,
+        1600
+      ],
+      "required": [
+        4009,
+        1599
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000448.png",
+      "actual": [
+        410,
+        83
+      ],
+      "required": [
+        499,
+        1049
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000900.png",
+      "actual": [
+        605,
+        183
+      ],
+      "required": [
+        603,
+        365
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001734.png",
+      "actual": [
+        1000,
+        500
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001735.png",
+      "actual": [
+        129,
+        117
+      ],
+      "required": [
+        1299,
+        117
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001737.png",
+      "actual": [
+        1000,
+        500
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001738.png",
+      "actual": [
+        129,
+        117
+      ],
+      "required": [
+        1299,
+        117
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001740.png",
+      "actual": [
+        1000,
+        500
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001741.png",
+      "actual": [
+        129,
+        117
+      ],
+      "required": [
+        1299,
+        117
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001711.png",
+      "actual": [
+        1000,
+        400
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001712.png",
+      "actual": [
+        800,
+        160
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001713.png",
+      "actual": [
+        400,
+        480
+      ],
+      "required": [
+        3999,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001521.png",
+      "actual": [
+        4900,
+        175
+      ],
+      "required": [
+        5249,
+        174
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000777.png",
+      "actual": [
+        1000,
+        500
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001761.png",
+      "actual": [
+        152,
+        753
+      ],
+      "required": [
+        151,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001781.png",
+      "actual": [
+        1000,
+        500
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001783.png",
+      "actual": [
+        1000,
+        500
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001760.png",
+      "actual": [
+        1000,
+        505
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001763.png",
+      "actual": [
+        1000,
+        505
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001765.png",
+      "actual": [
+        1000,
+        505
+      ],
+      "required": [
+        999,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000873.png",
+      "actual": [
+        800,
+        742
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000874.png",
+      "actual": [
+        1600,
+        200
+      ],
+      "required": [
+        1599,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000875.png",
+      "actual": [
+        3600,
+        600
+      ],
+      "required": [
+        5999,
+        2099
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000876.png",
+      "actual": [
+        3000,
+        600
+      ],
+      "required": [
+        2999,
+        2799
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000877.png",
+      "actual": [
+        783,
+        141
+      ],
+      "required": [
+        2609,
+        1973
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000409.png",
+      "actual": [
+        650,
+        249
+      ],
+      "required": [
+        3249,
+        248
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000852.png",
+      "actual": [
+        800,
+        880
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000853.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000854.png",
+      "actual": [
+        800,
+        880
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000855.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000856.png",
+      "actual": [
+        800,
+        880
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000857.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000824.png",
+      "actual": [
+        800,
+        1040
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000825.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000826.png",
+      "actual": [
+        800,
+        1040
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000827.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000828.png",
+      "actual": [
+        800,
+        1040
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000829.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000790.png",
+      "actual": [
+        801,
+        1040
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000791.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000792.png",
+      "actual": [
+        800,
+        1040
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000793.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000794.png",
+      "actual": [
+        801,
+        1040
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000795.png",
+      "actual": [
+        240,
+        1506
+      ],
+      "required": [
+        239,
+        2509
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001592.png",
+      "actual": [
+        1200,
+        120
+      ],
+      "required": [
+        1199,
+        1679
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000639.png",
+      "actual": [
+        800,
+        160
+      ],
+      "required": [
+        799,
+        959
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001469.png",
+      "actual": [
+        528,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001432.png",
+      "actual": [
+        1757,
+        228
+      ],
+      "required": [
+        2509,
+        797
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001433.png",
+      "actual": [
+        528,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000399.png",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        804,
+        482
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001452.png",
+      "actual": [
+        1510,
+        1602
+      ],
+      "required": [
+        1509,
+        5606
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001453.png",
+      "actual": [
+        528,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001132.png",
+      "actual": [
+        528,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001133.png",
+      "actual": [
+        160,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001121.png",
+      "actual": [
+        1056,
+        87
+      ],
+      "required": [
+        1759,
+        608
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001108.png",
+      "actual": [
+        1056,
+        92
+      ],
+      "required": [
+        1759,
+        608
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001090.png",
+      "actual": [
+        783,
+        462
+      ],
+      "required": [
+        2609,
+        281
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001663.png",
+      "actual": [
+        2510,
+        1600
+      ],
+      "required": [
+        2509,
+        2239
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001666.png",
+      "actual": [
+        2510,
+        1600
+      ],
+      "required": [
+        2509,
+        2239
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001636.png",
+      "actual": [
+        1800,
+        2250
+      ],
+      "required": [
+        2399,
+        2249
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001643.png",
+      "actual": [
+        800,
+        880
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001644.png",
+      "actual": [
+        2510,
+        3520
+      ],
+      "required": [
+        2509,
+        4479
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001646.png",
+      "actual": [
+        800,
+        880
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001647.png",
+      "actual": [
+        2510,
+        3520
+      ],
+      "required": [
+        2509,
+        4479
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001210.png",
+      "actual": [
+        800,
+        900
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001214.png",
+      "actual": [
+        800,
+        900
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001189.png",
+      "actual": [
+        800,
+        240
+      ],
+      "required": [
+        799,
+        319
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001194.png",
+      "actual": [
+        800,
+        240
+      ],
+      "required": [
+        799,
+        319
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001167.png",
+      "actual": [
+        800,
+        800
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001170.png",
+      "actual": [
+        800,
+        720
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001146.png",
+      "actual": [
+        800,
+        800
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001149.png",
+      "actual": [
+        800,
+        800
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001825.png",
+      "actual": [
+        1000,
+        505
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001325.png",
+      "actual": [
+        400,
+        880
+      ],
+      "required": [
+        3999,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001326.png",
+      "actual": [
+        1896,
+        170
+      ],
+      "required": [
+        2709,
+        2393
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001329.png",
+      "actual": [
+        2915,
+        131
+      ],
+      "required": [
+        3239,
+        1847
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001530.png",
+      "actual": [
+        763,
+        80
+      ],
+      "required": [
+        1089,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001836.png",
+      "actual": [
+        1000,
+        820
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001371.png",
+      "actual": [
+        801,
+        559
+      ],
+      "required": [
+        4009,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001372.png",
+      "actual": [
+        1896,
+        170
+      ],
+      "required": [
+        2709,
+        2393
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001374.png",
+      "actual": [
+        3239,
+        263
+      ],
+      "required": [
+        3239,
+        1847
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001689.png",
+      "actual": [
+        1000,
+        700
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001690.png",
+      "actual": [
+        1509,
+        200
+      ],
+      "required": [
+        1509,
+        2813
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001360.png",
+      "actual": [
+        1376,
+        376
+      ],
+      "required": [
+        1959,
+        373
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001700.png",
+      "actual": [
+        1000,
+        1100
+      ],
+      "required": [
+        999,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001701.png",
+      "actual": [
+        1509,
+        200
+      ],
+      "required": [
+        1509,
+        2813
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001529.png",
+      "actual": [
+        80,
+        41
+      ],
+      "required": [
+        799,
+        573
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001522.png",
+      "actual": [
+        9800,
+        350
+      ],
+      "required": [
+        15399,
+        349
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001546.png",
+      "actual": [
+        1872,
+        248
+      ],
+      "required": [
+        3119,
+        247
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001327.png",
+      "actual": [
+        1000,
+        300
+      ],
+      "required": [
+        999,
+        1499
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001314.png",
+      "actual": [
+        1,
+        1
+      ],
+      "required": [
+        43,
+        5
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000377.png",
+      "actual": [
+        560,
+        161
+      ],
+      "required": [
+        799,
+        159
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000380.png",
+      "actual": [
+        630,
+        49
+      ],
+      "required": [
+        899,
+        97
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000648.png",
+      "actual": [
+        507,
+        511
+      ],
+      "required": [
+        763,
+        504
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000649.png",
+      "actual": [
+        640,
+        384
+      ],
+      "required": [
+        644,
+        386
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000650.png",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        804,
+        482
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000651.png",
+      "actual": [
+        960,
+        576
+      ],
+      "required": [
+        964,
+        578
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001505.png",
+      "actual": [
+        519,
+        91
+      ],
+      "required": [
+        1729,
+        636
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001490.png",
+      "actual": [
+        519,
+        91
+      ],
+      "required": [
+        1729,
+        636
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001306.png",
+      "actual": [
+        800,
+        1027
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001252.png",
+      "actual": [
+        560,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001245.png",
+      "actual": [
+        480,
+        160
+      ],
+      "required": [
+        485,
+        161
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001291.png",
+      "actual": [
+        1400,
+        80
+      ],
+      "required": [
+        2799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001292.png",
+      "actual": [
+        800,
+        442
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001076.png",
+      "actual": [
+        1029,
+        260
+      ],
+      "required": [
+        3429,
+        909
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001065.png",
+      "actual": [
+        800,
+        80
+      ],
+      "required": [
+        879,
+        79
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000394.png",
+      "actual": [
+        327,
+        105
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001003.png",
+      "actual": [
+        29,
+        15
+      ],
+      "required": [
+        799,
+        404
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001005.png",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001008.png",
+      "actual": [
+        759,
+        308
+      ],
+      "required": [
+        752,
+        603
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001038.png",
+      "actual": [
+        426,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000449.png",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000452.png",
+      "actual": [
+        496,
+        783
+      ],
+      "required": [
+        495,
+        1099
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000432.png",
+      "actual": [
+        274,
+        22
+      ],
+      "required": [
+        818,
+        293
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000396.png",
+      "actual": [
+        4010,
+        1604
+      ],
+      "required": [
+        4009,
+        5613
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000397.png",
+      "actual": [
+        2010,
+        604
+      ],
+      "required": [
+        2009,
+        2813
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000415.png",
+      "actual": [
+        40,
+        40
+      ],
+      "required": [
+        409,
+        81
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000463.png",
+      "missing": true
+    },
+    {
+      "asset": "mods/dbz/a/000386.png",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001841.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001845.bmp",
+      "actual": [
+        341,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000744.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000706.png",
+      "actual": [
+        800,
+        1120
+      ],
+      "required": [
+        799,
+        2239
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000707.png",
+      "actual": [
+        722,
+        100
+      ],
+      "required": [
+        2209,
+        2771
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000708.png",
+      "actual": [
+        1189,
+        195
+      ],
+      "required": [
+        2359,
+        2295
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000732.png",
+      "actual": [
+        1,
+        1
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000750.png",
+      "actual": [
+        324,
+        864
+      ],
+      "required": [
+        323,
+        1343
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000768.png",
+      "actual": [
+        80,
+        92
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000778.png",
+      "actual": [
+        324,
+        576
+      ],
+      "required": [
+        323,
+        1343
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000775.png",
+      "actual": [
+        324,
+        768
+      ],
+      "required": [
+        323,
+        959
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000771.png",
+      "actual": [
+        324,
+        768
+      ],
+      "required": [
+        323,
+        959
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000757.png",
+      "actual": [
+        288,
+        136
+      ],
+      "required": [
+        479,
+        169
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000759.png",
+      "actual": [
+        384,
+        136
+      ],
+      "required": [
+        479,
+        169
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000393.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/000390.bmp",
+      "actual": [
+        40,
+        45
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001552.png",
+      "actual": [
+        288,
+        142
+      ],
+      "required": [
+        287,
+        212
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001560.png",
+      "actual": [
+        327,
+        105
+      ],
+      "required": [
+        435,
+        104
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001561.png",
+      "actual": [
+        492,
+        54
+      ],
+      "required": [
+        495,
+        54
+      ]
+    },
+    {
+      "asset": "mods/dbz/a/001549.png",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    }
+  ]
+}

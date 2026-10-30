@@ -1,0 +1,11 @@
+* text=auto
+*.sh text eol=lf
+engine/android/gradlew text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.dat -text
+*.zip -text
+*.keystore -text
+# Preserve upstream patch context and license wording byte for byte.
+*.patch -text -whitespace
+engine/scripts/base/fonts/license-dejavu.txt -text -whitespace

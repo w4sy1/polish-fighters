@@ -1,0 +1,38 @@
+[
+  {
+    "original": "assets/a/000275.bmp",
+    "encoded": "assets/a/000275.png",
+    "dimensions": [
+      5000,
+      2000
+    ],
+    "rgb_sha256": "95c2c69f454fd2623d906b90d66ccf3b37f2e54fe07f906cb2a5d19bc471767d",
+    "original_bytes": 40000064,
+    "encoded_bytes": 62519,
+    "original_retained": true
+  },
+  {
+    "original": "assets/a/000277.bmp",
+    "encoded": "assets/a/000277.png",
+    "dimensions": [
+      4000,
+      2000
+    ],
+    "rgb_sha256": "1f06e9ce8e4ae8c0c545a10f64342d22a73c0f21cad0303ae83c45851bf8a200",
+    "original_bytes": 32000064,
+    "encoded_bytes": 327112,
+    "original_retained": true
+  },
+  {
+    "original": "assets/a/000278.bmp",
+    "encoded": "assets/a/000278.png",
+    "dimensions": [
+      4000,
+      2000
+    ],
+    "rgb_sha256": "0b7b1bf912c327581815185222f97bc63413e12d4c0dda710506298b2ca1a9f1",
+    "original_bytes": 32000064,
+    "encoded_bytes": 321133,
+    "original_retained": true
+  }
+]

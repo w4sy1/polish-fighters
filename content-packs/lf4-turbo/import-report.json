@@ -1,0 +1,179 @@
+{
+  "pack_id": "lf4-turbo",
+  "fighters": [
+    {
+      "id": 58,
+      "name": "Moon",
+      "path": "data/moon.dat"
+    },
+    {
+      "id": 55,
+      "name": "LeumasEX",
+      "path": "data/leumasex.dat"
+    },
+    {
+      "id": 54,
+      "name": "Firce",
+      "path": "data/firce.dat"
+    },
+    {
+      "id": 53,
+      "name": "DarkKnight",
+      "path": "data/darkknight.dat"
+    },
+    {
+      "id": 52,
+      "name": "Julian",
+      "path": "data/julian.dat"
+    },
+    {
+      "id": 51,
+      "name": "Firzen",
+      "path": "data/firzen.dat"
+    },
+    {
+      "id": 50,
+      "name": "LouisEX",
+      "path": "data/louisex.dat"
+    },
+    {
+      "id": 39,
+      "name": "Justin",
+      "path": "data/justin.dat"
+    },
+    {
+      "id": 37,
+      "name": "Knight",
+      "path": "data/knight.dat"
+    },
+    {
+      "id": 36,
+      "name": "Jan",
+      "path": "data/jan.dat"
+    },
+    {
+      "id": 35,
+      "name": "Monk",
+      "path": "data/monk.dat"
+    },
+    {
+      "id": 34,
+      "name": "Sorcerer",
+      "path": "data/sorcerer.dat"
+    },
+    {
+      "id": 33,
+      "name": "Jack",
+      "path": "data/jack.dat"
+    },
+    {
+      "id": 32,
+      "name": "Mark",
+      "path": "data/mark.dat"
+    },
+    {
+      "id": 31,
+      "name": "Hunter",
+      "path": "data/hunter.dat"
+    },
+    {
+      "id": 30,
+      "name": "Bandit",
+      "path": "data/bandit.dat"
+    },
+    {
+      "id": 1,
+      "name": "Deep",
+      "path": "data/deep.dat"
+    },
+    {
+      "id": 2,
+      "name": "John",
+      "path": "data/john.dat"
+    },
+    {
+      "id": 4,
+      "name": "Henry",
+      "path": "data/henry.dat"
+    },
+    {
+      "id": 5,
+      "name": "Rudolf",
+      "path": "data/rudolf.dat"
+    },
+    {
+      "id": 6,
+      "name": "Louis",
+      "path": "data/louis.dat"
+    },
+    {
+      "id": 7,
+      "name": "Firen",
+      "path": "data/firen.dat"
+    },
+    {
+      "id": 8,
+      "name": "Freeze",
+      "path": "data/freeze.dat"
+    },
+    {
+      "id": 9,
+      "name": "Dennis",
+      "path": "data/dennis.dat"
+    },
+    {
+      "id": 10,
+      "name": "Woody",
+      "path": "data/woody.dat"
+    },
+    {
+      "id": 11,
+      "name": "Davis",
+      "path": "data/davis.dat"
+    },
+    {
+      "id": 3,
+      "name": "Bat",
+      "path": "data/bat.dat"
+    },
+    {
+      "id": 59,
+      "name": "SSJ5Woody",
+      "path": "woody5/swoody.dat"
+    },
+    {
+      "id": 57,
+      "name": "Davisx",
+      "path": "davisx/davisx.dat"
+    },
+    {
+      "id": 56,
+      "name": "SonGoku",
+      "path": "songoku/goku.dat"
+    },
+    {
+      "id": 12,
+      "name": "Kate_new",
+      "path": "kate/data/kate.dat"
+    },
+    {
+      "id": 38,
+      "name": "Tiger",
+      "path": "tiger/tiger.dat"
+    }
+  ],
+  "objects": 100,
+  "backgrounds": 12,
+  "assets": 975,
+  "source_catalog_sha256": "2e2dad4adf61aa9f421fa1466136c4d5c28982311993316372b6b79408b234b9",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "simulation_tested_fighters": 32,
+  "total_fighters": 32,
+  "sprite_edge_repairs": 3,
+  "unresolved_sprite_sheets": 64,
+  "tiger_native_parser": "own complete Linux engine parsed and ran Tiger for 300 simulation frames",
+  "visual_test": "LeumasEX and Tiger matches rendered through frame 85",
+  "exhaustive_gameplay_verified": false
+}

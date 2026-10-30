@@ -1,0 +1,1706 @@
+{
+  "scope": "Render-only packed-axis interpretation and intersection with physical image bounds; no inferred artwork",
+  "dimensions": {
+    "mods/kate/a/000051.bmp": [
+      130,
+      68
+    ],
+    "mods/kate/a/000052.bmp": [
+      190,
+      106
+    ],
+    "mods/kate/a/000056.bmp": [
+      349,
+      212
+    ],
+    "mods/kate/a/000046.bmp": [
+      797,
+      29
+    ],
+    "mods/kate/a/000047.bmp": [
+      797,
+      31
+    ],
+    "mods/kate/a/000048.bmp": [
+      800,
+      106
+    ],
+    "mods/kate/a/000061.bmp": [
+      180,
+      128
+    ],
+    "mods/kate/a/000060.bmp": [
+      163,
+      54
+    ],
+    "mods/kate/a/000054.bmp": [
+      313,
+      264
+    ],
+    "mods/kate/a/000055.bmp": [
+      220,
+      119
+    ],
+    "mods/kate/a/000058.bmp": [
+      82,
+      137
+    ],
+    "mods/kate/a/000059.bmp": [
+      82,
+      137
+    ],
+    "mods/kate/a/000053.bmp": [
+      641,
+      232
+    ],
+    "mods/kate/a/000062.bmp": [
+      141,
+      122
+    ],
+    "mods/kate/a/000045.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000049.bmp": [
+      800,
+      210
+    ],
+    "mods/kate/a/000050.bmp": [
+      167,
+      210
+    ],
+    "mods/kate/a/000057.bmp": [
+      407,
+      110
+    ],
+    "mods/kate/a/000072.bmp": [
+      54,
+      134
+    ],
+    "mods/kate/a/000073.bmp": [
+      60,
+      43
+    ],
+    "mods/kate/a/000087.bmp": [
+      1,
+      177
+    ],
+    "mods/kate/a/000074.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000075.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000076.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000077.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000078.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000079.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000080.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000081.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000082.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000083.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000084.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000085.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000086.bmp": [
+      54,
+      77
+    ],
+    "mods/kate/a/000068.bmp": [
+      162,
+      59
+    ],
+    "mods/kate/a/000069.bmp": [
+      140,
+      11
+    ],
+    "mods/kate/a/000070.bmp": [
+      140,
+      12
+    ],
+    "mods/kate/a/000071.bmp": [
+      128,
+      21
+    ],
+    "mods/kate/a/000063.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000064.bmp": [
+      797,
+      74
+    ],
+    "mods/kate/a/000065.bmp": [
+      144,
+      31
+    ],
+    "mods/kate/a/000066.bmp": [
+      24,
+      57
+    ],
+    "mods/kate/a/000067.bmp": [
+      144,
+      30
+    ],
+    "mods/kate/a/000111.bmp": [
+      1,
+      159
+    ],
+    "mods/kate/a/000106.bmp": [
+      800,
+      144
+    ],
+    "mods/kate/a/000107.bmp": [
+      404,
+      144
+    ],
+    "mods/kate/a/000108.bmp": [
+      235,
+      154
+    ],
+    "mods/kate/a/000109.bmp": [
+      93,
+      68
+    ],
+    "mods/kate/a/000110.bmp": [
+      104,
+      36
+    ],
+    "mods/kate/a/000104.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000105.bmp": [
+      800,
+      140
+    ],
+    "mods/kate/a/000137.bmp": [
+      794,
+      101
+    ],
+    "mods/kate/a/000138.bmp": [
+      794,
+      90
+    ],
+    "mods/kate/a/000139.bmp": [
+      794,
+      90
+    ],
+    "mods/kate/a/000140.bmp": [
+      794,
+      187
+    ],
+    "mods/kate/a/000136.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000127.bmp": [
+      800,
+      104
+    ],
+    "mods/kate/a/000128.bmp": [
+      300,
+      104
+    ],
+    "mods/kate/a/000129.bmp": [
+      284,
+      84
+    ],
+    "mods/kate/a/000130.bmp": [
+      184,
+      87
+    ],
+    "mods/kate/a/000126.bmp": [
+      800,
+      70
+    ],
+    "mods/kate/a/000131.bmp": [
+      253,
+      162
+    ],
+    "mods/kate/a/000133.bmp": [
+      175,
+      74
+    ],
+    "mods/kate/a/000134.bmp": [
+      225,
+      89
+    ],
+    "mods/kate/a/000132.bmp": [
+      1,
+      172
+    ],
+    "mods/kate/a/000135.bmp": [
+      206,
+      106
+    ],
+    "mods/kate/a/000125.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000103.bmp": [
+      1,
+      231
+    ],
+    "mods/kate/a/000089.bmp": [
+      800,
+      151
+    ],
+    "mods/kate/a/000098.bmp": [
+      186,
+      146
+    ],
+    "mods/kate/a/000102.bmp": [
+      800,
+      35
+    ],
+    "mods/kate/a/000099.bmp": [
+      73,
+      60
+    ],
+    "mods/kate/a/000100.bmp": [
+      128,
+      51
+    ],
+    "mods/kate/a/000101.bmp": [
+      128,
+      23
+    ],
+    "mods/kate/a/000091.bmp": [
+      67,
+      45
+    ],
+    "mods/kate/a/000092.bmp": [
+      67,
+      45
+    ],
+    "mods/kate/a/000093.bmp": [
+      67,
+      45
+    ],
+    "mods/kate/a/000094.bmp": [
+      127,
+      59
+    ],
+    "mods/kate/a/000095.bmp": [
+      90,
+      59
+    ],
+    "mods/kate/a/000096.bmp": [
+      51,
+      22
+    ],
+    "mods/kate/a/000097.bmp": [
+      67,
+      37
+    ],
+    "mods/kate/a/000090.bmp": [
+      251,
+      70
+    ],
+    "mods/kate/a/000088.bmp": [
+      35,
+      7
+    ],
+    "mods/kate/a/000117.bmp": [
+      21,
+      75
+    ],
+    "mods/kate/a/000118.bmp": [
+      21,
+      75
+    ],
+    "mods/kate/a/000119.bmp": [
+      21,
+      75
+    ],
+    "mods/kate/a/000120.bmp": [
+      21,
+      75
+    ],
+    "mods/kate/a/000121.bmp": [
+      21,
+      75
+    ],
+    "mods/kate/a/000122.bmp": [
+      21,
+      75
+    ],
+    "mods/kate/a/000123.bmp": [
+      21,
+      75
+    ],
+    "mods/kate/a/000124.bmp": [
+      1,
+      203
+    ],
+    "mods/kate/a/000112.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000113.bmp": [
+      277,
+      180
+    ],
+    "mods/kate/a/000115.bmp": [
+      131,
+      39
+    ],
+    "mods/kate/a/000116.bmp": [
+      131,
+      39
+    ],
+    "mods/kate/a/000114.bmp": [
+      103,
+      97
+    ],
+    "mods/kate/a/000035.bmp": [
+      800,
+      92
+    ],
+    "mods/kate/a/000040.bmp": [
+      800,
+      92
+    ],
+    "mods/kate/a/000036.bmp": [
+      800,
+      80
+    ],
+    "mods/kate/a/000041.bmp": [
+      800,
+      85
+    ],
+    "mods/kate/a/000037.bmp": [
+      800,
+      15
+    ],
+    "mods/kate/a/000042.bmp": [
+      800,
+      15
+    ],
+    "mods/kate/a/000038.bmp": [
+      800,
+      25
+    ],
+    "mods/kate/a/000043.bmp": [
+      800,
+      25
+    ],
+    "mods/kate/a/000039.bmp": [
+      800,
+      110
+    ],
+    "mods/kate/a/000044.bmp": [
+      800,
+      110
+    ],
+    "mods/kate/a/000031.bmp": [
+      800,
+      49
+    ],
+    "mods/kate/a/000033.bmp": [
+      455,
+      49
+    ],
+    "mods/kate/a/000032.bmp": [
+      800,
+      56
+    ],
+    "mods/kate/a/000034.bmp": [
+      455,
+      56
+    ],
+    "mods/kate/a/000030.bmp": [
+      510,
+      95
+    ],
+    "mods/kate/a/000029.bmp": [
+      364,
+      76
+    ],
+    "mods/kate/a/000028.bmp": [
+      800,
+      148
+    ],
+    "mods/kate/a/000027.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000019.bmp": [
+      800,
+      145
+    ],
+    "mods/kate/a/000020.bmp": [
+      167,
+      145
+    ],
+    "mods/kate/a/000021.bmp": [
+      500,
+      150
+    ],
+    "mods/kate/a/000022.bmp": [
+      500,
+      150
+    ],
+    "mods/kate/a/000023.bmp": [
+      750,
+      66
+    ],
+    "mods/kate/a/000024.bmp": [
+      750,
+      66
+    ],
+    "mods/kate/a/000025.bmp": [
+      800,
+      115
+    ],
+    "mods/kate/a/000026.bmp": [
+      800,
+      115
+    ],
+    "mods/kate/a/000018.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000010.bmp": [
+      800,
+      145
+    ],
+    "mods/kate/a/000011.bmp": [
+      167,
+      145
+    ],
+    "mods/kate/a/000012.bmp": [
+      500,
+      150
+    ],
+    "mods/kate/a/000013.bmp": [
+      500,
+      150
+    ],
+    "mods/kate/a/000014.bmp": [
+      750,
+      66
+    ],
+    "mods/kate/a/000015.bmp": [
+      750,
+      66
+    ],
+    "mods/kate/a/000016.bmp": [
+      800,
+      115
+    ],
+    "mods/kate/a/000017.bmp": [
+      800,
+      115
+    ],
+    "mods/kate/a/000009.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000001.bmp": [
+      800,
+      145
+    ],
+    "mods/kate/a/000002.bmp": [
+      167,
+      145
+    ],
+    "mods/kate/a/000003.bmp": [
+      500,
+      150
+    ],
+    "mods/kate/a/000004.bmp": [
+      500,
+      150
+    ],
+    "mods/kate/a/000005.bmp": [
+      750,
+      66
+    ],
+    "mods/kate/a/000006.bmp": [
+      750,
+      66
+    ],
+    "mods/kate/a/000007.bmp": [
+      800,
+      115
+    ],
+    "mods/kate/a/000008.bmp": [
+      800,
+      115
+    ],
+    "mods/kate/a/000000.bmp": [
+      37,
+      9
+    ],
+    "mods/kate/a/000563.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000564.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000561.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000562.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000196.bmp": [
+      360,
+      40
+    ],
+    "mods/kate/a/000216.bmp": [
+      1400,
+      400
+    ],
+    "mods/kate/a/000227.bmp": [
+      800,
+      405
+    ],
+    "mods/kate/a/000228.bmp": [
+      640,
+      405
+    ],
+    "mods/kate/a/000225.bmp": [
+      3200,
+      800
+    ],
+    "mods/kate/a/000226.bmp": [
+      3200,
+      640
+    ],
+    "mods/kate/a/000569.bmp": [
+      1200,
+      840
+    ],
+    "mods/kate/a/000570.bmp": [
+      1200,
+      840
+    ],
+    "mods/kate/a/000571.bmp": [
+      1200,
+      360
+    ],
+    "mods/kate/a/000587.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000568.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000572.bmp": [
+      1200,
+      480
+    ],
+    "mods/kate/a/000567.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000208.bmp": [
+      1440,
+      900
+    ],
+    "mods/kate/a/000277.bmp": [
+      960,
+      480
+    ],
+    "mods/kate/a/000278.bmp": [
+      260,
+      117
+    ],
+    "mods/kate/a/000206.bmp": [
+      1440,
+      900
+    ],
+    "mods/kate/a/000200.bmp": [
+      71,
+      80
+    ],
+    "mods/kate/a/000209.bmp": [
+      480,
+      60
+    ],
+    "mods/kate/a/000252.bmp": [
+      960,
+      120
+    ],
+    "mods/kate/a/000255.bmp": [
+      960,
+      120
+    ],
+    "mods/kate/a/000180.bmp": [
+      95,
+      400
+    ],
+    "mods/kate/a/000198.bmp": [
+      2,
+      2
+    ],
+    "mods/kate/a/000214.bmp": [
+      480,
+      60
+    ],
+    "mods/kate/a/000201.bmp": [
+      2400,
+      461
+    ],
+    "mods/kate/a/000202.bmp": [
+      1050,
+      461
+    ],
+    "mods/kate/a/000246.bmp": [
+      308,
+      177
+    ],
+    "mods/kate/a/000203.bmp": [
+      3775,
+      461
+    ],
+    "mods/kate/a/000205.bmp": [
+      1440,
+      360
+    ],
+    "mods/kate/a/000215.bmp": [
+      480,
+      80
+    ],
+    "mods/kate/a/000217.bmp": [
+      720,
+      80
+    ],
+    "mods/kate/a/000471.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000469.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000472.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000470.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000245.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000247.bmp": [
+      800,
+      405
+    ],
+    "mods/kate/a/000248.bmp": [
+      640,
+      405
+    ],
+    "mods/kate/a/000478.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000467.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000232.bmp": [
+      360,
+      192
+    ],
+    "mods/kate/a/000479.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000468.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000537.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000538.bmp": [
+      800,
+      350
+    ],
+    "mods/kate/a/000539.bmp": [
+      321,
+      81
+    ],
+    "mods/kate/a/000293.bmp": [
+      524,
+      72
+    ],
+    "mods/kate/a/000290.bmp": [
+      328,
+      169
+    ],
+    "mods/kate/a/000535.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000536.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000254.bmp": [
+      320,
+      80
+    ],
+    "mods/kate/a/000141.bmp": [
+      300,
+      300
+    ],
+    "mods/kate/a/000142.bmp": [
+      281,
+      152
+    ],
+    "mods/kate/a/000174.bmp": [
+      800,
+      320
+    ],
+    "mods/kate/a/000365.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000366.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000367.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000368.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000369.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000370.bmp": [
+      600,
+      315
+    ],
+    "mods/kate/a/000275.bmp": [
+      328,
+      141
+    ],
+    "mods/kate/a/000234.bmp": [
+      1800,
+      700
+    ],
+    "mods/kate/a/000463.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000464.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000465.bmp": [
+      800,
+      480
+    ],
+    "mods/kate/a/000199.bmp": [
+      880,
+      80
+    ],
+    "mods/kate/a/000337.bmp": [
+      1080,
+      720
+    ],
+    "mods/kate/a/000233.bmp": [
+      700,
+      480
+    ],
+    "mods/kate/a/000336.bmp": [
+      328,
+      166
+    ],
+    "mods/kate/a/000461.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000462.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000235.bmp": [
+      75,
+      36
+    ],
+    "mods/kate/a/000253.bmp": [
+      43,
+      30
+    ],
+    "mods/kate/a/000402.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000403.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000404.bmp": [
+      800,
+      430
+    ],
+    "mods/kate/a/000195.bmp": [
+      328,
+      189
+    ],
+    "mods/kate/a/000309.bmp": [
+      328,
+      250
+    ],
+    "mods/kate/a/000400.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000401.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000236.bmp": [
+      2730,
+      392
+    ],
+    "mods/kate/a/000332.bmp": [
+      2550,
+      380
+    ],
+    "mods/kate/a/000145.bmp": [
+      720,
+      80
+    ],
+    "mods/kate/a/000146.bmp": [
+      597,
+      148
+    ],
+    "mods/kate/a/000418.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000419.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000420.bmp": [
+      800,
+      430
+    ],
+    "mods/kate/a/000421.bmp": [
+      188,
+      240
+    ],
+    "mods/kate/a/000266.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000258.bmp": [
+      328,
+      166
+    ],
+    "mods/kate/a/000263.bmp": [
+      639,
+      796
+    ],
+    "mods/kate/a/000317.bmp": [
+      800,
+      480
+    ],
+    "mods/kate/a/000416.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000315.bmp": [
+      360,
+      192
+    ],
+    "mods/kate/a/000316.bmp": [
+      144,
+      200
+    ],
+    "mods/kate/a/000417.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000551.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000552.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000553.bmp": [
+      480,
+      80
+    ],
+    "mods/kate/a/000294.bmp": [
+      520,
+      249
+    ],
+    "mods/kate/a/000297.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000295.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000549.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000550.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000298.bmp": [
+      144,
+      150
+    ],
+    "mods/kate/a/000296.bmp": [
+      144,
+      100
+    ],
+    "mods/kate/a/000299.bmp": [
+      328,
+      83
+    ],
+    "mods/kate/a/000320.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000321.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000322.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000323.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000324.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000325.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000326.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000327.bmp": [
+      100,
+      900
+    ],
+    "mods/kate/a/000409.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000410.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000411.bmp": [
+      800,
+      270
+    ],
+    "mods/kate/a/000412.bmp": [
+      500,
+      180
+    ],
+    "mods/kate/a/000319.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000267.bmp": [
+      328,
+      166
+    ],
+    "mods/kate/a/000268.bmp": [
+      639,
+      796
+    ],
+    "mods/kate/a/000312.bmp": [
+      770,
+      440
+    ],
+    "mods/kate/a/000407.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000314.bmp": [
+      2590,
+      410
+    ],
+    "mods/kate/a/000408.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000313.bmp": [
+      800,
+      320
+    ],
+    "mods/kate/a/000443.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000444.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000445.bmp": [
+      720,
+      240
+    ],
+    "mods/kate/a/000340.bmp": [
+      490,
+      146
+    ],
+    "mods/kate/a/000328.bmp": [
+      294,
+      96
+    ],
+    "mods/kate/a/000284.bmp": [
+      294,
+      96
+    ],
+    "mods/kate/a/000329.bmp": [
+      294,
+      144
+    ],
+    "mods/kate/a/000285.bmp": [
+      294,
+      48
+    ],
+    "mods/kate/a/000283.bmp": [
+      294,
+      96
+    ],
+    "mods/kate/a/000318.bmp": [
+      140,
+      70
+    ],
+    "mods/kate/a/000441.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000442.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000335.bmp": [
+      1050,
+      461
+    ],
+    "mods/kate/a/000333.bmp": [
+      328,
+      166
+    ],
+    "mods/kate/a/000483.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000485.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000484.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000486.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000481.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000565.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000482.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000566.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000496.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000498.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000497.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000499.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000308.bmp": [
+      328,
+      166
+    ],
+    "mods/kate/a/000494.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000495.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000515.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000516.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000517.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000518.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000300.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000301.bmp": [
+      104,
+      26
+    ],
+    "mods/kate/a/000302.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000513.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000303.bmp": [
+      1120,
+      176
+    ],
+    "mods/kate/a/000514.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000455.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000456.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000458.bmp": [
+      457,
+      125
+    ],
+    "mods/kate/a/000457.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000342.bmp": [
+      656,
+      415
+    ],
+    "mods/kate/a/000310.bmp": [
+      364,
+      64
+    ],
+    "mods/kate/a/000453.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000454.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000557.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000558.bmp": [
+      800,
+      240
+    ],
+    "mods/kate/a/000534.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000559.bmp": [
+      220,
+      100
+    ],
+    "mods/kate/a/000288.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000221.bmp": [
+      440,
+      200
+    ],
+    "mods/kate/a/000286.bmp": [
+      800,
+      405
+    ],
+    "mods/kate/a/000287.bmp": [
+      640,
+      405
+    ],
+    "mods/kate/a/000224.bmp": [
+      800,
+      480
+    ],
+    "mods/kate/a/000555.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000556.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000530.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000532.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000531.bmp": [
+      800,
+      240
+    ],
+    "mods/kate/a/000533.bmp": [
+      800,
+      240
+    ],
+    "mods/kate/a/000231.bmp": [
+      328,
+      166
+    ],
+    "mods/kate/a/000222.bmp": [
+      3200,
+      800
+    ],
+    "mods/kate/a/000223.bmp": [
+      3200,
+      640
+    ],
+    "mods/kate/a/000528.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000529.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000521.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000524.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000522.bmp": [
+      770,
+      200
+    ],
+    "mods/kate/a/000525.bmp": [
+      770,
+      200
+    ],
+    "mods/kate/a/000523.bmp": [
+      800,
+      250
+    ],
+    "mods/kate/a/000526.bmp": [
+      800,
+      250
+    ],
+    "mods/kate/a/000527.bmp": [
+      990,
+      165
+    ],
+    "mods/kate/a/000519.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000520.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000426.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000427.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000428.bmp": [
+      800,
+      400
+    ],
+    "mods/kate/a/000424.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000251.bmp": [
+      1440,
+      352
+    ],
+    "mods/kate/a/000425.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000543.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000544.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000545.bmp": [
+      800,
+      190
+    ],
+    "mods/kate/a/000546.bmp": [
+      800,
+      270
+    ],
+    "mods/kate/a/000547.bmp": [
+      80,
+      125
+    ],
+    "mods/kate/a/000548.bmp": [
+      714,
+      240
+    ],
+    "mods/kate/a/000541.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000542.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000489.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000491.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000490.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000492.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000487.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000488.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000509.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000511.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000510.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000512.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000507.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000508.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000152.bmp": [
+      2,
+      2
+    ],
+    "mods/kate/a/000433.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000434.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000435.bmp": [
+      762,
+      188
+    ],
+    "mods/kate/a/000436.bmp": [
+      570,
+      65
+    ],
+    "mods/kate/a/000431.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000432.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000334.bmp": [
+      480,
+      160
+    ],
+    "mods/kate/a/000338.bmp": [
+      490,
+      98
+    ],
+    "mods/kate/a/000276.bmp": [
+      490,
+      98
+    ],
+    "mods/kate/a/000502.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000504.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000503.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000505.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000271.bmp": [
+      416,
+      804
+    ],
+    "mods/kate/a/000500.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000501.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000594.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000595.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000592.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000593.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/a/000175.bmp": [
+      682,
+      70
+    ],
+    "mods/kate/a/000362.bmp": [
+      490,
+      198
+    ],
+    "mods/kate/a/000350.bmp": [
+      455,
+      60
+    ],
+    "mods/kate/a/000345.bmp": [
+      455,
+      60
+    ],
+    "mods/kate/a/000343.bmp": [
+      455,
+      60
+    ],
+    "mods/kate/a/000259.bmp": [
+      700,
+      280
+    ],
+    "mods/kate/a/000360.bmp": [
+      490,
+      198
+    ],
+    "mods/kate/a/000346.bmp": [
+      455,
+      59
+    ],
+    "mods/kate/a/000358.bmp": [
+      490,
+      198
+    ],
+    "mods/kate/a/000356.bmp": [
+      490,
+      198
+    ],
+    "mods/kate/a/000355.bmp": [
+      490,
+      198
+    ],
+    "mods/kate/a/000311.bmp": [
+      700,
+      280
+    ],
+    "mods/kate/a/000352.bmp": [
+      490,
+      198
+    ],
+    "mods/kate/a/000351.bmp": [
+      490,
+      198
+    ],
+    "mods/kate/a/000390.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000391.bmp": [
+      800,
+      560
+    ],
+    "mods/kate/a/000331.bmp": [
+      800,
+      430
+    ],
+    "mods/kate/a/000330.bmp": [
+      328,
+      249
+    ],
+    "mods/kate/a/000388.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/a/000269.bmp": [
+      800,
+      480
+    ],
+    "mods/kate/a/000270.bmp": [
+      1000,
+      1000
+    ],
+    "mods/kate/a/000249.bmp": [
+      1200,
+      333
+    ],
+    "mods/kate/a/000389.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/r99/0005.bmp": [
+      226,
+      238
+    ],
+    "mods/kate/r99/0007.bmp": [
+      324,
+      298
+    ],
+    "mods/kate/r99/0004.bmp": [
+      187,
+      191
+    ],
+    "mods/kate/r99/0003.bmp": [
+      356,
+      156
+    ],
+    "mods/kate/r99/0001.bmp": [
+      120,
+      120
+    ],
+    "mods/kate/r99/0002.bmp": [
+      40,
+      45
+    ],
+    "mods/kate/r99/0006.bmp": [
+      416,
+      804
+    ]
+  },
+  "layouts": {}
+}

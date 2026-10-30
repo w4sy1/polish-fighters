@@ -1,0 +1,743 @@
+{
+  "padded": [
+    {
+      "asset": "mods/lf4-turbo/a/000532.bmp",
+      "before": [
+        1962,
+        250
+      ],
+      "after": [
+        1963,
+        250
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000469.bmp",
+      "before": [
+        142,
+        49
+      ],
+      "after": [
+        143,
+        49
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000461.bmp",
+      "before": [
+        326,
+        165
+      ],
+      "after": [
+        327,
+        165
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "asset": "mods/lf4-turbo/a/000604.bmp",
+      "actual": [
+        800,
+        350
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000156.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000575.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000828.bmp",
+      "actual": [
+        800,
+        500
+      ],
+      "required": [
+        1039,
+        499
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000830.bmp",
+      "actual": [
+        800,
+        300
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000619.bmp",
+      "actual": [
+        800,
+        319
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000549.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000725.bmp",
+      "actual": [
+        800,
+        409
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000634.bmp",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000635.bmp",
+      "actual": [
+        300,
+        120
+      ],
+      "required": [
+        299,
+        239
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000404.bmp",
+      "actual": [
+        328,
+        189
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000435.bmp",
+      "actual": [
+        1000,
+        405
+      ],
+      "required": [
+        1199,
+        404
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000319.bmp",
+      "actual": [
+        2559,
+        337
+      ],
+      "required": [
+        1973,
+        3379
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000497.bmp",
+      "actual": [
+        639,
+        796
+      ],
+      "required": [
+        639,
+        799
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000498.bmp",
+      "actual": [
+        639,
+        796
+      ],
+      "required": [
+        639,
+        799
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000660.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000540.bmp",
+      "actual": [
+        1430,
+        410
+      ],
+      "required": [
+        1689,
+        409
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000817.bmp",
+      "actual": [
+        3000,
+        300
+      ],
+      "required": [
+        3009,
+        300
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000513.bmp",
+      "actual": [
+        328,
+        83
+      ],
+      "required": [
+        327,
+        99
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000510.bmp",
+      "actual": [
+        144,
+        100
+      ],
+      "required": [
+        143,
+        149
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000651.bmp",
+      "actual": [
+        800,
+        259
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000689.bmp",
+      "actual": [
+        800,
+        485
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000690.bmp",
+      "actual": [
+        250,
+        570
+      ],
+      "required": [
+        249,
+        6649
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000567.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000553.bmp",
+      "actual": [
+        328,
+        166
+      ],
+      "required": [
+        327,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000518.bmp",
+      "actual": [
+        800,
+        282
+      ],
+      "required": [
+        799,
+        328
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000521.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000713.bmp",
+      "actual": [
+        800,
+        360
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000293.bmp",
+      "actual": [
+        656,
+        415
+      ],
+      "required": [
+        655,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000501.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        331
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000476.bmp",
+      "actual": [
+        1500,
+        300
+      ],
+      "required": [
+        1504,
+        300
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000798.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000800.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000787.bmp",
+      "actual": [
+        800,
+        300
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000790.bmp",
+      "actual": [
+        800,
+        300
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000839.bmp",
+      "actual": [
+        800,
+        340
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000489.bmp",
+      "actual": [
+        399,
+        399
+      ],
+      "required": [
+        799,
+        399
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000496.bmp",
+      "actual": [
+        399,
+        399
+      ],
+      "required": [
+        799,
+        399
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000805.bmp",
+      "actual": [
+        800,
+        190
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000806.bmp",
+      "actual": [
+        800,
+        270
+      ],
+      "required": [
+        713,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000809.bmp",
+      "actual": [
+        642,
+        164
+      ],
+      "required": [
+        799,
+        159
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000844.bmp",
+      "actual": [
+        1100,
+        400
+      ],
+      "required": [
+        1099,
+        699
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000845.bmp",
+      "actual": [
+        600,
+        100
+      ],
+      "required": [
+        1499,
+        699
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000846.bmp",
+      "actual": [
+        1100,
+        400
+      ],
+      "required": [
+        1099,
+        699
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000847.bmp",
+      "actual": [
+        600,
+        100
+      ],
+      "required": [
+        749,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000565.bmp",
+      "actual": [
+        490,
+        98
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000598.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000589.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000580.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000578.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000596.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000585.bmp",
+      "actual": [
+        455,
+        59
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000594.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000592.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000591.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000582.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000581.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000382.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000552.bmp",
+      "actual": [
+        328,
+        332
+      ],
+      "required": [
+        327,
+        414
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000444.bmp",
+      "actual": [
+        165,
+        326
+      ],
+      "required": [
+        271,
+        327
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000305.bmp",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        799,
+        799
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000371.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000233.bmp",
+      "actual": [
+        1200,
+        480
+      ],
+      "required": [
+        1199,
+        1319
+      ]
+    },
+    {
+      "asset": "mods/lf4-turbo/a/000344.bmp",
+      "actual": [
+        800,
+        410
+      ],
+      "required": [
+        799,
+        559
+      ]
+    }
+  ]
+}

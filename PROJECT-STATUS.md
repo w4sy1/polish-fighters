@@ -1,0 +1,376 @@
+# Dostarczenie Windows / Android Studio — 2026-10-30
+
+Nowy EXE zbudowany; pełna lokalna paczka i ZIP kodu Android Studio. Odzyskano Kate99/action390/392 (25 zasobów, oba opoint przetestowane). Pozostały2 cele Bleach. Bezpieczne przycinanie źródeł;58768 lookupów Lua bez wyjścia poza obraz.
+
+117/129 map i170/259 startów etapów OK (headless, stały aktor QA). DBZ/NTSD/część One Piece nadal eksperymentalne. Pełnych kampanii i obrazu nie potwierdzono.
+
+Python46 (45OK/1skip),Lua14/składnia83,C++6 iTCP2–8 OK. Android: konfiguracja iJava OK; lint27 błędów SDL/9 ostrzeżeń,brak.so/APK/testu telefonu.
+
+Aktualny raport: validation/maps-build-2026-10-30/REPORT.md; instrukcja Androida: ANDROID_STUDIO.md. Poniższe sekcje są historią wcześniejszych etapów.
+
+# Aktualny stan Bleach / Kate / Reinforced — 2026-10-30
+
+Usunięto blokady natywnego startu: setmetatable w historii oraz duże BMP Bleach
+(bezstratny PNG, oryginały zachowane). Poprawiono odczyt8 upakowanych deklaracji
+Bleach, pomijanie pustych źródeł i rysowanie obiektów daleko poza widokiem.
+Kate: nienumerowany transform dostał wywnioskowany numer350; inferencja zapisana.
+
+91/91 postaci przeszło natywną próbę300 klatek z kontrolą geometrii.
+91/91 przeszło po2 powtarzalne próby ze sterowaniem do900 klatek lub naturalnego
+zakończenia walki. W tych próbach nie zaobserwowano rysowania poza obrazami.
+Kate30 odwiedziła350; w8 próbach Bleach obserwowano zmianę rekordu gracza.
+To nie jest potwierdzenie wszystkich ataków, transformacji ani wyglądu.
+
+130 dawnych alarmów:99 ma klatki mieszczące się w obrazie,20 ma całkowicie puste
+źródła pomijane podczas rysowania,11 nadal ma częściowe przycięcia (6/2/3).
+Pozostają4 nieistniejące cele opoint (Bleach284/151, Kate99 dwa razy), już nieobecne
+w oryginalnych katalogach. Nie podstawiano zgadywanych obiektów ani rysunków.
+
+Testy:44 Python (43OK,1pominięty),13 zestawów LuaJIT,składnia83 plików.
+2162 fizyczne zasoby mają odświeżone SHA256 (w tym3 zachowane dodatkowe BMP).
+Istniejący własny EXE bez zmian. Bez buildu EXE/APK, publikacji i wykonania
+oryginalnych programów. Kampanie, pełna zgodność1.9c i Android niezweryfikowane.
+Raport i wznowienie: validation/native-fixes-2026-10-29/REPORT.md.
+Kopia przed zmianami: ../baseline-native-fixes-2026-10-29/.
+
+## Historia poprzedniego etapu — poniższe blokady zostały już usunięte
+
+# Zgodność Bleach / Kate / Reinforced — 2026-10-29
+
+Sprawdzono130 alarmów siatek:91 ma komplet bezpośrednich pic w granicach obrazów,
+39 ma odwołania poza obrazem (25Bleach/8Kate/6Reinforced). Dynamiczne przesunięcia,
+osiągalność klatek i wygląd nie są tym potwierdzone. Dokładne prostokąty w raporcie.
+Z5 alarmów spawn, oid0 Reinforced jest nieaktywne;4 aktywne brakujące cele istnieją
+już w oryginalnych katalogach i pozostają nierozwiązane, bez zgadywania ID.
+
+Sześć „brakujących nagrań” Bleach okazało się wyłączonymi #sound: w Kon.dat.
+Poprawiono importer; ścisły import trzech pakietów kończy się bez aktywnych braków.
+Bazy Kate/Reinforced uzupełniono współdzielonymi danymi Starterkitu zawierającego1.9c,
+z zachowaniem plików dodatków. Wymiary285/268 bazowych obrazów są zgodne z1.9.
+Dokładnej zgodności natywnej z1.9c nie potwierdzono.
+
+Przeniesiono rozpoznany patch Bleach: transformacje8000–8999 ustawiają pic_offset0
+zamiast140, przez izolowane rozszerzenie frame_rules.lua. Test rzeczywistego kodu
+Lua potwierdza zmianę rekordu, granice zakresu oraz brak wpływu na klasyczny profil.
+Kate/Reinforced mają .text/.rdata/.data identyczne zLF2v1.9.exe ze Starterkitu.
+
+Testy:40Python (39OK,1pominięty),11LuaJIT,składnia79plików;2159hashy zasobów zgodnych.
+Natywne próby na starym własnym EXE nie uruchomiły meczu: Bleach — limit pliku40MB;
+Kate/Reinforced — wcześniejszy match_history.lua i niedostępny setmetatable.
+Nie budowano EXE/APK. Nie wykonywano oryginalnych programów. Pozostałe problemy
+nie są ukończone; raport: validation/pack-compatibility-2026-10-29/REPORT.md.
+Kopie przed zmianami: ../baseline-pack-compatibility-2026-10-29/.
+
+# Polish Fighters — stan lokalny, 2026-10-29
+
+## Bleach, Kate i Reinforced — odzyskane i zaimportowane dane
+
+| Pakiet | Postacie | Obiekty | Areny | Zasoby | Ograniczenia |
+|---|---:|---:|---:|---:|---|
+| Bleach BBR 2.0a | 34 | 100 | 12 | 753 | 6 brakujących nagrań, 43 rozbieżności arkuszy, 2 odwołania spawn poza katalogiem |
+| Kate | 29 | 98 | 11 | 719 | 44 rozbieżności arkuszy, 2 odwołania spawn poza katalogiem, baza 1.9 zamiast dokładnej 1.9c |
+| Reinforced | 28 | 100 | 14 | 687 | 43 rozbieżności arkuszy, 1 odwołanie spawn poza katalogiem, baza 1.9 zamiast dokładnej 1.9c |
+
+Zakończono statyczne odzyskiwanie 356 plików danych Kate i 335 Reinforced;
+nowy tools/clickteam_legacy.py czyta starą kompresję Clickteam i sprawdza rozmiary
+oraz wspólny XOR sum rekordów. Wszystkie odzyskane pliki obu dodatków sprawdzono
+ponownie po SHA256. Pominięto programy i skrót strony autora. Bleach odzyskano
+statycznym demoleition 0.61: 1078 plików, log Molebox Pro v2.2534 i potwierdzenie
+MD5 wejścia. Oryginalnych gier ani instalatorów nie wykonywano.
+
+Kate/Reinforced wymagały brakujących danych bazowych. Z osobnego, statycznie
+odczytanego LF2 1.9 skopiowano wyłącznie brakujące ścieżki: 395 dla Kate i 386
+dla Reinforced. Nie nadpisano danych dodatków. Nie mają już braków w badanych
+odwołaniach. Ogólna instrukcja LFE dopuszcza 1.9/1.9c, ale instrukcje tych
+instalatorów wskazują 1.9c: dokładna zgodność tej bazy pozostaje niezweryfikowana.
+Instalator 1.9c pobrano, lecz ekstraktor go nie odczytał; nie użyto jego danych.
+
+Bleach zachowuje oryginalny katalog; w kopii roboczej uzupełniono brakujące
+dwukropki type w trzech rekordach (458,228,229). Braków audio nie zastąpiono
+atrapami. SOURCE.md, import-report.json, sprite-edge-repairs.json i
+asset-checksums.json opisują każdy pakiet i jego pochodzenie.
+
+Weryfikacja: rzeczywisty katalog Lua wczytał wszystkie 91 postaci, 298 obiektów
+i 37 aren z dysku. Audyty wykazały zero wartości poza int32; opisują odpowiednio
+21/33/45 etapów i 64/179/131 faz (Bleach/Kate/Reinforced), bez potwierdzenia ich
+przebiegu. Zweryfikowano SHA256 wszystkich 2159 zasobów trzech pakietów.
+Testy: 36 Python (35 zaliczonych, 1 pominięty: uprawnienia symlinków),
+10 zestawów LuaJIT, składnia 78 plików. Logi i audyty:
+validation/bleach-kate-reinforced-2026-10-29/.
+
+**Nie ukończono zgodności rozgrywki:** ruchów, własnych stanów i modyfikacji EXE,
+AI, efektów, animacji i przebiegu kampanii. Nie uruchamiano natywnej symulacji C++
+ani testów urządzeń dla tych pakietów. To importy eksperymentalne, bez nowego
+EXE/APK i bez zmian w historycznej paczce Windows. Nie oznaczają trzech gotowych,
+przetestowanych dodatków. Silnika tej tury nie zmieniano.
+
+Projekt nie ma .git. Zachowano kopie źródeł i wcześniejsze niepełne importy w
+../baseline-bleach-kate-reinforced-2026-10-29/; przegląd zmian w validation.
+
+# Polish Fighters — stan lokalny, 2026-10-28
+
+## Zakres 2, 3 i 5 — importy, kampanie i multiplayer
+
+### 2. Pozostałe pakiety
+
+Statycznie odzyskano 2879 plików danych DBZ z Enigma Virtual Box oraz osobno
+osadzony data/stage.dat i 55 plików źródłowych AI AngelScript. Nie odtwarzano
+ani nie wykonywano oryginalnego EXE/DLL. Zachowano oryginalne archiwa i katalogi.
+Importer obsługuje teraz PNG, MP3/OGG i powtarzające się separatory; jawna opcja
+aliasów BMP→istniejący PNG zachowuje kanał alfa. Braki nie są uzupełniane atrapami.
+
+| Pakiet | Import eksperymentalny | Nadal blokuje pełną zgodność |
+|---|---|---|
+| DBZ | 56 postaci, 190 obiektów, 14 aren, 2119 zasobów | bgm/stage4.wma i common/kiball_pink.png; 149 rozbieżności arkuszy; 18 odwołań spawn poza katalogiem; autorskie rozszerzenia i AI nieprzeniesione |
+| One Piece | 61 postaci, 130 obiektów, 36 aren, 1179 zasobów | cheat.bmp, cheatz.bmp, data/109.wav, nar/xit.bmp; 74 rozbieżności arkuszy; semantyka %, $, &, *, fileb nieprzeniesiona |
+| Bleach | Zachowano oryginał i katalog; sprawdzono format PE/overlay | Bieżący statyczny ekstraktor nie czyta użytego opakowania; brak pełnych danych |
+| Reinforced / Kate | Zachowano instalatory i instrukcje LF2 1.9c | Bieżący ekstraktor nie czyta tych instalatorów; nie uruchamiano instalacji |
+
+Nowe katalogi: `content-packs/dbz`, `content-packs/one-piece`; SOURCE.md,
+import-report.json i asset-checksums.json opisują pochodzenie i ograniczenia.
+Nie są dołączone do starej paczki Windows. Limit loadera w **źródłach C++**
+zwiększono do 4096 zasobów i 256 KiB manifestu; zmieniono test graniczny na
+4096/4097. Nie kompilowano tego testu ani silnika. Dotychczasowy EXE ma stary limit.
+
+### 3. Mapy i kampanie
+
+Importer rozpoznaje katalog DBZ `<stage_information>`: 24 nazwane przygody i
+wyzwania z osobnymi plikami etapów. Menu aktywnego pakietu przekazuje wybór do
+rzeczywistego ekranu Stage. Zapisano osobną ścieżkę kampanii w opcjach meczu;
+cache etapów jest rozdzielony według pliku, a brak kolejnego rozdziału kończy
+samodzielną kampanię. Standardowy LF2 zachowuje dotychczasową ścieżkę danych.
+Nagrody rozróżniają ID kampanii, zamiast mieszać rozdziały o tych samych numerach.
+
+Cztery kampanie mają autorskie warunki hidden; GUI blokuje ich start, dopóki
+nie zostanie przeniesiona ich semantyka. Pozostałe rozszerzenia DBZ (m.in. zmiany
+aren w trakcie etapu, odwołania do plików i własne reguły) nadal wymagają audytu.
+Początkową arenę indeksowano według ID katalogu; zgodność tej interpretacji z
+oryginałem wymaga testu. Nie oznacza to ukończenia kampanii ani własnej historii
+łączącej światy. One Piece zachowuje oryginalne etapy; ich przejścia niezweryfikowane.
+
+### 5. Multiplayer
+
+Usługa kont ma prywatne pokoje, zaproszenia z terminem, rozwiązywanie i odwoływanie
+kodów, kontrolę właściciela oraz heartbeat. Prywatny pokój nie jest pokazywany
+obcym kontom; uzyskanie biletu relay wymaga zaproszenia. Most gospodarza odnawia
+pokój co 25 s. Rozdzielono limity prób logowania od pozostałych operacji API.
+Migracja bazy zachowuje stare pokoje. Test HTTP→prywatne zaproszenie→relay→most
+przesyła niezmienione bajty istniejącego protokołu.
+
+**Nie ukończono:** integracji kont/relay z natywnym menu, transportu Bluetooth,
+hostingu/TLS ani fizycznych testów internetu. Usługi nie wdrażano. Dalsza praca
+jest potrzebna także w niezablokowanej integracji GUI; nie jest to zamknięcie
+całego zleconego zakresu 2/3/5.
+
+Weryfikacja: 30 testów Python (29 zaliczonych, 1 pominięty przez uprawnienia
+symlinków), 10 zestawów LuaJIT i składnia 72 plików. Nowy C++ pozostaje
+niezbudowany i niewykonany. Logi: `validation/packs-network-2026-10-28/`.
+Nie tworzono EXE/APK, instalatora, wdrożenia ani reguł zapory. Kopie zmienianych
+źródeł: `../baseline-packs-network-2026-10-28/`.
+
+## Układy dotykowe i wpisywanie kodu na Androidzie — 2026-10-26
+
+Zaimplementowano wybór `Ustawienia → Układ dotykowy`: Klasyczny LF lub
+Nowoczesny joystick. Dostępny także w `Dodatki → Sterowanie dotykowe`.
+Klasyczny: cztery kierunki na krzyżaku i dokładnie trzy przyciski Skok/Blok/Atak.
+Nowoczesny: joystick z dotychczasowym impulsem biegu, atak po puszczeniu palca,
+przeciągnięcie wybiera kierunek, dodatkowe przyciski kombinacji pokazują się tylko,
+gdy postać je obsługuje. Gest przekłada się na istniejące wejścia kierunku i ataku,
+nie zmienia balistyki ani nie dodaje swobodnego celowania pociskiem pod dowolnym
+kątem. Podgląd wskazuje ten sam jeden z czterech kierunków co rzeczywiste wejście.
+
+Układ zapisuje się w istniejących opcjach; stare `digipad` jest migrowane.
+Zmiany układu, rozmiaru, położenia i przezroczystości odświeżają nakładkę bez
+restartu gry. Gesty są anulowane po pauzie, ukryciu lub zmianie geometrii okna;
+palec trzymany przez pauzę nie staje się nowym atakiem po wznowieniu.
+Zachowano normalne wejścia klawiatury/padów i protokół sieciowy.
+
+Ekran odblokowania ma pole kodu, zatwierdzanie, obsługę tekstu z systemowej
+klawiatury i błędnego kodu. Wywołuje istniejące `context.text_input`;
+`polishfighters` oraz szybki przycisk pozostają dostępne. Klawiatura jest zamykana
+po zatwierdzeniu/anulowaniu lub wybraniu innej czynności. Nie zweryfikowano jeszcze
+wyglądu konkretnej klawiatury Androida ani jej współpracy z oknem na telefonie.
+
+Weryfikacja: 9 zestawów LuaJIT, składnia 68 plików; testy przełącznika w rzeczywistym
+skrypcie menu, migracji/zapisu, multitouch, próbkowania ataku co drugą klatkę,
+anulowania gestów i wpisywania kodu. Podglądy poleceń renderera Lua (font podglądu
+Arial, nie natywny bitmapowy): `preview/touch-classic.png`, `preview/touch-modern.png`.
+Obejrzano oba podglądy. To nie zrzuty z uruchomionej gry.
+Bez builda EXE/APK i bez zmian zapory. Kopie: `../baseline-touch-layouts-2026-10-26/`.
+
+## Etap przy pozostałych 5%: postęp i nagrody za przygodę
+
+Dodano `progression.lua` oraz `progression_network.lua`, zarejestrowano je w
+manifeście i podłączono do istniejącej kroniki, zakończenia meczu i polityki rosteru.
+Pierwsze ukończenie rozdziału lokalnego trybu Stage przez uczestniczącego gracza
+odblokowuje kolejną ukrytą postać w kolejności katalogu danego pakietu.
+Rozdział to grupa etapów 0–9, 10–19 itd.; zapisywany jest etap sprzed przejścia
+silnika do następnej grupy. Jedna nagroda na rozdział i pakiet; ponowne przejście
+nie służy do zdobywania kolejnych nagród. Brak nagród za porażki, demo, powtórki,
+rozgrywkę bez człowieka oraz mecze sieciowe.
+
+Postęp i historia zapisują się w jednym wywołaniu istniejącego magazynu ustawień.
+Nieudany zapis nie daje odblokowania. Stan odblokowań jest pamiętany w cache
+poza symulacją i odświeżany po udanym zapisie. Lokalne nagrody są zawieszone
+w sesjach sieciowych, aby nie różnicować rosterów klientów. Jawne ograniczenia
+`allowed_ids` i istniejące funkcje/kody pozostają zachowane.
+
+Menu Odblokowanie postaci → Postęp przygody i nagrody pokazuje liczbę ukończonych
+rozdziałów i następną nagrodę. Przyznana postać jest widoczna w szczegółach wpisu
+kroniki. To odblokowanie istniejącej zawartości, nie deklaracja jej zgodności
+ani implementacja nowej wieloświatowej kampanii. Przy braku kolejnych ukrytych
+postaci rozdział nadal liczy się jako ukończony.
+
+Weryfikacja: 7 zestawów LuaJIT zaliczonych; składnia 68 plików poprawna.
+Testy obejmują przyznawanie i brak wielokrotnych nagród, rozdzielenie pakietów,
+błędy zapisu, ograniczenia rosteru, zawieszenie sieciowe oraz rzeczywiste
+wywołanie rozszerzenia zakończenia meczu z kontrolowanym stanem.
+Log: `validation/content-work/progression-lua-tests.log`.
+Nie budowano EXE/APK; nie zweryfikowano nowego meczu na fizycznym urządzeniu.
+Kopie sprzed zmian: `../baseline-progression/`.
+
+## Mały etap przy pozostałym limicie: kronika i kod postaci
+
+Dodano `polish-fighters/chronicle.lua` i rozszerzenie `match_history.lua`,
+zarejestrowane w manifeście pakietu. Zakończenie meczu dopisuje do ustawień
+lokalnych maksymalnie 50 wpisów: kolejny numer, profil dodatku, tryb, flagę
+sieci, arenę/etap, zwycięską drużynę, liczbę klatek, wybrane postacie i statystyki.
+Pokazy, powtórki i niedokończone mecze nie są wpisywane. Nie zapisuje haseł,
+adresów IP ani fikcyjnych dat; numer wpisu określa kolejność. Księgowanie jest
+poza synchronizowanymi tabelami symulacji. Błędy zapisu są dostępne w menu historii.
+
+Menu Dodatki ma ekrany Historia rozgrywek oraz Odblokowanie postaci. Na ekranie
+odblokowania można wpisać `polishfighters` lub użyć przycisku dotykowego.
+Kod ustawia istniejącą opcję `unlock_characters`, zapisuje ją i odblokowuje ukryte
+postacie dostępnego rosteru. Zachowuje jawne ograniczenia `allowed_ids`, nie
+instaluje dodatków, nie naprawia niezgodnych postaci i nie zmienia zasad sieci.
+Dotychczasowy kod `lf2.net` pozostaje dostępny na dotychczasowych zasadach.
+
+Testy: 6 zestawów LuaJIT oraz składnia 66 plików. Sprawdzono limit historii,
+ochronę innych ustawień, błąd zapisu, jednokrotny wpis po zakończeniu,
+pomijanie powtórek/pokazów, ekran pustej historii i kod odblokowania.
+Nie zbudowano EXE/APK i nie wykonano nowego meczu na urządzeniu.
+To pierwszy działający w testach element kroniki; nie obejmuje jeszcze
+odblokowań za kampanie, wspólnej przygody, synchronizacji kont ani pełnych powtórek.
+Kopie sprzed zmian: `../baseline-chronicle/`.
+
+## Aktualny zakres użytkownika: źródła i zawartość, bez budowania
+
+### Kontynuacja z wklejonego polecenia — 2026-10-25
+
+Nie uruchamiano CMake, Gradle, kompilatora ani nowego builda gry. Nie zmieniano
+zapory, nie publikowano ani nie uruchamiano obcych plików EXE. Do lokalnego
+środowiska testowego pobrano gotowe koło `lupa 2.8`, używające LuaJIT 2.1.
+
+| Obszar | Zmiana źródeł / dowód | Pozostaje |
+|---|---|---|
+| Postacie | Audyt LF4 i NTSD obejmuje grafy klatek, kombinacje, stany i przywołania | Pełna implementacja/zgodność ruchów i przemian nieukończona |
+| LF4 | 32 postacie, 12 aren, 26 deklaracji etapów; 58 odwołań opoint do ID poza katalogiem | Ustalić semantykę tych odwołań, nie podstawiać przypadkowych obiektów |
+| NTSD | 42 postacie, 17 aren, 25 deklaracji etapów; 364 wartości poza int32 | Ustalić semantykę oryginalnego CRT i naprawy arkuszy |
+| Przegląd pakietu | Menu czyta rzeczywiste postacie i etapy aktywnego profilu, ma strony i obsługę błędów; aktywny NTSD oznaczany poprawnie | Aktywacja innych profili, walidacja i mieszanie ID |
+| Sterowanie | Wykrywanie powtórzeń przypisań w zestawie, odmowa nadpisania ustawień; edytor pozostaje otwarty po błędzie | Ostrzeżenia o współdzieleniu urządzeń, pełny edytor wszystkich parametrów |
+| Dotyk | GUI: rozmiar, przesuwanie przycisków, przezroczystość i reset układu; zapis używany przez rysowanie | Ręczna ocena ergonomii i położenia na telefonie |
+| Języki | Polski rozszerzony z 77 do 178 wpisów; audyt kluczy i parametrów, zero błędów formatowania | Wszystkie wymagane języki nadal nie są kompletne; sześć słowników jeszcze nie istnieje |
+| Konta | Odzyskanie dostępu jednorazowym kodem, rotacja kodu i unieważnianie sesji/pokoju | Integracja z menu, ustanowienie kodów dla starszych kont |
+| Relay | Bilety host/join, ograniczone kanały, transparentny TCP; most zachowuje istniejący protokół | Hosting/TLS, integracja natywna i GUI, zaproszenia, fizyczne testy internetu |
+| Bluetooth | Bez zmian transportu w tej kontynuacji | Nadal niezaimplementowany; wcześniejsze deklaracje uprawnień to tylko przygotowanie |
+| Pozostałe mody | Zachowane źródła i wcześniejsze raporty braków | Import/odtworzenie zasobów i obsługa modyfikacji EXE |
+
+Dowody: `validation/content-work/`. Testy Python: 22 uruchomione, 21 zaliczonych,
+1 pominięty (uprawnienia symlinków). Pięć zestawów LuaJIT i składnia 64 plików:
+zaliczone. Testy obejmują rzeczywisty HTTP localhost, parowanie relay i przesyłanie
+ponad 100 KiB przez most; nie uruchamiają meczu gry przez internet. Test menu
+wykonuje skrypty z kontrolowanym wejściem i atrapą renderera, nie ocenia obrazu.
+
+**Nie ma nowego potwierdzenia działania gry na urządzeniu.** Nowe źródła nie są
+w historycznej paczce EXE. Zakres całości pozostaje otwarty, bez deklaracji, że
+postacie, kampanie, Bluetooth lub wszystkie języki zostały ukończone.
+Kopie zmienianych źródeł: `../baseline-source-continuation/`.
+
+Użytkownik wstrzymał nowe buildy EXE/APK. Priorytet: kompletne postacie, areny,
+kampanie i wygląd LF4, Naruto oraz pozostałych dodatków; pakiety, sterowanie,
+języki, konta, Bluetooth i pokoje internetowe. Poniższy build Windows jest
+historycznym wynikiem; nie zawiera zmian tego etapu.
+
+W tym etapie dodano:
+
+- `tools/audit_content.py`: odczyt manifestów, postaci i klatek, aren, kampanii,
+  brakujących zasobów i wartości całkowitych poza zakresem. Raporty:
+  `validation/content-work/ntsd.json` i `lf4-turbo.json`. Naruto: 42 postacie,
+  364 wartości poza int32; LF4: 32 postacie, zero takich wartości. To audyt
+  danych, nie potwierdzenie kompletności ruchów ani kampanii.
+- `tools/account_service.py`: lokalna usługa rejestracji/logowania/wylogowania,
+  hasła scrypt, wygasające tokeny, katalog pokoi z odnawianiem ogłoszeń,
+  autoryzacja właściciela. Pięć testów, w tym HTTP na localhost, zaliczonych.
+  Brak wdrożenia HTTPS, integracji GUI, relay/NAT, zaproszeń i synchronizacji.
+- Android: deklaracje Bluetooth oraz metoda żądania uprawnień w Activity.
+  Brak spięcia z menu i transportu. Nie wykonano kompilacji ani testu Androida.
+- `tools/configure_firewall.ps1`: jawna konfiguracja/usuwanie reguły TCP LAN
+  dla konkretnego EXE, Private/LocalSubnet. Sprawdzono tylko `-WhatIf`;
+  zapora systemowa nie została zmieniona.
+- Menu map: stronicowanie po osiem aren; zmiana kodu Lua bez nowego builda
+  i bez potwierdzenia jej wykonania w silniku.
+
+Dokumentacja API i ograniczeń: `docs/ACCOUNT_SERVICE.md`. Kopie sprzed zmian
+manifestu, menu i statusu: `../baseline-content-work/`. Repozytorium nadal
+nie ma Git; brak commitów i publikacji.
+
+**Cały zamówiony zakres pozostaje nieukończony.** Nie dokończono postaci ani
+kampanii LF4/Naruto, nie zaimportowano pozostałych modów i nie dodano pełnych
+tłumaczeń/nowego sterowania. Następna praca zawartości: ustalenie interpretacji
+364 wartości Naruto oraz naprawy arkuszy, potem zgodność stanów, ciosów,
+przemian i kampanii. Nie zawijać/przycinać liczb bez dowodu zachowania.
+
+## Gotowe lokalne wydanie testowe Windows x64
+
+Folder: `engine/out/PolishFighters-Windows-x64-portable`.
+Uruchom `Graj-LF2.cmd` albo `Graj-LF4-Turbo.cmd`. W paczce są własny silnik, biblioteki DLL, dane LF2 v2.0a, skrypty i izolowany pakiet LF4. Python nie jest potrzebny do grania. Ustawienia obu profili są rozdzielone. Nie tworzono instalatora systemowego ani publicznego release.
+
+Budowa: MSVC 2022, C++23, CMake/Conan. Wszystkie zależności zbudowane/pobrane w lokalnym cache; poprawiono przepis LuaJIT, aby używał zgodnego CRT /MD. Końcowe linkowanie nie zgłasza konfliktu LNK4098. FreeType pobrano z mirrora z kontrolą oryginalnego SHA-256. Polecenia i granice: `BUILD_WINDOWS.md`.
+
+## Weryfikacja Windows
+
+- 5 natywnych testów C++: reguły pokoju, poprzedni transport TCP, parser Tigera, loader skryptów oraz limit zasobów 2048/2049.
+- 3 zestawy testów Lua: roster, losowanie i model dodatków.
+- Python: 9 zaliczonych, 1 pominięty z powodu braku uprawnienia Windows do tworzenia symlinków.
+- TCP: 2–8 osobnych klientów po 30 klatek, przerwanie po rozłączeniu, timeout i niedozwolonym poleceniu klienta.
+- 11 scenariuszy menu i klasycznej walki.
+- LF4: 32/32 postacie po 300 klatek symulacji.
+- Mecze 2–8 osobnych procesów gry po 120 klatek, zgodne końcowe skróty stanu.
+- Lobby → wybór postaci → mecz: 2 i 8 procesów.
+- LF4 w pokoju: 2 i 8 procesów; celowa desynchronizacja: sesja przerwana.
+- Oba profile przeszły osobny test z danych gotowej paczki i obcego katalogu roboczego.
+- 975/975 zasobów LF4 w paczce ma sumy zgodne z manifestem.
+
+Logi i JSON: `validation/windows-native/`. Są to automatyczne testy bez okna, na jednym laptopie. Nie potwierdzają obrazu, sterowania, dźwięku z głośników, pełnych ciosów/kampanii ani ośmiu fizycznych urządzeń. Historyczne dowody Linux z Work zachowano w dotychczasowych katalogach.
+
+## Dodatki
+
+Archiwa w `../downloads/`; rozpakowane pliki w `../games/`. Dokładne źródła i sumy początkowych plików: `validation/windows-2026-10-25/downloads.json`; dodatkowe wydanie NTSD: `validation/windows-native/ntsd-download.json`.
+
+| Dodatek | Stan |
+|---|---|
+| LF2 v2.0a | W lokalnej paczce; oficjalny instalator zgodny SHA-256; dane czytane bez instalowania go |
+| LF4 Turbo | Działający profil testowy; 32/32 smoke, pełna zgodność ciosów i kampanii nadal niezweryfikowana |
+| Naruto NTSD 2.4_2.0a | Zaimportowano 42 postacie, 137 obiektów, 17 aren i 1121 zasobów. Eksperymentalny: tylko 13/42 smoke zaliczonych. Główna przeszkoda: liczby poza zakresem 32-bitowym; 31 rozbieżności arkuszy. Nie jest w paczce do grania |
+| NTSD 2.4 — pierwsze pobrane wydanie | 152 brakujące pliki katalogowe; zachowane osobno |
+| R-LF2 / Kate | Archiwa poprawne; instalatory wymagają LF2 1.9c według instrukcji. Nie uruchamiano instalatorów |
+| DBZ 0.6.9 hotfix | Archiwum poprawne; inspekcja wskazuje 204 brakujące pliki katalogowe; nie jest gotowym pakietem danych do importu |
+| One Piece Legends of Sea 2.1X | Archiwum poprawne; katalog zawiera znaczniki %, $, &, * wymagające osobnego audytu. Nie usuwano ich automatycznie |
+| Bleach Bankai Revolution 2.0a | Archiwum poprawne; zasoby nie są udostępnione jako pełny zwykły katalog. Nie uruchamiano EXE |
+
+Pobranie i rozpakowanie oryginalnych modów nie oznacza potwierdzenia ich działania na Windowsie. Nie uruchamiano obcych EXE/DLL. Wykonano własny, skompilowany silnik projektu.
+
+## Poprzedni plan — zastąpiony powyższym zakresem
+
+1. Sprawdzić rzeczywiste okno gry Windows, obraz, sterowanie i audio; następnie pełne ciosy, przemiany i kampanię LF4.
+2. Ustalić zachowanie liczb poza 32 bitami w oryginalnym NTSD; nie przycinać ani nie zawijać ich bez dowodu. Dokończyć zgodność i testy Naruto przed dołączeniem profilu.
+3. Zbudować APK. Na dysku są JBR/SDK/android-35/CMake i NDK 29.x; obecny skrypt Androida jest dla Linuxa i wymaga NDK 28.2.13676358. APK ani testów telefonu jeszcze nie wykonano.
+4. Testy fizycznego LAN/Wi-Fi/hotspot i zgodności ARM/x64; potem Bluetooth, pokoje online i zaproszenia.
+5. Usługa kont/synchronizacji, wybór profilu w aplikacji, bezpieczne mapowanie ID do mieszania modów, rozbudowa sterowania i tłumaczeń.
+
+## Zakres zmian i punkt przywracania
+
+Odzyskana baza 0.6: czat „Little Fighter dodatki” (`6adcabde-96f0-83eb-a40d-e86a777d6d78`). Oryginalny ZIP pozostaje w Pobranych. Dodatkowe kopie zmienianych plików są w `../baseline-windows-build/`. Paczka źródłowa nie ma historii Git; użyto porównań `git diff --no-index` i porównania z oryginalnym archiwum.
+
+Kontynuacja obejmuje pełny build Windows, testy lokalne, poprawkę CRT, rozszerzenie ograniczonego loadera do 2048 zasobów wraz z testem granicznym, eksperymentalny import Naruto oraz narzędzia i dokumentację. Nie usuwano istniejących funkcji. Brak commitów, pushów, publikacji i zmian w projekcie Prestige Tech. Cały projekt gry nadal nie jest ukończony.

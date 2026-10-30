@@ -1,0 +1,346 @@
+{
+  "padded": [],
+  "unresolved": [
+    {
+      "asset": "mods/ntsd/a/000376.bmp",
+      "actual": [
+        328,
+        669
+      ],
+      "required": [
+        327,
+        829
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000260.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000379.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        331
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000252.bmp",
+      "actual": [
+        713,
+        540
+      ],
+      "required": [
+        704,
+        654
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000307.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000232.bmp",
+      "actual": [
+        713,
+        540
+      ],
+      "required": [
+        704,
+        654
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000259.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000454.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000530.bmp",
+      "actual": [
+        669,
+        490
+      ],
+      "required": [
+        663,
+        563
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000890.bmp",
+      "actual": [
+        800,
+        484
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000285.bmp",
+      "actual": [
+        810,
+        405
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000937.bmp",
+      "actual": [
+        804,
+        952
+      ],
+      "required": [
+        803,
+        1087
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000235.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000470.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000222.bmp",
+      "actual": [
+        549,
+        496
+      ],
+      "required": [
+        545,
+        665
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000229.bmp",
+      "actual": [
+        489,
+        197
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000411.bmp",
+      "actual": [
+        772,
+        365
+      ],
+      "required": [
+        1205,
+        361
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000683.bmp",
+      "actual": [
+        312,
+        578
+      ],
+      "required": [
+        311,
+        671
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000254.bmp",
+      "actual": [
+        714,
+        541
+      ],
+      "required": [
+        704,
+        654
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000472.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000467.bmp",
+      "actual": [
+        455,
+        61
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000465.bmp",
+      "actual": [
+        455,
+        61
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000476.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000473.bmp",
+      "actual": [
+        455,
+        59
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000474.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000477.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000469.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000468.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000423.bmp",
+      "actual": [
+        328,
+        166
+      ],
+      "required": [
+        327,
+        497
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000215.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/ntsd/a/000216.bmp",
+      "actual": [
+        321,
+        84
+      ],
+      "required": [
+        319,
+        319
+      ]
+    }
+  ]
+}

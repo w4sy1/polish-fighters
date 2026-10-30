@@ -1,0 +1,7 @@
+id=visual-check
+version=1
+api=1
+requires=base@1
+requires=polish-fighters@1
+requires=lf4-turbo@1
+extend=base/ui/flow|flow.lua

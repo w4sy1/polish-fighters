@@ -1,0 +1,103 @@
+{
+  "name": "Polish Fighters",
+  "version": "0.6.0-integrated-room",
+  "engine_commit": "5b23d37f052174991fa2b5d7baa3d6194f7efd5e",
+  "target_players": 8,
+  "platforms": [
+    "android",
+    "windows"
+  ],
+  "planned_languages": [
+    "pl",
+    "en",
+    "ja",
+    "de",
+    "fr",
+    "ru",
+    "es",
+    "ko",
+    "it"
+  ],
+  "implemented_languages": [
+    "partial-pl",
+    "en",
+    "de",
+    "zh"
+  ],
+  "transports": {
+    "direct_tcp": "upstream: two endpoints, four slots each",
+    "wifi_hotspot": "LAN room integrated; physical Wi-Fi/hotspot tests pending",
+    "eight_devices": "Integrated lobby, character selection and simulation; 2..8 real Linux processes tested, physical-device and ARM/x64 tests pending",
+    "bluetooth": "not implemented"
+  },
+  "packs": [
+    {
+      "id": "lf2-classic",
+      "status": "working, requires base data installer"
+    },
+    {
+      "id": "lf4-turbo",
+      "status": "32/32 fighters passed 300-frame smoke on own Linux and Windows engines; exhaustive moves/campaign checks pending"
+    },
+    {
+      "id": "reinforced",
+      "status": "experimental; current Windows build smoke passed; map/stage warmups and limitations in validation/maps-build-2026-10-30/REPORT.md"
+    },
+    {
+      "id": "kate",
+      "status": "experimental; current Windows build smoke passed; map/stage warmups and limitations in validation/maps-build-2026-10-30/REPORT.md"
+    },
+    {
+      "id": "ntsd",
+      "status": "experimental import from NTSD 2.4_2.0a; 13/42 passed Windows smoke; not in playable package; integer-range compatibility audit pending"
+    },
+    {
+      "id": "dbz",
+      "status": "experimental data import: 56 fighters, 14 arenas, 24 campaign descriptors, 2119 assets; 2 missing resources; no gameplay verification"
+    },
+    {
+      "id": "one-piece",
+      "status": "experimental data import: 61 fighters, 36 arenas, 1179 assets; 4 missing resources; EXE extensions not emulated"
+    },
+    {
+      "id": "bleach",
+      "status": "experimental; current Windows build smoke passed; map/stage warmups and limitations in validation/maps-build-2026-10-30/REPORT.md"
+    },
+    {
+      "id": "polish-originals",
+      "status": "not_imported"
+    }
+  ],
+  "integration": {
+    "bundled_extension": "engine/scripts/polish-fighters",
+    "android_application_id": "pl.prestigetech.polishfighters",
+    "native_build": "Linux x86_64 and Windows x64 built locally; Android APK pending",
+    "runtime_gameplay": "headless: classic and restricted matches, 300 frames each, two deterministic runs per case"
+  },
+  "dashboard": {
+    "style": "original LF2 + classic extras",
+    "authentication": "not connected"
+  },
+  "minimum_devices": 2,
+  "maximum_devices": 8,
+  "ui_style": "original LF2 with separate classic-style extras",
+  "last_validation": "2026-10-25",
+  "native_build": {
+    "platform": "Linux x86_64 and Windows x64",
+    "status": "complete engines built locally",
+    "details": "BUILD_LOCAL.md",
+    "android_apk": false,
+    "windows_exe": true,
+    "windows_details": "BUILD_WINDOWS.md",
+    "windows_validation": "validation/windows-native"
+  },
+  "source_work": {
+    "date": "2026-10-30",
+    "new_game_build": true,
+    "native_package_limits": "Windows built and tested:4096 assets,256KiB manifest; Android native build pending",
+    "campaigns": "DBZ campaign selection and separate stage sources; author rules incomplete",
+    "multiplayer": "private-room invitations and heartbeat tested locally; native GUI, Bluetooth and hosting pending",
+    "pack_validation": "validation/maps-build-2026-10-30/REPORT.md",
+    "android_studio": "Java compiled; native ARM libraries/APK pending; lint27 upstream errors"
+  }
+}

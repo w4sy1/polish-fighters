@@ -1,0 +1,336 @@
+{
+  "pack_id": "one-piece",
+  "fighters": [
+    {
+      "id": 99,
+      "name": "TrainingBot",
+      "path": "data/dugong.dat"
+    },
+    {
+      "id": 1,
+      "name": "Luffy",
+      "path": "data/luff.dat"
+    },
+    {
+      "id": 70,
+      "name": "LuffyG2",
+      "path": "data/second.dat"
+    },
+    {
+      "id": 2,
+      "name": "Zoro",
+      "path": "data/zoro.dat"
+    },
+    {
+      "id": 3,
+      "name": "Nami",
+      "path": "data/nam.dat"
+    },
+    {
+      "id": 4,
+      "name": "Usopp",
+      "path": "data/usopp.dat"
+    },
+    {
+      "id": 5,
+      "name": "Sanji",
+      "path": "data/sanji.dat"
+    },
+    {
+      "id": 0,
+      "name": "Chopper",
+      "path": "data/chopper.dat"
+    },
+    {
+      "id": 13,
+      "name": "Robin",
+      "path": "data/nico.dat"
+    },
+    {
+      "id": 6,
+      "name": "Franky",
+      "path": "data/franky.dat"
+    },
+    {
+      "id": 8,
+      "name": "Brook",
+      "path": "data/brook.dat"
+    },
+    {
+      "id": 82,
+      "name": "Vivi",
+      "path": "data/vivi.dat"
+    },
+    {
+      "id": 15,
+      "name": "Ace",
+      "path": "data/asce.dat"
+    },
+    {
+      "id": 10,
+      "name": "Marco",
+      "path": "data/marco.dat"
+    },
+    {
+      "id": 19,
+      "name": "Ivankov",
+      "path": "data/ivankov.dat"
+    },
+    {
+      "id": 29,
+      "name": "Law",
+      "path": "data/law.dat"
+    },
+    {
+      "id": 89,
+      "name": "Kuma",
+      "path": "data/kuma.dat"
+    },
+    {
+      "id": 16,
+      "name": "Buggy",
+      "path": "data/buggy.dat"
+    },
+    {
+      "id": 11,
+      "name": "BoaHancock",
+      "path": "data/boa.dat"
+    },
+    {
+      "id": 27,
+      "name": "GeckoMoria",
+      "path": "data/moria.dat"
+    },
+    {
+      "id": 18,
+      "name": "Jinbe",
+      "path": "data/jinbe.dat"
+    },
+    {
+      "id": 17,
+      "name": "Crocodile",
+      "path": "data/crocodile.dat"
+    },
+    {
+      "id": 88,
+      "name": "Bon-chan",
+      "path": "data/bon.dat"
+    },
+    {
+      "id": 60,
+      "name": "Rayleigh",
+      "path": "data/silver.dat"
+    },
+    {
+      "id": 9,
+      "name": "Mihawk",
+      "path": "data/mihawk.dat"
+    },
+    {
+      "id": 21,
+      "name": "Smoker",
+      "path": "data/smo.dat"
+    },
+    {
+      "id": 14,
+      "name": "Kizaru",
+      "path": "data/kiza.dat"
+    },
+    {
+      "id": 20,
+      "name": "Aokiji",
+      "path": "data/aokiji.dat"
+    },
+    {
+      "id": 54,
+      "name": "Akainu",
+      "path": "data/akainu.dat"
+    },
+    {
+      "id": 81,
+      "name": "Fujitora",
+      "path": "data/fuji.dat"
+    },
+    {
+      "id": 80,
+      "name": "Coby",
+      "path": "data/coby.dat"
+    },
+    {
+      "id": 22,
+      "name": "X-Drake",
+      "path": "data/drake.dat"
+    },
+    {
+      "id": 73,
+      "name": "DrakeRex",
+      "path": "data/xrex.dat"
+    },
+    {
+      "id": 28,
+      "name": "EustassKid",
+      "path": "data/kid.dat"
+    },
+    {
+      "id": 83,
+      "name": "Caribou",
+      "path": "data/caribou.dat"
+    },
+    {
+      "id": 7,
+      "name": "Kuro",
+      "path": "data/kuro.dat"
+    },
+    {
+      "id": 12,
+      "name": "Arlong",
+      "path": "data/arlong.dat"
+    },
+    {
+      "id": 85,
+      "name": "Hody_Jones",
+      "path": "data/hody.dat"
+    },
+    {
+      "id": 23,
+      "name": "RobLucci",
+      "path": "data/lucci.dat"
+    },
+    {
+      "id": 72,
+      "name": "Luccipard",
+      "path": "data/leop.dat"
+    },
+    {
+      "id": 24,
+      "name": "Kaku",
+      "path": "data/kaku.dat"
+    },
+    {
+      "id": 71,
+      "name": "KakuGiraffe",
+      "path": "data/girafa.dat"
+    },
+    {
+      "id": 25,
+      "name": "Enel",
+      "path": "data/enel.dat"
+    },
+    {
+      "id": 86,
+      "name": "Baby5",
+      "path": "data/baby.dat"
+    },
+    {
+      "id": 84,
+      "name": "Perona",
+      "path": "data/perona.dat"
+    },
+    {
+      "id": 87,
+      "name": "Bartolomeo",
+      "path": "data/barto.dat"
+    },
+    {
+      "id": 30,
+      "name": "Marine",
+      "path": "data/marine.dat"
+    },
+    {
+      "id": 31,
+      "name": "MarineRifle",
+      "path": "data/mariner.dat"
+    },
+    {
+      "id": 32,
+      "name": "Doge",
+      "path": "data/dog.dat"
+    },
+    {
+      "id": 33,
+      "name": "Pirate",
+      "path": "data/megap.dat"
+    },
+    {
+      "id": 34,
+      "name": "PirateGun",
+      "path": "data/megapg.dat"
+    },
+    {
+      "id": 39,
+      "name": "Pirate",
+      "path": "data/pirm.dat"
+    },
+    {
+      "id": 35,
+      "name": "ViceAdmiral",
+      "path": "data/alm.dat"
+    },
+    {
+      "id": 36,
+      "name": "ViceAdmiral",
+      "path": "data/alm.dat"
+    },
+    {
+      "id": 37,
+      "name": "PX4",
+      "path": "data/pacifista.dat"
+    },
+    {
+      "id": 53,
+      "name": "Magellan",
+      "path": "data/magellan.dat"
+    },
+    {
+      "id": 52,
+      "name": "Shirohige",
+      "path": "data/shirohige.dat"
+    },
+    {
+      "id": 55,
+      "name": "Shanks",
+      "path": "data/shanks.dat"
+    },
+    {
+      "id": 51,
+      "name": "Teach",
+      "path": "data/teach.dat"
+    },
+    {
+      "id": 50,
+      "name": "Doflamingo",
+      "path": "data/doflamingo.dat"
+    },
+    {
+      "id": 38,
+      "name": "SpoilerMan",
+      "path": "data/spoiler.dat"
+    }
+  ],
+  "objects": 130,
+  "backgrounds": 36,
+  "assets": 1179,
+  "source_catalog_sha256": "7b03bc77b6a0facbc7e6befb653c0f5b8a76bc28ae5e18f173a1004fa3cde407",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "png_aliases": {},
+  "catalog_markers_not_emulated": [
+    "%",
+    "$",
+    "&",
+    "*"
+  ],
+  "custom_catalog_labels": [
+    "id: 231  type: 3  fileb: data\\ace_b.dat"
+  ],
+  "missing_resources": [
+    "cheat.bmp",
+    "cheatz.bmp",
+    "data/109.wav",
+    "nar/xit.bmp"
+  ],
+  "experimental": true,
+  "sprite_edge_repairs": 0,
+  "unresolved_sprite_sheets": 74
+}

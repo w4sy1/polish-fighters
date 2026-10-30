@@ -1,0 +1,9 @@
+[
+  {
+    "asset": "assets/a/000965.dat",
+    "change": "x: - 250 -> x: -250",
+    "scope": "numeric spelling only; same signed value",
+    "before_sha256": "c7ba49cc76a9ce2e9502058e2ede92584e757b3c47d786b243b495c714ba37d4",
+    "after_sha256": "7fd221213638558c3039e8d6221748ab07ded974eb559f9568441d50f972e830"
+  }
+]

@@ -1,0 +1,140 @@
+{
+  "archive_sha256": "e71fdc5332eb88b2eb9dd5414909cb84c8809c84957e59c076ff4af2d88ab7b8",
+  "author_page": "https://hcyang1227.blogspot.com/2019/11/lf2-kate.html",
+  "version": "Author V1.00, LF2_Kate_Ver2",
+  "id": 99,
+  "kind": 0,
+  "actions": [
+    390,
+    392
+  ],
+  "assets": [
+    {
+      "source": "sprite/sys/pkm_f.bmp",
+      "source_sha256": "ea0a6557e71709244d5a4c32caf18684a7469927d3500202b9ae2336b7d5a3c6",
+      "output_sha256": "ea0a6557e71709244d5a4c32caf18684a7469927d3500202b9ae2336b7d5a3c6"
+    },
+    {
+      "source": "sprite/sys/pkm_s.bmp",
+      "source_sha256": "ea7e020721e8a8f5e0b2146ef0b0a1f0f73f85271f032312d8cbf8b09bf9295d",
+      "output_sha256": "ea7e020721e8a8f5e0b2146ef0b0a1f0f73f85271f032312d8cbf8b09bf9295d"
+    },
+    {
+      "source": "sprite/kate/nintales.bmp",
+      "source_sha256": "2ac9c3a22fe344de67f7ce523cb7798544850754671936d8de110d61dac5fd03",
+      "output_sha256": "2ac9c3a22fe344de67f7ce523cb7798544850754671936d8de110d61dac5fd03"
+    },
+    {
+      "source": "sprite/kate/electrode.bmp",
+      "source_sha256": "87bdcf96230fc31a0d170593243042748fa8179c250e8338c038c4d2154fc190",
+      "output_sha256": "87bdcf96230fc31a0d170593243042748fa8179c250e8338c038c4d2154fc190"
+    },
+    {
+      "source": "sprite/kate/dragonair.bmp",
+      "source_sha256": "9c505177e41d43538ba5c9eb5440283d2220f4eaad155144cb377c4894b4b396",
+      "output_sha256": "9c505177e41d43538ba5c9eb5440283d2220f4eaad155144cb377c4894b4b396"
+    },
+    {
+      "source": "sprite/sys/sorcerer_articuno.bmp",
+      "source_sha256": "9fb19c63a9f639e6b69b2f7dcc907e935584655c1b758de9ce7409d1efc3e907",
+      "output_sha256": "9fb19c63a9f639e6b69b2f7dcc907e935584655c1b758de9ce7409d1efc3e907"
+    },
+    {
+      "source": "sprite/kate/dragonite.bmp",
+      "source_sha256": "bc7231ab59068e8bbc653312d868dd6743c05d218d97cac57b10f038821c9b28",
+      "output_sha256": "bc7231ab59068e8bbc653312d868dd6743c05d218d97cac57b10f038821c9b28"
+    },
+    {
+      "source": "data/003.wav",
+      "source_sha256": "74885981a2003f1bc1c7f2cd22493c47c4b8059088aeffaed652eeef996f9c7a",
+      "output_sha256": "74885981a2003f1bc1c7f2cd22493c47c4b8059088aeffaed652eeef996f9c7a"
+    },
+    {
+      "source": "data/004.wav",
+      "source_sha256": "4b501f67bec53f364530e041012faa40334e7f4f0f82088b6b7caa472c2207ac",
+      "output_sha256": "4b501f67bec53f364530e041012faa40334e7f4f0f82088b6b7caa472c2207ac"
+    },
+    {
+      "source": "data/009.wav",
+      "source_sha256": "9b02288a8412d68ef9264d7b3db2cd3767be0631c33b95844bc9405c6fe9acde",
+      "output_sha256": "9b02288a8412d68ef9264d7b3db2cd3767be0631c33b95844bc9405c6fe9acde"
+    },
+    {
+      "source": "data/008.wav",
+      "source_sha256": "1e766a858e5177db7078674db7749e37aca8bd6b5ab93093385328d04c36837b",
+      "output_sha256": "1e766a858e5177db7078674db7749e37aca8bd6b5ab93093385328d04c36837b"
+    },
+    {
+      "source": "data/007.wav",
+      "source_sha256": "d8e7bbee32a2a582a07d53f43db50c0c6c6e579ed322aa2369be8859b6385002",
+      "output_sha256": "d8e7bbee32a2a582a07d53f43db50c0c6c6e579ed322aa2369be8859b6385002"
+    },
+    {
+      "source": "data/042.wav",
+      "source_sha256": "a7d6654cb95f4fdd0c0f0e80d9cf0cac3f204f22bc0a87a7c22e2763b4e62bed",
+      "output_sha256": "a7d6654cb95f4fdd0c0f0e80d9cf0cac3f204f22bc0a87a7c22e2763b4e62bed"
+    },
+    {
+      "source": "data/017.wav",
+      "source_sha256": "43030d58b00f98999af6635c9966294fb9b5b6889d03fd1dca8f46bfedf3b5a6",
+      "output_sha256": "43030d58b00f98999af6635c9966294fb9b5b6889d03fd1dca8f46bfedf3b5a6"
+    },
+    {
+      "source": "data/015.wav",
+      "source_sha256": "1badf632365f0b711c669f94cd9228af0f2b73f987d399df1322a1f958a6af60",
+      "output_sha256": "1badf632365f0b711c669f94cd9228af0f2b73f987d399df1322a1f958a6af60"
+    },
+    {
+      "source": "data/014.wav",
+      "source_sha256": "670a61c14ba16c51f057a909ab1393f8917e38e80b7af5a0beadb9c7299d8e96",
+      "output_sha256": "670a61c14ba16c51f057a909ab1393f8917e38e80b7af5a0beadb9c7299d8e96"
+    },
+    {
+      "source": "data/012.wav",
+      "source_sha256": "04e2b02ab4415827045d25cb9c7dadda70da23fc8637beac13123a34dce7f95c",
+      "output_sha256": "04e2b02ab4415827045d25cb9c7dadda70da23fc8637beac13123a34dce7f95c"
+    },
+    {
+      "source": "data/105.wav",
+      "source_sha256": "89d7d9360b08255e5328b640da821522d72585eed50cd537b7165b6a49d69917",
+      "output_sha256": "89d7d9360b08255e5328b640da821522d72585eed50cd537b7165b6a49d69917"
+    },
+    {
+      "source": "data/854.wav",
+      "source_sha256": "4275b3fefe204fc5a15a3248de59e8541f74d6d4589287b85bbcbf1d44968d4d",
+      "output_sha256": "4275b3fefe204fc5a15a3248de59e8541f74d6d4589287b85bbcbf1d44968d4d"
+    },
+    {
+      "source": "data/855.wav",
+      "source_sha256": "2c2faffa5d449aae30df2802ee5d7c9c81960ddc5c53fd08034666ee4b6e4879",
+      "output_sha256": "2c2faffa5d449aae30df2802ee5d7c9c81960ddc5c53fd08034666ee4b6e4879"
+    },
+    {
+      "source": "data/802.wav",
+      "source_sha256": "4ecbd8d4bcd73d49e5a7d68f3e0074f4f9a8518fae8b235aa96bf910c219a60f",
+      "output_sha256": "4ecbd8d4bcd73d49e5a7d68f3e0074f4f9a8518fae8b235aa96bf910c219a60f"
+    },
+    {
+      "source": "data/856.wav",
+      "source_sha256": "4213b46daf6f2583def22430be32978731af86e27ee9fd79fd1d93ededf588be",
+      "output_sha256": "4213b46daf6f2583def22430be32978731af86e27ee9fd79fd1d93ededf588be"
+    },
+    {
+      "source": "data/064.wav",
+      "source_sha256": "ccf3e495d8adec853fd64b8bd78109f80f3697acc26745796c3043ab61325d74",
+      "output_sha256": "ccf3e495d8adec853fd64b8bd78109f80f3697acc26745796c3043ab61325d74"
+    },
+    {
+      "source": "data/853.wav",
+      "source_sha256": "040a3fbe0d24a4022bf7c5aea59554916bdd5c77528b5d291e94395c45fc2456",
+      "output_sha256": "040a3fbe0d24a4022bf7c5aea59554916bdd5c77528b5d291e94395c45fc2456"
+    },
+    {
+      "source": "data/pkmnt.dat",
+      "source_sha256": "fa8f15cc14263f6af7d88c872471c890eb9f30d38510cff8089fa1f5b4990593",
+      "output_sha256": "1c24bdbe206f50c7e9488a7890225bfcabef6b0433ac9593419385367b6d7105"
+    }
+  ],
+  "existing_record_indices_preserved": true,
+  "scope": "Exact authored dependency recovery; cross-version full compatibility unverified"
+}

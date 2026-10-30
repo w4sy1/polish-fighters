@@ -1,0 +1,252 @@
+{
+  "pack_id": "bleach",
+  "fighters": [
+    {
+      "id": 30,
+      "name": "Hollow",
+      "path": "data/hollow.dat"
+    },
+    {
+      "id": 31,
+      "name": "Hollow2",
+      "path": "data/hollow2.dat"
+    },
+    {
+      "id": 32,
+      "name": "Hollow3",
+      "path": "data/hollow3.dat"
+    },
+    {
+      "id": 34,
+      "name": "Adjuca",
+      "path": "data/adjuca.dat"
+    },
+    {
+      "id": 39,
+      "name": "Menos-G",
+      "path": "data/menos_grande.dat"
+    },
+    {
+      "id": 33,
+      "name": "Arrancar",
+      "path": "data/arrancar.dat"
+    },
+    {
+      "id": 36,
+      "name": "Shinigami",
+      "path": "data/shinigami.dat"
+    },
+    {
+      "id": 35,
+      "name": "Shinigami2",
+      "path": "data/shinigami2.dat"
+    },
+    {
+      "id": 50,
+      "name": "Stark",
+      "path": "data/stark.dat"
+    },
+    {
+      "id": 37,
+      "name": "Isshin",
+      "path": "data/isshin.dat"
+    },
+    {
+      "id": 54,
+      "name": "Kon",
+      "path": "data/kon.dat"
+    },
+    {
+      "id": 11,
+      "name": "Ichigo",
+      "path": "data/ichigo.dat"
+    },
+    {
+      "id": 55,
+      "name": "Ichigo-Bankai",
+      "path": "data/ichigo_bankai.dat"
+    },
+    {
+      "id": 56,
+      "name": "Ichigo-Vizard",
+      "path": "data/ichigo_vizard.dat"
+    },
+    {
+      "id": 4,
+      "name": "Ishida",
+      "path": "data/ishida.dat"
+    },
+    {
+      "id": 3,
+      "name": "Sado",
+      "path": "data/chad.dat"
+    },
+    {
+      "id": 58,
+      "name": "Sado_2",
+      "path": "data/chad2.dat"
+    },
+    {
+      "id": 16,
+      "name": "Orihime",
+      "path": "data/orihime.dat"
+    },
+    {
+      "id": 10,
+      "name": "Rukia",
+      "path": "data/rukia.dat"
+    },
+    {
+      "id": 9,
+      "name": "Renji",
+      "path": "data/renji.dat"
+    },
+    {
+      "id": 52,
+      "name": "Renji-Bankai",
+      "path": "data/renji_bankai.dat"
+    },
+    {
+      "id": 7,
+      "name": "Byakuya",
+      "path": "data/byakuya.dat"
+    },
+    {
+      "id": 38,
+      "name": "Byakuya-Bankai",
+      "path": "data/byakuya_bankai.dat"
+    },
+    {
+      "id": 8,
+      "name": "Hitsugaya",
+      "path": "data/hitsugaya.dat"
+    },
+    {
+      "id": 51,
+      "name": "Hitsu-bankai",
+      "path": "data/hitsugaya_bankai.dat"
+    },
+    {
+      "id": 1,
+      "name": "Zaraki",
+      "path": "data/zaraki.dat"
+    },
+    {
+      "id": 53,
+      "name": "Zaraki_Max",
+      "path": "data/zaraki_2.dat"
+    },
+    {
+      "id": 15,
+      "name": "Mayuri",
+      "path": "data/mayuri.dat"
+    },
+    {
+      "id": 13,
+      "name": "Urahara",
+      "path": "data/urahara.dat"
+    },
+    {
+      "id": 12,
+      "name": "Grimmjow",
+      "path": "data/grimmjow.dat"
+    },
+    {
+      "id": 2,
+      "name": "Ulquiorra",
+      "path": "data/ulquiorra.dat"
+    },
+    {
+      "id": 57,
+      "name": "Murcielago",
+      "path": "data/murcielago.dat"
+    },
+    {
+      "id": 14,
+      "name": "Shirozaki",
+      "path": "data/shirozaki.dat"
+    },
+    {
+      "id": 59,
+      "name": "Shiro-Bankai",
+      "path": "data/shirozaki_bankai.dat"
+    }
+  ],
+  "objects": 100,
+  "backgrounds": 12,
+  "assets": 753,
+  "source_catalog_sha256": "f73f0c2cac06aa8e40d409e558c48a63a009ea6d2033929837956430017c4866",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "png_aliases": {},
+  "catalog_markers_not_emulated": [],
+  "custom_catalog_labels": [],
+  "missing_resources": [],
+  "experimental": true,
+  "campaigns": [],
+  "disabled_sound_annotations": [
+    {
+      "source": "data/shirozaki_bankai.dat",
+      "resource": "data/cfc_9999.wav"
+    },
+    {
+      "source": "data/shirozaki_bankai.dat",
+      "resource": "data/cfc_9999.wav"
+    },
+    {
+      "source": "data/kon.dat",
+      "resource": "data/m-quincys_craft.wav"
+    },
+    {
+      "source": "data/kon.dat",
+      "resource": "data/m-dominio_del_chad.wav"
+    },
+    {
+      "source": "data/kon.dat",
+      "resource": "data/m-hollowed.wav"
+    },
+    {
+      "source": "data/kon.dat",
+      "resource": "data/m-la_distancia_para_un_duelo.wav"
+    },
+    {
+      "source": "data/kon.dat",
+      "resource": "data/m-principi_de_lucha.wav"
+    },
+    {
+      "source": "data/kon.dat",
+      "resource": "data/m_final.wav"
+    }
+  ],
+  "sprite_edge_repairs": 2,
+  "unresolved_sprite_sheets": 43,
+  "compatibility_overrides": [
+    {
+      "module": "frame_rules.lua",
+      "behavior": "record transform states 8000..8999 use picture offset 0",
+      "evidence": "Original LF2 v2.0a VA 0x41F66B/imm 0x41F671: 140->0 in BBR 2.0a",
+      "lua_test_passed": true,
+      "native_gameplay_verified": false
+    }
+  ],
+  "native_smoke_validation": {
+    "date": "2026-10-30",
+    "fighters": 34,
+    "frames": 300,
+    "passed": 34,
+    "draw_rectangles_outside_images": 0,
+    "full_gameplay_verified": false,
+    "evidence": "validation/native-fixes-2026-10-29/fighters-geometry/summary.json"
+  },
+  "render_layout_validation": {
+    "classification": {
+      "empty_sources_suppressed": 11,
+      "referenced_cells_fit": 26,
+      "partial_clipping_remaining": 6
+    },
+    "inferred_packed_declarations": 8,
+    "partial_clipping_resolved": false,
+    "pixels_modified": false
+  }
+}

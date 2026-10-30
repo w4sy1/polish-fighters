@@ -1,0 +1,68 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Java/resource checks remain available before the cross-build. Never package an
+// APK that looks complete but has no game engine or native SDL dependency.
+def verifyNativeGame = tasks.register('verifyNativeGame') {
+    doLast {
+        def root = file('../../build/android/jniLibs')
+        def abis = root.isDirectory() ? root.listFiles().findAll { it.isDirectory() } : []
+        if (abis.isEmpty()) {
+            throw new GradleException('Brak bibliotek gry. Najpierw uruchom engine/dist/build-android.sh arm64-v8a (Linux/CI); instrukcja ANDROID_STUDIO.md.')
+        }
+        abis.each { abi ->
+            ['libmain.so', 'libSDL3.so', 'libc++_shared.so'].each { library ->
+                if (!new File(abi, library).isFile()) {
+                    throw new GradleException("Brak ${abi.name}/${library}; nie mozna zbudowac dzialajacego APK.")
+                }
+            }
+        }
+    }
+}
+tasks.configureEach {
+    if (name.startsWith('merge') && name.endsWith('NativeLibs')) dependsOn verifyNativeGame
+}
+
+android {
+    namespace 'io.github.openlf2.openlf2'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'pl.prestigetech.polishfighters'
+        minSdk 21
+        targetSdk 35
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 6
+        versionName project.findProperty('openlf2VersionName') ?: '0.6.0'
+    }
+
+    // A fixed key, so each build is signed the same and installs over the previous one; the
+    // generated per-machine debug key would differ on every CI runner and block updates. The
+    // key is public: this is for sideloaded builds, not a store release.
+    signingConfigs {
+        debug {
+            storeFile file('../debug.keystore')
+            storeType 'pkcs12'
+            storePassword 'android'
+            keyAlias 'openlf2'
+            keyPassword 'android'
+        }
+    }
+
+    sourceSets {
+        main {
+            java.srcDir '../../build/android/sdl-java'
+            assets.srcDir '../../build/android/assets'
+            res.srcDir '../../build/android/res'
+            jniLibs.srcDir '../../build/android/jniLibs'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            // Release builds stay unsigned so F-Droid and other distributors can sign
+            // them with their own key.
+        }
+    }
+}

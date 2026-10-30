@@ -1,0 +1,24 @@
+userdata/
+__pycache__/
+*.pyc
+engine/build/
+engine/out/
+.build-venv/
+**/local.properties
+**/.idea/
+**/.gradle/
+*.jks
+*.keystore
+!engine/android/debug.keystore
+.env
+.env.*
+delivery/
+preview/
+# Imported proprietary game data stays local; sources and import provenance remain.
+content-packs/*/assets/
+# Large raw logs and user-specific test configurations stay local.
+validation/
+!validation/
+validation/**
+!validation/maps-build-2026-10-30/
+!validation/maps-build-2026-10-30/REPORT.md

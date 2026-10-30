@@ -1,0 +1,798 @@
+{
+  "padded": [],
+  "unresolved": [
+    {
+      "asset": "mods/one-piece/a/000387.bmp",
+      "actual": [
+        1600,
+        480
+      ],
+      "required": [
+        1599,
+        639
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000392.bmp",
+      "actual": [
+        800,
+        402
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000393.bmp",
+      "actual": [
+        1326,
+        664
+      ],
+      "required": [
+        1325,
+        883
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000328.bmp",
+      "actual": [
+        800,
+        399
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000313.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000503.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000300.bmp",
+      "actual": [
+        993,
+        241
+      ],
+      "required": [
+        999,
+        1088
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000816.bmp",
+      "actual": [
+        800,
+        403
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000360.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000401.bmp",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000759.bmp",
+      "actual": [
+        1100,
+        672
+      ],
+      "required": [
+        1099,
+        1007
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000403.bmp",
+      "actual": [
+        490,
+        99
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000311.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        799,
+        719
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000269.bmp",
+      "actual": [
+        116,
+        90
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000769.bmp",
+      "actual": [
+        1120,
+        270
+      ],
+      "required": [
+        1119,
+        1214
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000410.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000412.bmp",
+      "missing": true
+    },
+    {
+      "asset": "mods/one-piece/a/000445.bmp",
+      "actual": [
+        1401,
+        418
+      ],
+      "required": [
+        1400,
+        626
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000522.bmp",
+      "actual": [
+        580,
+        124
+      ],
+      "required": [
+        579,
+        433
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000523.bmp",
+      "actual": [
+        580,
+        124
+      ],
+      "required": [
+        579,
+        433
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000632.bmp",
+      "actual": [
+        1600,
+        462
+      ],
+      "required": [
+        1599,
+        643
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000556.bmp",
+      "actual": [
+        1300,
+        420
+      ],
+      "required": [
+        1299,
+        524
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000270.bmp",
+      "actual": [
+        341,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000364.bmp",
+      "actual": [
+        1020,
+        476
+      ],
+      "required": [
+        1599,
+        959
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000363.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000291.bmp",
+      "actual": [
+        644,
+        228
+      ],
+      "required": [
+        763,
+        241
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000320.bmp",
+      "actual": [
+        13,
+        14
+      ],
+      "required": [
+        111,
+        3
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000340.bmp",
+      "actual": [
+        1070,
+        1215
+      ],
+      "required": [
+        1599,
+        1439
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000798.bmp",
+      "actual": [
+        1000,
+        417
+      ],
+      "required": [
+        999,
+        694
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000739.bmp",
+      "actual": [
+        1040,
+        891
+      ],
+      "required": [
+        1039,
+        1385
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000572.bmp",
+      "actual": [
+        1550,
+        658
+      ],
+      "required": [
+        1549,
+        1315
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000304.bmp",
+      "actual": [
+        800,
+        483
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000352.bmp",
+      "actual": [
+        1600,
+        320
+      ],
+      "required": [
+        1599,
+        1439
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000353.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        799
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000354.bmp",
+      "actual": [
+        1326,
+        442
+      ],
+      "required": [
+        1325,
+        883
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000351.bmp",
+      "actual": [
+        780,
+        421
+      ],
+      "required": [
+        779,
+        839
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000576.bmp",
+      "actual": [
+        1600,
+        1120
+      ],
+      "required": [
+        1599,
+        2239
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000583.bmp",
+      "actual": [
+        1380,
+        237
+      ],
+      "required": [
+        1379,
+        552
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000943.bmp",
+      "actual": [
+        802,
+        888
+      ],
+      "required": [
+        801,
+        7769
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000944.bmp",
+      "actual": [
+        1326,
+        663
+      ],
+      "required": [
+        1325,
+        883
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000945.bmp",
+      "actual": [
+        2669,
+        79
+      ],
+      "required": [
+        18211,
+        79
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000385.bmp",
+      "actual": [
+        520,
+        667
+      ],
+      "required": [
+        519,
+        746
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000485.bmp",
+      "actual": [
+        1360,
+        930
+      ],
+      "required": [
+        1359,
+        1394
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000347.bmp",
+      "actual": [
+        1360,
+        465
+      ],
+      "required": [
+        1359,
+        929
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000348.bmp",
+      "actual": [
+        1250,
+        160
+      ],
+      "required": [
+        1249,
+        1439
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000349.bmp",
+      "actual": [
+        865,
+        368
+      ],
+      "required": [
+        864,
+        459
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000530.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000531.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000526.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000527.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000518.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000519.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000513.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000514.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000406.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000408.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000706.bmp",
+      "actual": [
+        1070,
+        405
+      ],
+      "required": [
+        1069,
+        1214
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000332.bmp",
+      "actual": [
+        1190,
+        160
+      ],
+      "required": [
+        1189,
+        1439
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000749.bmp",
+      "actual": [
+        1053,
+        917
+      ],
+      "required": [
+        1052,
+        1144
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000374.bmp",
+      "actual": [
+        520,
+        338
+      ],
+      "required": [
+        519,
+        746
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000415.bmp",
+      "missing": true
+    },
+    {
+      "asset": "mods/one-piece/a/000416.bmp",
+      "missing": true
+    },
+    {
+      "asset": "mods/one-piece/a/000494.bmp",
+      "actual": [
+        910,
+        436
+      ],
+      "required": [
+        909,
+        1525
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000495.bmp",
+      "actual": [
+        910,
+        436
+      ],
+      "required": [
+        909,
+        1525
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000507.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1039
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000508.bmp",
+      "actual": [
+        279,
+        191
+      ],
+      "required": [
+        279,
+        479
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000509.bmp",
+      "actual": [
+        800,
+        242
+      ],
+      "required": [
+        799,
+        1039
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000510.bmp",
+      "actual": [
+        279,
+        191
+      ],
+      "required": [
+        279,
+        479
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000884.bmp",
+      "actual": [
+        1600,
+        480
+      ],
+      "required": [
+        1599,
+        1439
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000934.bmp",
+      "actual": [
+        680,
+        54
+      ],
+      "required": [
+        679,
+        323
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000456.bmp",
+      "actual": [
+        1250,
+        800
+      ],
+      "required": [
+        1249,
+        959
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000369.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        799,
+        799
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000368.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        799,
+        799
+      ]
+    },
+    {
+      "asset": "mods/one-piece/a/000626.bmp",
+      "actual": [
+        1600,
+        445
+      ],
+      "required": [
+        1599,
+        2071
+      ]
+    }
+  ]
+}

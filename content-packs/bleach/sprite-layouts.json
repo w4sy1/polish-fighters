@@ -1,0 +1,1851 @@
+{
+  "scope": "Render-only packed-axis interpretation and intersection with physical image bounds; no inferred artwork",
+  "dimensions": {
+    "mods/bleach/a/000059.bmp": [
+      130,
+      68
+    ],
+    "mods/bleach/a/000060.bmp": [
+      190,
+      106
+    ],
+    "mods/bleach/a/000054.bmp": [
+      797,
+      29
+    ],
+    "mods/bleach/a/000055.bmp": [
+      797,
+      31
+    ],
+    "mods/bleach/a/000056.bmp": [
+      800,
+      106
+    ],
+    "mods/bleach/a/000068.bmp": [
+      180,
+      128
+    ],
+    "mods/bleach/a/000067.bmp": [
+      163,
+      54
+    ],
+    "mods/bleach/a/000062.bmp": [
+      313,
+      264
+    ],
+    "mods/bleach/a/000063.bmp": [
+      220,
+      119
+    ],
+    "mods/bleach/a/000065.bmp": [
+      82,
+      137
+    ],
+    "mods/bleach/a/000066.bmp": [
+      82,
+      137
+    ],
+    "mods/bleach/a/000061.bmp": [
+      1165,
+      232
+    ],
+    "mods/bleach/a/000069.bmp": [
+      141,
+      122
+    ],
+    "mods/bleach/a/000053.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000057.bmp": [
+      800,
+      210
+    ],
+    "mods/bleach/a/000058.bmp": [
+      167,
+      210
+    ],
+    "mods/bleach/a/000064.bmp": [
+      407,
+      110
+    ],
+    "mods/bleach/a/000083.bmp": [
+      54,
+      134
+    ],
+    "mods/bleach/a/000084.bmp": [
+      60,
+      43
+    ],
+    "mods/bleach/a/000085.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000086.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000087.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000088.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000089.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000090.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000091.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000092.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000093.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000094.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000095.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000096.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000097.bmp": [
+      54,
+      77
+    ],
+    "mods/bleach/a/000079.bmp": [
+      162,
+      59
+    ],
+    "mods/bleach/a/000080.bmp": [
+      140,
+      11
+    ],
+    "mods/bleach/a/000081.bmp": [
+      140,
+      12
+    ],
+    "mods/bleach/a/000082.bmp": [
+      128,
+      21
+    ],
+    "mods/bleach/a/000074.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000075.bmp": [
+      797,
+      74
+    ],
+    "mods/bleach/a/000076.bmp": [
+      144,
+      31
+    ],
+    "mods/bleach/a/000077.bmp": [
+      24,
+      57
+    ],
+    "mods/bleach/a/000078.bmp": [
+      144,
+      30
+    ],
+    "mods/bleach/a/000070.bmp": [
+      845,
+      575
+    ],
+    "mods/bleach/a/000071.bmp": [
+      94,
+      63
+    ],
+    "mods/bleach/a/000072.bmp": [
+      94,
+      63
+    ],
+    "mods/bleach/a/000073.bmp": [
+      94,
+      63
+    ],
+    "mods/bleach/a/000119.bmp": [
+      800,
+      104
+    ],
+    "mods/bleach/a/000120.bmp": [
+      300,
+      104
+    ],
+    "mods/bleach/a/000121.bmp": [
+      284,
+      84
+    ],
+    "mods/bleach/a/000122.bmp": [
+      184,
+      87
+    ],
+    "mods/bleach/a/000118.bmp": [
+      800,
+      70
+    ],
+    "mods/bleach/a/000123.bmp": [
+      253,
+      162
+    ],
+    "mods/bleach/a/000124.bmp": [
+      600,
+      231
+    ],
+    "mods/bleach/a/000117.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000107.bmp": [
+      101,
+      231
+    ],
+    "mods/bleach/a/000105.bmp": [
+      800,
+      151
+    ],
+    "mods/bleach/a/000106.bmp": [
+      800,
+      35
+    ],
+    "mods/bleach/a/000104.bmp": [
+      35,
+      7
+    ],
+    "mods/bleach/a/000052.bmp": [
+      101,
+      203
+    ],
+    "mods/bleach/a/000050.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000051.bmp": [
+      1078,
+      180
+    ],
+    "mods/bleach/a/000022.bmp": [
+      800,
+      92
+    ],
+    "mods/bleach/a/000027.bmp": [
+      800,
+      92
+    ],
+    "mods/bleach/a/000023.bmp": [
+      800,
+      80
+    ],
+    "mods/bleach/a/000028.bmp": [
+      800,
+      85
+    ],
+    "mods/bleach/a/000024.bmp": [
+      800,
+      15
+    ],
+    "mods/bleach/a/000029.bmp": [
+      800,
+      15
+    ],
+    "mods/bleach/a/000025.bmp": [
+      800,
+      25
+    ],
+    "mods/bleach/a/000030.bmp": [
+      800,
+      25
+    ],
+    "mods/bleach/a/000026.bmp": [
+      800,
+      110
+    ],
+    "mods/bleach/a/000031.bmp": [
+      800,
+      110
+    ],
+    "mods/bleach/a/000018.bmp": [
+      800,
+      49
+    ],
+    "mods/bleach/a/000020.bmp": [
+      455,
+      49
+    ],
+    "mods/bleach/a/000019.bmp": [
+      800,
+      56
+    ],
+    "mods/bleach/a/000021.bmp": [
+      455,
+      56
+    ],
+    "mods/bleach/a/000017.bmp": [
+      510,
+      95
+    ],
+    "mods/bleach/a/000016.bmp": [
+      364,
+      76
+    ],
+    "mods/bleach/a/000015.bmp": [
+      800,
+      148
+    ],
+    "mods/bleach/a/000014.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000099.bmp": [
+      460,
+      150
+    ],
+    "mods/bleach/a/000100.bmp": [
+      460,
+      150
+    ],
+    "mods/bleach/a/000101.bmp": [
+      459,
+      150
+    ],
+    "mods/bleach/a/000102.bmp": [
+      800,
+      35
+    ],
+    "mods/bleach/a/000103.bmp": [
+      600,
+      231
+    ],
+    "mods/bleach/a/000098.bmp": [
+      35,
+      7
+    ],
+    "mods/bleach/a/000109.bmp": [
+      800,
+      145
+    ],
+    "mods/bleach/a/000110.bmp": [
+      169,
+      167
+    ],
+    "mods/bleach/a/000111.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000112.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000113.bmp": [
+      750,
+      66
+    ],
+    "mods/bleach/a/000114.bmp": [
+      750,
+      66
+    ],
+    "mods/bleach/a/000115.bmp": [
+      800,
+      115
+    ],
+    "mods/bleach/a/000116.bmp": [
+      800,
+      115
+    ],
+    "mods/bleach/a/000108.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000033.bmp": [
+      800,
+      145
+    ],
+    "mods/bleach/a/000034.bmp": [
+      167,
+      145
+    ],
+    "mods/bleach/a/000035.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000036.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000037.bmp": [
+      750,
+      66
+    ],
+    "mods/bleach/a/000038.bmp": [
+      750,
+      66
+    ],
+    "mods/bleach/a/000039.bmp": [
+      800,
+      115
+    ],
+    "mods/bleach/a/000040.bmp": [
+      800,
+      115
+    ],
+    "mods/bleach/a/000032.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000042.bmp": [
+      800,
+      145
+    ],
+    "mods/bleach/a/000043.bmp": [
+      167,
+      145
+    ],
+    "mods/bleach/a/000044.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000045.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000046.bmp": [
+      710,
+      66
+    ],
+    "mods/bleach/a/000047.bmp": [
+      710,
+      66
+    ],
+    "mods/bleach/a/000048.bmp": [
+      710,
+      115
+    ],
+    "mods/bleach/a/000049.bmp": [
+      710,
+      115
+    ],
+    "mods/bleach/a/000041.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000006.bmp": [
+      800,
+      145
+    ],
+    "mods/bleach/a/000007.bmp": [
+      169,
+      167
+    ],
+    "mods/bleach/a/000008.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000009.bmp": [
+      500,
+      150
+    ],
+    "mods/bleach/a/000010.bmp": [
+      750,
+      66
+    ],
+    "mods/bleach/a/000011.bmp": [
+      750,
+      66
+    ],
+    "mods/bleach/a/000012.bmp": [
+      800,
+      115
+    ],
+    "mods/bleach/a/000013.bmp": [
+      800,
+      115
+    ],
+    "mods/bleach/a/000005.bmp": [
+      37,
+      9
+    ],
+    "mods/bleach/a/000566.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000564.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000565.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000171.bmp": [
+      412,
+      205
+    ],
+    "mods/bleach/a/000222.bmp": [
+      3200,
+      400
+    ],
+    "mods/bleach/a/000223.bmp": [
+      3200,
+      320
+    ],
+    "mods/bleach/a/000130.bmp": [
+      300,
+      300
+    ],
+    "mods/bleach/a/000131.bmp": [
+      281,
+      152
+    ],
+    "mods/bleach/a/000182.bmp": [
+      330,
+      245
+    ],
+    "mods/bleach/a/000433.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000434.bmp": [
+      505,
+      403
+    ],
+    "mods/bleach/a/000276.bmp": [
+      328,
+      249
+    ],
+    "mods/bleach/a/000290.bmp": [
+      656,
+      166
+    ],
+    "mods/bleach/a/000423.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000424.bmp": [
+      505,
+      403
+    ],
+    "mods/bleach/a/000425.bmp": [
+      303,
+      99
+    ],
+    "mods/bleach/a/000279.bmp": [
+      445,
+      800
+    ],
+    "mods/bleach/a/000280.bmp": [
+      445,
+      800
+    ],
+    "mods/bleach/a/000281.bmp": [
+      445,
+      800
+    ],
+    "mods/bleach/a/000431.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000432.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000291.bmp": [
+      332,
+      346
+    ],
+    "mods/bleach/a/000167.bmp": [
+      684,
+      540
+    ],
+    "mods/bleach/a/000421.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000422.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000166.bmp": [
+      403,
+      204
+    ],
+    "mods/bleach/a/000156.bmp": [
+      403,
+      204
+    ],
+    "mods/bleach/a/000158.bmp": [
+      684,
+      540
+    ],
+    "mods/bleach/a/000146.bmp": [
+      520,
+      249
+    ],
+    "mods/bleach/a/000492.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000479.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000480.bmp": [
+      106,
+      54
+    ],
+    "mods/bleach/a/000212.bmp": [
+      155,
+      53
+    ],
+    "mods/bleach/a/000210.bmp": [
+      123,
+      71
+    ],
+    "mods/bleach/a/000211.bmp": [
+      123,
+      71
+    ],
+    "mods/bleach/a/000477.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000478.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000493.bmp": [
+      106,
+      54
+    ],
+    "mods/bleach/a/000220.bmp": [
+      80,
+      40
+    ],
+    "mods/bleach/a/000221.bmp": [
+      40,
+      80
+    ],
+    "mods/bleach/a/000213.bmp": [
+      489,
+      498
+    ],
+    "mods/bleach/a/000214.bmp": [
+      105,
+      137
+    ],
+    "mods/bleach/a/000215.bmp": [
+      105,
+      137
+    ],
+    "mods/bleach/a/000216.bmp": [
+      105,
+      137
+    ],
+    "mods/bleach/a/000217.bmp": [
+      105,
+      137
+    ],
+    "mods/bleach/a/000218.bmp": [
+      105,
+      137
+    ],
+    "mods/bleach/a/000490.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000209.bmp": [
+      125,
+      305
+    ],
+    "mods/bleach/a/000491.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000198.bmp": [
+      327,
+      581
+    ],
+    "mods/bleach/a/000159.bmp": [
+      1860,
+      440
+    ],
+    "mods/bleach/a/000296.bmp": [
+      800,
+      320
+    ],
+    "mods/bleach/a/000132.bmp": [
+      254,
+      666
+    ],
+    "mods/bleach/a/000177.bmp": [
+      328,
+      498
+    ],
+    "mods/bleach/a/000125.bmp": [
+      321,
+      84
+    ],
+    "mods/bleach/a/000289.bmp": [
+      838,
+      435
+    ],
+    "mods/bleach/a/000287.bmp": [
+      838,
+      435
+    ],
+    "mods/bleach/a/000286.bmp": [
+      826,
+      850
+    ],
+    "mods/bleach/a/000137.bmp": [
+      328,
+      249
+    ],
+    "mods/bleach/a/000207.bmp": [
+      800,
+      480
+    ],
+    "mods/bleach/a/000205.bmp": [
+      360,
+      192
+    ],
+    "mods/bleach/a/000206.bmp": [
+      144,
+      200
+    ],
+    "mods/bleach/a/000219.bmp": [
+      2000,
+      1200
+    ],
+    "mods/bleach/a/000168.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000175.bmp": [
+      343,
+      171
+    ],
+    "mods/bleach/a/000358.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000359.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000149.bmp": [
+      784,
+      830
+    ],
+    "mods/bleach/a/000414.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000401.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000402.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000403.bmp": [
+      800,
+      512
+    ],
+    "mods/bleach/a/000415.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000196.bmp": [
+      240,
+      101
+    ],
+    "mods/bleach/a/000194.bmp": [
+      400,
+      300
+    ],
+    "mods/bleach/a/000190.bmp": [
+      120,
+      100
+    ],
+    "mods/bleach/a/000191.bmp": [
+      119,
+      100
+    ],
+    "mods/bleach/a/000192.bmp": [
+      120,
+      99
+    ],
+    "mods/bleach/a/000193.bmp": [
+      119,
+      99
+    ],
+    "mods/bleach/a/000400.bmp": [
+      1304,
+      402
+    ],
+    "mods/bleach/a/000189.bmp": [
+      520,
+      249
+    ],
+    "mods/bleach/a/000412.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000413.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000398.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000399.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000583.bmp": [
+      800,
+      160
+    ],
+    "mods/bleach/a/000133.bmp": [
+      480,
+      90
+    ],
+    "mods/bleach/a/000580.bmp": [
+      800,
+      160
+    ],
+    "mods/bleach/a/000578.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000579.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000576.bmp": [
+      800,
+      320
+    ],
+    "mods/bleach/a/000577.bmp": [
+      805,
+      113
+    ],
+    "mods/bleach/a/000574.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000575.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000573.bmp": [
+      799,
+      199
+    ],
+    "mods/bleach/a/000571.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000572.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000581.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000582.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000531.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000532.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000533.bmp": [
+      800,
+      401
+    ],
+    "mods/bleach/a/000534.bmp": [
+      800,
+      512
+    ],
+    "mods/bleach/a/000535.bmp": [
+      283,
+      423
+    ],
+    "mods/bleach/a/000536.bmp": [
+      89,
+      95
+    ],
+    "mods/bleach/a/000260.bmp": [
+      139,
+      82
+    ],
+    "mods/bleach/a/000261.bmp": [
+      126,
+      99
+    ],
+    "mods/bleach/a/000266.bmp": [
+      126,
+      99
+    ],
+    "mods/bleach/a/000267.bmp": [
+      126,
+      99
+    ],
+    "mods/bleach/a/000262.bmp": [
+      129,
+      125
+    ],
+    "mods/bleach/a/000160.bmp": [
+      129,
+      125
+    ],
+    "mods/bleach/a/000161.bmp": [
+      129,
+      125
+    ],
+    "mods/bleach/a/000258.bmp": [
+      320,
+      90
+    ],
+    "mods/bleach/a/000259.bmp": [
+      320,
+      90
+    ],
+    "mods/bleach/a/000263.bmp": [
+      320,
+      208
+    ],
+    "mods/bleach/a/000245.bmp": [
+      252,
+      200
+    ],
+    "mods/bleach/a/000264.bmp": [
+      139,
+      82
+    ],
+    "mods/bleach/a/000265.bmp": [
+      139,
+      82
+    ],
+    "mods/bleach/a/000225.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000516.bmp": [
+      529,
+      201
+    ],
+    "mods/bleach/a/000517.bmp": [
+      723,
+      201
+    ],
+    "mods/bleach/a/000518.bmp": [
+      343,
+      171
+    ],
+    "mods/bleach/a/000519.bmp": [
+      403,
+      403
+    ],
+    "mods/bleach/a/000520.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000521.bmp": [
+      723,
+      201
+    ],
+    "mods/bleach/a/000522.bmp": [
+      723,
+      201
+    ],
+    "mods/bleach/a/000523.bmp": [
+      723,
+      201
+    ],
+    "mods/bleach/a/000242.bmp": [
+      151,
+      96
+    ],
+    "mods/bleach/a/000243.bmp": [
+      181,
+      120
+    ],
+    "mods/bleach/a/000246.bmp": [
+      181,
+      120
+    ],
+    "mods/bleach/a/000247.bmp": [
+      181,
+      120
+    ],
+    "mods/bleach/a/000248.bmp": [
+      213,
+      146
+    ],
+    "mods/bleach/a/000514.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000515.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000150.bmp": [
+      800,
+      405
+    ],
+    "mods/bleach/a/000151.bmp": [
+      640,
+      405
+    ],
+    "mods/bleach/a/000152.bmp": [
+      800,
+      405
+    ],
+    "mods/bleach/a/000153.bmp": [
+      640,
+      406
+    ],
+    "mods/bleach/a/000529.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000530.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000537.bmp": [
+      300,
+      203
+    ],
+    "mods/bleach/a/000504.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000505.bmp": [
+      529,
+      201
+    ],
+    "mods/bleach/a/000506.bmp": [
+      723,
+      201
+    ],
+    "mods/bleach/a/000507.bmp": [
+      343,
+      171
+    ],
+    "mods/bleach/a/000508.bmp": [
+      403,
+      403
+    ],
+    "mods/bleach/a/000509.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000244.bmp": [
+      396,
+      216
+    ],
+    "mods/bleach/a/000502.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000503.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000497.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000270.bmp": [
+      165,
+      31
+    ],
+    "mods/bleach/a/000271.bmp": [
+      165,
+      31
+    ],
+    "mods/bleach/a/000269.bmp": [
+      504,
+      100
+    ],
+    "mods/bleach/a/000495.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000498.bmp": [
+      401,
+      200
+    ],
+    "mods/bleach/a/000496.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000268.bmp": [
+      12,
+      75
+    ],
+    "mods/bleach/a/000273.bmp": [
+      75,
+      12
+    ],
+    "mods/bleach/a/000285.bmp": [
+      26,
+      76
+    ],
+    "mods/bleach/a/000272.bmp": [
+      328,
+      83
+    ],
+    "mods/bleach/a/000550.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000548.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000549.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000204.bmp": [
+      328,
+      166
+    ],
+    "mods/bleach/a/000200.bmp": [
+      328,
+      249
+    ],
+    "mods/bleach/a/000201.bmp": [
+      104,
+      26
+    ],
+    "mods/bleach/a/000294.bmp": [
+      392,
+      66
+    ],
+    "mods/bleach/a/000295.bmp": [
+      20,
+      16
+    ],
+    "mods/bleach/a/000188.bmp": [
+      630,
+      150
+    ],
+    "mods/bleach/a/000169.bmp": [
+      630,
+      150
+    ],
+    "mods/bleach/a/000186.bmp": [
+      328,
+      141
+    ],
+    "mods/bleach/a/000546.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000547.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000544.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000545.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000377.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000378.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000379.bmp": [
+      424,
+      101
+    ],
+    "mods/bleach/a/000375.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000376.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000569.bmp": [
+      1601,
+      1281
+    ],
+    "mods/bleach/a/000570.bmp": [
+      1600,
+      1275
+    ],
+    "mods/bleach/a/000567.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000568.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000346.bmp": [
+      850,
+      560
+    ],
+    "mods/bleach/a/000348.bmp": [
+      115,
+      80
+    ],
+    "mods/bleach/a/000344.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000345.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000224.bmp": [
+      2000,
+      1200
+    ],
+    "mods/bleach/a/000184.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000185.bmp": [
+      480,
+      361
+    ],
+    "mods/bleach/a/000202.bmp": [
+      328,
+      249
+    ],
+    "mods/bleach/a/000473.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000474.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000181.bmp": [
+      339,
+      245
+    ],
+    "mods/bleach/a/000453.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000455.bmp": [
+      1504,
+      75
+    ],
+    "mods/bleach/a/000454.bmp": [
+      605,
+      808
+    ],
+    "mods/bleach/a/000456.bmp": [
+      605,
+      808
+    ],
+    "mods/bleach/a/000457.bmp": [
+      605,
+      808
+    ],
+    "mods/bleach/a/000458.bmp": [
+      832,
+      108
+    ],
+    "mods/bleach/a/000459.bmp": [
+      800,
+      160
+    ],
+    "mods/bleach/a/000460.bmp": [
+      311,
+      557
+    ],
+    "mods/bleach/a/000442.bmp": [
+      560,
+      540
+    ],
+    "mods/bleach/a/000443.bmp": [
+      826,
+      910
+    ],
+    "mods/bleach/a/000440.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000441.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000451.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000452.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000468.bmp": [
+      800,
+      720
+    ],
+    "mods/bleach/a/000139.bmp": [
+      480,
+      1080
+    ],
+    "mods/bleach/a/000140.bmp": [
+      1000,
+      405
+    ],
+    "mods/bleach/a/000466.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000467.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000284.bmp": [
+      2000,
+      600
+    ],
+    "mods/bleach/a/000283.bmp": [
+      2000,
+      600
+    ],
+    "mods/bleach/a/000275.png": [
+      5000,
+      2000
+    ],
+    "mods/bleach/a/000277.png": [
+      4000,
+      2000
+    ],
+    "mods/bleach/a/000278.png": [
+      4000,
+      2000
+    ],
+    "mods/bleach/a/000558.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000559.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000556.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000557.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000562.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000563.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000560.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000561.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000338.bmp": [
+      300,
+      203
+    ],
+    "mods/bleach/a/000332.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000333.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000334.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000335.bmp": [
+      800,
+      512
+    ],
+    "mods/bleach/a/000336.bmp": [
+      283,
+      423
+    ],
+    "mods/bleach/a/000337.bmp": [
+      89,
+      95
+    ],
+    "mods/bleach/a/000251.bmp": [
+      139,
+      82
+    ],
+    "mods/bleach/a/000252.bmp": [
+      126,
+      99
+    ],
+    "mods/bleach/a/000256.bmp": [
+      126,
+      99
+    ],
+    "mods/bleach/a/000257.bmp": [
+      126,
+      99
+    ],
+    "mods/bleach/a/000253.bmp": [
+      129,
+      125
+    ],
+    "mods/bleach/a/000240.bmp": [
+      320,
+      90
+    ],
+    "mods/bleach/a/000241.bmp": [
+      320,
+      90
+    ],
+    "mods/bleach/a/000233.bmp": [
+      252,
+      200
+    ],
+    "mods/bleach/a/000254.bmp": [
+      139,
+      82
+    ],
+    "mods/bleach/a/000255.bmp": [
+      139,
+      82
+    ],
+    "mods/bleach/a/000330.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000331.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000310.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000311.bmp": [
+      529,
+      201
+    ],
+    "mods/bleach/a/000312.bmp": [
+      723,
+      201
+    ],
+    "mods/bleach/a/000313.bmp": [
+      343,
+      171
+    ],
+    "mods/bleach/a/000314.bmp": [
+      403,
+      403
+    ],
+    "mods/bleach/a/000315.bmp": [
+      723,
+      201
+    ],
+    "mods/bleach/a/000230.bmp": [
+      151,
+      96
+    ],
+    "mods/bleach/a/000231.bmp": [
+      181,
+      120
+    ],
+    "mods/bleach/a/000236.bmp": [
+      181,
+      120
+    ],
+    "mods/bleach/a/000237.bmp": [
+      181,
+      120
+    ],
+    "mods/bleach/a/000232.bmp": [
+      213,
+      146
+    ],
+    "mods/bleach/a/000308.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000309.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000234.bmp": [
+      900,
+      1350
+    ],
+    "mods/bleach/a/000235.bmp": [
+      900,
+      900
+    ],
+    "mods/bleach/a/000176.bmp": [
+      900,
+      1350
+    ],
+    "mods/bleach/a/000178.bmp": [
+      900,
+      900
+    ],
+    "mods/bleach/a/000249.bmp": [
+      900,
+      900
+    ],
+    "mods/bleach/a/000288.bmp": [
+      900,
+      1350
+    ],
+    "mods/bleach/a/000555.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000553.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000554.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000148.bmp": [
+      295,
+      195
+    ],
+    "mods/bleach/a/000162.bmp": [
+      429,
+      81
+    ],
+    "mods/bleach/a/000157.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000347.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000356.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000357.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000366.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000144.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000145.bmp": [
+      440,
+      200
+    ],
+    "mods/bleach/a/000364.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000365.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000142.bmp": [
+      2730,
+      392
+    ],
+    "mods/bleach/a/000304.bmp": [
+      455,
+      60
+    ],
+    "mods/bleach/a/000301.bmp": [
+      455,
+      60
+    ],
+    "mods/bleach/a/000183.bmp": [
+      490,
+      196
+    ],
+    "mods/bleach/a/000305.bmp": [
+      490,
+      198
+    ],
+    "mods/bleach/a/000229.bmp": [
+      312,
+      245
+    ],
+    "mods/bleach/a/000386.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000387.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000388.bmp": [
+      305,
+      91
+    ],
+    "mods/bleach/a/000384.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000385.bmp": [
+      40,
+      45
+    ],
+    "mods/bleach/a/000396.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000397.bmp": [
+      800,
+      560
+    ],
+    "mods/bleach/a/000174.bmp": [
+      440,
+      200
+    ],
+    "mods/bleach/a/000172.bmp": [
+      800,
+      405
+    ],
+    "mods/bleach/a/000173.bmp": [
+      640,
+      405
+    ],
+    "mods/bleach/a/000199.bmp": [
+      615,
+      184
+    ],
+    "mods/bleach/a/000394.bmp": [
+      120,
+      120
+    ],
+    "mods/bleach/a/000395.bmp": [
+      40,
+      45
+    ]
+  },
+  "layouts": {
+    "mods/bleach/a/000258.bmp|80|90|4|1": {
+      "resource": "mods/bleach/a/000258.bmp",
+      "cell": [
+        80,
+        90
+      ],
+      "grid": [
+        4,
+        1
+      ],
+      "stride": [
+        80,
+        91
+      ],
+      "dimensions": [
+        320,
+        90
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "9647a20fa436f821708be17563bdf88e866afd4c3b9109d506abcc67a280a2cf"
+    },
+    "mods/bleach/a/000259.bmp|80|90|4|1": {
+      "resource": "mods/bleach/a/000259.bmp",
+      "cell": [
+        80,
+        90
+      ],
+      "grid": [
+        4,
+        1
+      ],
+      "stride": [
+        80,
+        91
+      ],
+      "dimensions": [
+        320,
+        90
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "e8c1198b5ea8556b57db2b4c3478a1da0eaf78c5dd55136ee4710a464fed4e83"
+    },
+    "mods/bleach/a/000188.bmp|42|150|15|1": {
+      "resource": "mods/bleach/a/000188.bmp",
+      "cell": [
+        42,
+        150
+      ],
+      "grid": [
+        15,
+        1
+      ],
+      "stride": [
+        42,
+        151
+      ],
+      "dimensions": [
+        630,
+        150
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "26467fbb29c91ca49445318e21c0f01776b00473a7d068602bc8ac6dfeab5061"
+    },
+    "mods/bleach/a/000169.bmp|42|150|15|1": {
+      "resource": "mods/bleach/a/000169.bmp",
+      "cell": [
+        42,
+        150
+      ],
+      "grid": [
+        15,
+        1
+      ],
+      "stride": [
+        42,
+        151
+      ],
+      "dimensions": [
+        630,
+        150
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "c58d77666e240434b57cd19a3901ad4c5879829afd8150c47921f23882b50674"
+    },
+    "mods/bleach/a/000346.bmp|85|79|10|7": {
+      "resource": "mods/bleach/a/000346.bmp",
+      "cell": [
+        85,
+        79
+      ],
+      "grid": [
+        10,
+        7
+      ],
+      "stride": [
+        85,
+        80
+      ],
+      "dimensions": [
+        850,
+        560
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "e951c4a03c18763eb1f433ecd477859fdcc988e250423233c8976d226409769e"
+    },
+    "mods/bleach/a/000455.bmp|188|75|8|1": {
+      "resource": "mods/bleach/a/000455.bmp",
+      "cell": [
+        188,
+        75
+      ],
+      "grid": [
+        8,
+        1
+      ],
+      "stride": [
+        188,
+        76
+      ],
+      "dimensions": [
+        1504,
+        75
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "f212ee2b658e8525c86348ca3c3faed9f50e25f01311dffb6b557ddb319dc1a0"
+    },
+    "mods/bleach/a/000240.bmp|80|90|4|1": {
+      "resource": "mods/bleach/a/000240.bmp",
+      "cell": [
+        80,
+        90
+      ],
+      "grid": [
+        4,
+        1
+      ],
+      "stride": [
+        80,
+        91
+      ],
+      "dimensions": [
+        320,
+        90
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "0d6065eeef18614bf79f14aca745023b2a0a0cbdc7990b606c8fe23c62e5aca8"
+    },
+    "mods/bleach/a/000241.bmp|80|90|4|1": {
+      "resource": "mods/bleach/a/000241.bmp",
+      "cell": [
+        80,
+        90
+      ],
+      "grid": [
+        4,
+        1
+      ],
+      "stride": [
+        80,
+        91
+      ],
+      "dimensions": [
+        320,
+        90
+      ],
+      "inferred_packed_axis": true,
+      "pixel_file_sha256": "003531b338a4bcf728a3f9a1404c71e1a408a9af8bd5235b22e48d5a0928953d"
+    }
+  }
+}

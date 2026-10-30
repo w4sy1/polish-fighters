@@ -1,0 +1,501 @@
+{
+  "padded": [
+    {
+      "asset": "mods/bleach/a/000434.bmp",
+      "before": [
+        505,
+        402
+      ],
+      "after": [
+        505,
+        403
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000424.bmp",
+      "before": [
+        505,
+        402
+      ],
+      "after": [
+        505,
+        403
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "asset": "mods/bleach/a/000573.bmp",
+      "actual": [
+        799,
+        199
+      ],
+      "required": [
+        799,
+        1399
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000566.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000183.bmp",
+      "actual": [
+        490,
+        196
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000131.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000167.bmp",
+      "actual": [
+        684,
+        540
+      ],
+      "required": [
+        799,
+        479
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000212.bmp",
+      "actual": [
+        155,
+        53
+      ],
+      "required": [
+        599,
+        399
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000210.bmp",
+      "actual": [
+        123,
+        71
+      ],
+      "required": [
+        123,
+        311
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000219.bmp",
+      "actual": [
+        2000,
+        1200
+      ],
+      "required": [
+        10004,
+        3602
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000296.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000132.bmp",
+      "actual": [
+        254,
+        666
+      ],
+      "required": [
+        254,
+        998
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000125.bmp",
+      "actual": [
+        321,
+        84
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000175.bmp",
+      "actual": [
+        343,
+        171
+      ],
+      "required": [
+        869,
+        608
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000403.bmp",
+      "actual": [
+        800,
+        512
+      ],
+      "required": [
+        959,
+        429
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000400.bmp",
+      "actual": [
+        1304,
+        402
+      ],
+      "required": [
+        1299,
+        699
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000583.bmp",
+      "actual": [
+        800,
+        160
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000580.bmp",
+      "actual": [
+        800,
+        160
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000576.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000577.bmp",
+      "actual": [
+        805,
+        113
+      ],
+      "required": [
+        1599,
+        559
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000533.bmp",
+      "actual": [
+        800,
+        401
+      ],
+      "required": [
+        1119,
+        399
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000534.bmp",
+      "actual": [
+        800,
+        512
+      ],
+      "required": [
+        959,
+        429
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000262.bmp",
+      "actual": [
+        129,
+        125
+      ],
+      "required": [
+        129,
+        251
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000258.bmp",
+      "actual": [
+        320,
+        90
+      ],
+      "required": [
+        323,
+        90
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000259.bmp",
+      "actual": [
+        320,
+        90
+      ],
+      "required": [
+        323,
+        90
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000188.bmp",
+      "actual": [
+        630,
+        150
+      ],
+      "required": [
+        644,
+        150
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000169.bmp",
+      "actual": [
+        630,
+        150
+      ],
+      "required": [
+        644,
+        150
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000186.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000570.bmp",
+      "actual": [
+        1600,
+        1275
+      ],
+      "required": [
+        3199,
+        1919
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000346.bmp",
+      "actual": [
+        850,
+        560
+      ],
+      "required": [
+        859,
+        559
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000455.bmp",
+      "actual": [
+        1504,
+        75
+      ],
+      "required": [
+        1511,
+        75
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000458.bmp",
+      "actual": [
+        832,
+        108
+      ],
+      "required": [
+        827,
+        215
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000442.bmp",
+      "actual": [
+        560,
+        540
+      ],
+      "required": [
+        1399,
+        755
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000277.bmp",
+      "actual": [
+        4000,
+        2000
+      ],
+      "required": [
+        5000,
+        2000
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000278.bmp",
+      "actual": [
+        4000,
+        2000
+      ],
+      "required": [
+        5000,
+        2000
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000334.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        1119,
+        399
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000335.bmp",
+      "actual": [
+        800,
+        512
+      ],
+      "required": [
+        959,
+        429
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000253.bmp",
+      "actual": [
+        129,
+        125
+      ],
+      "required": [
+        129,
+        251
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000240.bmp",
+      "actual": [
+        320,
+        90
+      ],
+      "required": [
+        323,
+        90
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000241.bmp",
+      "actual": [
+        320,
+        90
+      ],
+      "required": [
+        323,
+        90
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000145.bmp",
+      "actual": [
+        440,
+        200
+      ],
+      "required": [
+        1099,
+        601
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000304.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000301.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000305.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/bleach/a/000133.bmp",
+      "actual": [
+        480,
+        90
+      ],
+      "required": [
+        479,
+        159
+      ]
+    }
+  ]
+}

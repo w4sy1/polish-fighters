@@ -1,0 +1,224 @@
+{
+  "pack_id": "ntsd",
+  "fighters": [
+    {
+      "id": 50,
+      "name": "Pein",
+      "path": "chars/pein.dat"
+    },
+    {
+      "id": 52,
+      "name": "Naruto",
+      "path": "chars/kyubi.dat"
+    },
+    {
+      "id": 38,
+      "name": "Sasuke",
+      "path": "chars/sasuke_cs2.dat"
+    },
+    {
+      "id": 58,
+      "name": "Deidara_Bird",
+      "path": "chars/deidara_bird.dat"
+    },
+    {
+      "id": 51,
+      "name": "Sasori",
+      "path": "chars/sasori.dat"
+    },
+    {
+      "id": 56,
+      "name": "Hidan",
+      "path": "chars/reaper.dat"
+    },
+    {
+      "id": 57,
+      "name": "Kakuzu",
+      "path": "chars/nckakuzu.dat"
+    },
+    {
+      "id": 39,
+      "name": "Sand_Creature",
+      "path": "chars/sand_creature.dat"
+    },
+    {
+      "id": 37,
+      "name": "Jiroubou",
+      "path": "chars/jiroubou.dat"
+    },
+    {
+      "id": 36,
+      "name": "Tayuya",
+      "path": "chars/tayuya.dat"
+    },
+    {
+      "id": 35,
+      "name": "Sakon",
+      "path": "chars/sakon.dat"
+    },
+    {
+      "id": 34,
+      "name": "Kidomaru",
+      "path": "chars/kidomaru.dat"
+    },
+    {
+      "id": 33,
+      "name": "Clone",
+      "path": "chars/naruto_clone.dat"
+    },
+    {
+      "id": 55,
+      "name": "Puppet",
+      "path": "chars/puppet_sasori.dat"
+    },
+    {
+      "id": 32,
+      "name": "Hunter_Nin",
+      "path": "chars/hunter.dat"
+    },
+    {
+      "id": 31,
+      "name": "Striker_Nin",
+      "path": "chars/sound_nin2.dat"
+    },
+    {
+      "id": 30,
+      "name": "Enemy",
+      "path": "chars/sound_nin.dat"
+    },
+    {
+      "id": 2,
+      "name": "Naruto",
+      "path": "chars/naruto.dat"
+    },
+    {
+      "id": 1,
+      "name": "Sakura",
+      "path": "chars/sakura.dat"
+    },
+    {
+      "id": 3,
+      "name": "Kakashi",
+      "path": "chars/kakashi.dat"
+    },
+    {
+      "id": 4,
+      "name": "Sai",
+      "path": "chars/sai.dat"
+    },
+    {
+      "id": 11,
+      "name": "Sasuke",
+      "path": "chars/sasuke.dat"
+    },
+    {
+      "id": 13,
+      "name": "Yamato",
+      "path": "chars/yamato.dat"
+    },
+    {
+      "id": 16,
+      "name": "Gaara",
+      "path": "chars/gaara.dat"
+    },
+    {
+      "id": 7,
+      "name": "Rock_Lee",
+      "path": "chars/rock_lee.dat"
+    },
+    {
+      "id": 18,
+      "name": "Neji",
+      "path": "chars/neji.dat"
+    },
+    {
+      "id": 22,
+      "name": "Shikamaru",
+      "path": "chars/shikamaru.dat"
+    },
+    {
+      "id": 19,
+      "name": "Ten_Ten",
+      "path": "chars/tenten.dat"
+    },
+    {
+      "id": 12,
+      "name": "Kiba",
+      "path": "chars/kiba.dat"
+    },
+    {
+      "id": 5,
+      "name": "Shino",
+      "path": "chars/shino.dat"
+    },
+    {
+      "id": 8,
+      "name": "Chiyo",
+      "path": "chars/chiyo.dat"
+    },
+    {
+      "id": 14,
+      "name": "Kankuro",
+      "path": "chars/kankuro.dat"
+    },
+    {
+      "id": 15,
+      "name": "Temari",
+      "path": "chars/temari.dat"
+    },
+    {
+      "id": 6,
+      "name": "Sasori",
+      "path": "chars/hsasori.dat"
+    },
+    {
+      "id": 17,
+      "name": "Kisame",
+      "path": "chars/kisame.dat"
+    },
+    {
+      "id": 9,
+      "name": "Itachi",
+      "path": "chars/itachi.dat"
+    },
+    {
+      "id": 10,
+      "name": "Deidara",
+      "path": "chars/deidara.dat"
+    },
+    {
+      "id": 24,
+      "name": "Hidan",
+      "path": "chars/hidan.dat"
+    },
+    {
+      "id": 25,
+      "name": "Kakuzu",
+      "path": "chars/kakuzu.dat"
+    },
+    {
+      "id": 23,
+      "name": "Kabuto",
+      "path": "chars/kabuto.dat"
+    },
+    {
+      "id": 20,
+      "name": "Orochimaru",
+      "path": "chars/orochimaru.dat"
+    },
+    {
+      "id": 21,
+      "name": "Jiraiya",
+      "path": "chars/jiraiya.dat"
+    }
+  ],
+  "objects": 137,
+  "backgrounds": 17,
+  "assets": 1121,
+  "source_catalog_sha256": "8a08f9f39d978425943fdf64f3f3ebcad5383b72b225d8603e3ae19238df04d8",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "sprite_edge_repairs": 0,
+  "unresolved_sprite_sheets": 31
+}

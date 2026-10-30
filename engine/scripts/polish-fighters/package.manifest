@@ -1,0 +1,16 @@
+id=polish-fighters
+version=1
+api=1
+requires=base@1
+module=settings|settings.lua
+module=roster|roster.lua
+extend=base/game/catalog|catalog.lua
+module=dashboard_model|dashboard_model.lua
+extend=base/ui/launch|classic_shell.lua
+extend=base/ui/character_select|selection.lua
+extend=base/game/network|room_network.lua
+module=sync_state|sync_state.lua
+module=chronicle|chronicle.lua
+extend=base/ui/match_screen|match_history.lua
+module=progression|progression.lua
+extend=base/game/network|progression_network.lua

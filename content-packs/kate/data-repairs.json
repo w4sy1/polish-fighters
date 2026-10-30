@@ -1,0 +1,11 @@
+[
+  {
+    "asset": "assets/a/000700.dat",
+    "before_sha256": "eecd725194edf0c872767b6a7275ac1dd5f80991aefc8611b5dcec0096aeaeda",
+    "after_sha256": "bc5679da79e76859abc014be22715b776d70054787258b10dfc8dbb045720ce7",
+    "change": "Unnamed transform frame assigned 350",
+    "evidence": "Incoming hit_ja350 and existing frame351 transform; unique missing entry",
+    "inferred": true,
+    "original_runtime_verified": false
+  }
+]

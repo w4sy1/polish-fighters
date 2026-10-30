@@ -1,0 +1,198 @@
+{
+  "pack_id": "kate",
+  "fighters": [
+    {
+      "id": 0,
+      "name": "Template",
+      "path": "data/template.dat"
+    },
+    {
+      "id": 7,
+      "name": "Kate",
+      "path": "data/kate.dat"
+    },
+    {
+      "id": 51,
+      "name": "KateEX",
+      "path": "data/kateex.dat"
+    },
+    {
+      "id": 60,
+      "name": "Hacker",
+      "path": "data/hacker.dat"
+    },
+    {
+      "id": 54,
+      "name": "Firce777",
+      "path": "data/f7.dat"
+    },
+    {
+      "id": 38,
+      "name": "Julian",
+      "path": "data/julian.dat"
+    },
+    {
+      "id": 55,
+      "name": "Firzen",
+      "path": "data/firzen.dat"
+    },
+    {
+      "id": 50,
+      "name": "LouisEX",
+      "path": "data/louisex.dat"
+    },
+    {
+      "id": 56,
+      "name": "Bat",
+      "path": "data/bat.dat"
+    },
+    {
+      "id": 39,
+      "name": "Justin",
+      "path": "data/justin.dat"
+    },
+    {
+      "id": 37,
+      "name": "Knight",
+      "path": "data/knight.dat"
+    },
+    {
+      "id": 36,
+      "name": "Jan",
+      "path": "data/jan.dat"
+    },
+    {
+      "id": 35,
+      "name": "Monk",
+      "path": "data/monk.dat"
+    },
+    {
+      "id": 34,
+      "name": "Sorcerer",
+      "path": "data/sorcerer.dat"
+    },
+    {
+      "id": 33,
+      "name": "Jack",
+      "path": "data/jack.dat"
+    },
+    {
+      "id": 32,
+      "name": "Mark",
+      "path": "data/mark.dat"
+    },
+    {
+      "id": 31,
+      "name": "Hunter",
+      "path": "data/hunter.dat"
+    },
+    {
+      "id": 30,
+      "name": "Bandit",
+      "path": "data/bandit.dat"
+    },
+    {
+      "id": 53,
+      "name": "BanditEX",
+      "path": "data/bandit2.dat"
+    },
+    {
+      "id": 1,
+      "name": "Deep",
+      "path": "data/deep.dat"
+    },
+    {
+      "id": 2,
+      "name": "John",
+      "path": "data/john.dat"
+    },
+    {
+      "id": 4,
+      "name": "Henry",
+      "path": "data/henry.dat"
+    },
+    {
+      "id": 5,
+      "name": "Rudolf",
+      "path": "data/rudolf.dat"
+    },
+    {
+      "id": 6,
+      "name": "Louis",
+      "path": "data/louis.dat"
+    },
+    {
+      "id": 3,
+      "name": "Firen",
+      "path": "data/firen.dat"
+    },
+    {
+      "id": 8,
+      "name": "Freeze",
+      "path": "data/freeze.dat"
+    },
+    {
+      "id": 9,
+      "name": "Dennis",
+      "path": "data/dennis.dat"
+    },
+    {
+      "id": 10,
+      "name": "Woody",
+      "path": "data/woody.dat"
+    },
+    {
+      "id": 11,
+      "name": "Davis",
+      "path": "data/davis.dat"
+    }
+  ],
+  "objects": 98,
+  "backgrounds": 11,
+  "assets": 744,
+  "source_catalog_sha256": "21711ac490a1c691052414b0e3e2e14deaf210cdcf6dcfb3d329c8596cd11673",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "png_aliases": {},
+  "catalog_markers_not_emulated": [],
+  "custom_catalog_labels": [],
+  "missing_resources": [],
+  "experimental": true,
+  "campaigns": [],
+  "disabled_sound_annotations": [],
+  "sprite_edge_repairs": 0,
+  "unresolved_sprite_sheets": 44,
+  "native_smoke_validation": {
+    "date": "2026-10-30",
+    "fighters": 29,
+    "frames": 300,
+    "passed": 29,
+    "draw_rectangles_outside_images": 0,
+    "full_gameplay_verified": false,
+    "evidence": "validation/native-fixes-2026-10-29/fighters-geometry/summary.json"
+  },
+  "render_layout_validation": {
+    "classification": {
+      "referenced_cells_fit": 36,
+      "partial_clipping_remaining": 2,
+      "empty_sources_suppressed": 6
+    },
+    "inferred_packed_declarations": 0,
+    "partial_clipping_resolved": false,
+    "pixels_modified": false
+  },
+  "recovered_internal_records": [
+    {
+      "id": 99,
+      "kind": 0,
+      "assets": 25,
+      "actions": [
+        390,
+        392
+      ],
+      "evidence": "recovered-oid99.json",
+      "native_spawn_tests_passed": true
+    }
+  ]
+}

@@ -1,0 +1,478 @@
+{
+  "padded": [],
+  "unresolved": [
+    {
+      "asset": "mods/reinforced/a/000520.bmp",
+      "actual": [
+        800,
+        350
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000521.bmp",
+      "actual": [
+        321,
+        81
+      ],
+      "required": [
+        1599,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000525.bmp",
+      "actual": [
+        800,
+        350
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000526.bmp",
+      "actual": [
+        321,
+        81
+      ],
+      "required": [
+        1599,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000163.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000183.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        331
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000324.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000353.bmp",
+      "actual": [
+        800,
+        340
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000448.bmp",
+      "actual": [
+        800,
+        350
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000385.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000386.bmp",
+      "actual": [
+        800,
+        240
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000303.bmp",
+      "actual": [
+        328,
+        189
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000223.bmp",
+      "actual": [
+        639,
+        796
+      ],
+      "required": [
+        639,
+        799
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000224.bmp",
+      "actual": [
+        639,
+        796
+      ],
+      "required": [
+        639,
+        799
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000164.bmp",
+      "actual": [
+        341,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000403.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000266.bmp",
+      "actual": [
+        144,
+        100
+      ],
+      "required": [
+        143,
+        149
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000394.bmp",
+      "actual": [
+        800,
+        270
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000428.bmp",
+      "actual": [
+        800,
+        190
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000318.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000305.bmp",
+      "actual": [
+        328,
+        166
+      ],
+      "required": [
+        327,
+        497
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000440.bmp",
+      "actual": [
+        800,
+        360
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000319.bmp",
+      "actual": [
+        656,
+        415
+      ],
+      "required": [
+        655,
+        497
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000279.bmp",
+      "actual": [
+        490,
+        98
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000511.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000513.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000503.bmp",
+      "actual": [
+        800,
+        250
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000506.bmp",
+      "actual": [
+        800,
+        250
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000408.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000536.bmp",
+      "actual": [
+        800,
+        190
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000537.bmp",
+      "actual": [
+        800,
+        270
+      ],
+      "required": [
+        713,
+        559
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000346.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000337.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000328.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000326.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000345.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000333.bmp",
+      "actual": [
+        455,
+        59
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000343.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000341.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000340.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000330.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000329.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/reinforced/a/000376.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    }
+  ]
+}

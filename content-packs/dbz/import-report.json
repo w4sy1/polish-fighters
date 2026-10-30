@@ -1,0 +1,501 @@
+{
+  "pack_id": "dbz",
+  "fighters": [
+    {
+      "id": 93,
+      "name": "Piccolo_(1)",
+      "path": "char/piccolo/1/piccolotur.dat"
+    },
+    {
+      "id": 91,
+      "name": "Piccolo_(1)(A)",
+      "path": "char/piccolo/1/piccolo.dat"
+    },
+    {
+      "id": 92,
+      "name": "Vegeta_(1)",
+      "path": "char/vegeta/1/vegeta.dat"
+    },
+    {
+      "id": 32,
+      "name": "Namek_Warrior",
+      "path": "c/nmk/w1/warrior1.dat"
+    },
+    {
+      "id": 35,
+      "name": "Warrior_Namek",
+      "path": "c/nmk/w2/warrior2.dat"
+    },
+    {
+      "id": 39,
+      "name": "Namek_Healer",
+      "path": "c/nmk/h/healer.dat"
+    },
+    {
+      "id": 98,
+      "name": "Nail",
+      "path": "c/nmk/nail/nail.dat"
+    },
+    {
+      "id": 95,
+      "name": "Piccolo_(2)",
+      "path": "char/piccolo/2/piccolotur.dat"
+    },
+    {
+      "id": 94,
+      "name": "Piccolo_(2)(A)",
+      "path": "char/piccolo/2/piccolo.dat"
+    },
+    {
+      "id": 85,
+      "name": "Goku_[2]",
+      "path": "char/goku/2/b/goku.dat"
+    },
+    {
+      "id": 86,
+      "name": "SS_Goku_[2]",
+      "path": "char/goku/2/ss/ssgoku.dat"
+    },
+    {
+      "id": 66,
+      "name": "Vegeta_(2)",
+      "path": "char/vegeta/2/vegeta.dat"
+    },
+    {
+      "id": 61,
+      "name": "FF_Frieza_(2)",
+      "path": "char/frieza/final/ffrieza.dat"
+    },
+    {
+      "id": 304,
+      "name": "Krillin",
+      "path": "sprite/krillin/krillin.dat"
+    },
+    {
+      "id": 97,
+      "name": "Piccolo_(3)",
+      "path": "char/piccolo/3/piccolotur.dat"
+    },
+    {
+      "id": 96,
+      "name": "Piccolo_(3)(A)",
+      "path": "char/piccolo/3/piccolo.dat"
+    },
+    {
+      "id": 67,
+      "name": "Vegeta_(3)",
+      "path": "char/vegeta/3/b/vegeta.dat"
+    },
+    {
+      "id": 68,
+      "name": "SS_Vegeta_(3)",
+      "path": "char/vegeta/3/ss/ssvegeta.dat"
+    },
+    {
+      "id": 69,
+      "name": "Super_Vegeta_(3)",
+      "path": "char/vegeta/3/super/supervegeta.dat"
+    },
+    {
+      "id": 82,
+      "name": "Trunks_(3)",
+      "path": "char/ftrunks/a/b/trunks.dat"
+    },
+    {
+      "id": 83,
+      "name": "SS_Trunks_(3)",
+      "path": "char/ftrunks/a/ss/sstrunks.dat"
+    },
+    {
+      "id": 89,
+      "name": "Super_Trunks_(3)",
+      "path": "char/ftrunks/a/s/strunks.dat"
+    },
+    {
+      "id": 84,
+      "name": "Ultra_Trunks_(3)",
+      "path": "char/ftrunks/a/u/utrunks.dat"
+    },
+    {
+      "id": 60,
+      "name": "Perfect_Cell",
+      "path": "char/cell/perfect/pcell.dat"
+    },
+    {
+      "id": 302,
+      "name": "Piccolo_(4)",
+      "path": "char/piccolo/4/piccolo4w.dat"
+    },
+    {
+      "id": 303,
+      "name": "Piccolo_(4)(A)",
+      "path": "char/piccolo/4/piccolo4a.dat"
+    },
+    {
+      "id": 70,
+      "name": "Vegeta_(4)",
+      "path": "char/vegeta/4/b/vegeta.dat"
+    },
+    {
+      "id": 71,
+      "name": "SS_Vegeta_(4)",
+      "path": "char/vegeta/4/ss/ssvegeta.dat"
+    },
+    {
+      "id": 72,
+      "name": "SS2_Vegeta_(4)",
+      "path": "char/vegeta/4/ss2/ss2vegeta.dat"
+    },
+    {
+      "id": 73,
+      "name": "Majin_Vegeta_(4)",
+      "path": "char/vegeta/4/m/mvegeta.dat"
+    },
+    {
+      "id": 74,
+      "name": "Goku_(4)",
+      "path": "char/goku/4/b/goku.dat"
+    },
+    {
+      "id": 75,
+      "name": "SS_Goku_[4]",
+      "path": "char/goku/4/ss/ssgoku.dat"
+    },
+    {
+      "id": 76,
+      "name": "SS2_Goku_[4]",
+      "path": "char/goku/4/ss2/ss2goku.dat"
+    },
+    {
+      "id": 77,
+      "name": "SS3_Goku_[4]",
+      "path": "char/goku/4/ss3/ss3goku.dat"
+    },
+    {
+      "id": 78,
+      "name": "Gohan_[4]",
+      "path": "char/gohan/4/b/gohan.dat"
+    },
+    {
+      "id": 79,
+      "name": "SS_Gohan_[4]",
+      "path": "char/gohan/4/ss/ssgohan.dat"
+    },
+    {
+      "id": 80,
+      "name": "SS2_Gohan_[4]",
+      "path": "char/gohan/4/ss2/ss2gohan.dat"
+    },
+    {
+      "id": 81,
+      "name": "Ultimate_Gohan_[4]",
+      "path": "char/gohan/4/u/gohan.dat"
+    },
+    {
+      "id": 305,
+      "name": "Vegito_(4)",
+      "path": "char/vegito/b/vegito.dat"
+    },
+    {
+      "id": 306,
+      "name": "Super_Vegito_(4)",
+      "path": "char/vegito/ss/supervegito.dat"
+    },
+    {
+      "id": 307,
+      "name": "Gogeta",
+      "path": "c/gog/b/gog.dat"
+    },
+    {
+      "id": 308,
+      "name": "Super_Gogeta",
+      "path": "c/gog/ss/ssgog.dat"
+    },
+    {
+      "id": 88,
+      "name": "Kid_Buu",
+      "path": "char/buu/kid/kidbuu.dat"
+    },
+    {
+      "id": 30,
+      "name": "FF_Fist_(2)",
+      "path": "char/ffs/f/fist.dat"
+    },
+    {
+      "id": 31,
+      "name": "FF_Gun_(2)",
+      "path": "char/ffs/g/gun.dat"
+    },
+    {
+      "id": 33,
+      "name": "FF_Special_(2)",
+      "path": "char/ffs/s/special.dat"
+    },
+    {
+      "id": 501,
+      "name": "?",
+      "path": "data/stage/cinema/t0_invisible.dat"
+    },
+    {
+      "id": 502,
+      "name": "Namek_Warrior",
+      "path": "sprite/ship/ship.dat"
+    },
+    {
+      "id": 506,
+      "name": "Namek_Warrior",
+      "path": "sprite/ship/ship2.dat"
+    },
+    {
+      "id": 513,
+      "name": "?",
+      "path": "data/stage/cinema/t0_challenge.dat"
+    },
+    {
+      "id": 996,
+      "name": "Announcer",
+      "path": "char/spec.dat"
+    },
+    {
+      "id": 34,
+      "name": "Bandit",
+      "path": "data/seppuku.dat"
+    },
+    {
+      "id": 36,
+      "name": "Bandit",
+      "path": "data/seppuku.dat"
+    },
+    {
+      "id": 37,
+      "name": "Bandit",
+      "path": "data/seppuku.dat"
+    },
+    {
+      "id": 87,
+      "name": "Fat_Buu_(Concept)",
+      "path": "data/monk.dat"
+    },
+    {
+      "id": 63,
+      "name": "LSS_Broly",
+      "path": "c/fakebro/fakebroly.dat"
+    }
+  ],
+  "objects": 190,
+  "backgrounds": 14,
+  "assets": 2119,
+  "source_catalog_sha256": "b978d6af9a077cf7d7c75c54976cf6e1fea468d3504d9dfdd0fc0fd107bbcd69",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "png_aliases": {
+    "char/ftrunks/a/ss/energyblast.bmp": "char/ftrunks/a/ss/energyblast.png",
+    "common/superekamehameha.bmp": "common/superekamehameha.png",
+    "common/kamend.bmp": "common/kamend.png",
+    "common/superkamehameha.bmp": "common/superkamehameha.png"
+  },
+  "catalog_markers_not_emulated": [],
+  "custom_catalog_labels": [],
+  "missing_resources": [
+    "bgm/stage4.wma",
+    "common/kiball_pink.png"
+  ],
+  "experimental": true,
+  "campaigns": [
+    {
+      "id": 0,
+      "name": "Arcade_1_(Bandit_Hunt)",
+      "path": "mods/dbz/a/000000.dat",
+      "start_id": 0,
+      "background": 8,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 1,
+      "name": "Arcade_2_(Namek)",
+      "path": "mods/dbz/a/000002.dat",
+      "start_id": 0,
+      "background": 6,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 2,
+      "name": "Arcade_3_(Cell_Saga)",
+      "path": "mods/dbz/a/000004.dat",
+      "start_id": 0,
+      "background": 5,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 3,
+      "name": "Arcade_4_(Buu_Saga)",
+      "path": "mods/dbz/a/000006.dat",
+      "start_id": 0,
+      "background": null,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 4,
+      "name": "Arcade_5_(RUN)",
+      "path": "mods/dbz/a/000008.dat",
+      "start_id": 0,
+      "background": 3,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 5,
+      "name": "Survival_Stage",
+      "path": "mods/dbz/a/000010.dat",
+      "start_id": 0,
+      "background": 4,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 6,
+      "name": "Survival_Stage_[Phase_10]",
+      "path": "mods/dbz/a/000012.dat",
+      "start_id": 0,
+      "background": 4,
+      "requires_custom_unlock": true
+    },
+    {
+      "id": 7,
+      "name": "Survival_Stage_[Phase_20]",
+      "path": "mods/dbz/a/000014.dat",
+      "start_id": 0,
+      "background": 4,
+      "requires_custom_unlock": true
+    },
+    {
+      "id": 8,
+      "name": "Survival_Stage_[Phase_25]",
+      "path": "mods/dbz/a/000016.dat",
+      "start_id": 0,
+      "background": 4,
+      "requires_custom_unlock": true
+    },
+    {
+      "id": 9,
+      "name": "Survival_Stage_[Phase_31]",
+      "path": "mods/dbz/a/000018.dat",
+      "start_id": 0,
+      "background": 4,
+      "requires_custom_unlock": true
+    },
+    {
+      "id": 10,
+      "name": "Challenge_1",
+      "path": "mods/dbz/a/000020.dat",
+      "start_id": 0,
+      "background": 5,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 11,
+      "name": "Challenge_2",
+      "path": "mods/dbz/a/000022.dat",
+      "start_id": 0,
+      "background": 6,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 12,
+      "name": "Challenge_3",
+      "path": "mods/dbz/a/000024.dat",
+      "start_id": 0,
+      "background": 0,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 13,
+      "name": "Challenge_4",
+      "path": "mods/dbz/a/000026.dat",
+      "start_id": 0,
+      "background": null,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 14,
+      "name": "Challenge_5",
+      "path": "mods/dbz/a/000028.dat",
+      "start_id": 0,
+      "background": 3,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 15,
+      "name": "Challenge_6",
+      "path": "mods/dbz/a/000030.dat",
+      "start_id": 0,
+      "background": 3,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 16,
+      "name": "Frieza_Warriors_Level_1",
+      "path": "mods/dbz/a/000032.dat",
+      "start_id": 0,
+      "background": 6,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 17,
+      "name": "Frieza_Warriors_Level_2",
+      "path": "mods/dbz/a/000034.dat",
+      "start_id": 0,
+      "background": 6,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 18,
+      "name": "Frieza_Warriors_Level_3",
+      "path": "mods/dbz/a/000036.dat",
+      "start_id": 0,
+      "background": 6,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 19,
+      "name": "Mirror_Match",
+      "path": "mods/dbz/a/000038.dat",
+      "start_id": 0,
+      "background": null,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 20,
+      "name": "Arcade_1_(Unlock_Piccolo[1])",
+      "path": "mods/dbz/a/000039.dat",
+      "start_id": 0,
+      "background": 8,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 21,
+      "name": "Arcade_2_(Unlock_Piccolo[2])",
+      "path": "mods/dbz/a/000041.dat",
+      "start_id": 0,
+      "background": 6,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 22,
+      "name": "Arcade_3_(Unlock_Piccolo[3])",
+      "path": "mods/dbz/a/000043.dat",
+      "start_id": 0,
+      "background": 5,
+      "requires_custom_unlock": false
+    },
+    {
+      "id": 23,
+      "name": "Arcade_4_(Unlock_Piccolo[4])",
+      "path": "mods/dbz/a/000045.dat",
+      "start_id": 0,
+      "background": null,
+      "requires_custom_unlock": false
+    }
+  ],
+  "sprite_edge_repairs": 0,
+  "unresolved_sprite_sheets": 149
+}

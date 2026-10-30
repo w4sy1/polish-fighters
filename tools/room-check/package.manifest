@@ -1,0 +1,8 @@
+id=room-check
+version=1
+api=1
+requires=base@1
+requires=polish-fighters@1
+module=config|config.lua
+extend=base/ui/flow|flow.lua
+extend=base/ui/network|network.lua
