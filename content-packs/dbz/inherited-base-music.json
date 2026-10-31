@@ -1,0 +1,11 @@
+{
+  "missing_mod_resource": "bgm/stage4.wma",
+  "virtual_resource": "mods/dbz/a/000052.wma",
+  "asset": "assets/inherited-base/stage4.wma",
+  "source": "Pinned original LF2 v2.0a archive; read as data only",
+  "source_sha256": "540c485547e234b0d09595f54d067aafd7176092c308aca61868f3cbc03030e1",
+  "source_resource": "bgm/stage4.wma",
+  "asset_sha256": "323ec7712db42b348c50964b919d3859b206f3da9f6f5b8d61f433741db92a36",
+  "scope": "Explicit base-game compatibility fallback; DBZ-specific intended recording not established",
+  "original_dbz_audio_recovered": false
+}

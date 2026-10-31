@@ -2,7 +2,7 @@ param(
     [switch]$SkipDependencies,
     [string]$Installer,
     [string]$StageDirectory,
-    [string[]]$PackIds = @('lf4-turbo', 'bleach', 'kate', 'reinforced', 'dbz', 'ntsd', 'one-piece')
+    [string[]]$PackIds = @('lf4-turbo', 'bleach', 'kate', 'reinforced', 'dbz', 'ntsd', 'one-piece', 'polish-originals')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -53,6 +53,7 @@ try {
         "-DPython3_EXECUTABLE=$(Join-Path $venv 'python.exe')") 'cmake-configure.log'
     Invoke-Logged cmake @('--build', $native, '--config', 'Release', '--parallel', '4') 'cmake-build.log'
     Copy-Item -LiteralPath (Join-Path $native 'Release/openlf2.exe') -Destination $stage -Force
+    Copy-Item -LiteralPath (Join-Path $native 'Release/openlf2.exe') -Destination (Join-Path $stage 'LittleFighters.exe') -Force
     $dlls = @(Get-ChildItem -LiteralPath (Join-Path $build 'runtime') -Recurse -File -Filter '*.dll')
     if ($dlls.Count -eq 0) { throw 'No runtime DLLs were deployed.' }
     foreach ($dll in $dlls) { Copy-Item -LiteralPath $dll.FullName -Destination $stage -Force }
@@ -76,9 +77,11 @@ try {
         '--key', 'openssl', '--key', 'libcurl') 'licenses.log'
     foreach ($pack in (@('LF2') + $PackIds)) {
         $modArgument = if ($pack -ne 'LF2') { ' --mod "%~dp0content-packs\' + $pack + '"' } else { '' }
-        $launcher = "@echo off`r`ncd /d `"%~dp0`"`r`n`"%~dp0openlf2.exe`" --installer `"%~dp0LF2_v2.0a.exe`" --scripts `"%~dp0scripts`" --mod `"%~dp0scripts\polish-fighters`" --config-dir `"%~dp0userdata\$pack`"$modArgument`r`nif errorlevel 1 pause`r`n"
+        $launcher = "@echo off`r`ncd /d `"%~dp0`"`r`n`"%~dp0LittleFighters.exe`" --installer `"%~dp0LF2_v2.0a.exe`" --scripts `"%~dp0scripts`" --mod `"%~dp0scripts\polish-fighters`" --config-dir `"%~dp0userdata\common`"$modArgument`r`nif errorlevel 1 pause`r`n"
         Set-Content -LiteralPath (Join-Path $stage "Graj-$pack.cmd") -Value $launcher -Encoding ascii
     }
+    $mainLauncher = @('@echo off', 'cd /d "%~dp0"', '"%~dp0LittleFighters.exe" --config-dir "%~dp0userdata/common"', 'if errorlevel 1 pause') -join "`r`n"
+    Set-Content -LiteralPath (Join-Path $stage 'Graj-Little-Fighters.cmd') -Value $mainLauncher -Encoding ascii
     $files = Get-ChildItem -LiteralPath $stage -Recurse -File | ForEach-Object {
         [pscustomobject]@{ path = [IO.Path]::GetRelativePath($stage, $_.FullName); bytes = $_.Length;
             sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }

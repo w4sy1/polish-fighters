@@ -109,7 +109,7 @@ local state = screen.create(runtime_settings or {menu_seed = 0})
 local FrameOpcode = {
     viewport = 1, sprite = 2, fill = 3, overlay = 4, render_area = 5,
     clip = 6, sound = 7, rumble = 8, music = 9, speed = 10,
-    render_filter = 11, text_input = 12, replay_drop = 13, fullscreen = 14, action = 15, text = 16, file_dialog = 17, world_sprite = 18,
+    render_filter = 11, text_input = 12, replay_drop = 13, fullscreen = 14, action = 15, text = 16, file_dialog = 17, world_sprite = 18, scaled_sprite = 19,
 }
 local RumbleTarget = {gamepad = 0, phone = 1}
 local MusicKind = {play = 0, stop = 1, resume = 2, volume = 3}
@@ -128,6 +128,10 @@ local function render(input)
         size, count = size + fields + 1, count + 1
     end
     local context = {}
+    function context.scaled_sprite(resource, source, x, y, width, height, mirrored, tint)
+        command(FrameOpcode.scaled_sprite, resource, source[1], source[2], source[3], source[4],
+            x, y, width, height, not not mirrored, tint or 0xffffff)
+    end
     -- What the frame has drawn that translated text must be able to restore (see i18n.paint_baked).
     local scene = {}
     function context.viewport(w, h, r, g, b)

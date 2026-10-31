@@ -74,7 +74,8 @@ return function(base)
                 {"touch-reset","PRZYWROC UKLAD"},{"touch-classic","UKLAD: KLASYCZNY LF"},
                 {"touch-modern","UKLAD: NOWOCZESNY JOYSTICK"},{"back","POWROT"}}
         end
-        return {{"play","GRAJ W LF2 CLASSIC"},{"maps","WYBIERZ MAPE"},{"packs","PAKIETY I POSTACIE"},
+        local title=require("polish-fighters/hub").title(require("base/game/catalog").profile_id)
+        return {{"play","GRAJ W "..title:upper()},{"maps","WYBIERZ MAPE"},{"packs","PAKIETY I POSTACIE"},
             {"connection","POLACZENIA: 2-8 URZADZEN"},{"account","KONTO / GOSC"},{"options","USTAWIENIA"},
             {"touch","STEROWANIE DOTYKOWE"},{"history","HISTORIA ROZGRYWEK"},
             {"unlock","ODBLOKOWANIE POSTACI"},{"close","POWROT DO LF2"}}

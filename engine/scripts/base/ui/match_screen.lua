@@ -316,13 +316,15 @@ local function draw_status(context, state)
             if small then context.image(small:gsub("\\", "/"):lower(), column + 9, row + 7, false) end
             if value.hp > 0 then
                 local function bar(source_y, width, y)
+                    width=math.max(0,math.min(124,width))
                     if width > 0 then context.sprite("pe/bars", {0, source_y, width, 10}, column + 57, row + y, false) end
                 end
-                bar(30, math.floor(value.dark_hp * 31 / 125), 16)
-                bar(20, math.floor(value.hp * 31 / 125), 16)
+                local hp_scale=math.max(500,value.max_hp or 500)
+                bar(30, math.floor(value.dark_hp * 124 / hp_scale), 16)
+                bar(20, math.floor(value.hp * 124 / hp_scale), 16)
                 -- Healing (milk, regeneration): the bar flashes every other tick of the 12-tick counter.
                 if (math.floor(value.regen_timer / constants.healing.timer_base) == 1 or value.heal_timer > 0) and state.counter_12 % 2 == 0 then
-                    bar(40, math.floor(value.hp * 31 / 125), 16)
+                    bar(40, math.floor(value.hp * 124 / hp_scale), 16)
                 end
                 bar(10, 124, 36)
                 bar(0, math.floor(value.mp * 31 / 125), 36)

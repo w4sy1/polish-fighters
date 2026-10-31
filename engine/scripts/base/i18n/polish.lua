@@ -1,5 +1,12 @@
 -- Polish Fighters: initial Polish UI translation; missing keys fall back to English.
-return {
+local polish = {
+    ["Character Selection （選擇角色）"] = "Wybór postaci",
+    ["Player （玩家）:"] = "Gracz:",
+    ["Fighter （角色）:"] = "Postać:",
+    ["Team （組別）:"] = "Drużyna:",
+    ["有多少個電腦玩家？"] = "",
+    ["隨機選角"] = "",
+    ["按 攻擊 加入!"] = "",
     ["default"] = "Domyślny",
     ["english"] = "Angielski",
     ["german"] = "Niemiecki",
@@ -175,4 +182,41 @@ return {
     ["and press its attack button."] = "i naciśnij przycisk ataku.",
     ["data"] = "dane", ["sequence"] = "kolejność", ["version"] = "wersja",
     ["to join!"] = "aby dołączyć!",
+    ["Invalid room frame sequence"] = "Nieprawidłowa kolejność klatek pokoju",
+    ["Invalid room checksum sequence"] = "Nieprawidłowa kolejność kontroli synchronizacji",
+    ["Room receive buffer exceeded"] = "Przekroczono bufor odbioru pokoju",
+    ["Room connection timed out"] = "Przekroczono czas łączenia z pokojem",
+    ["Room checksum timed out"] = "Przekroczono czas kontroli synchronizacji",
+    ["Room input timed out"] = "Przekroczono czas oczekiwania na gracza",
 }
+-- Reuse translations for bilingual bitmap labels; hide duplicate Chinese-only lines.
+local labels={
+ ['control settings']='Ustawienia sterowania',['up']='Góra',['down']='Dół',
+ ['left']='Lewo',['right']='Prawo',['attack']='Atak',['jump']='Skok',['defend']='Blok',
+ ['ok']='OK',['cancel']='Anuluj',
+ ['Click here to see the special moves table of characters']='Zobacz listę umiejętności postaci',
+ ['Default Setting']='Ustawienia domyślne',['Army Size:']='Wielkość armii:',
+ ['Small']='Mała',['Middle']='Średnia',['Large']='Duża',['Army Type:']='Rodzaj armii:',
+ ['1 on 1 Championship']='Turniej 1 na 1',
+ ['For details, please click here to visit the competition webpage.']='Szczegóły na stronie konkursu LF2',
+ ['Control:']='Sterowanie:',['Yes']='Tak',['No']='Nie',
+ ['LF2 Mission Challenge']='Wyzwania LF2',
+ ['Click here to know more about recording']='Instrukcja nagrywania powtórek',
+ ['Team 1']='Drużyna 1',['Team 2']='Drużyna 2',
+ ['Open the recording files saving folder']='Otwórz folder powtórek',
+ ['Turn on recording']='Włącz nagrywanie',['Hero']='Bohater',['E-mail']='E-mail',
+ ['Defense:']='Obrona:',['More info']='Dodatkowe informacje',['Follower']='Żołnierz',
+ ['Your name']='Twoje imię',['Use default setting']='Użyj ustawień domyślnych',
+ ['OK!']='OK!',['Recording Information']='Informacje o powtórce',
+ ['recording info']='Informacje o powtórce',['game start']='Rozpocznij grę',
+ ['official website']='Oficjalna strona',['network game']='Gra sieciowa',['skip']='Pomiń',
+ ['Use the following buttons to control']='Sterowanie poniższymi przyciskami',
+ ['Waiting for Opponent']='Oczekiwanie na przeciwnika',['Connect to Opponent']='Połącz z przeciwnikiem',
+ ['ver 2.0a']='wersja 2.0a',['Die']='Zgony',['time:']='Czas:',
+ ["Press 'Attack' or 'Jump' to continue"]='Naciśnij atak lub skok, aby kontynuować',
+ ['Summary']='Podsumowanie',
+}
+for key,value in pairs(require('base/i18n/english')) do
+ if polish[key]==nil then polish[key]=value=='' and '' or polish[value] or labels[value] or value end
+end
+return polish

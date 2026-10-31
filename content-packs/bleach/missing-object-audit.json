@@ -1,0 +1,679 @@
+{
+  "catalog_sha256": "d7628a7933af9f3458bf1e01a09cb36c785b2fb255027ffb01a6c6773ebb156e",
+  "source_dat_count": 123,
+  "targets": [
+    {
+      "oid": 284,
+      "action": 83,
+      "status": "unresolved: original catalog has no target; candidates do not establish intended identity",
+      "references": [
+        {
+          "source": "data/zaraki_2.dat",
+          "frame": 9,
+          "opoint": "kind: 1  x: 40  y: 100  action: 83  dvx: 0  dvy: 0  oid: 284 facing: 0"
+        }
+      ],
+      "action_candidates": [
+        {
+          "source": "data/broken_weapon.dat",
+          "registered_ids": [
+            999
+          ],
+          "sha256": "295a625a057f391c50951275f2fe33ceb713e09e3f50ec9a11bbea9aeaceee83"
+        },
+        {
+          "source": "data/byakuya_swords.dat",
+          "registered_ids": [
+            405
+          ],
+          "sha256": "de0464813edd1abffcafd112acf3159e0127e6c106653c0a7f407293b35dfad0"
+        },
+        {
+          "source": "data/byakuya_swords2.dat",
+          "registered_ids": [
+            419
+          ],
+          "sha256": "b9a615b7765935f31334817994ba9f4e46f0a76f331e935f3764c8281304f2b5"
+        },
+        {
+          "source": "data/grimmjow_loko.dat",
+          "registered_ids": [
+            413
+          ],
+          "sha256": "b0b9af88341a294c0770483adf583bbcb20209fa6f42135419f74237ebe504f3"
+        },
+        {
+          "source": "data/hunter.dat",
+          "registered_ids": [],
+          "sha256": "4485c81d192e52d43210450ce0ccd5c06e0298e7a4f37fa1916474229d5f321f"
+        },
+        {
+          "source": "data/ichigo.dat",
+          "registered_ids": [
+            11
+          ],
+          "sha256": "9c053060509719ab66af3b68c8b00263370f6792b82b65ac2b34627127b7d52f"
+        },
+        {
+          "source": "data/ichigobankai_ball.dat",
+          "registered_ids": [
+            205
+          ],
+          "sha256": "8978b60e4652b49af2ada3e6be1ad98efc324769029db2cfdaa589c2cdf93ab6"
+        },
+        {
+          "source": "data/ichigovizard_ball.dat",
+          "registered_ids": [
+            417
+          ],
+          "sha256": "c0049d74fbc1bb632067c42e48bf0f035ea9008c5cc6a3162062b73d70e8c32f"
+        },
+        {
+          "source": "data/ichigo_bankai.dat",
+          "registered_ids": [
+            55
+          ],
+          "sha256": "4b83fa115f0dc8d2bb63254ada0ef3827a1515f6aaf0f3996025065dedd9f052"
+        },
+        {
+          "source": "data/ichigo_vizard.dat",
+          "registered_ids": [
+            56
+          ],
+          "sha256": "c1d83aeb99bc9b3b3361369d97ba2a0a60e8181e3c383ac83f2ba3146dc4b8d2"
+        },
+        {
+          "source": "data/ikkaku.dat",
+          "registered_ids": [],
+          "sha256": "c4c693f9b9173e501fd689b51474ccd37e924be356d697ebec2f4f2ccda2657d"
+        },
+        {
+          "source": "data/ishida_arrow.dat",
+          "registered_ids": [
+            204
+          ],
+          "sha256": "283132e8557f1b18d667d92d3ac577629d633ef009fd8d786ea01ebfd6c6516d"
+        },
+        {
+          "source": "data/renji.dat",
+          "registered_ids": [
+            9
+          ],
+          "sha256": "a29b92a76a10f43b66e005bf74ddf27a500559d45dea2be31041e951e696fd66"
+        },
+        {
+          "source": "data/rukia.dat",
+          "registered_ids": [
+            10
+          ],
+          "sha256": "4e2568e25445c810dd0eee8b4853848722dd4076519ba2320c9db8d0b2add152"
+        },
+        {
+          "source": "data/shirozaki.dat",
+          "registered_ids": [
+            14
+          ],
+          "sha256": "62c9337d917a22756e68df7bb0938d57c8b624b2476ca2406de865d787df5c58"
+        },
+        {
+          "source": "data/shirozakibankai_ball.dat",
+          "registered_ids": [
+            206
+          ],
+          "sha256": "259f79a3fd1178e9535736f62b7d8f5cfe271a582041440cfca9eb3d78217ca2"
+        },
+        {
+          "source": "data/shirozaki_bankai.dat",
+          "registered_ids": [
+            59
+          ],
+          "sha256": "ef2f82f9209ae1861ad76b9e5f6d0d1065ac129dd5777398bf69aeff15f675f9"
+        },
+        {
+          "source": "data/sword.dat",
+          "registered_ids": [
+            229
+          ],
+          "sha256": "c2248cf7744df96b369abac1eabfbf7946979a2a428e2f26f18e1c626fc78929"
+        }
+      ]
+    },
+    {
+      "oid": 151,
+      "action": 30,
+      "status": "unresolved: original catalog has no target; candidates do not establish intended identity",
+      "references": [
+        {
+          "source": "data/wind.dat",
+          "frame": 153,
+          "opoint": "kind: 1  x: 35  y: 70  action: 30  dvx: 0  dvy: 0  oid: 151  facing: 0"
+        }
+      ],
+      "action_candidates": [
+        {
+          "source": "data/arrancar.dat",
+          "registered_ids": [
+            33
+          ],
+          "sha256": "0a8b19f7db5953b12bd7e02072a2a35cb3dd98c7fd8f0971da9680b98c233e55"
+        },
+        {
+          "source": "data/bandit.dat",
+          "registered_ids": [],
+          "sha256": "4ddf62da7a919208a5eed6a94c51428955126c2ffa22aa1214535f6c6b324fed"
+        },
+        {
+          "source": "data/bankai_attack.dat",
+          "registered_ids": [
+            208
+          ],
+          "sha256": "f63ef34decfc44322d1f21e9be271168b1fe6cd36dffa2334546176401eacf50"
+        },
+        {
+          "source": "data/broken_weapon.dat",
+          "registered_ids": [
+            999
+          ],
+          "sha256": "295a625a057f391c50951275f2fe33ceb713e09e3f50ec9a11bbea9aeaceee83"
+        },
+        {
+          "source": "data/byakuya.dat",
+          "registered_ids": [
+            7
+          ],
+          "sha256": "37fd821f47ba86d825b1a4fde6631112ab5175c6d0cb084e633abbcf2983ff73"
+        },
+        {
+          "source": "data/byakuya_bankai.dat",
+          "registered_ids": [
+            38
+          ],
+          "sha256": "42046deaddb8ce744ab4d7499dd778f95419a427347e47f6a185ea6117346ef6"
+        },
+        {
+          "source": "data/byakuya_shield.dat",
+          "registered_ids": [
+            234
+          ],
+          "sha256": "80efcb5fa022e9beeada4aa584f56f55586186cbe402620d03ae9c3282ad94c5"
+        },
+        {
+          "source": "data/byakuya_swords.dat",
+          "registered_ids": [
+            405
+          ],
+          "sha256": "de0464813edd1abffcafd112acf3159e0127e6c106653c0a7f407293b35dfad0"
+        },
+        {
+          "source": "data/cero.dat",
+          "registered_ids": [
+            221
+          ],
+          "sha256": "a6e96fa2bab039f41f4df69af3f1ac83f4f37bf92a882beda9cfd02e5004c30b"
+        },
+        {
+          "source": "data/cero2.dat",
+          "registered_ids": [
+            457
+          ],
+          "sha256": "a62e6ee0759e544faa403734056de3a8e51f66404880982832002c06b7391e5b"
+        },
+        {
+          "source": "data/cero3.dat",
+          "registered_ids": [
+            459
+          ],
+          "sha256": "b431e73e8d5b944869520692d04f7f1b453f851bdc0a21f175ab0da92052faa7"
+        },
+        {
+          "source": "data/chad.dat",
+          "registered_ids": [
+            3
+          ],
+          "sha256": "889c989d94d209b13a5d7513a31076469f0002a1c40cb072d1a1e00951baf786"
+        },
+        {
+          "source": "data/chad2.dat",
+          "registered_ids": [
+            58
+          ],
+          "sha256": "4abfb7243f9c6ea7ecd6bb20070be0915c24b915c493ca952197b062f1cb0796"
+        },
+        {
+          "source": "data/chad2_ball.dat",
+          "registered_ids": [
+            209
+          ],
+          "sha256": "200f386dbf5533ec404010a3328e70bac7064146ff31ee01a58837694b9216be"
+        },
+        {
+          "source": "data/chad2_ball2.dat",
+          "registered_ids": [
+            215
+          ],
+          "sha256": "849a9aef8d270e504be2475b2dbc897325075df1e68331bf5d69d8816bb45ce4"
+        },
+        {
+          "source": "data/chad2_ballx.dat",
+          "registered_ids": [
+            217
+          ],
+          "sha256": "cc9c70a64e2cc59f994f7f58f1176978b4ce861a478c7e6df702f40e5f628e9f"
+        },
+        {
+          "source": "data/chad_ball.dat",
+          "registered_ids": [
+            222
+          ],
+          "sha256": "3714203d9c6769448c8d8880f2c7b40754dcabf82ca244a8f49d830bea9163f1"
+        },
+        {
+          "source": "data/charge.dat",
+          "registered_ids": [
+            230
+          ],
+          "sha256": "66ec1bb47b38945e3fe111395fba0b30cdc100faff39af89abf9856183774a26"
+        },
+        {
+          "source": "data/criminal.dat",
+          "registered_ids": [
+            300
+          ],
+          "sha256": "75480e1ffdff100d5f551a84fbc86e564d397edd947f5b0f582ef27f0dbfdccb"
+        },
+        {
+          "source": "data/flame.dat",
+          "registered_ids": [
+            211
+          ],
+          "sha256": "bbd591f0ff86aed153e7049061dc72f8a85d462a1f4d4381adf77b9ca4e84038"
+        },
+        {
+          "source": "data/grimmjow.dat",
+          "registered_ids": [
+            12
+          ],
+          "sha256": "165a8c96f77ddf7f359b5a6e8ce754141bf2a6a4c71ca6d64e6e9546e10bf70e"
+        },
+        {
+          "source": "data/grimmjow_loko.dat",
+          "registered_ids": [
+            413
+          ],
+          "sha256": "b0b9af88341a294c0770483adf583bbcb20209fa6f42135419f74237ebe504f3"
+        },
+        {
+          "source": "data/hitsugaya.dat",
+          "registered_ids": [
+            8
+          ],
+          "sha256": "6e06a9d2e5d4ae15ad515478fc1b9640475dcc191ba66177b189ecdbc24c91af"
+        },
+        {
+          "source": "data/hitsugaya_ball.dat",
+          "registered_ids": [
+            154
+          ],
+          "sha256": "f8ccc69a339195cc579f5d8e23041c34327477fd81f23e0c6c8947766a604a15"
+        },
+        {
+          "source": "data/hitsugaya_ball2.dat",
+          "registered_ids": [
+            294
+          ],
+          "sha256": "61cab124f31edcfa9a55a39106d8d92823e2004b7d4e093d44c4f54acd419894"
+        },
+        {
+          "source": "data/hitsugaya_bankai.dat",
+          "registered_ids": [
+            51
+          ],
+          "sha256": "e63c813b637e3b6c0d141360067574eda07793c98e37f569fe53aee1eff058d2"
+        },
+        {
+          "source": "data/hunter.dat",
+          "registered_ids": [],
+          "sha256": "4485c81d192e52d43210450ce0ccd5c06e0298e7a4f37fa1916474229d5f321f"
+        },
+        {
+          "source": "data/ichigo.dat",
+          "registered_ids": [
+            11
+          ],
+          "sha256": "9c053060509719ab66af3b68c8b00263370f6792b82b65ac2b34627127b7d52f"
+        },
+        {
+          "source": "data/ichigobankai_ball.dat",
+          "registered_ids": [
+            205
+          ],
+          "sha256": "8978b60e4652b49af2ada3e6be1ad98efc324769029db2cfdaa589c2cdf93ab6"
+        },
+        {
+          "source": "data/ichigovizard_ball.dat",
+          "registered_ids": [
+            417
+          ],
+          "sha256": "c0049d74fbc1bb632067c42e48bf0f035ea9008c5cc6a3162062b73d70e8c32f"
+        },
+        {
+          "source": "data/ichigo_ball.dat",
+          "registered_ids": [
+            203
+          ],
+          "sha256": "72bb39fbbd09c2dc69f018bf023fc7f4563ef7a72fe83453b843e0243fd48ccd"
+        },
+        {
+          "source": "data/ichigo_bankai.dat",
+          "registered_ids": [
+            55
+          ],
+          "sha256": "4b83fa115f0dc8d2bb63254ada0ef3827a1515f6aaf0f3996025065dedd9f052"
+        },
+        {
+          "source": "data/ichigo_vizard.dat",
+          "registered_ids": [
+            56
+          ],
+          "sha256": "c1d83aeb99bc9b3b3361369d97ba2a0a60e8181e3c383ac83f2ba3146dc4b8d2"
+        },
+        {
+          "source": "data/ikkaku.dat",
+          "registered_ids": [],
+          "sha256": "c4c693f9b9173e501fd689b51474ccd37e924be356d697ebec2f4f2ccda2657d"
+        },
+        {
+          "source": "data/ishida.dat",
+          "registered_ids": [
+            4
+          ],
+          "sha256": "640e61637bb4c886b9f13f2be3ffb5ff6e5a8c27d4fa020e5ea264a9e028ab19"
+        },
+        {
+          "source": "data/ishida_arrow.dat",
+          "registered_ids": [
+            204
+          ],
+          "sha256": "283132e8557f1b18d667d92d3ac577629d633ef009fd8d786ea01ebfd6c6516d"
+        },
+        {
+          "source": "data/ishida_arrow3.dat",
+          "registered_ids": [
+            403
+          ],
+          "sha256": "fa7e1589252e066062944bd1e2acc935638ce58d45ab2bd3de6208dae09197fd"
+        },
+        {
+          "source": "data/isshin.dat",
+          "registered_ids": [
+            37
+          ],
+          "sha256": "2282f39f7bf2db88fb8dc5cf3e6cea4e8228757aad325ed0685590b3bcf2ab1f"
+        },
+        {
+          "source": "data/isshin_ball.dat",
+          "registered_ids": [
+            216
+          ],
+          "sha256": "886ef1b71ab167c7a671d45a9e3fa69a188ca796a71303fff1aa072b234d1198"
+        },
+        {
+          "source": "data/isshin_fire.dat",
+          "registered_ids": [
+            236
+          ],
+          "sha256": "19ab7bd2571f84bd92c0a0979cd1c3e8f671fd91efccaf7c3a57bbe87d795182"
+        },
+        {
+          "source": "data/jan_chase.dat",
+          "registered_ids": [
+            220
+          ],
+          "sha256": "edd58402d97c2836506931bb4c18525bffdbc5ba821f81756d96ae4a29a5943a"
+        },
+        {
+          "source": "data/jan_chaseh.dat",
+          "registered_ids": [],
+          "sha256": "e3cfb9c13b2923ad6a9d5c09925f87a81b3a5a34f5c724fe4d3c05a822fca7a9"
+        },
+        {
+          "source": "data/justin_ball.dat",
+          "registered_ids": [],
+          "sha256": "b6210b825585e02f1b1e5c65df8b8a2a6380a1648d34c714263950daaa83aa00"
+        },
+        {
+          "source": "data/kidou.dat",
+          "registered_ids": [
+            200
+          ],
+          "sha256": "5d5fa44b3f4b099fd99ea974995de0855d8977c43bd8d93c01abc20c4370084e"
+        },
+        {
+          "source": "data/koma_1.dat",
+          "registered_ids": [
+            400
+          ],
+          "sha256": "393007d28a49e3b8e49b767e7b0ee48cb74ec1b809f3b5e41457430faf1b6761"
+        },
+        {
+          "source": "data/koma_12.dat",
+          "registered_ids": [
+            458
+          ],
+          "sha256": "51f209bd2c714899da971783bf4ec9a65c40e46c03aef6cedd4dc187196d5d2d"
+        },
+        {
+          "source": "data/koma_2.dat",
+          "registered_ids": [
+            401
+          ],
+          "sha256": "24efb612772fcf5b8bdbada5dbd29d6f0a44a1280d5c2171c17eff54d29f3ab3"
+        },
+        {
+          "source": "data/kon.dat",
+          "registered_ids": [
+            54
+          ],
+          "sha256": "815d972f880180541daf0194509f23080df3882abf737d9758fbcf266d35df55"
+        },
+        {
+          "source": "data/mark.dat",
+          "registered_ids": [],
+          "sha256": "70348080f3c3fd9317291a252bd2803cc8414702b5e6284cec41c1321dfcdc43"
+        },
+        {
+          "source": "data/mayuri.dat",
+          "registered_ids": [
+            15
+          ],
+          "sha256": "f313aec8823f353722972f9560d20e1674e083d58f98b030fecbcf144293d56b"
+        },
+        {
+          "source": "data/monk.dat",
+          "registered_ids": [],
+          "sha256": "8d6981b47023944efbf40313298b1a83560e23cc847aa24f6aceea80d892c868"
+        },
+        {
+          "source": "data/murcielago.dat",
+          "registered_ids": [
+            57
+          ],
+          "sha256": "88299b504458a41d40824937d49302c7cbd5187fee16f6499c97aa8c3c1e81e3"
+        },
+        {
+          "source": "data/murcielago_ball.dat",
+          "registered_ids": [
+            231
+          ],
+          "sha256": "626150a8a3578fb6d6fc73d9ac7b86fc8913430b1103396860ebbf0e5b3ac51d"
+        },
+        {
+          "source": "data/orihime.dat",
+          "registered_ids": [
+            16
+          ],
+          "sha256": "f4bad96d5ee017a7468c7e5e172594c0457dae51b61cfbe133e0cc81337cb581"
+        },
+        {
+          "source": "data/orihime_ball.dat",
+          "registered_ids": [
+            219
+          ],
+          "sha256": "60f799d5a1431ce63acd04118c449d2bd69863e89fa7b3a85994767cefbea3b5"
+        },
+        {
+          "source": "data/renji.dat",
+          "registered_ids": [
+            9
+          ],
+          "sha256": "a29b92a76a10f43b66e005bf74ddf27a500559d45dea2be31041e951e696fd66"
+        },
+        {
+          "source": "data/renji_bankai.dat",
+          "registered_ids": [
+            52
+          ],
+          "sha256": "4263bf4663a3dae8cff4314fdce7f798140fa72aa0fbb4b5c36065720af81d19"
+        },
+        {
+          "source": "data/rukia.dat",
+          "registered_ids": [
+            10
+          ],
+          "sha256": "4e2568e25445c810dd0eee8b4853848722dd4076519ba2320c9db8d0b2add152"
+        },
+        {
+          "source": "data/senbonzakura3.dat",
+          "registered_ids": [
+            408
+          ],
+          "sha256": "2704b1be60dc982f4feeec2851f5a9fd2059aa66eeec6381859bb5c9f69023e5"
+        },
+        {
+          "source": "data/shinigami.dat",
+          "registered_ids": [
+            36
+          ],
+          "sha256": "c3ca9ebc99dbf34e157edf32ed03baa6651d08ab57bbecb685c201bff63cece3"
+        },
+        {
+          "source": "data/shinigami2.dat",
+          "registered_ids": [
+            35
+          ],
+          "sha256": "e0207b9a01e85e50c6bccd1401afcda19d10188652d2e9c66b71ce5350c906fe"
+        },
+        {
+          "source": "data/shirozaki.dat",
+          "registered_ids": [
+            14
+          ],
+          "sha256": "62c9337d917a22756e68df7bb0938d57c8b624b2476ca2406de865d787df5c58"
+        },
+        {
+          "source": "data/shirozakibankai_ball.dat",
+          "registered_ids": [
+            206
+          ],
+          "sha256": "259f79a3fd1178e9535736f62b7d8f5cfe271a582041440cfca9eb3d78217ca2"
+        },
+        {
+          "source": "data/shirozaki_ball.dat",
+          "registered_ids": [
+            213
+          ],
+          "sha256": "a208d9d461150f519ba1d8a8bbca1e66573fae062e15ba152a75b332ec9fb0a0"
+        },
+        {
+          "source": "data/shirozaki_bankai.dat",
+          "registered_ids": [
+            59
+          ],
+          "sha256": "ef2f82f9209ae1861ad76b9e5f6d0d1065ac129dd5777398bf69aeff15f675f9"
+        },
+        {
+          "source": "data/stark.dat",
+          "registered_ids": [
+            50
+          ],
+          "sha256": "a0e4c7c6353e3656d607981921c99493ec6151fc502b31379957362232f79744"
+        },
+        {
+          "source": "data/sword.dat",
+          "registered_ids": [
+            229
+          ],
+          "sha256": "c2248cf7744df96b369abac1eabfbf7946979a2a428e2f26f18e1c626fc78929"
+        },
+        {
+          "source": "data/ulquiorra.dat",
+          "registered_ids": [
+            2
+          ],
+          "sha256": "91f75de34ec044a8ee6dcd4f5fd4d8d5fbc3442b2ec6a0a95d9a9a6075c9e332"
+        },
+        {
+          "source": "data/urahara.dat",
+          "registered_ids": [
+            13
+          ],
+          "sha256": "3cd26916285d6c7463579e1030704fa0b3a973284cf7b9783c2257d762002cfa"
+        },
+        {
+          "source": "data/weapon8.dat",
+          "registered_ids": [
+            122,
+            123
+          ],
+          "sha256": "3e586d1786be70fb305015f30bd3c232ed2d87562ee93a2860be2236fb0a04bf"
+        },
+        {
+          "source": "data/white_lightning.dat",
+          "registered_ids": [
+            207
+          ],
+          "sha256": "227877bab11656be11d42377fb13d4033afea3c3245a3abebf41e6cef516b8c3"
+        },
+        {
+          "source": "data/wind.dat",
+          "registered_ids": [
+            233
+          ],
+          "sha256": "e41cf98604fc84462d741f403b4e3b8fdedf67ce665df3b294df91e97ec6fc60"
+        },
+        {
+          "source": "data/zaraki.dat",
+          "registered_ids": [
+            1
+          ],
+          "sha256": "da909b1f4d11ea2fecc5b25b830222a34c6d3af83722f55e5148cb43c448b16e"
+        },
+        {
+          "source": "data/zaraki_2.dat",
+          "registered_ids": [
+            53
+          ],
+          "sha256": "d7e394f43d4c5f1b3c5e2af347808b9a7357848d6b159c98e2457d8db2c78cdb"
+        }
+      ]
+    }
+  ],
+  "base_weapon3_frames": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    10,
+    20,
+    21,
+    399
+  ],
+  "author_older_versions": "https://bleachbankaibr.webnode.page/download/versoes-anteriores/",
+  "older_2_0_final_link": "https://www.4shared.com/file/183420377/13a11930/BleachBankaiRevolution20_final.html",
+  "older_2_0_mirror": "https://uploadmirrors.com/download/ADRFWVLI/BleachBankaiRevolution2.0_final.rar",
+  "recovery_performed": false,
+  "reason": "No authenticated original catalog/object mapping recovered; no substitute or fabricated action added."
+}

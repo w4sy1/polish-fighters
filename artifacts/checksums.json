@@ -1,17 +1,12 @@
 [
   {
-    "path": "delivery/PolishFighters-Windows-2026-10-30.zip",
-    "bytes": 528345602,
-    "sha256": "7db831c713ac1a81a092d0059580e7f996fa78ddc352a6986de96f42f74b5056"
+    "path": "artifacts/PolishFighters-Windows-core-pack-ai-2026-10-31.zip",
+    "bytes": 11348396,
+    "sha256": "ea66eb7375e1c51964b1d6afe0cdaf00974921f286f825993edcf31023f24d70"
   },
   {
-    "path": "artifacts/PolishFighters-Windows-core-2026-10-30.zip",
-    "bytes": 8244177,
-    "sha256": "1dbaa0e1eb3e75dcfa463acd5f0a21524cb990d629d2164d95e6c372c6184f55"
-  },
-  {
-    "path": "artifacts/PolishFighters-AndroidStudio-2026-10-30.zip",
-    "bytes": 6652821,
-    "sha256": "1cf8edcddc937102c5435c0fc02c91385d9d7d53482ab17e1565e95355585eb4"
+    "path": "artifacts/PolishFighters-AndroidStudio-pack-ai-2026-10-31.zip",
+    "bytes": 16459798,
+    "sha256": "fe11533707fe208c6d493171c4a6433ca26a4bb6c3bbb749ebb9356611b8dcef"
   }
 ]

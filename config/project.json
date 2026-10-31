@@ -1,5 +1,5 @@
 {
-  "name": "Polish Fighters",
+  "name": "Little Fighters",
   "version": "0.6.0-integrated-room",
   "engine_commit": "5b23d37f052174991fa2b5d7baa3d6194f7efd5e",
   "target_players": 8,
@@ -33,39 +33,39 @@
   "packs": [
     {
       "id": "lf2-classic",
-      "status": "working, requires base data installer"
+      "status": "experimental; 13/13 map and 25/25 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "lf4-turbo",
-      "status": "32/32 fighters passed 300-frame smoke on own Linux and Windows engines; exhaustive moves/campaign checks pending"
+      "status": "experimental; 12/12 map and 25/25 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "reinforced",
-      "status": "experimental; current Windows build smoke passed; map/stage warmups and limitations in validation/maps-build-2026-10-30/REPORT.md"
+      "status": "experimental; 14/14 map and 44/44 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "kate",
-      "status": "experimental; current Windows build smoke passed; map/stage warmups and limitations in validation/maps-build-2026-10-30/REPORT.md"
+      "status": "experimental; 11/11 map and 33/33 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "ntsd",
-      "status": "experimental import from NTSD 2.4_2.0a; 13/42 passed Windows smoke; not in playable package; integer-range compatibility audit pending"
+      "status": "experimental; 17/17 map and 25/25 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "dbz",
-      "status": "experimental data import: 56 fighters, 14 arenas, 24 campaign descriptors, 2119 assets; 2 missing resources; no gameplay verification"
+      "status": "experimental; 14/14 map and 62/62 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "one-piece",
-      "status": "experimental data import: 61 fighters, 36 arenas, 1179 assets; 4 missing resources; EXE extensions not emulated"
+      "status": "experimental; 36/36 map and 25/25 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "bleach",
-      "status": "experimental; current Windows build smoke passed; map/stage warmups and limitations in validation/maps-build-2026-10-30/REPORT.md"
+      "status": "experimental; 12/12 map and 20/20 stage-start warmups passed on current Windows engine; full gameplay not verified"
     },
     {
       "id": "polish-originals",
-      "status": "not_imported"
+      "status": "experimental: face portraits and scale corrected, SZ basic shot verified, 4 fighters tested on Windows; animation polish and Android/network verification pending"
     }
   ],
   "integration": {
@@ -81,7 +81,7 @@
   "minimum_devices": 2,
   "maximum_devices": 8,
   "ui_style": "original LF2 with separate classic-style extras",
-  "last_validation": "2026-10-25",
+  "last_validation": "2026-10-31",
   "native_build": {
     "platform": "Linux x86_64 and Windows x64",
     "status": "complete engines built locally",
@@ -97,7 +97,63 @@
     "native_package_limits": "Windows built and tested:4096 assets,256KiB manifest; Android native build pending",
     "campaigns": "DBZ campaign selection and separate stage sources; author rules incomplete",
     "multiplayer": "private-room invitations and heartbeat tested locally; native GUI, Bluetooth and hosting pending",
-    "pack_validation": "validation/maps-build-2026-10-30/REPORT.md",
+    "pack_validation": "validation/remaining-mechanics-2026-10-30/REPORT.md",
     "android_studio": "Java compiled; native ARM libraries/APK pending; lint27 upstream errors"
+  },
+  "remaining_mechanics": {
+    "report": "validation/remaining-mechanics-2026-10-30/REPORT.md",
+    "bleach_missing_targets": [
+      "284/action83",
+      "151/action30"
+    ],
+    "dbz_unported": [
+      "quest semantics",
+      "mirror selectors8001-8008",
+      "between-phase scene transitions",
+      "AngelScript AI"
+    ],
+    "visual_sheets_reviewed": 11,
+    "missing_art_restored": false
+  },
+  "polish_originals": {
+    "fighters": [
+      410,
+      411,
+      412,
+      413
+    ],
+    "helpers": [
+      420,
+      421,
+      422,
+      423,
+      424,
+      425,
+      426
+    ],
+    "original_files_preserved": 7710,
+    "report": "validation/hub-controls-2026-10-31/REPORT.md",
+    "portable": "engine/out/LittleFighters-hub-2026-10-31",
+    "android_verified": false,
+    "network_verified": false,
+    "intentional_base_ui_changes": [
+      "controls.lua",
+      "match_screen.lua"
+    ],
+    "basic_shot_verified": true
+  },
+  "own_pack_name": "Polish Fighters",
+  "hub_controls": {
+    "date": "2026-10-31",
+    "profiles": 9,
+    "local_packs": 8,
+    "mouse_buttons": true,
+    "controller_bindings": true,
+    "shared_settings": "userdata/common",
+    "all_mods_merged": false,
+    "github_downloader": false,
+    "physical_controller_verified": false,
+    "report": "validation/hub-controls-2026-10-31/REPORT.md",
+    "portable": "engine/out/LittleFighters-hub-2026-10-31"
   }
 }

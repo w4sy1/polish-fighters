@@ -1,0 +1,29 @@
+-- Global scene opoints are distinct from character-relative frame opoints.
+local runtime = {}
+function runtime.spawn(state, objects)
+    local scene, mode = state.stage.dbz_scene, state.stage.dbz_mode
+    if not scene then return end
+    local enabled = {}
+    for _, value in ipairs(mode.arest or {0}) do enabled[value] = true end
+    state.dbz_scene_objects = {}
+    for _, point in ipairs(scene.opoints) do
+        local selector = point.arest and point.arest[1] or 0
+        if enabled[selector] then
+            assert(point.kind == 1, "unsupported DBZ global opoint kind")
+            local slot = objects.free_slot(state)
+            assert(slot >= 0, "no free slot for DBZ scene object")
+            local record = assert(objects.record(state, point.oid), "missing DBZ scene object " .. point.oid)
+            assert(record.frames[point.action] and not record.frames[point.action].undefined,
+                "missing DBZ scene action " .. point.oid .. "/" .. point.action)
+            local value = assert(objects.place(state, slot, point.oid))
+            value.frame, value.owner, value.team = point.action, slot, 0
+            value.x, value.y, value.z = point.x or 0, point.y or 0, point.z or 0
+            value.x_int, value.y_int, value.z_int = value.x, value.y, value.z
+            value.vx, value.vy, value.vz = point.dvx or 0, point.dvy or 0, point.dvz or 0
+            value.facing = point.facing or 0
+            if point.hp then value.hp, value.max_hp, value.dark_hp = point.hp, point.hp, point.hp end
+            state.dbz_scene_objects[#state.dbz_scene_objects + 1] = {slot=slot,oid=point.oid,action=point.action}
+        end
+    end
+end
+return runtime

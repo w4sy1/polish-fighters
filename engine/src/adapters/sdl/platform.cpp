@@ -186,7 +186,7 @@ public:
 #endif
         // Scale directly to the display's backing pixels on high-density screens.
         const bool restore = desktop_window && placement.has_value();
-        window_.reset(SDL_CreateWindow("Polish Fighters", viewport.width, viewport.height,
+        window_.reset(SDL_CreateWindow("Little Fighters", viewport.width, viewport.height,
                                       window_flags | SDL_WINDOW_HIGH_PIXEL_DENSITY |
                                       (restore ? SDL_WINDOW_HIDDEN : 0)));
         if (!window_) return error();
@@ -489,6 +489,12 @@ public:
         float window_y = 0.0f;
         const auto buttons = SDL_GetMouseState(&window_x, &window_y);
         input.button = (buttons & SDL_BUTTON_LMASK) != 0;
+        // Windows virtual mouse keys can be assigned like keyboard keys in control settings.
+        input.keys[1] = (buttons & SDL_BUTTON_LMASK) != 0;
+        input.keys[2] = (buttons & SDL_BUTTON_RMASK) != 0;
+        input.keys[4] = (buttons & SDL_BUTTON_MMASK) != 0;
+        input.keys[5] = (buttons & SDL_BUTTON_X1MASK) != 0;
+        input.keys[6] = (buttons & SDL_BUTTON_X2MASK) != 0;
         float x = 0.0f;
         float y = 0.0f;
         if (pointer_from_touch_ && touch_pointer_) {
@@ -647,6 +653,15 @@ public:
     std::string renderer_name() const override {
         const char* name = renderer_ ? SDL_GetRendererName(renderer_.get()) : nullptr;
         return name != nullptr ? name : "none";
+    }
+    Result<void> capture_frame(const std::filesystem::path& path) override {
+        auto* surface = SDL_RenderReadPixels(renderer_.get(), nullptr);
+        if (!surface) return error();
+        const auto utf8 = path.u8string();
+        const bool saved = SDL_SaveBMP(surface, reinterpret_cast<const char*>(utf8.c_str()));
+        SDL_DestroySurface(surface);
+        if (!saved) return error();
+        return {};
     }
     bool supports_fullscreen() const override {
         return desktop_window && window_ != nullptr;
@@ -926,7 +941,8 @@ private:
             const SDL_FRect destination{static_cast<float>(sprite.x) * sprite.scale_x
                                             + static_cast<float>(sprite.translate_x) + offset_x,
                                         static_cast<float>(sprite.y) + offset_y,
-                                        source.w * sprite.scale_x, source.h};
+                                        (sprite.destination_width > 0 ? static_cast<float>(sprite.destination_width) : source.w) * sprite.scale_x,
+                                        sprite.destination_height > 0 ? static_cast<float>(sprite.destination_height) : source.h};
             // The tint multiplies the texture's colors (SDL keeps it on the texture, so set it every draw).
             if (!SDL_SetTextureColorMod(texture.get(), static_cast<Uint8>((sprite.tint >> 16) & 0xff),
                                         static_cast<Uint8>((sprite.tint >> 8) & 0xff), static_cast<Uint8>(sprite.tint & 0xff))) {

@@ -76,7 +76,11 @@ def inventory(pack):
     (OUT/(pack+'-inventory.json')).write_text(json.dumps(report,indent=2)+'\n')
     return report
 
-def probe(pack,kind,key,row,stage_path=None,stage_id=None,engine=None):
+def probe(pack,kind,key,row,stage_path=None,stage_id=None,engine=None,scene_mode=None):
+    if pack=='dbz' and stage_path:
+        definitions=json.loads((ROOT/'content-packs/dbz/stage-scenes.json').read_text())['stages']
+        selected=definitions.get(stage_path,{}).get(str(stage_id))
+        if selected:row=selected['row']
     folder=OUT/'native'/pack/(kind+'-'+str(key));folder.mkdir(parents=True,exist_ok=True)
     override=folder/'qa';override.mkdir(exist_ok=True)
     report=json.loads((ROOT/'content-packs'/pack/'import-report.json').read_text()) if pack!='lf2-classic' else {'fighters':[{'id':0}]}
@@ -87,6 +91,7 @@ def probe(pack,kind,key,row,stage_path=None,stage_id=None,engine=None):
     # Separate map/stage diagnosis from unrelated extended fighter parser failures.
     # Only the QA human is stock Deep; campaign enemies remain authored pack records.
     setup='options.background='+str(row)+'\noptions.fighters={{id=0,path="data/deep.dat",name="Deep"}};options.slots={[0]={kind="human",fighter=1,team=1}}\n'
+    if scene_mode is not None:setup+='options.scene_mode='+str(scene_mode)+'\n'
     if stage_path:
         setup+='options.mode=1;options.stage_level='+str(stage_id)+';options.campaign_path='+json.dumps(stage_path)+';options.campaign_background='+str(row)+'\n'
     else:setup+='options.mode=0;for slot=1,7 do options.slots[slot]=nil end\n'
@@ -96,7 +101,9 @@ def probe(pack,kind,key,row,stage_path=None,stage_id=None,engine=None):
  function base.create(options)
  '''+setup+'''
   local state=create(options)
-  local doc=engine.read_settings() or {};doc.map_probe={created=true,background=state.match.background_row,qa_actor="data/deep.dat"};assert(engine.write_settings(doc))
+  local doc=engine.read_settings() or {};doc.map_probe={created=true,background=state.match.background_row,qa_actor="data/deep.dat",width=state.match.stage.width,
+   scene_mode=state.match.stage.dbz_mode and state.match.stage.dbz_mode.name,
+   scene_objects=state.match.dbz_scene_objects and #state.match.dbz_scene_objects};assert(engine.write_settings(doc))
   return state
  end
  function base.draw(state,context,bounds)
@@ -126,8 +133,11 @@ end
     return result
 
 def main():
+    global OUT
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--native',action='store_true');parser.add_argument('--engine',type=Path);parser.add_argument('--pack',choices=PACKS)
-    args=parser.parse_args();reports=[inventory(p) for p in ([args.pack] if args.pack else PACKS)]
+    parser.add_argument('--output',type=Path,default=OUT)
+    args=parser.parse_args();OUT=args.output.resolve();OUT.mkdir(parents=True,exist_ok=True)
+    reports=[inventory(p) for p in ([args.pack] if args.pack else PACKS)]
     for r in reports:print(r['pack'],'maps',len(r['maps']),'adventures',len(r['adventures']),'stages',sum(len(a['stages']) for a in r['adventures']),flush=True)
     if args.native:
         assert args.engine and args.engine.is_file()
@@ -143,5 +153,5 @@ def main():
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
             for result in pool.map(lambda item:probe(*item),targets):
                 rows.append(result);print(result['pack'],result['kind'],result['key'],'PASS' if result['pass'] else 'FAIL',flush=True)
-        (OUT/'native-summary.json').write_text(json.dumps({'scope':'Each map rendered 120 frames with stock Deep QA actor; adventure stage warmups use authored enemies. Not full fighter/phase/campaign completion. QA map for campaign chosen independently of author unlocks.','binary_sha256':hashlib.sha256(args.engine.read_bytes()).hexdigest(),'tests':rows},indent=2)+'\n')
+        (OUT/'native-summary.json').write_text(json.dumps({'scope':'Each map rendered 120 frames with stock Deep QA actor; adventure stage warmups use authored enemies. Not full fighter/phase/campaign completion. DBZ uses authored scene/mode; other QA maps selected independently of author unlocks.','binary_sha256':hashlib.sha256(args.engine.read_bytes()).hexdigest(),'tests':rows},indent=2)+'\n')
 if __name__=='__main__':main()

@@ -5,9 +5,9 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def port():
  with socket.socket() as sock:sock.bind(('127.0.0.1',0));return sock.getsockname()[1]
-def case(engine,installer,count,probe=False,menu=False,pack=None,unlock=False,output_dir=None):
+def case(engine,installer,count,probe=False,menu=False,pack=None,unlock=False,output_dir=None,own=False):
  started=time.monotonic()
- config=ROOT/'tools/room-check/config.lua';config.write_text('return {players='+str(count)+',damage_probe='+str(probe).lower()+',menu='+str(menu).lower()+'}\n')
+ config=ROOT/'tools/room-check/config.lua';config.write_text('return {players='+str(count)+',damage_probe='+str(probe).lower()+',menu='+str(menu).lower()+',own='+str(own).lower()+'}\n')
  listen_port=port()
  common=[str(Path(engine).resolve()),'--installer',str(Path(installer).resolve()),'--scripts',str(ROOT/'engine/scripts'),'--mod',str(ROOT/'engine/scripts/polish-fighters'),'--mod',str(ROOT/'tools/room-check'),'--port',str(listen_port)]
  if pack:common+=['--mod',str(ROOT/'content-packs'/pack)]

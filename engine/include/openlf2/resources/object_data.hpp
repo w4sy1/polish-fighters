@@ -15,6 +15,7 @@
 
 namespace openlf2::object_data {
 inline constexpr std::int32_t frame_count = 400;
+inline constexpr std::int32_t extended_frame_count = 999; // 999 remains the standing selector.
 inline constexpr std::size_t max_sheets = 10;
 inline constexpr std::size_t max_frame_blocks = 16;
 inline constexpr std::size_t strength_entries = 10;
@@ -144,9 +145,10 @@ struct PictureCell {
 };
 
 // Parses decoded text. Errors carry the 1-based line of the failing token.
-Result<ObjectData> parse(std::string_view text);
+Result<ObjectData> parse(std::string_view text, std::int32_t frame_limit = frame_count);
 // Reads a resource, decoding `.dat` files like the original, then parses it.
-Result<ObjectData> load(const ResourceSource& resources, std::string_view path);
+Result<ObjectData> load(const ResourceSource& resources, std::string_view path,
+                        std::int32_t frame_limit = frame_count);
 std::optional<PictureCell> find_picture(const ObjectData& data, std::int32_t picture);
 // Script-facing table.
 ScriptValue to_script_value(const ObjectData& data);

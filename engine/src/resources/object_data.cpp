@@ -18,7 +18,9 @@ constexpr std::size_t max_input = 4 * 1024 * 1024;
 
 class Parser {
 public:
-    explicit Parser(std::string_view text) : stream_(text) {}
+    explicit Parser(std::string_view text, std::int32_t frame_limit) : stream_(text), frame_limit_(frame_limit) {
+        data_.frames.resize(static_cast<std::size_t>(frame_limit));
+    }
 
     ObjectData run() {
         bool first = true;
@@ -37,7 +39,7 @@ public:
                 note("ignored top-level token `" + token_ + "`");
             }
         }
-        for (std::int32_t index = 0; index < frame_count; ++index) {
+        for (std::int32_t index = 0; index < frame_limit_; ++index) {
             const auto& frame = data_.frames[static_cast<std::size_t>(index)];
             if (frame.defined && !find_picture(data_, frame.picture)) {
                 note("frame " + std::to_string(index) + " picture " +
@@ -330,8 +332,8 @@ private:
         if (stream_.integer(index) != TokenStream::Scan::value) {
             throw ParseFailure{ErrorCode::unsupported, "<frame> without a frame number"};
         }
-        if (index < 0 || index >= frame_count) {
-            throw ParseFailure{ErrorCode::unsupported, "frame number outside 0-399: " + std::to_string(index)};
+        if (index < 0 || index >= frame_limit_) {
+            throw ParseFailure{ErrorCode::unsupported, "frame number outside 0-" + std::to_string(frame_limit_-1) + ": " + std::to_string(index)};
         }
         auto& frame = data_.frames[static_cast<std::size_t>(index)];
         if (frame.defined) note("frame " + std::to_string(index) + " redefined; earlier fields kept");
@@ -374,8 +376,9 @@ private:
             else if (token_ == "wpoint:") block("wpoint_end:", [&] { return weapon_point(frame.wpoint); });
             else if (token_ == "itr:") {
                 // Mods may exceed the original five records; keep a bounded dynamic list.
-                if (frame.interactions.size() == max_frame_blocks) {
-                    throw ParseFailure{ErrorCode::unsupported, "too many itr blocks in a frame (limit 16)"};
+                const auto limit = frame_limit_ == extended_frame_count ? std::size_t{32} : max_frame_blocks;
+                if (frame.interactions.size() == limit) {
+                    throw ParseFailure{ErrorCode::unsupported, "too many itr blocks in a frame (limit " + std::to_string(limit) + ")"};
                 }
                 auto& interaction = frame.interactions.emplace_back();
                 block("itr_end:", [&] { return interaction_block_field(interaction); });
@@ -401,6 +404,7 @@ private:
     }
 
     TokenStream stream_;
+    std::int32_t frame_limit_;
     ObjectData data_;
     std::string token_;
     PendingSheet pending_;
@@ -495,8 +499,10 @@ ScriptValue frame_value(const Frame& frame) {
 }
 }
 
-Result<ObjectData> parse(std::string_view text) {
-    Parser parser(text);
+Result<ObjectData> parse(std::string_view text, std::int32_t frame_limit) {
+    if (frame_limit != frame_count && frame_limit != extended_frame_count)
+        return fail(ErrorCode::unsupported, "unsupported object frame capacity");
+    Parser parser(text,frame_limit);
     try {
         return parser.run();
     } catch (const ParseFailure& failure) {
@@ -504,10 +510,10 @@ Result<ObjectData> parse(std::string_view text) {
     }
 }
 
-Result<ObjectData> load(const ResourceSource& resources, std::string_view path) {
+Result<ObjectData> load(const ResourceSource& resources, std::string_view path, std::int32_t frame_limit) {
     auto bytes = read_data_text(resources, path, max_input);
     if (!bytes) return std::unexpected(bytes.error());
-    auto parsed = parse(std::string_view(bytes->data(), bytes->size()));
+    auto parsed = parse(std::string_view(bytes->data(), bytes->size()),frame_limit);
     if (!parsed) parsed.error().message = std::string(path) + ": " + parsed.error().message;
     return parsed;
 }

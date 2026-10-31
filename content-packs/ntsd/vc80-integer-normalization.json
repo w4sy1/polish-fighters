@@ -1,0 +1,2494 @@
+{
+  "scope": "Exact observed x86 Microsoft VC80 sscanf %d conversion; not clamping/guessing values",
+  "crt": "Installed Windows MSVCR80.dll 8.0.50727.9680, x86",
+  "original_game_import": "MSVCR80.dll sscanf/fscanf",
+  "probe_source": "tests/vc80_scan_probe.cpp",
+  "probe_sha256": "0853f30ac5f526e5c831819c2cd6e417b8a3c07db3421b4178c0d482c9b761c2",
+  "unique_tokens": {
+    "-29748692786": 316078286,
+    "-38976841354687": -13143487,
+    "-38976841354787": -13143587,
+    "-45456635779800": 1298081064,
+    "-45456635779900": 1298080964,
+    "-4564896489452763489789879": 794531913,
+    "-4564896489452763489789979": 794531813,
+    "-458686942584": 874558088,
+    "-458686942684": 874557988,
+    "-50000000000": 1539607552,
+    "-555565665656666600": 2032240152,
+    "-564248980000": -1608264224,
+    "-63489789979": 934719461,
+    "-6546832333": 2043102259,
+    "-6546832933": 2043101659,
+    "-6666660000": 1923274592,
+    "-6666660100": 1923274492,
+    "-6842487454687": -604552159,
+    "-6846518779": 1743415813,
+    "-6846518879": 1743415713,
+    "-7777777787877": 407985179,
+    "-7777777797777": 407975279,
+    "-876427836875656222": -1614597150,
+    "-88888888888880000": -917728128,
+    "-922848643544945": -1905555313,
+    "-964844262763489789979": 143259621,
+    "-9782457512": -1192522920,
+    "-9782457612": -1192523020,
+    "-9848643544945": -283535217,
+    "-9848643599945": -283590217,
+    "-99999898425321456": 1221105680,
+    "-99999898425321456555555": -767448611,
+    "-9999999999": -1410065407,
+    "180000000000": -388626432,
+    "7897897890000": -546967344,
+    "9999999999": 1410065407,
+    "99999999999999": 276447231,
+    "9999999999999999": 1874919423,
+    "99999999999999999999": 1661992959
+  },
+  "files": [
+    {
+      "asset": "assets/a/000985.dat",
+      "before_sha256": "cbe1d58731c11c970a069b72d85ce59a4b44cbaed876720c5815991a2e84b9ba",
+      "after_sha256": "f611f7645189938934ba215bfa855e4903e5265125c1a790b9a01f78708d9378",
+      "fields": [
+        {
+          "line": 93,
+          "field": "y",
+          "literal": "-99999898425321456",
+          "crt_value": 1221105680
+        },
+        {
+          "line": 105,
+          "field": "y",
+          "literal": "-99999898425321456",
+          "crt_value": 1221105680
+        },
+        {
+          "line": 264,
+          "field": "y",
+          "literal": "-99999898425321456",
+          "crt_value": 1221105680
+        },
+        {
+          "line": 270,
+          "field": "y",
+          "literal": "-99999898425321456",
+          "crt_value": 1221105680
+        },
+        {
+          "line": 276,
+          "field": "y",
+          "literal": "-99999898425321456",
+          "crt_value": 1221105680
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/000995.dat",
+      "before_sha256": "0a3c04322cfe42f1d515e44a4db99f4f363ae4c58a1674fa08b4b38f60554612",
+      "after_sha256": "ec5cb9a6277a94ae5db285533b263cf773789252eedb5f595e89b5cdf0fc3612",
+      "fields": [
+        {
+          "line": 38,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/000998.dat",
+      "before_sha256": "c76366626e5efdaac725b9b873b6c8ed82b172692dc032f7f6f53c8b94ca4409",
+      "after_sha256": "e921f919b2cc2b79d3a2b7d017892d0deb2f1877f08c29dd13d7f02803df6526",
+      "fields": [
+        {
+          "line": 211,
+          "field": "y",
+          "literal": "-45456635779800",
+          "crt_value": 1298081064
+        },
+        {
+          "line": 211,
+          "field": "w",
+          "literal": "9999999999999999",
+          "crt_value": 1874919423
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001002.dat",
+      "before_sha256": "14a5eeba5e844dc22d6c4819dd6ed7e9092afd7fe94f450c5cc9390973c5ad6c",
+      "after_sha256": "c251bbca57e9ed7a01b4ba23846a524e5515bba13a2d55bd55998af34ca9ac93",
+      "fields": [
+        {
+          "line": 161,
+          "field": "y",
+          "literal": "-6846518879",
+          "crt_value": 1743415713
+        },
+        {
+          "line": 168,
+          "field": "y",
+          "literal": "-6846518879",
+          "crt_value": 1743415713
+        },
+        {
+          "line": 380,
+          "field": "y",
+          "literal": "-458686942684",
+          "crt_value": 874557988
+        },
+        {
+          "line": 391,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        },
+        {
+          "line": 416,
+          "field": "y",
+          "literal": "-458686942584",
+          "crt_value": 874558088
+        },
+        {
+          "line": 423,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        },
+        {
+          "line": 429,
+          "field": "y",
+          "literal": "-458686942584",
+          "crt_value": 874558088
+        },
+        {
+          "line": 436,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        },
+        {
+          "line": 450,
+          "field": "y",
+          "literal": "-458686942584",
+          "crt_value": 874558088
+        },
+        {
+          "line": 457,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        },
+        {
+          "line": 503,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        },
+        {
+          "line": 506,
+          "field": "y",
+          "literal": "-458686942584",
+          "crt_value": 874558088
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001006.dat",
+      "before_sha256": "1768ca5c3e31be66775ee961fdf2687368effececa1161a9b1334bcddc1a5591",
+      "after_sha256": "7ef94e639a97ca6c4f36aa46f783df927efc646d918d6707f80f595c760ca8a0",
+      "fields": [
+        {
+          "line": 87,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 96,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 105,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 117,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 126,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 138,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 150,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 165,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 180,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 195,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 210,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001014.dat",
+      "before_sha256": "376c64bc76c88f8b17f6803c26ef0a60544ec1d3e7093192f71006aad1ea93fe",
+      "after_sha256": "6acd7e6a38b6c43cee090f486e51fa6f24bfa1283db69f7487a2653bf909b525",
+      "fields": [
+        {
+          "line": 31,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 31,
+          "field": "w",
+          "literal": "9999999999999999",
+          "crt_value": 1874919423
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001027.dat",
+      "before_sha256": "8aae311f20bd965c9e223d8ae7448febe349968ba1a0454c3992ecbe9b6fc17b",
+      "after_sha256": "c2e6db0cf7b86fc2056457cb690b97c2d3c9fd2dc88f424f285a047c2e170b75",
+      "fields": [
+        {
+          "line": 16,
+          "field": "y",
+          "literal": "-564248980000",
+          "crt_value": -1608264224
+        },
+        {
+          "line": 28,
+          "field": "y",
+          "literal": "-564248980000",
+          "crt_value": -1608264224
+        },
+        {
+          "line": 37,
+          "field": "y",
+          "literal": "-564248980000",
+          "crt_value": -1608264224
+        },
+        {
+          "line": 59,
+          "field": "y",
+          "literal": "-564248980000",
+          "crt_value": -1608264224
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001030.dat",
+      "before_sha256": "926b1639673e7cca910a562b63dd311f94ae72f373b1d55f49c064ede82669bb",
+      "after_sha256": "266c4736b4fa3174546492b5d4cf8959f0f27e0bfbb5d396f7a604558bcff40c",
+      "fields": [
+        {
+          "line": 19,
+          "field": "y",
+          "literal": "-7777777787877",
+          "crt_value": 407985179
+        },
+        {
+          "line": 19,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001036.dat",
+      "before_sha256": "8d49b5d05ddd9d4d920897077848c72d50be2c4b37448b323209aa66c63364cf",
+      "after_sha256": "c17a3cd31e8c68d0caf9ee5fdd4957d3cc4bd4447f8b1e7b380affe91a70683d",
+      "fields": [
+        {
+          "line": 239,
+          "field": "w",
+          "literal": "99999999999999",
+          "crt_value": 276447231
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001037.dat",
+      "before_sha256": "178b81feb4da3aad424fcba6cc2f3b4deeb05705951131c8313e263530f93ca9",
+      "after_sha256": "0ad25182dcc7d57fa546cb65917741140dd4ca71fbc55a34d751ba8ee7ec9a49",
+      "fields": [
+        {
+          "line": 572,
+          "field": "y",
+          "literal": "-9782457612",
+          "crt_value": -1192523020
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001038.dat",
+      "before_sha256": "8204bb99fcda613ef7c2bea5aafa9ba04d6efa1a914346f5a7015cadc7fe9d9e",
+      "after_sha256": "930146f6c8a28201bee56850aabe5cccfc0207d19992c4a5def19acd2307e30f",
+      "fields": [
+        {
+          "line": 188,
+          "field": "y",
+          "literal": "7897897890000",
+          "crt_value": -546967344
+        },
+        {
+          "line": 304,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001040.dat",
+      "before_sha256": "41a08c1b76c19f220b885c82c112977232ed6c9301710b8b89484847655e62dd",
+      "after_sha256": "13dd0a87afd9e6bcf2696a074054baa7b171fc974cf9cbb44abef9f74965608c",
+      "fields": [
+        {
+          "line": 121,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 124,
+          "field": "y",
+          "literal": "-63489789979",
+          "crt_value": 934719461
+        },
+        {
+          "line": 124,
+          "field": "w",
+          "literal": "9999999999999999",
+          "crt_value": 1874919423
+        },
+        {
+          "line": 133,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 136,
+          "field": "y",
+          "literal": "-63489789979",
+          "crt_value": 934719461
+        },
+        {
+          "line": 136,
+          "field": "w",
+          "literal": "9999999999999999",
+          "crt_value": 1874919423
+        },
+        {
+          "line": 569,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 579,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 586,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 592,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 598,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 604,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 610,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 616,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 622,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 628,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 635,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 641,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 648,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 657,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 664,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 670,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 676,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 682,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 688,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 694,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 700,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 706,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 713,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 719,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 726,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 732,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 749,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 755,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 761,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 767,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 774,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 804,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 811,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 821,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 827,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 833,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 839,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001044.dat",
+      "before_sha256": "93707c0fbc53ade4c614bda6f33d9e37d51a8a1061457c4e1ba83516f0e7eedf",
+      "after_sha256": "8b099bb713e0f8f59261c5c7c15391b8d4824115fdabb2c5e8c2c974bd570c1d",
+      "fields": [
+        {
+          "line": 135,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 153,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 160,
+          "field": "y",
+          "literal": "-9848643599945",
+          "crt_value": -283590217
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001053.dat",
+      "before_sha256": "bb731a11c9b9b3c195ba1e54019029a8b50735224aa72ae03fb4cfab1959698c",
+      "after_sha256": "2c5df3afa6cf7d03939a6c222ed3f9d01ae9d3b62108cf1c99b0b5f46d41eaa3",
+      "fields": [
+        {
+          "line": 191,
+          "field": "y",
+          "literal": "-6546832333",
+          "crt_value": 2043102259
+        },
+        {
+          "line": 191,
+          "field": "w",
+          "literal": "9999999999999999",
+          "crt_value": 1874919423
+        },
+        {
+          "line": 197,
+          "field": "y",
+          "literal": "-6546832333",
+          "crt_value": 2043102259
+        },
+        {
+          "line": 197,
+          "field": "w",
+          "literal": "9999999999999999",
+          "crt_value": 1874919423
+        },
+        {
+          "line": 203,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 215,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 221,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 233,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 239,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001054.dat",
+      "before_sha256": "6c10afd3d76ce8da111bd43203fb571d4ebbe356dca735139eee93bf3ddf9eb2",
+      "after_sha256": "6ac2738d7ed23cee01232a6936f20540475921a4f45e817c4b5aa2d5cb5aa81a",
+      "fields": [
+        {
+          "line": 678,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001055.dat",
+      "before_sha256": "a6d007dd9f33b6e018156f7c30f7879889f72e9665f35317d20f748a06830320",
+      "after_sha256": "b65165ce1496e7f7c332991365ff6f6c93bc30bc5d586599d613f25b914a5077",
+      "fields": [
+        {
+          "line": 531,
+          "field": "y",
+          "literal": "-876427836875656222",
+          "crt_value": -1614597150
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001056.dat",
+      "before_sha256": "1a2693afc4f6f3612bbfbf4c648f1b3b040ab03266e09c2711549c6e4200a5be",
+      "after_sha256": "1d35c8297f93b5fa6fbcf6b85614ba46545d566a0b8259f3ecbe9d9de14529d8",
+      "fields": [
+        {
+          "line": 524,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001057.dat",
+      "before_sha256": "5c34c531b1fe46af7b829633cd922b14b75bfc82337f55d2c6437a8c30dbe5ea",
+      "after_sha256": "0e88d2aa69797da5943d9c5af84cd8c49565f003ad3fde0babf4a5155c8db5f9",
+      "fields": [
+        {
+          "line": 10,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 13,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 22,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 25,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 34,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 37,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 47,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 180,
+          "field": "y",
+          "literal": "-922848643544945",
+          "crt_value": -1905555313
+        },
+        {
+          "line": 186,
+          "field": "y",
+          "literal": "-922848643544945",
+          "crt_value": -1905555313
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001064.dat",
+      "before_sha256": "e9e4259f6b04133415ff5831a3a7532a59a340222ae6b07b4c99bb33a4e525ba",
+      "after_sha256": "2b2bcb4fbefe078528aea211de44cdce1a3d101f33111206acf17430683d2794",
+      "fields": [
+        {
+          "line": 625,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        },
+        {
+          "line": 636,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        },
+        {
+          "line": 646,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        },
+        {
+          "line": 657,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        },
+        {
+          "line": 685,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        },
+        {
+          "line": 692,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001066.dat",
+      "before_sha256": "15a5cd93fbd84c6726659728ad547ba6023ed51b7ae4a1a4af2790f43947db57",
+      "after_sha256": "2a3b56e0324a918023d51be77384471ab9ef33bc997a959c642e125fda31cda5",
+      "fields": [
+        {
+          "line": 196,
+          "field": "y",
+          "literal": "180000000000",
+          "crt_value": -388626432
+        },
+        {
+          "line": 202,
+          "field": "y",
+          "literal": "180000000000",
+          "crt_value": -388626432
+        },
+        {
+          "line": 208,
+          "field": "y",
+          "literal": "180000000000",
+          "crt_value": -388626432
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001079.dat",
+      "before_sha256": "024fd5a5ffdd59fef94c9d19c59ea8dbd8027997795de8820d3b350ab2b4dd96",
+      "after_sha256": "4bdc24af664dfc31ec3695df3bd4ff5cd8941156576aa2920b1c3947c3f22589",
+      "fields": [
+        {
+          "line": 487,
+          "field": "y",
+          "literal": "180000000000",
+          "crt_value": -388626432
+        },
+        {
+          "line": 545,
+          "field": "y",
+          "literal": "180000000000",
+          "crt_value": -388626432
+        },
+        {
+          "line": 2155,
+          "field": "y",
+          "literal": "-9782457512",
+          "crt_value": -1192522920
+        },
+        {
+          "line": 2197,
+          "field": "y",
+          "literal": "-9782457512",
+          "crt_value": -1192522920
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001080.dat",
+      "before_sha256": "dc5f63acf5e06ddc79c31ef9a4838b0ddc896f11b875f90faac1d84650d1c544",
+      "after_sha256": "04e4e1ffc65b9145f747e6dd2c62227267116e576d9ef3c5530c2f2e50833376",
+      "fields": [
+        {
+          "line": 36,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 242,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 254,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 373,
+          "field": "y",
+          "literal": "-6666660100",
+          "crt_value": 1923274492
+        },
+        {
+          "line": 418,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 438,
+          "field": "y",
+          "literal": "-6666660100",
+          "crt_value": 1923274492
+        },
+        {
+          "line": 445,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 521,
+          "field": "y",
+          "literal": "-6666660100",
+          "crt_value": 1923274492
+        },
+        {
+          "line": 538,
+          "field": "y",
+          "literal": "-6666660100",
+          "crt_value": 1923274492
+        },
+        {
+          "line": 1475,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 1518,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 1532,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 1686,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 1721,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 1739,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 2664,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        },
+        {
+          "line": 2672,
+          "field": "y",
+          "literal": "-6666660000",
+          "crt_value": 1923274592
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001081.dat",
+      "before_sha256": "53b663cfde0759a24734699766b3e20084e59e0f1ac5ed28df11eebadd56f228",
+      "after_sha256": "ef49a2d6c44a26ef5dd17acb3498bfe7c5dd628aa4483304f7c51d87b51bd06f",
+      "fields": [
+        {
+          "line": 2888,
+          "field": "y",
+          "literal": "-876427836875656222",
+          "crt_value": -1614597150
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001082.dat",
+      "before_sha256": "be1e9ad129e4d8041de9206cd8e72d16d68c9553632e283483ea924d18b96d87",
+      "after_sha256": "b441ff0fb93ec4be54a2b1757e821913010d883df61dae2cbde67ddba6b63099",
+      "fields": [
+        {
+          "line": 1776,
+          "field": "y",
+          "literal": "-458686942684",
+          "crt_value": 874557988
+        },
+        {
+          "line": 1789,
+          "field": "y",
+          "literal": "-458686942684",
+          "crt_value": 874557988
+        },
+        {
+          "line": 1891,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001084.dat",
+      "before_sha256": "8afa94abfb5bb7f99a83f341b7db913d306e9a7bd46f4055fb6dc330f5d54bc1",
+      "after_sha256": "2bc01b516a45c3504a7b7e0d08276ea2a66143a5786ab081a91d90cd8a3284d7",
+      "fields": [
+        {
+          "line": 41,
+          "field": "y",
+          "literal": "-63489789979",
+          "crt_value": 934719461
+        },
+        {
+          "line": 44,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 44,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 60,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 60,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 111,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 111,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 133,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 133,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 179,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 179,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 1047,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 1047,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 1464,
+          "field": "y",
+          "literal": "-4564896489452763489789879",
+          "crt_value": 794531913
+        },
+        {
+          "line": 1640,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1656,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1675,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1691,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1710,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1720,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1731,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1747,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1766,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1785,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1801,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1811,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1821,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1830,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1845,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1861,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1875,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1895,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 1922,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 1922,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 2056,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2075,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2088,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2108,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2124,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2140,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2156,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2172,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2191,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2207,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2220,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2233,
+          "field": "y",
+          "literal": "-964844262763489789979",
+          "crt_value": 143259621
+        },
+        {
+          "line": 2744,
+          "field": "y",
+          "literal": "-6546832933",
+          "crt_value": 2043101659
+        },
+        {
+          "line": 2770,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 2770,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 2803,
+          "field": "x",
+          "literal": "-9999999999",
+          "crt_value": -1410065407
+        },
+        {
+          "line": 2803,
+          "field": "w",
+          "literal": "99999999999999999999",
+          "crt_value": 1661992959
+        },
+        {
+          "line": 3243,
+          "field": "y",
+          "literal": "-4564896489452763489789979",
+          "crt_value": 794531813
+        },
+        {
+          "line": 3266,
+          "field": "y",
+          "literal": "-4564896489452763489789979",
+          "crt_value": 794531813
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001085.dat",
+      "before_sha256": "f13213023e699019dd065194a1fd59df61006f713f051178871e69674ba22ba1",
+      "after_sha256": "e795395c86ce10ac4c465af10f3ebcd73f723d87d898c62ee41ffa238a131117",
+      "fields": [
+        {
+          "line": 2491,
+          "field": "y",
+          "literal": "-99999898425321456555555",
+          "crt_value": -767448611
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001087.dat",
+      "before_sha256": "97fa47b5c59dd52377ee859a907f82fadebe9bbb1fdf70684f1b4ea1b32a4552",
+      "after_sha256": "264180bf0f729f77ad59acf1fe52c4850633fcd898b2daf792621f267fe18a04",
+      "fields": [
+        {
+          "line": 1562,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1562,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1578,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1578,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1595,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1595,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1611,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1611,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1627,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1627,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1643,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1643,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1659,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1659,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1678,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1678,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1691,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1691,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1710,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1710,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1723,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1723,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 1736,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 1736,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2565,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2565,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2581,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2581,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2594,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2594,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2783,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2783,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2792,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2792,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2801,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2801,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2825,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2825,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2834,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2834,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2843,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2843,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2852,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2852,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2861,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2861,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2870,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2870,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2879,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2879,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2888,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2888,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2897,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2897,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2906,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2906,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2915,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2915,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2924,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2924,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2933,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2933,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2942,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2942,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2951,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2951,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2960,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2960,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2969,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2969,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2978,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2978,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2987,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2987,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2996,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 2996,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 3006,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 3006,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 3015,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 3015,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 3024,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 3024,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 3033,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 3033,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 3042,
+          "field": "y",
+          "literal": "-555565665656666600",
+          "crt_value": 2032240152
+        },
+        {
+          "line": 3042,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001088.dat",
+      "before_sha256": "5e4325d6a36b6a0923fcdb4c50387cb8f8b0559bceaecb6a52b43ccc0b6ba954",
+      "after_sha256": "90502388e145db0672701f55a3a191f7bffe5f47d3ce4b47c044844277b06467",
+      "fields": [
+        {
+          "line": 2042,
+          "field": "y",
+          "literal": "-38976841354687",
+          "crt_value": -13143487
+        },
+        {
+          "line": 2045,
+          "field": "y",
+          "literal": "-38976841354787",
+          "crt_value": -13143587
+        },
+        {
+          "line": 2536,
+          "field": "y",
+          "literal": "-38976841354687",
+          "crt_value": -13143487
+        },
+        {
+          "line": 2539,
+          "field": "y",
+          "literal": "-38976841354687",
+          "crt_value": -13143487
+        },
+        {
+          "line": 2545,
+          "field": "y",
+          "literal": "-38976841354687",
+          "crt_value": -13143487
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001089.dat",
+      "before_sha256": "083e21fdf8f2b2a0de770c744bfac47700b33dc2f7a18133fc9ce98c816cb2d3",
+      "after_sha256": "176c8c4a942ed37176096d711bf3d2cf9b5f8b156c50512665f109da9ebd6d46",
+      "fields": [
+        {
+          "line": 3858,
+          "field": "y",
+          "literal": "7897897890000",
+          "crt_value": -546967344
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001097.dat",
+      "before_sha256": "3ec092aae1fa5abcb764151b93ddf37d96e56ef07ed29094e1c9d2b4fde1952b",
+      "after_sha256": "01a10ada9528311445f92ea1033043b8de4035e10d46f55f7dd6161405e21fcd",
+      "fields": [
+        {
+          "line": 227,
+          "field": "y",
+          "literal": "-564248980000",
+          "crt_value": -1608264224
+        },
+        {
+          "line": 233,
+          "field": "y",
+          "literal": "-564248980000",
+          "crt_value": -1608264224
+        },
+        {
+          "line": 242,
+          "field": "y",
+          "literal": "-564248980000",
+          "crt_value": -1608264224
+        },
+        {
+          "line": 2731,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 2740,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 2749,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 2758,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        },
+        {
+          "line": 2767,
+          "field": "y",
+          "literal": "-29748692786",
+          "crt_value": 316078286
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001100.dat",
+      "before_sha256": "66a71af00f863795a4633f185a737492649631395709b63deba832920c4e3a3e",
+      "after_sha256": "4633a6087a9757abf662d57270f0a3ff1b8a90fe8a6a5de56855683e04ee2bbe",
+      "fields": [
+        {
+          "line": 1390,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1409,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1425,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1444,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1454,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1464,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1481,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1500,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1516,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1535,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1545,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1555,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1565,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1574,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1587,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1603,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1788,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1805,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1821,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1838,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1854,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1870,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1886,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1902,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1918,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1934,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1947,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 1960,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 2249,
+          "field": "y",
+          "literal": "-922848643544945",
+          "crt_value": -1905555313
+        },
+        {
+          "line": 2264,
+          "field": "y",
+          "literal": "-922848643544945",
+          "crt_value": -1905555313
+        },
+        {
+          "line": 2273,
+          "field": "y",
+          "literal": "-922848643544945",
+          "crt_value": -1905555313
+        },
+        {
+          "line": 2291,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 2295,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 2308,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        },
+        {
+          "line": 2312,
+          "field": "y",
+          "literal": "-9848643544945",
+          "crt_value": -283535217
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001103.dat",
+      "before_sha256": "d80f8c2446df1172105e6d024d43926c7476900ebb7a31d2cf61ddbc2d030332",
+      "after_sha256": "7a957bee828ff290b05df7addb57810a5736d6393b5ef455c907759a05314f90",
+      "fields": [
+        {
+          "line": 1925,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2058,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2086,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        },
+        {
+          "line": 2106,
+          "field": "w",
+          "literal": "9999999999",
+          "crt_value": 1410065407
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001112.dat",
+      "before_sha256": "c8ead3b94f622c6bc3f7423bd6c46861c9796bb344dcc7975c62ccd3ab5285df",
+      "after_sha256": "7e7d8025e643a983280453a6f1bb17f9acaffca93bd17928cd548e852bf6e4cc",
+      "fields": [
+        {
+          "line": 902,
+          "field": "y",
+          "literal": "-7777777797777",
+          "crt_value": 407975279
+        },
+        {
+          "line": 911,
+          "field": "y",
+          "literal": "-7777777797777",
+          "crt_value": 407975279
+        },
+        {
+          "line": 920,
+          "field": "y",
+          "literal": "-7777777797777",
+          "crt_value": 407975279
+        },
+        {
+          "line": 929,
+          "field": "y",
+          "literal": "-7777777797777",
+          "crt_value": 407975279
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001113.dat",
+      "before_sha256": "a646b883b6fdee70d94d068aac2ce172ab502c4c4094c74ce64a58677672ed0c",
+      "after_sha256": "84957ae9bc172ac1a5c2987fee0c2920b16199773f51978ba8bcfefda3a63735",
+      "fields": [
+        {
+          "line": 469,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        },
+        {
+          "line": 532,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        },
+        {
+          "line": 1736,
+          "field": "y",
+          "literal": "-45456635779900",
+          "crt_value": 1298080964
+        },
+        {
+          "line": 1751,
+          "field": "y",
+          "literal": "-45456635779900",
+          "crt_value": 1298080964
+        },
+        {
+          "line": 2274,
+          "field": "y",
+          "literal": "-50000000000",
+          "crt_value": 1539607552
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001114.dat",
+      "before_sha256": "ec4ae6a0b000e35d4d3bfb36248f7bd1509052f6aba67208ad7322cdc271ee20",
+      "after_sha256": "0c1c42477f89a65346fc558b471259b9756a99aeb1aa32aca90164d14b264aa5",
+      "fields": [
+        {
+          "line": 1842,
+          "field": "y",
+          "literal": "-458686942684",
+          "crt_value": 874557988
+        },
+        {
+          "line": 1855,
+          "field": "y",
+          "literal": "-458686942684",
+          "crt_value": 874557988
+        },
+        {
+          "line": 1908,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        },
+        {
+          "line": 1920,
+          "field": "y",
+          "literal": "-6842487454687",
+          "crt_value": -604552159
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001115.dat",
+      "before_sha256": "d75935500d84902ff2557a1973f689eb784e0c6309f305d511c499c7c7827598",
+      "after_sha256": "c30dab1e299c7dedb7483dfe0ae38cb26404b215103cb125786aa59c28edaf74",
+      "fields": [
+        {
+          "line": 41,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 56,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 71,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 86,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 101,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 143,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 160,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 176,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 2889,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 3295,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 3313,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 3427,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        },
+        {
+          "line": 3439,
+          "field": "y",
+          "literal": "-88888888888880000",
+          "crt_value": -917728128
+        }
+      ]
+    },
+    {
+      "asset": "assets/a/001118.dat",
+      "before_sha256": "392bec80f2f898f28095f47391a549271d9bf27b3b7c54b9e1ca5d6b528d51b3",
+      "after_sha256": "d830862deb07add00fa458b8ee7843c82b6c883a3d2cc9dfb33a98b02e9c599b",
+      "fields": [
+        {
+          "line": 1949,
+          "field": "y",
+          "literal": "-6846518779",
+          "crt_value": 1743415813
+        }
+      ]
+    }
+  ],
+  "field_count": 364
+}

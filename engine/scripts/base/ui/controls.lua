@@ -74,7 +74,7 @@ local function from_settings(section)
             if not integer(player.buttons[index], 0, 31) then return nil end
             buttons[index] = player.buttons[index]
         end
-        sets[set] = {device = player.device, keys = keys, buttons = buttons}
+        sets[set] = {device = player.device, keys = keys, buttons = buttons, mouse_mode=player.mouse_mode==true}
         names[set] = player.name
     end
     return {sets = sets, names = names}
@@ -136,7 +136,7 @@ function controls.copy(settings)
         record = settings.record, author = settings.author, email = settings.email, info = settings.info}
     for set = 1, 4 do
         local original = settings.sets[set]
-        copy.sets[set] = {device = original.device, keys = {unpack(original.keys)},
+        copy.sets[set] = {device = original.device, mouse_mode=original.mouse_mode==true, keys = {unpack(original.keys)},
             buttons = {unpack(original.buttons)}}
         copy.names[set] = settings.names[set]
     end
@@ -176,7 +176,7 @@ function controls.save(settings)
     local players = {}
     for set = 1, 4 do
         local source = settings.sets[set]
-        local player = {name = settings.names[set], device = source.device,
+        local player = {name = settings.names[set], device = source.device, mouse_mode=source.mouse_mode==true,
             buttons = {source.buttons[1], source.buttons[2], source.buttons[3]}}
         for index, name in ipairs(key_names) do player[name] = source.keys[index] end
         players[set] = player
@@ -325,12 +325,13 @@ function controls.read(settings, raw)
     end
     raw = raw:gsub("&%d+_%d+_%d+", "")
     -- "?x"/"?w": trace form of live " fx"/" fw" (xBRZ / toggleable window).
-    if raw:find("?x", 1, true) or raw:find("?w", 1, true) then
+    if raw:find("?x", 1, true) or raw:find("?w", 1, true) or raw:find("?t", 1, true) then
         input.filters = input.filters or {}
         if raw:find("?x", 1, true) then input.filters.xbrz = true end
         if raw:find("?w", 1, true) then input.filters.window = true end
+        if raw:find("?t", 1, true) then input.filters.text = true end
     end
-    raw = raw:gsub("%?x", ""):gsub("%?w", "")
+    raw = raw:gsub("%?x", ""):gsub("%?w", ""):gsub("%?t", "")
     -- "~N": trace form of live " sN" (fixed FPS; traces have no wall-clock time).
     local fps = raw:match("~(%d+)")
     if fps then input.fps = tonumber(fps) end

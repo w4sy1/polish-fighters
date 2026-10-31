@@ -1,3 +1,35 @@
+<!-- hub-controls:start -->
+# Little Fighters — pierwsze menu i sterowanie, 2026-10-31
+
+Nowa paczka: engine/out/LittleFighters-hub-2026-10-31/LittleFighters.exe. Wspolny tytul Little Fighters, osobny zestaw Polish Fighters. Pierwsze menu wybiera 9 profili bez osobnych procesow; 8 pakietow jest lokalnie. Dostepna konfiguracja klawiatury, przyciskow myszy i padow 1–4, zapisywana wspolnie w userdata/common. Stary panel nazw/sterowania i ustawienia nagran zachowane.
+
+Naprawiono zwykly strzal SZ i gubienie krotkich tapniec. Proba natywna: 1 strzal, 22 obrazenia, 0 MP. Portrety 120×120 i HUD 40×45 jak LF2, poprawiona skala i pozycje animacji, wycinki efektow oraz pasek HP bossa. Animacje pozostaja eksperymentalne.
+
+Oryginalne dane postaci i dodatkow zachowane; 7710 chronionych plikow bez zmian, 2 bazowe pliki UI zmienione celowo. Sprawdzono 7603 odwolania zasobow w 8 pakietach. Testy: 9 profili, konfiguracja i zapis przez GUI, 8×900 klatek walk, 28 kontrolowanych umiejetnosci; Lua19/skladnia106, Python48 (47OK/1skip), C++6/TCP2–8. Fizyczny pad/telefon/siec nowej czworki niepotwierdzone.
+
+Nadal pozostaja wspolna pula wszystkich modow, dobieranie mieszanego zestawu, pobieranie/aktualizacje GitHub, finalne animacje/balans, pelne kampanie i Android. Raport: validation/hub-controls-2026-10-31/REPORT.md. Starsze paczki zachowane. Brak commita/pushu/release.
+<!-- hub-controls:end -->
+
+<!-- polish-originals:start -->
+# Cztery własne postacie — 2026-10-31
+
+Dodano Wasyla, Szymonoko/SZ, Mega Ninja Jasia i bossa Skibidi Sigma Tatę w osobnym pakiecie polish-originals. 7712/7712 dotychczasowych plików LF2 i dodatków zachowanych. Nowy Windows EXE, skala RGBA, animacje, klony, teleporty, miecze/śluz i umiejętności bossa.
+
+Testy: 8 rzeczywistych prób wejść po 900 klatek; 4 kontrolowane próby po 7 umiejętności; SDL software 64 rysowania; Lua18/składnia99; Python48 (47OK/1skip); C++6/TCP2–8. Android, sieć nowej czwórki, replay i pełny balans nadal niepotwierdzone; grafika eksperymentalna z drobnymi artefaktami.
+
+Uruchom engine/out/PolishFighters-originals-2026-10-31/Graj-Polish-Fighters.cmd. Raport: validation/polish-originals-2026-10-30/REPORT.md. Starsze paczki i opisane poniżej braki pozostałych dodatków zachowane.
+<!-- polish-originals:end -->
+
+<!-- remaining-mechanics:start -->
+# Aktualizacja mechanik — 2026-10-30
+
+129/129 map oraz 259/259 startów etapów przeszło test120 klatek na nowym Windows EXE. DBZ50/50 wariantów. NTSD25/25 i One Piece25/25 startów.
+
+Bleach284/83 i151/30 pozostają nieodzyskane. DBZ: pełne questy, mirror/8001–8008, przejścia scen i AI nadal nieprzeniesione; stage4.wma to jawny zamiennik z bazowego LF2. 11 arkuszy obejrzano; brakujących rysunków nie odtworzono. Pełnej rozgrywki i Android ARM nie potwierdzono.
+
+Raport: validation/remaining-mechanics-2026-10-30/REPORT.md. Nowy build: engine/out/PolishFighters-remaining-2026-10-30/. Testy Python48(47OK/1skip), Lua17/składnia90, C++6/TCP2–8.
+<!-- remaining-mechanics:end -->
+
 # Dostarczenie Windows / Android Studio — 2026-10-30
 
 Nowy EXE zbudowany; pełna lokalna paczka i ZIP kodu Android Studio. Odzyskano Kate99/action390/392 (25 zasobów, oba opoint przetestowane). Pozostały2 cele Bleach. Bezpieczne przycinanie źródeł;58768 lookupów Lua bez wyjścia poza obraz.
@@ -374,3 +406,24 @@ Pobranie i rozpakowanie oryginalnych modów nie oznacza potwierdzenia ich dział
 Odzyskana baza 0.6: czat „Little Fighter dodatki” (`6adcabde-96f0-83eb-a40d-e86a777d6d78`). Oryginalny ZIP pozostaje w Pobranych. Dodatkowe kopie zmienianych plików są w `../baseline-windows-build/`. Paczka źródłowa nie ma historii Git; użyto porównań `git diff --no-index` i porównania z oryginalnym archiwum.
 
 Kontynuacja obejmuje pełny build Windows, testy lokalne, poprawkę CRT, rozszerzenie ograniczonego loadera do 2048 zasobów wraz z testem granicznym, eksperymentalny import Naruto oraz narzędzia i dokumentację. Nie usuwano istniejących funkcji. Brak commitów, pushów, publikacji i zmian w projekcie Prestige Tech. Cały projekt gry nadal nie jest ukończony.
+<!-- ui-num789:start -->
+## 2026-10-31 — polski interfejs i opcjonalny WASD + Num7/8/9
+
+Nowy folder: `engine/out/LittleFighters-ui-num789-2026-10-31`.
+Oryginalne klawisze LF2 pozostają domyślne; preset numeryczny wymaga wyboru i zapisu.
+Polski domyślny dla nowych konfiguracji, uzupełnione etykiety wyboru postaci i poprawione menu.
+Build Release, 20 testów Lua i natywne próby UI/zapisu: PASS.
+Raport i granice weryfikacji: `validation/ui-num789-2026-10-31/REPORT.md`.
+GitHub nie publikowano. Pełny redesign, kompletne tłumaczenia, Android i fizyczny pad pozostają do dalszej pracy.
+<!-- ui-num789:end -->
+<!-- pack-ai:start -->
+## 2026-10-31 — wybór pakietów, AI i tłumaczenia
+
+Wersja lokalna: `engine/out/LittleFighters-pack-ai-2026-10-31`.
+Wykonano filtr pakietów w menu z zapisem, dobór ataków AI według dystansu/MP,
+uzupełnienie etykiet bitmap PL oraz test czterech własnych bohaterów w 4 procesach TCP (120 klatek, zgodny digest).
+Lua 21 zestawów PASS; Python 47 PASS/1 SKIP; C++ 6 PASS; TCP 2–8 PASS.
+Pełny zakres użytkownika pozostaje częściowy: wspólna pula, finalne animacje/balans,
+braki Bleach/DBZ, całe kampanie, logowanie w kliencie, publiczne pokoje i Bluetooth nieukończone.
+Publiczny ZIP to rdzeń bez danych modów; raport: `validation/pack-ai-2026-10-31/REPORT.md`.
+<!-- pack-ai:end -->

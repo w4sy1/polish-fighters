@@ -61,6 +61,8 @@ struct SpriteCommand {
     float scale_x = 1.0f; // horizontal transform; source sampling is unchanged
     int translate_x = 0;
     std::optional<SpriteLighting> lighting = std::nullopt;
+    int destination_width = 0; // zero preserves legacy natural-size drawing
+    int destination_height = 0;
 };
 // Solid rectangle in 8-bit RGBA channels.
 struct FillCommand {
@@ -198,6 +200,10 @@ public:
     virtual InputSnapshot poll() = 0;
     // Commands are drawn in order over the viewport's clear color.
     virtual Result<void> present(std::span<const DrawCommand> commands, const Viewport& viewport) = 0;
+    // Diagnostic screenshot after a software-rendered trace, without desktop capture.
+    virtual Result<void> capture_frame(const std::filesystem::path&) {
+        return fail(ErrorCode::unsupported, "frame capture is unavailable");
+    }
     // Shows or hides the on-screen keyboard where the system has one; `text` of the snapshot
     // only carries typing while it is active.
     virtual void set_text_input(bool active) = 0;

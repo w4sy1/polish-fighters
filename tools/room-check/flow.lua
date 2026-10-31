@@ -10,7 +10,15 @@ return function(flow)
   if s.session and s.session.room and not s.test_match and not require("room-check/config").menu then
    s.test_match=true
    local catalog=require("base/game/catalog");local fighters=catalog.load();local slots={}
-   for _,peer in ipairs(s.session.peers) do slots[peer.slot]={kind="human",fighter=peer.slot%#fighters+1,team=peer.slot+1} end
+   for _,peer in ipairs(s.session.peers) do
+    local selected=peer.slot%#fighters+1
+    if require("room-check/config").own then
+     selected=nil
+     for row,fighter in ipairs(fighters) do if fighter.id==410+peer.slot%4 then selected=row;break end end
+     assert(selected,"own fighter missing in network fixture")
+    end
+    slots[peer.slot]={kind="human",fighter=selected,team=peer.slot+1}
+   end
    s.match=require("base/ui/match_screen").create({mode=0,difficulty=0,background=0,
     fighters=fighters,backgrounds=catalog.backgrounds(),slots=slots,network=true})
    s.active="match";s.wait_release=nil

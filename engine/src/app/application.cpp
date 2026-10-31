@@ -120,9 +120,32 @@ struct Configuration {
     // --default-controller: until controls are saved, player 1 starts on the first controller (the
     // consoles do this by default; PortMaster handhelds pass it).
     bool default_controller = false;
+    bool hub_menu = false; // Explicitly exercise the live first menu in headless UI probes.
+    bool profile_start = false;
+    std::optional<std::filesystem::path> capture_frame;
     std::vector<std::string> input_trace; // held action letters per frame, headless
     std::optional<std::uint32_t> seed;
 };
+struct ProfileDefinition { std::string_view action; std::string_view directory; };
+constexpr std::array profile_definitions{
+    ProfileDefinition{"profile_lf_two", ""}, ProfileDefinition{"profile_polish_fighters", "polish-originals"},
+    ProfileDefinition{"profile_lf_four_turbo", "lf4-turbo"}, ProfileDefinition{"profile_dbz", "dbz"},
+    ProfileDefinition{"profile_one_piece", "one-piece"}, ProfileDefinition{"profile_kate", "kate"},
+    ProfileDefinition{"profile_reinforced", "reinforced"}, ProfileDefinition{"profile_ntsd", "ntsd"},
+    ProfileDefinition{"profile_bleach", "bleach"}};
+struct ProfileRequest { std::string directory; std::vector<std::string> remaining_trace; };
+std::filesystem::path content_directory(const Configuration& config) {
+    for (const auto& path : {config.scripts.parent_path() / "content-packs",
+                             config.scripts.parent_path().parent_path() / "content-packs"}) {
+        std::error_code error;
+        if (std::filesystem::is_directory(path, error)) return path;
+    }
+    return config.scripts.parent_path() / "content-packs";
+}
+std::optional<std::string> requested_profile(std::string_view action) {
+    for (const auto& profile : profile_definitions) if (profile.action == action) return std::string(profile.directory);
+    return std::nullopt;
+}
 // Headless input trace mini-language: udlrcbf (player 1 actions), '/' next player, digits F1-F9,
 // "@X_Y" pointer, "#N" raw key, "$Nx"/"%x" controller, "^x" typed char, "&N_X_Y" touch.
 Result<void> valid_trace_frame(std::string_view frame) {
@@ -391,6 +414,7 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
         }
         if (argument == "--help") config.help = true;
         else if (argument == "--headless") config.headless = true;
+        else if (argument == "--hub-menu") config.hub_menu = true;
         else if (argument == "--jit") config.jit = true;
         else if (argument == "--no-jit") config.jit = false;
         else if (argument == "--preview-backgrounds") config.preview_backgrounds = true;
@@ -437,12 +461,13 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
             config.renderer = arguments[index];
         }
         else if (argument == "--installer" || argument == "--scripts" || argument == "--mod"
-                 || argument == "--config-dir" || argument == "--replay") {
+                 || argument == "--config-dir" || argument == "--replay" || argument == "--capture-frame") {
             if (++index == arguments.size()) return fail(ErrorCode::format, argument + " needs a path");
             const auto& value = arguments[index];
             if (argument == "--installer") config.installer = value;
             else if (argument == "--scripts") config.scripts = value;
             else if (argument == "--config-dir") config.config_directory = std::filesystem::path(value);
+            else if (argument == "--capture-frame") config.capture_frame = std::filesystem::path(value);
             else if (argument == "--replay") {
                 if (value.empty()) return fail(ErrorCode::format, "recording path must not be empty");
                 if (config.replay) return fail(ErrorCode::format, "open one recording at a time");
@@ -454,6 +479,15 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
     if (config.replay && (!config.network_role.empty() || config.preview_backgrounds || config.preview_ending)) {
         return fail(ErrorCode::format, "a recording cannot be combined with network or preview startup");
     }
+    if (config.installer.empty()) {
+        auto local_installer = find_installer(directory);
+        if (!local_installer) return std::unexpected(local_installer.error());
+        if (*local_installer) {
+            config.installer = **local_installer;
+            if (!config.headless && !config.config_directory) config.config_directory = directory / "userdata" / "common";
+        }
+    }
+    if (config.capture_frame && !config.headless) return fail(ErrorCode::format, "--capture-frame requires --headless or --input-trace");
     return config;
 }
 class GameResources final : public ResourceSource {
@@ -519,7 +553,9 @@ public:
             if (!parsed) return std::unexpected(parsed.error());
             return stage_data::to_script_value(*parsed);
         }
-        auto parsed = object_data::load(resources_, path);
+        // Isolated DBZ format extension; other profiles retain the original 400-frame validation.
+        const auto capacity = path.starts_with("mods/dbz/") ? object_data::extended_frame_count : object_data::frame_count;
+        auto parsed = object_data::load(resources_, path, capacity);
         if (!parsed) return std::unexpected(parsed.error());
         return object_data::to_script_value(*parsed);
     }
@@ -819,7 +855,7 @@ private:
 #endif
 };
 
-Result<void> run(const Configuration& config) {
+Result<void> run(const Configuration& config, std::optional<ProfileRequest>& profile_request) {
     std::vector<std::filesystem::path> packages{config.scripts / "base"};
     // Polish Fighters is bundled with the script tree on desktop and Android.
     const auto bundled = config.scripts / "polish-fighters";
@@ -861,7 +897,7 @@ Result<void> run(const Configuration& config) {
 #endif
     // Open the window before installer setup, restoring saved desktop placement if present.
     std::unique_ptr<Platform> platform;
-    if (!config.headless) {
+    if (!config.headless || config.capture_frame) {
         const Viewport window{scripts->window.width, scripts->window.height, 0, 0, 0};
         auto placement = load_window_placement(*settings);
         if (!placement) std::cerr << "Window settings: " << placement.error().message << '\n';
@@ -928,7 +964,17 @@ Result<void> run(const Configuration& config) {
     const auto network_options = std::string(config.headless ? ", network_trace=true" : "") + ", network_port=" + std::to_string(config.network_port) +
         (config.network_role.empty() ? std::string{} : ", network_role=\"" + config.network_role +
             "\", network_address=\"" + config.network_address + "\"");
-    const auto bundle = "local runtime_settings = {menu_seed=" + std::to_string(menu_seed) +
+    std::string profiles_available = ", profiles_available={";
+    for (const auto& profile_entry : profile_definitions) {
+        std::error_code error;
+        const bool available = profile_entry.directory.empty() || std::filesystem::is_regular_file(
+            content_directory(config) / profile_entry.directory / "package.manifest", error);
+        profiles_available += std::string(profile_entry.action.substr(8)) + "=" + (available ? "true," : "false,");
+    }
+    profiles_available += "}";
+    const auto bundle = "local runtime_settings = {menu_seed=" + std::to_string(menu_seed) + profiles_available +
+        (config.profile_start ? ", profile_start=true" : "") +
+        (config.headless && !config.hub_menu ? ", legacy_menu=true" : "") +
         ", network_profile=\"" + *profile + "\", recording_version=" + std::to_string(constants->second) + network_options +
 #if defined(__SWITCH__) || defined(__vita__)
         ", default_controller=true" +
@@ -958,12 +1004,14 @@ Result<void> run(const Configuration& config) {
         bool music_running = false;
         bool music_available = true;
         for (std::size_t index = 0; index < frames.size(); ++index) {
-            auto frame = simulation.frame(frames[index]);
+            const auto traced_input = frames[index] +
+                (config.capture_frame && platform->supports_text() ? "?t" : "");
+            auto frame = simulation.frame(traced_input);
             if (!frame) return std::unexpected(frame.error());
             // A trace frame denotes a committed script tick, not a socket polling attempt.
             while (frame->waiting) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                frame = simulation.frame(frames[index]);
+                frame = simulation.frame(traced_input);
                 if (!frame) return std::unexpected(frame.error());
             }
             for (const auto& command : frame->commands) {
@@ -1000,6 +1048,17 @@ Result<void> run(const Configuration& config) {
             }
             for (const auto& action : frame->actions) {
                 std::cout << "frame " << index << ": action " << action << '\n';
+                if (auto target = requested_profile(action)) {
+                    profile_request = ProfileRequest{std::move(*target),
+                        std::vector<std::string>(frames.begin() + static_cast<std::ptrdiff_t>(index + 1), frames.end())};
+                    return {};
+                }
+            }
+            if (config.capture_frame && index + 1 == frames.size()) {
+                auto presented = platform->present(frame->commands, frame->viewport);
+                if (!presented) return std::unexpected(presented.error());
+                auto captured = platform->capture_frame(*config.capture_frame);
+                if (!captured) return std::unexpected(captured.error());
             }
         }
         if (!config.input_trace.empty()) {
@@ -1248,6 +1307,11 @@ Result<void> run(const Configuration& config) {
             chosen_file.reset();
         }
         for (const auto& action : frame->actions) {
+            if (auto target = requested_profile(action)) {
+                save_window();
+                profile_request = ProfileRequest{std::move(*target), {}};
+                return {};
+            }
             if (action == "quit") {
                 save_window();
                 return {};
@@ -1341,8 +1405,25 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
                          "Only explicitly selected, trusted local mod packages are supported.\n";
             return 0;
         }
-        auto result = run(*config);
-        if (!result) { std::cerr << result.error().message << '\n'; return 1; }
+        while (true) {
+            std::optional<ProfileRequest> profile_request;
+            auto result = run(*config, profile_request);
+            if (!result) { std::cerr << result.error().message << '\n'; return 1; }
+            if (!profile_request) break;
+            const auto target = content_directory(*config) / profile_request->directory;
+            if (!profile_request->directory.empty()) {
+                std::error_code error;
+                if (!std::filesystem::is_regular_file(target / "package.manifest", error)) {
+                    std::cerr << "Selected package is not installed: " << profile_request->directory << '\n';return 1;
+                }
+            }
+            config->mods.clear();
+            if (!profile_request->directory.empty()) config->mods.push_back(target);
+            config->profile_start = true;
+            config->input_trace = std::move(profile_request->remaining_trace);
+            config->network_role.clear();config->replay.reset();
+            std::cout << "Profile loaded: " << (profile_request->directory.empty() ? "lf2-classic" : profile_request->directory) << '\n';
+        }
         return 0;
     } catch (const std::exception& error) {
         std::cerr << "Application failure: " << error.what() << '\n';

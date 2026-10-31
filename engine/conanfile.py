@@ -30,7 +30,7 @@ class OpenLF2Conan(ConanFile):
         "ffmpeg/*:postproc": False,
         "ffmpeg/*:with_asm": False,
         "ffmpeg/*:disable_everything": True,
-        "ffmpeg/*:enable_decoders": "wmav2",
+        "ffmpeg/*:enable_decoders": "wmav2,wmalossless",
         "ffmpeg/*:enable_demuxers": "asf",
         # SDL3_ttf (translated languages) must be built like SDL; no text shaping or SVG emoji is needed.
         "sdl_ttf/*:shared": True,

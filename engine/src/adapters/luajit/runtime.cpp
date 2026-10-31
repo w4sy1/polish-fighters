@@ -208,7 +208,7 @@ int create_bridge_slot(lua_State* state) {
 // Private protocol, matching the fixed-size opcodes in runtime/bootstrap.lua.
 enum class FrameOpcode {
     viewport = 1, sprite, fill, overlay, render_area, clip, sound, rumble,
-    music, speed, render_filter, text_input, replay_drop, fullscreen, action, text, file_dialog, world_sprite
+    music, speed, render_filter, text_input, replay_drop, fullscreen, action, text, file_dialog, world_sprite, scaled_sprite
 };
 class FrameReader {
 public:
@@ -278,8 +278,19 @@ Result<ScriptFrame> decode_frame(lua_State* state, int table, int count) {
         int commands = 0;
         while (reader.remaining()) {
             if (++commands > 4096) throw std::runtime_error("too many frame commands");
-            const auto opcode = static_cast<FrameOpcode>(reader.integer(1, 18));
+            const auto opcode = static_cast<FrameOpcode>(reader.integer(1, 19));
             switch (opcode) {
+            case FrameOpcode::scaled_sprite: {
+                SpriteCommand sprite{};
+                sprite.resource = reader.resource(); sprite.source = reader.rectangle();
+                sprite.x = reader.integer(); sprite.y = reader.integer();
+                sprite.destination_width = reader.integer(1, 8192);
+                sprite.destination_height = reader.integer(1, 8192);
+                sprite.mirrored = reader.flag(); sprite.tint = reader.integer(0, 0xffffff);
+                sprite.color_key = false; sprite.overlay = overlay; sprite.clip = clip;
+                frame.commands.emplace_back(std::move(sprite));
+                break;
+            }
             case FrameOpcode::viewport:
                 if (frame.viewport.width) throw std::runtime_error("duplicate viewport");
                 frame.viewport.width = reader.integer(1, 8192); frame.viewport.height = reader.integer(1, 8192);

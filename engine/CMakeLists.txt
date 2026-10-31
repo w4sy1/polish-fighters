@@ -416,6 +416,13 @@ elseif(OPENLF2_DEPENDENCY_PROVIDER STREQUAL "vita")
     vita_create_vpk(openlf2.vpk OLF200001 eboot.bin VERSION 01.01 NAME "OpenLF2"
         FILE ${openlf2_vita_files})
 endif()
+option(OPENLF2_SPRITE_PROBE "Build the optional SDL scaled-sprite regression probe" OFF)
+if(OPENLF2_SPRITE_PROBE AND WIN32)
+    add_executable(openlf2_sprite_probe ../tests/scaled_sprite_probe.cpp)
+    openlf2_target(openlf2_sprite_probe)
+    target_link_libraries(openlf2_sprite_probe PRIVATE openlf2_adapter_sdl SDL3::SDL3)
+endif()
+
 # SDL startup is itself an adapter boundary and requires SDL's header on the executable.
 if(NOT ANDROID AND NOT APPLE AND NOT OPENLF2_DEPENDENCY_PROVIDER STREQUAL "vita"
     AND NOT OPENLF2_DEPENDENCY_PROVIDER STREQUAL "web")

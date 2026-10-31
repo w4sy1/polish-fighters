@@ -1,0 +1,35 @@
+{
+  "fighters": [
+    {
+      "id": 410,
+      "name": "Wasyl",
+      "path": "mods/polish-originals/w.dat"
+    },
+    {
+      "id": 411,
+      "name": "SZ",
+      "path": "mods/polish-originals/s.dat"
+    },
+    {
+      "id": 412,
+      "name": "Mega Ninja Jas",
+      "path": "mods/polish-originals/j.dat"
+    },
+    {
+      "id": 413,
+      "name": "Sigma Tata",
+      "path": "mods/polish-originals/b.dat"
+    }
+  ],
+  "original_catalog_preserved": true,
+  "art_unmodified": true,
+  "helpers": [
+    420,
+    421,
+    422,
+    423,
+    424,
+    425,
+    426
+  ]
+}

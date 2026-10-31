@@ -59,7 +59,7 @@ local gamepad_defaults = {
     daj = {right = 72, bottom = 80, radius = 26},
 }
 local defaults = {battlefield_layout = "classic", gamepad = gamepad_defaults, unlock_characters = false, upscaling_filter = "linear", fullscreen = false, digipad = true, show_fps = false,
-    rumble = false, show_gamepad = false, language = "default", font_antialiasing = true,
+    rumble = false, show_gamepad = false, language = "polish", font_antialiasing = true,
     character_shading = false, projected_shadows = false,
     light_azimuth = -50, light_elevation = 70, shadow_blur = 2, shadow_opacity = 0.275}
 local current
