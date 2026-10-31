@@ -1,4 +1,4 @@
--- The upstream launch/title screens remain intact. Extras use the original blue/bitmap style.
+-- Extras share the modern LF2 backdrop; original bitmap rendering remains a fallback.
 return function(base)
     local font=require("base/ui/font")
     local nav=require("base/ui/navigation")
@@ -46,7 +46,7 @@ return function(base)
             for index,pack in ipairs(model.packs) do list[#list+1]={"pack:"..index,pack[1]..(pack[2] and " [AKTYWNY]" or " [NIEAKTYWNY]")} end
             list[#list+1]={"back","POWROT"};return list
         elseif s.pf_panel=="account" then
-            return {{"google","KONTO GOOGLE"},{"email","KONTO E-MAIL"},{"guest","GRAJ BEZ LOGOWANIA"},{"back","POWROT"}}
+            return {{"native-account","ZALOGUJ / UTWÓRZ KONTO"},{"guest","GRAJ BEZ LOGOWANIA"},{"back","POWRÓT"}}
         elseif s.pf_panel=="pack-content" then
             return {{"fighters","PRZEGLADAJ POSTACIE"},{"maps","PRZEGLADAJ MAPY"},
                 {"campaigns","PRZEGLADAJ ETAPY KAMPANII"},{"back","POWROT"}}
@@ -153,6 +153,8 @@ return function(base)
             end
         elseif id=="play" then
             model.pending_map=model.selected_map().row;c.action("versus")
+        elseif id=='native-account' then
+            s.pf_panel=nil;s.hub_classic=nil;require('polish-fighters/online_screen').open(s)
         elseif id=="room" then require("base/game/network").next_room=true;s.pf_panel=nil;c.action("network")
         elseif id=="tcp" then s.pf_panel=nil;c.action("network")
         elseif id=="capacity" then
@@ -251,22 +253,30 @@ return function(base)
             end
             return
         end
-        c.viewport(794,550,16,32,108)
+        c.viewport(794,550,8,13,27)
         c.image("pe/menu_back"..s.background,0,0,true)
-        c.sprite("pe/menu_clip",{0,41,434,80},155,55,true)
-        c.sprite("pe/menu_clip",{434,41,62,68},589,55,true)
-        c.fill(186,164,470,359,16,32,80,235)
-        local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOSC",connection="POLACZENIA",touch="STEROWANIE DOTYKOWE",
-            ["pack-content"]="ZAWARTOSC PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA"}
-        font.draw(c,s.pf_message and s.pf_message[1] or titles[s.pf_panel],421,183,4,nil,"center")
+        c.fill(0,0,794,550,8,13,27,100)
+        if c.text then c.text('POLISH FIGHTERS / DODATKI',397,47,'center',28,0xf0f5ff,nil,nil,true)
+        else
+            c.sprite("pe/menu_clip",{0,41,434,80},155,55,true)
+            c.sprite("pe/menu_clip",{434,41,62,68},589,55,true)
+        end
+        c.fill(186,164,470,359,16,27,47,220)
+        c.fill(186,164,470,2,224,72,92)
+        local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOŚĆ",connection="POŁĄCZENIA",touch="STEROWANIE DOTYKOWE",
+            ["pack-content"]="ZAWARTOŚĆ PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA"}
+        local title=s.pf_message and s.pf_message[1] or titles[s.pf_panel]
+        if c.text then c.text(title,421,181,'center',20,0xf0f5ff,nil,nil,true)
+        else font.draw(c,title,421,183,4,nil,"center") end
         if s.pf_message then
             for i=2,#s.pf_message do font.gdi(c,s.pf_message[i],210,270+(i-2)*28,0xffffff) end
         end
         for index,entry in ipairs(items(s)) do
-            if index==s.pf_hover then c.fill(200,212+(index-1)*25,442,24,32,58,115) end
-            font.draw(c,entry[2],421,219+(index-1)*25,index==s.pf_hover and 4 or 1,nil,"center")
+            if index==s.pf_hover then c.fill(200,212+(index-1)*25,442,24,42,80,120) end
+            if c.text then c.text(entry[2],421,216+(index-1)*25,'center',13,0xe0eaff,nil,nil,true)
+            else font.draw(c,entry[2],421,219+(index-1)*25,index==s.pf_hover and 4 or 1,nil,"center") end
         end
-        font.gdi(c,"ESC: POWROT     POLISH FIGHTERS 0.6",210,532,0x5077d0)
+        font.gdi(c,"ESC: POWRÓT     POLISH FIGHTERS",210,532,0x9db6d8)
     end
     function base.describe(s)
         return original_describe(s).." pf_panel="..tostring(s.pf_panel or "classic").." pf_map="..model.current().map.." pf_room_capacity="..model.current().room_capacity

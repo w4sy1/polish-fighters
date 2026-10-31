@@ -7,6 +7,7 @@ return function(base)
  local font=require("base/ui/font")
  local options=require("base/game/options")
  local packs=require("polish-fighters/pack_preferences")
+ local online=require('polish-fighters/online_screen')
  function base.create(value)
   local state=create(value);state.hub_navigation=nav.create()
   local selected,problem=packs.read(hub.profiles)
@@ -34,6 +35,10 @@ return function(base)
    if state.hub_available and state.hub_available[tag]==false then
     state.hub_note="Brak lokalnego pakietu. Uruchom pełną paczkę Little Fighters.";return
    end
+   if tag=='mixed' then
+    context.action(id)
+    return
+   end
    for _,entry in ipairs(hub.profiles) do
     if entry.id==tag then
      if catalog.profile_id==entry.profile then state.hub_mode="profile"
@@ -41,6 +46,9 @@ return function(base)
      return
     end
    end
+  elseif id=="network" and catalog.profile_id=='mixed-all' then
+   state.hub_note='Wspólna pula: najpierw testy lokalne. Sieć uruchom w osobnym profilu.'
+  elseif id=='network' then online.open(state)
   elseif id=="controls" then input_settings.open(state)
   elseif id=="options" then
    state.page="options";state.options=options.current();state.options_focus=1
@@ -66,6 +74,7 @@ return function(base)
    state.hub_wait_release=nil
   end
   if state.hub_edit then return input_settings.update(state,input) end
+  if state.hub_online then return online.update(state,input,context) end
   if state.page~="menu" then return update(state,input,context) end
   if state.hub_classic then
    update(state,input,context)
@@ -93,11 +102,15 @@ return function(base)
  end
  function base.draw(state,context)
   if not state.hub_enabled or state.page~="menu" or state.hub_classic then return draw(state,context) end
+  if state.hub_online then return online.draw(state,context) end
   context.viewport(794,550,12,18,35)
+  -- Reuse the owner's original LF2 menu illustration; no extra download is needed.
+  context.image("pe/menu_back"..(state.background or 0),0,0,true)
+  context.fill(0,0,794,550,8,13,27,75)
   context.fill(0,0,794,78,20,35,66)
   context.fill(0,76,794,2,224,72,92)
-  context.fill(24,151,389,346,16,27,47)
-  context.fill(416,151,365,346,16,27,47)
+  context.fill(24,151,389,346,16,27,47,105)
+  context.fill(416,151,365,346,16,27,47,105)
   local title=state.hub_edit and "USTAWIENIA STEROWANIA" or
       (state.hub_mode=="profile" and hub.title(catalog.profile_id):upper() or "LITTLE FIGHTERS")
   text(context,title,397,20,29,0xf0f5ff,"center")
@@ -119,15 +132,15 @@ return function(base)
    return
   end
   text(context,"AKTYWNY ZESTAW: "..hub.title(catalog.profile_id),397,89,17,0x9bcbff,"center")
-  local subtitle=state.hub_mode=="library" and "Pakiety uruchamiasz osobno. Wspólna pula postaci wymaga jeszcze integracji." or
+  local subtitle=state.hub_mode=="library" and "Uruchom jeden zestaw lub wspólną pulę zaznaczonych modów (tryb testowy)." or
     "Mysz: kliknij    Klawiatura: strzałki / Enter    Pad: D-pad / A"
   if state.hub_mode=="profile" then subtitle=input_settings.hint()
-  elseif state.hub_mode=="packs" then subtitle="Wybierz pakiety widoczne w menu. Postacie pakietów pozostają osobno." end
+  elseif state.hub_mode=="packs" then subtitle="Wybierz pakiety do wspólnej puli oraz widoczne w menu. Zapisz, aby zastosować." end
   text(context,subtitle,397,121,13,0xaac0dd,"center")
   for index,row in ipairs(hub.rows(state)) do
    local column=math.floor((index-1)/9);local y=160+(index-1)%9*37;local x=35+column*385
    local selected=index==state.hub_hover
-   context.fill(x,y,370,32,selected and 42 or 22,selected and 80 or 42,selected and 120 or 68)
+   context.fill(x,y,370,32,selected and 42 or 22,selected and 80 or 42,selected and 120 or 68,selected and 230 or 180)
    context.fill(x,y,3,32,selected and 255 or 160,selected and 102 or 54,selected and 115 or 74)
    text(context,row[2],x+12,y+7,15,0xf3f7ff)
   end
@@ -136,7 +149,8 @@ return function(base)
  end
  function base.describe(state)
   return describe(state).." hub="..tostring(state.hub_enabled==true)..":"..tostring(state.hub_mode)..
-    " input_settings="..tostring(state.hub_edit~=nil).." input_capture="..tostring(state.hub_capture and state.hub_capture.row or 0)
+    " input_settings="..tostring(state.hub_edit~=nil).." input_capture="..tostring(state.hub_capture and state.hub_capture.row or 0)..
+    " online="..tostring(state.hub_online~=nil)
  end
  return base
 end

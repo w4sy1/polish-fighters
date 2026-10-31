@@ -150,10 +150,24 @@
     "mouse_buttons": true,
     "controller_bindings": true,
     "shared_settings": "userdata/common",
-    "all_mods_merged": false,
+    "all_mods_merged": true,
     "github_downloader": false,
     "physical_controller_verified": false,
     "report": "validation/hub-controls-2026-10-31/REPORT.md",
     "portable": "engine/out/LittleFighters-hub-2026-10-31"
+  },
+  "mixed_online": {
+    "date": "2026-10-31",
+    "portable": "engine/out/LittleFighters-mixed-online-2026-10-31",
+    "objects": 932,
+    "maps": 128,
+    "mixed_combat_frames": 300,
+    "account_client_local_verified": true,
+    "directory_tcp_two_process_frames": 120,
+    "mixed_status": "experimental local profile; original engine mechanics incomplete",
+    "public_hosting_deployed": false,
+    "bluetooth_implemented": false,
+    "android_verified": false,
+    "report": "validation/mixed-2026-10-31/REPORT.md"
   }
 }

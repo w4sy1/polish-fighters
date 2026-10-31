@@ -1,4 +1,4 @@
--- Local launcher selection. Packages remain isolated until their IDs are remapped.
+-- Shared selection for launcher visibility and the generated mixed roster.
 local preferences={}
 function preferences.read(profiles)
  local doc,problem=engine.read_settings()

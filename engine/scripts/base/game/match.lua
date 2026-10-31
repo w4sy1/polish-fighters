@@ -78,9 +78,12 @@ function match.create(options)
         row = math.floor(options.stage_level / 10) + 1
         if options.campaign_path and options.campaign_background~=nil then row=options.campaign_background end
     elseif row == constants.background_rows.random then
+        if catalog.mixed_pool then row=engine.random(count)
+        else
         -- Random background: the last two rows are excluded and the third-last means row 99.
         row = engine.random(count - 2)
         if row == count - 3 then row = constants.background_rows.lee_on_road end
+        end
     end
     state.background_row = row
     state.stage_bound, state.camera_limit = 0, 0

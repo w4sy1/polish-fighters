@@ -49,7 +49,7 @@ function catalog.load()
                 local family = math.floor(id / 10)
                 fighters[#fighters + 1] = {id = id, record = record, name = name,
                     portrait = canonical(portrait), path = path, hidden = family == 3 or family == 5}
-                assert(#fighters <= 400, "too many character records")
+                assert(#fighters <= (catalog.fighter_limit or 400), "too many character records")
                 end
             end
         elseif line:find("%S") and not id then error("invalid object catalog line") end
@@ -136,7 +136,7 @@ function catalog.objects()
         local entry = {id = tonumber(id), kind = tonumber(kind), path = canonical(path)}
         objects[#objects + 1] = entry
         if not by_id[entry.id] then by_id[entry.id] = entry end
-        assert(#objects <= 500, "too many object records")
+        assert(#objects <= (catalog.object_limit or 500), "too many object records")
     end
     cached_objects = {list = objects, by_id = by_id}
     return cached_objects
@@ -149,7 +149,7 @@ function catalog.backgrounds()
     local backgrounds = {}
     for id, path in section:gmatch("id:%s*(%d+)%s+%S+%s+(%S+)") do
         backgrounds[#backgrounds + 1] = {id = tonumber(id), path = canonical(path)}
-        assert(#backgrounds <= 100, "too many background records")
+        assert(#backgrounds <= (catalog.background_limit or 100), "too many background records")
     end
     assert(#backgrounds > 0, "empty background catalog")
     cached_backgrounds = backgrounds

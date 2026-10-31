@@ -36,5 +36,11 @@ int main() {
     write(extra, "extra", 2049);
     loaded = openlf2::load_packages(roots);
     assert(!loaded && loaded.error().code == openlf2::ErrorCode::limit);
+    write(base, "base", 0); write(extra, "mixed-all", 12288);
+    loaded = openlf2::load_packages(roots);
+    assert(loaded && loaded->assets.size() == 12288);
+    write(extra, "mixed-all", 12289);
+    loaded = openlf2::load_packages(roots);
+    assert(!loaded && loaded.error().code == openlf2::ErrorCode::limit);
     std::cout << "PASS: accepts 4096 total package assets and rejects 4097\n";
 }

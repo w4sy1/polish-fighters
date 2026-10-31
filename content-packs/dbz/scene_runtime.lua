@@ -26,4 +26,23 @@ function runtime.spawn(state, objects)
         end
     end
 end
+function runtime.transition(state,selected,backgrounds,background,objects)
+    local entry=assert(backgrounds[selected.row+1],'missing DBZ transition background')
+    for _,owned in ipairs(state.dbz_scene_objects or {}) do
+        local value=state.items[owned.slot]
+        if value and value.record.id==owned.oid then objects.remove(state,owned.slot) end
+    end
+    background.select_mode(entry.path,selected.mode or 0)
+    state.stage=background.load(entry.path)
+    state.view=background.create_state(state.stage)
+    state.background_row=selected.row
+    state.camera,state.camera_step,state.camera_limit,state.stage_bound=0,0,0,0
+    local near,far=state.stage.zboundary[1],state.stage.zboundary[2]
+    for _,value in pairs(state.items) do
+        value.z=math.max(near,math.min(far,value.z));value.z_int=math.floor(value.z)
+        value.x=math.max(0,math.min(state.stage.width,value.x));value.x_int=math.floor(value.x)
+    end
+    runtime.spawn(state,objects)
+    state.dbz_scene_transitions=(state.dbz_scene_transitions or 0)+1
+end
 return runtime

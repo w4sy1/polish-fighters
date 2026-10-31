@@ -12,6 +12,7 @@ hub.profiles={
  {id="bleach",profile="bleach",title="Bleach"},
 }
 function hub.title(profile)
+ if profile=='mixed-all' then return 'Polish Fighters: wszystkie mody' end
  for _,entry in ipairs(hub.profiles) do if entry.profile==profile then return entry.title end end
  return "Little Fighters"
 end
@@ -29,10 +30,10 @@ function hub.rows(state)
  if state.hub_mode=="profile" then
   return {{"versus","WALKA LOKALNA"},{"stage","KAMPANIA / PRZYGODA"},{"battle_setup","BITWA DRUŻYN"},
     {"championship","TURNIEJ"},{"maps","WYBIERZ MAPĘ"},{"fighters","POSTACIE I UMIEJĘTNOŚCI"},
-    {"network","MULTIPLAYER LAN"},{"controls","USTAWIENIA STEROWANIA"},{"root","MENU GŁÓWNE"}}
+    {"network","KONTA / POKOJE / LAN"},{"controls","USTAWIENIA STEROWANIA"},{"root","MENU GŁÓWNE"}}
  end
  local rows={}
- if state.hub_mode~="library" then rows[#rows+1]={"library","WSZYSTKIE MODY - KATALOG"} end
+ if state.hub_mode~="library" then rows[#rows+1]={"library","WSZYSTKIE MODY / WSPÓLNA PULA"} end
  for _,entry in ipairs(hub.profiles) do
   if not state.hub_selected or state.hub_selected[entry.id]~=false then
   local available=state.hub_available and state.hub_available[entry.id]
@@ -40,13 +41,14 @@ function hub.rows(state)
   end
  end
  if state.hub_mode=="library" then
-  rows[#rows+1]={"packs","DOBIERZ PAKIETY W MENU"}
+  rows[#rows+1]={"packs","DOBIERZ AKTYWNE PAKIETY"}
+  rows[#rows+1]={"profile_mixed","WSZYSTKIE RAZEM — TRYB TESTOWY"}
   rows[#rows+1]={"root","POWRÓT"};return rows
  end
  rows[#rows+1]={"controls","USTAWIENIA STEROWANIA"}
  rows[#rows+1]={"options","USTAWIENIA"}
  rows[#rows+1]={"versus","GRA LOKALNA"}
- rows[#rows+1]={"network","MULTIPLAYER LAN"}
+ rows[#rows+1]={"network","KONTA / POKOJE / LAN"}
  rows[#rows+1]={"extras","HISTORIA / ODBLOKOWANIA"}
  rows[#rows+1]={"recording","USTAWIENIA NAGRAŃ"}
  rows[#rows+1]={"replay","ODTWÓRZ NAGRANIE"}

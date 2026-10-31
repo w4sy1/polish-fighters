@@ -1,3 +1,22 @@
+# Bieżący etap: mieszana pula i klient kont — 2026-10-31
+
+Lokalna instalacja: `engine/out/LittleFighters-mixed-online-2026-10-31`.
+`Graj-Wszystkie-Mody.cmd`: wspólne walki ośmiu źródeł; wybór aktywnych pakietów
+zmienia pulę postaci. 932 obiekty i 128 map. Nowy wygląd menu/wyboru postaci.
+Natywne konta i katalog pokoi sprawdzone z rzeczywistym lokalnym serwerem.
+Użytkownik nie ma jeszcze hostingu; publicznego wdrożenia nie wykonano.
+DBZ: przełączanie autorskich scen między etapami sprawdzone w natywnym silniku.
+
+Testy: Windows Release OK; Lua120/23 zestawy; Python51 (50 OK/1skip);
+C++6/TCP2–8; krótka walka8 źródeł i render128 map. Wspomagane przejścia:
+48/56 zakończone, 7 blokad źródłowych (DBZ mirror, One Piece122), LF4 survival
+bez końca w budżecie. To nie są naturalne pełne przejścia kampanii.
+
+Pozostało: Bleach284/151, brakujące rysunki, pełne mechaniki/AI/questy modów,
+pełne tłumaczenia, publiczne HTTPS/Internet/NAT, Bluetooth, Android i urządzenia.
+Raport: `validation/mixed-2026-10-31/REPORT.md`; instrukcja serwera:
+`server/README_PL.md`. Poniższe sekcje są historią wcześniejszych dostaw.
+
 <!-- hub-controls:start -->
 # Little Fighters — pierwsze menu i sterowanie, 2026-10-31
 

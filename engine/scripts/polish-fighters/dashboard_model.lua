@@ -37,7 +37,7 @@ local current
 local function clean(values)
     values = type(values) == "table" and values or {}
     local map = values.map
-    if type(map) ~= "number" or map % 1 ~= 0 or map < 0 or map > 99 then map = 0 end
+    if type(map) ~= "number" or map % 1 ~= 0 or map < 0 or map >= (require('base/game/catalog').background_limit or 100) then map = 0 end
     local name = type(values.nickname) == "string" and values.nickname or "Gracz"
     name = name:gsub("[%c]", ""):sub(1, 24)
     if name == "" then name = "Gracz" end

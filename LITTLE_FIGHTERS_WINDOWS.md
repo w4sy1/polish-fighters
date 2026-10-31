@@ -1,14 +1,16 @@
 # Little Fighters — menu i sterowanie, 2026-10-31
 
-Uruchom **LittleFighters.exe** z katalogu `engine/out/LittleFighters-pack-ai-2026-10-31`. Program znajduje dane LF2 obok siebie; nie uruchamiaj instalatora LF2_v2.0a.exe. Zachowaj obok programu biblioteki DLL, `scripts`, `content-packs` i `licenses`.
+Uruchom **Graj-Little-Fighters.cmd** z katalogu `engine/out/LittleFighters-mixed-online-2026-10-31`. **Graj-Wszystkie-Mody.cmd** uruchamia od razu mieszaną pulę. Program znajduje dane LF2 w katalogu gry; nie uruchamiaj instalatora LF2_v2.0a.exe. Zachowaj obok programu biblioteki DLL, `scripts`, `content-packs` i `licenses`.
 
-Publiczny ZIP `artifacts/PolishFighters-Windows-core-pack-ai-2026-10-31.zip` zawiera silnik, skrypty i biblioteki. Nie zawiera danych LF2 ani ośmiu dodatków z pełnej lokalnej paczki. To nie jest pełna paczka modów. Repozytorium zawiera kod i pochodzenie importów; własne grafiki postaci są w `content-packs/polish-originals/art`.
+Publiczny ZIP `artifacts/PolishFighters-Windows-core-mixed-online-2026-10-31.zip` zawiera silnik, skrypty i biblioteki. Nie zawiera danych LF2 ani dodatków z pełnej lokalnej paczki. To nie jest pełna paczka modów. Repozytorium zawiera kod i pochodzenie importów; własne grafiki postaci są w `content-packs/polish-originals/art`.
 
-W **Wszystkie mody — katalog → Dobierz pakiety w menu** można ukryć wybrane zestawy i zapisać wybór. To filtr menu, a nie łączenie postaci różnych modów w jednej walce. Zawsze można wrócić do panelu i zaznaczyć wszystkie.
+W **Wszystkie mody / wspólna pula → Dobierz aktywne pakiety** wybierz zestawy i zapisz wybór. **Wszystkie razem — tryb testowy** przeładowuje wspólny katalog postaci zaznaczonych pakietów. Działa lokalna walka postaci z różnych dodatków. Zależności efektów pozostają załadowane niezależnie od wyboru.
 
 Pierwszy ekran to **Little Fighters**. **Polish Fighters** oznacza osobny zestaw naszych czterech postaci razem z zachowanym katalogiem LF2. Pozostałe wybory: LF2, LF4 Turbo, Dragon Ball, One Piece, Kate, Reinforced, NTSD/Naruto i Bleach. Wybranie innego zestawu przeładowuje dane w tym samym programie, a następnie pokazuje wybór walki, kampanii, bitwy, turnieju i map. Pakiety są już lokalnie w pełnej paczce.
 
-**Wszystkie mody — katalog** pozwala wybrać pojedynczy pakiet. Nie oznacza jeszcze wspólnej puli postaci. Łączenie modów, własne mieszane zestawy i automatyczne pobieranie/aktualizowanie z GitHuba nie są w tej wersji dostępne.
+Mieszana pula jest eksperymentalna: 932 obiekty i 128 map, standardowe etapy LF2. Autorskie mechaniki EXE/AngelScript, wyspecjalizowane AI i mieszane kampanie pozostają niepełne. Oryginalne przygody wybieraj w osobnych profilach. Automatyczne pobieranie/aktualizowanie modów z GitHuba nadal nie jest dostępne.
+
+**Konta / pokoje / LAN** otwiera ekran logowania i katalog pokoi. Bez serwera nadal działa gra lokalna i LAN. Uruchomienie lokalnego serwera oraz wymagania przyszłego hostowania opisano w `server/README_PL.md`; nie ma jeszcze publicznej usługi ani Bluetooth. Mieszany profil ma w GUI wyłączoną sieć do czasu dalszych testów.
 
 ## Sterowanie
 
@@ -30,10 +32,10 @@ Przypisano właściwsze pozy do skoków, bloków i umiejętności; poprawiono wy
 
 ## Co pozostaje
 
-- Wspólna pula wszystkich modów i dobieranie mieszanego zestawu.
+- Pełna zgodność autorskich mechanik we wspólnej puli i mieszane kampanie.
 - Pobieranie pakietów, sprawdzanie aktualizacji i naprawa instalacji z GitHuba.
 - Dopracowanie unikalnych klatek animacji, wszystkich ataków, AI i balansu.
 - Wcześniejsze braki zawartości Bleach i mechanik DBZ oraz pełne przejścia kampanii.
 - Android/APK, rzeczywisty telefon, fizyczny pad oraz testy sieci nowej czwórki. Bluetooth nadal niezaimplementowany.
 
-Pełny raport bieżącego etapu: `validation/hub-controls-2026-10-31/REPORT.md` lub `RAPORT-HUB-STEROWANIE.md` w paczce. Uruchomienia testowe i obrazy z SDL nie zastępują testu fizycznego pada ani pełnego ręcznego przejścia gry.
+Pełny raport bieżącego etapu: `validation/mixed-2026-10-31/REPORT.md`. Uruchomienia testowe i obrazy z SDL nie zastępują testu fizycznego pada ani pełnego ręcznego przejścia gry.

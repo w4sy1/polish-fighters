@@ -247,6 +247,8 @@ add_library(openlf2_adapter_download STATIC ${openlf2_download_source})
 target_link_libraries(openlf2_adapter_download PRIVATE openlf2_core)
 if(NOT OPENLF2_DEPENDENCY_PROVIDER STREQUAL "web")
     target_link_libraries(openlf2_adapter_download PRIVATE CURL::libcurl)
+    target_sources(openlf2_adapter_download PRIVATE src/adapters/curl/account_http.cpp)
+    target_link_libraries(openlf2_adapter_luajit PRIVATE openlf2_adapter_download)
 endif()
 openlf2_target(openlf2_adapter_download)
 

@@ -15,3 +15,17 @@ assert(state.items[50].hp==800 and state.items[50].max_hp==800)
 assert(state.items[51].frame==20)
 objects.record=function()return nil end
 assert(not pcall(runtime.spawn,state,objects))
+do
+ local old={record={id=405},x=0,z=100}
+ local kept={record={id=1},x=999,z=999}
+ local s={items={[0]=kept,[50]=old},dbz_scene_objects={{slot=50,oid=405}},
+   camera=200,stage_bound=500}
+ local called=false
+ local bg={select_mode=function(path,mode) assert(path=='next' and mode==1);called=true end,
+   load=function() return {width=600,zboundary={200,400},dbz_mode={arest={0}},dbz_scene={opoints={}}} end,
+   create_state=function() return {counters={}} end}
+ runtime.transition(s,{row=0,mode=1},{{path='next'}},bg,{remove=function(w,i)w.items[i]=nil end})
+ assert(called and s.items[50]==nil and s.items[0]==kept)
+ assert(kept.x==600 and kept.z==400 and s.camera==0 and s.background_row==0)
+ assert(s.dbz_scene_transitions==1 and #s.dbz_scene_objects==0)
+end

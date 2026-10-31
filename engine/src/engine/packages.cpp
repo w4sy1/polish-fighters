@@ -47,7 +47,7 @@ std::optional<WindowSize> window_size(std::string_view value) {
 Result<Package> parse_package(const std::filesystem::path& root) {
     auto manifest_path = package_file(root, "package.manifest");
     if (!manifest_path) return std::unexpected(manifest_path.error());
-    auto bytes = read_file(*manifest_path, 256 * 1024);
+    auto bytes = read_file(*manifest_path, 1024 * 1024);
     if (!bytes) return std::unexpected(bytes.error());
     Package package;
     package.root = root;
@@ -115,6 +115,7 @@ Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots)
     if (!packages.contains("base")) return fail(ErrorCode::dependency, "base package required");
     if (!packages.at("base").window) return fail(ErrorCode::format, "base package must declare its window size");
     ScriptBundle bundle{{}, *packages.at("base").window, {}};
+    const std::size_t asset_limit = packages.contains("mixed-all") ? 12288 : 4096;
     std::optional<std::string> window_owner;
     for (const auto& [id, package] : packages) {
         if (id == "base" || !package.window) continue;
@@ -154,7 +155,7 @@ Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots)
                 auto path = package_file(package.root, file);
                 if (!path) return std::unexpected(path.error());
                 bundle.assets.push_back({resource, package.root, file});
-                if (bundle.assets.size() > 4096) return fail(ErrorCode::limit, "too many package assets");
+                if (bundle.assets.size() > asset_limit) return fail(ErrorCode::limit, "too many package assets");
             }
             for (const auto& declaration : package.declarations) {
                 const auto target = declaration.operation == "module" ? id + "/" + declaration.target : declaration.target;

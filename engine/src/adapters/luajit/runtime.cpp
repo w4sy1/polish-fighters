@@ -5,6 +5,7 @@
 #include "openlf2/core/json.hpp"
 #include "openlf2/engine/room_host.hpp"
 #include "openlf2/ports/digest.hpp"
+#include "openlf2/ports/download.hpp"
 #include "openlf2/core/files.hpp"
 #include "openlf2_build_info.hpp"
 #include <algorithm>
@@ -14,6 +15,7 @@
 #include <memory>
 #include <limits>
 #include <optional>
+#include <future>
 #include <stdexcept>
 #include <utility>
 extern "C" {
@@ -63,6 +65,8 @@ struct ResourceBridge {
     NetworkTransport& network;
     std::unique_ptr<RoomHost> room_host;
     std::optional<Result<std::string>> pending_network;
+    std::future<Result<std::string>> account_future;
+    std::optional<Result<std::string>> account_result;
     bool network_operation(std::string_view operation, std::string_view value, std::uint16_t port) noexcept {
         try {
             pending_network = std::string{};
@@ -420,6 +424,44 @@ int network_operation(lua_State* state) {
     lua_pushlstring(state, bridge->pending_network->value().data(), bridge->pending_network->value().size());
     return 1;
 }
+int account_operation(lua_State* state) {
+#ifdef __EMSCRIPTEN__
+    lua_pushnil(state);lua_pushliteral(state,"Accounts unavailable in this browser build");return 2;
+#else
+    auto* bridge=resource_bridge(state);
+    const auto* action=luaL_checkstring(state,1);
+    if(std::strcmp(action,"poll")==0){
+        if(!bridge->account_future.valid() || bridge->account_future.wait_for(std::chrono::seconds(0))!=std::future_status::ready){
+            lua_pushliteral(state,"pending");return 1;
+        }
+        try {bridge->account_result=bridge->account_future.get();}
+        catch(...){bridge->account_result=fail(ErrorCode::io,"Account worker failed");}
+        if(!bridge->account_result->has_value()){
+            lua_pushnil(state);lua_pushstring(state,bridge->account_result->error().message.c_str());return 2;
+        }
+        lua_pushlstring(state,bridge->account_result->value().data(),bridge->account_result->value().size());return 1;
+    }
+    if(std::strcmp(action,"start")!=0 || bridge->account_future.valid()){
+        lua_pushnil(state);lua_pushliteral(state,"Account request already pending");return 2;
+    }
+    std::size_t base_size=0,operation_size=0,body_size=0,token_size=0;
+    const auto* base=luaL_checklstring(state,2,&base_size);
+    const auto* operation=luaL_checklstring(state,3,&operation_size);
+    const auto* body=luaL_checklstring(state,4,&body_size);
+    const auto* token=luaL_checklstring(state,5,&token_size);
+    if(base_size>512 || operation_size>32 || body_size>8192 || token_size>128){
+        lua_pushnil(state);lua_pushliteral(state,"Account request exceeds limit");return 2;
+    }
+    try {
+        bridge->account_future=std::async(std::launch::async,
+            [endpoint=std::string(base,base_size),op=std::string(operation,operation_size),
+             payload=std::string(body,body_size),bearer=std::string(token,token_size)]{
+                return account_post(endpoint,op,payload,bearer);
+            });
+    } catch(...){lua_pushnil(state);lua_pushliteral(state,"Cannot start account request");return 2;}
+    lua_pushboolean(state,1);return 1;
+#endif
+}
 int network_time(lua_State* state) {
     lua_pushnumber(state, std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now().time_since_epoch()).count());
     return 1;
@@ -755,6 +797,7 @@ int open_libraries(lua_State* state) {
     const std::pair<const char*, lua_CFunction> recording_functions[] = {
         {"openlf2_json_encode", json_encode}, {"openlf2_json_decode", json_decode}, {"openlf2_state_digest", state_digest},
         {"openlf2_network", network_operation}, {"openlf2_network_time", network_time},
+        {"openlf2_account", account_operation},
         {"openlf2_random_state", random_state}, {"openlf2_set_random_state", set_random_state},
         {"openlf2_reset_random_sequence", reset_random_sequence}, {"openlf2_save_recording", save_recording},
         {"openlf2_take_recording", take_recording}, {"openlf2_local_time", local_time}};

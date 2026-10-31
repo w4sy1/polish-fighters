@@ -123,6 +123,7 @@ struct Configuration {
     bool hub_menu = false; // Explicitly exercise the live first menu in headless UI probes.
     bool profile_start = false;
     std::optional<std::filesystem::path> capture_frame;
+    bool render_trace = false;
     std::vector<std::string> input_trace; // held action letters per frame, headless
     std::optional<std::uint32_t> seed;
 };
@@ -132,7 +133,7 @@ constexpr std::array profile_definitions{
     ProfileDefinition{"profile_lf_four_turbo", "lf4-turbo"}, ProfileDefinition{"profile_dbz", "dbz"},
     ProfileDefinition{"profile_one_piece", "one-piece"}, ProfileDefinition{"profile_kate", "kate"},
     ProfileDefinition{"profile_reinforced", "reinforced"}, ProfileDefinition{"profile_ntsd", "ntsd"},
-    ProfileDefinition{"profile_bleach", "bleach"}};
+    ProfileDefinition{"profile_bleach", "bleach"}, ProfileDefinition{"profile_mixed", "mixed-all"}};
 struct ProfileRequest { std::string directory; std::vector<std::string> remaining_trace; };
 std::filesystem::path content_directory(const Configuration& config) {
     for (const auto& path : {config.scripts.parent_path() / "content-packs",
@@ -415,6 +416,7 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
         if (argument == "--help") config.help = true;
         else if (argument == "--headless") config.headless = true;
         else if (argument == "--hub-menu") config.hub_menu = true;
+        else if (argument == "--render-trace") config.render_trace = true;
         else if (argument == "--jit") config.jit = true;
         else if (argument == "--no-jit") config.jit = false;
         else if (argument == "--preview-backgrounds") config.preview_backgrounds = true;
@@ -488,6 +490,7 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
         }
     }
     if (config.capture_frame && !config.headless) return fail(ErrorCode::format, "--capture-frame requires --headless or --input-trace");
+    if (config.render_trace && !config.capture_frame) return fail(ErrorCode::format, "--render-trace requires --capture-frame");
     return config;
 }
 class GameResources final : public ResourceSource {
@@ -554,7 +557,8 @@ public:
             return stage_data::to_script_value(*parsed);
         }
         // Isolated DBZ format extension; other profiles retain the original 400-frame validation.
-        const auto capacity = path.starts_with("mods/dbz/") ? object_data::extended_frame_count : object_data::frame_count;
+        const auto capacity = (path.starts_with("mods/dbz/") || path.starts_with("mods/mixed-all/2/"))
+            ? object_data::extended_frame_count : object_data::frame_count;
         auto parsed = object_data::load(resources_, path, capacity);
         if (!parsed) return std::unexpected(parsed.error());
         return object_data::to_script_value(*parsed);
@@ -1054,11 +1058,13 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
                     return {};
                 }
             }
-            if (config.capture_frame && index + 1 == frames.size()) {
+            if (config.capture_frame && (config.render_trace || index + 1 == frames.size())) {
                 auto presented = platform->present(frame->commands, frame->viewport);
                 if (!presented) return std::unexpected(presented.error());
-                auto captured = platform->capture_frame(*config.capture_frame);
-                if (!captured) return std::unexpected(captured.error());
+                if (index + 1 == frames.size()) {
+                    auto captured = platform->capture_frame(*config.capture_frame);
+                    if (!captured) return std::unexpected(captured.error());
+                }
             }
         }
         if (!config.input_trace.empty()) {
@@ -1418,6 +1424,7 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
                 }
             }
             config->mods.clear();
+            if (profile_request->directory == "mixed-all") config->mods.push_back(content_directory(*config) / "polish-originals");
             if (!profile_request->directory.empty()) config->mods.push_back(target);
             config->profile_start = true;
             config->input_trace = std::move(profile_request->remaining_trace);

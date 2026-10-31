@@ -37,7 +37,7 @@ def main():
     for p in STAGE.rglob('*'):
         if not p.is_file():continue
         rel=p.relative_to(STAGE)
-        if rel.parts[0] in ['scripts','licenses'] or (len(rel.parts)==1 and p.suffix in ['.exe','.dll'] and p.name!='LF2_v2.0a.exe') or p.name in ['LICENSE','THIRD-PARTY-NOTICES.md']:
+        if rel.parts[0] in ['scripts','licenses','server'] or rel.as_posix() in ['tools/account_service.py','tools/room_relay.py'] or (len(rel.parts)==1 and p.suffix in ['.exe','.dll'] and p.name!='LF2_v2.0a.exe') or p.name in ['LICENSE','THIRD-PARTY-NOTICES.md','LITTLE_FIGHTERS_WINDOWS.md','RAPORT-MIXED-ONLINE.md']:
             files.append((p,rel.as_posix()))
     launcher='@echo off\r\ncd /d "%~dp0"\r\n"%~dp0LittleFighters.exe" --config-dir "%~dp0userdata\\common"\r\nif errorlevel 1 pause\r\n'
     results.append(write_zip(ROOT/f'artifacts/PolishFighters-Windows-core-{label}.zip',files,
