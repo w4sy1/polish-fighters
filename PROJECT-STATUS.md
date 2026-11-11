@@ -1,6 +1,6 @@
 # Sterowanie, LAN i płynność — test lokalny 2026-11-11
 
-Gałąź robocza `codex/local-leumas-combo-guide-2026-11-11`. Zmiany źródeł i testów są przygotowane do publikacji po weryfikacji diffu. F4/przycisk MENU wraca do modułów; wybór dotykowy 1/2 zachowuje się w ekranie walki i wyborze postaci. Wi‑Fi: host TCP 12345 lub klient po IPv4; Android i Windows wcześniej połączyły się fizycznie, ale końcowy APK nie został ponownie sprawdzony na telefonie. Bluetooth PAN/radio nadal niepotwierdzone.
+Gałąź robocza `codex/local-leumas-combo-guide-2026-11-11`. Zmiany źródeł i testów zapisano w commicie `16c5a11` i wypchnięto na roboczą gałąź GitHuba; nie utworzono release. F4/przycisk MENU wraca do modułów; wybór dotykowy 1/2 zachowuje się w ekranie walki i wyborze postaci. Wi‑Fi: host TCP 12345 lub klient po IPv4; Android i Windows wcześniej połączyły się fizycznie, ale końcowy APK nie został ponownie sprawdzony na telefonie. Bluetooth PAN/radio nadal niepotwierdzone.
 
 Windowsowy profil zapisano jako WASD + Num7 atak / Num8 blok / Num9 skok, z kopią poprzedniego pliku ustawień poza repozytorium. Ładowanie offline przy rozgrzanym cache: mediana 5,55 → 1,25 s; mikrobenchmark oczekiwania 1 ms: 11,49 → 1,60 ms. Build Windows i Android Gradle PASS; 41 testów Lua, 53 Python (52 PASS/1 SKIP), 27 testów Android PASS. Lint nadal zgłasza 27 błędów/39 ostrzeżeń w generowanych plikach SDL. Końcowa poprawa płynności wymaga próby na prawdziwym telefonie i komputerze; użytkownik nie podłącza telefonu ponownie.
 

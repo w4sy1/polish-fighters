@@ -4,7 +4,7 @@ Repozytorium: `C:\Users\01dwa\Documents\Little-Fighter-Work\Polish-Fighters`.
 Gałąź początkowa i końcowa: `codex/local-leumas-combo-guide-2026-11-11`.
 Punkt początkowy: `8b7030f296771979489a516459c0545bddc64cb0`, zgodny ze zdalnym HEAD
 w chwili rozpoczęcia. Brak zmian w śledzonych plikach przed zadaniem; dwa zastane ZIP-y
-w `artifacts` zachowano. Nie wykonano commita, pushu, wydania ani wdrożenia.
+w `artifacts` zachowano. Po testach zapisano commit `16c5a11` i wypchnięto roboczą gałąź na GitHuba. Nie utworzono release ani wdrożenia.
 Kopia początkowych plików śledzonych: `work/baseline/tracked-source.zip` w katalogu rozmowy.
 
 ## Ustalone przyczyny
@@ -80,18 +80,17 @@ mediana startu 5,55 → 1,25 s. Pomiar etapów wskazał około 4,21 s na dotychc
 haszowanie sieciowe, około 1,15 s na pakiety, około 0,01 s na inicjalizację Lua.
 Nie jest to pomiar pełnego startu z zimnego dysku ani działania wszystkich kampanii.
 
-Lokalny test 2 procesów / 120 klatek: 8,91 → 5,57 s; 8 procesów: 10,75 → 7,07 s.
+Po precyzyjnym timerze lokalny test 2 procesów / 120 klatek trwał 1,134 s; 8 procesów: 1,503 s.
 Te czasy obejmują przygotowanie testu i nie oznaczają FPS telefonu ani testu radia.
 
 Raptor 5G / Android 14 i Windows faktycznie połączyły się przez Wi‑Fi. Użytkownik
 potwierdził wspólną walkę i niezależne sterowanie po usunięciu błędnego porównania
-możliwości okna. Zgłoszone później spowolnienie uruchomiło poprawkę oczekiwań i Wi‑Fi.
-Końcowa poprawka płynności i nowe podpowiedzi wymagają ponownej próby na urządzeniach:
-telefon odłączono od ADB przed instalacją końcowej paczki. Nie należy traktować
-lokalnych testów jako potwierdzenia płynności tej paczki na telefonie.
+możliwości okna. Zgłoszone później spowolnienie uruchomiło poprawkę oczekiwań, Wi‑Fi
+i precyzyjnego timera. Użytkownik nie podłącza ponownie telefonu. Końcowa poprawka
+płynności i nowe podpowiedzi nie zostały zainstalowane ani sprawdzone fizycznie.
 
 Poprzednie przygotowanie danych Androida po aktualizacji trwało około 85,9 s;
-brakuje jeszcze porównawczego pomiaru po buforowaniu. Pierwsze rozpakowanie dużej
+pełnego porównawczego pomiaru po buforowaniu nie wykonano. Pierwsze rozpakowanie dużej
 paczki i późniejszy start z gotowymi danymi to różne etapy.
 
 Bluetooth PAN i radio dwóch telefonów nie zostały potwierdzone fizycznie. PAN
