@@ -1,6 +1,8 @@
-# Wydanie testowe 0.11 — publikacja zatwierdzona 2026-11-11
+# Wydanie testowe 0.11 — opublikowane publicznie 2026-11-11
 
 Użytkownik zatwierdził udostępnienie przygotowanych paczek 0.11.
+Publikacja zakończona: 5/5 załączników dostępnych bez logowania; rozmiary
+i SHA256 GitHuba zgodne z lokalnymi paczkami. Kod wydania: 81612a3.
 Tag: guide-updates-test-2026-11-11. APK i pełny ZIP Windows mają te same
 sumy kontrolne co lokalnie przetestowane pliki. Ograniczenia: brak próby
 na fizycznym telefonie/Bluetooth; 27 istniejących błędów lint SDL.
