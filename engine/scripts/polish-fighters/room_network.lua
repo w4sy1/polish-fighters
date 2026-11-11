@@ -4,6 +4,15 @@ return function(legacy)
  local room={}
  local timeout=30000
  local function fail(s,message)
+  if tostring(message)=='simulation desynchronized' then
+   message='Rozbieżny stan gry (simulation desynchronized). Sesja została bezpiecznie przerwana.'
+  elseif tostring(message):lower():find('desynchronized',1,true) then
+   message='Rozłączono: utrata połączenia, limit czasu lub różny stan gry (simulation desynchronized).'
+  elseif tostring(message):lower():find('profile',1,true) then
+   message='Niezgodny silnik, moduł lub dane gry. Użyj tej samej paczki testowej na obu urządzeniach.'
+  elseif tostring(message):lower():find('timed out',1,true) then
+   message='Brak odpowiedzi pokoju. Sprawdź IP, port TCP '..s.port..', wspólną sieć i zaporę gospodarza.'
+  end
   engine.network("close");s.phase,s.error="failed",message;return nil,message
  end
  local function send(s,value)
@@ -14,6 +23,9 @@ return function(legacy)
   return true
  end
  function room.create(options)
+  if not options.network_profile then
+   local profile,problem=engine.network('profile');assert(profile,problem);options.network_profile=profile
+  end
   return {room=true,phase="idle",profile=options.network_profile,port=options.network_port or 12345,
    capacity=require("polish-fighters/dashboard_model").current().room_capacity,
    received="",frames=0,sequence=0,version=options.recording_version}
@@ -26,7 +38,7 @@ return function(legacy)
   s.phase="connecting";s.deadline=engine.network_time()+timeout;return true
  end
  function room.close(s)
-  engine.network("close");s.phase="idle";s.pending=nil;s.received="";s.frame=nil;s.checked=nil;s.queued_unlock=0
+  engine.network("close");s.phase="idle";s.pending=nil;s.received="";s.frame=nil;s.checked=nil;s.queued_unlock=0;s.queued_actions={};s.observed_actions={};s.queued_action_directions=nil
  end
  function room.ready(s,value) return send(s,{op="ready",value=value}) end
  function room.begin(s) return send(s,{op="start"}) end
@@ -76,6 +88,17 @@ return function(legacy)
   return s.phase=="ready"
  end
  function room.exchange(s,input,hp,digest)
+  -- Rendering keeps polling while a network frame is pending. Preserve short taps
+  -- until the next packet is sent instead of losing them between two barriers.
+  s.queued_actions=s.queued_actions or {}
+  s.observed_actions=s.observed_actions or {}
+  for _,action in ipairs({'c','b','f'}) do
+   local held=(input[0] or ''):find(action,1,true)~=nil
+   if held and not s.observed_actions[action] then
+    s.queued_actions[action]=true;s.queued_action_directions=(input[0] or ''):gsub('[^udlr]','')
+   end
+   s.observed_actions[action]=held
+  end
   -- Preserve unlock events while the previous checksum barrier is still pending.
   local marks=input.unlock_bits or 0
   s.queued_unlock=s.queued_unlock or 0
@@ -88,15 +111,23 @@ return function(legacy)
    s.sent_checksum=s.frames-1;s.deadline=engine.network_time()+timeout
   end
   local ok,problem=room.poll(s);if not ok then return nil,problem end
-  if s.frames>0 and s.checked~=s.frames-1 then
-   if engine.network_time()>s.deadline then return fail(s,"Room checksum timed out") end
-   return nil
-  end
   if not s.pending then
    s.pending=true;s.deadline=engine.network_time()+timeout
    local functions=s.slot==0 and input.functions or ""
-   if not send(s,{op="input",frame=s.frames,keys=input[0] or "",functions=functions,unlock=s.slot==0 and s.queued_unlock or 0}) then return nil,s.error end
+   local keys=input[0] or ''
+   for _,action in ipairs({'c','b','f'}) do
+    if s.queued_actions[action] and not keys:find(action,1,true) then keys=keys..action end
+   end
+   if not keys:find('[udlr]') then keys=keys..(s.queued_action_directions or '') end
+   if not send(s,{op="input",frame=s.frames,keys=keys,functions=functions,unlock=s.slot==0 and s.queued_unlock or 0}) then return nil,s.error end
+   s.queued_actions={};s.queued_action_directions=nil
    s.queued_unlock=0
+  end
+  -- The server queues this input behind the previous checksum barrier. Avoid a
+  -- separate round trip before sending it, while retaining per-frame validation.
+  if s.frames>0 and s.checked~=s.frames-1 then
+   if engine.network_time()>s.deadline then return fail(s,"Room checksum timed out") end
+   return nil
   end
   if not s.frame then
    if engine.network_time()>s.deadline then return fail(s,"Room input timed out") end
@@ -109,7 +140,7 @@ return function(legacy)
  end
  local create=legacy.create
  function legacy.create(options)
-  if legacy.next_room then legacy.next_room=nil;return room.create(options) end
+  if legacy.next_room or options.network_room then legacy.next_room=nil;return room.create(options) end
   return create(options)
  end
  for _,name in ipairs({"start","poll","close","exchange"}) do

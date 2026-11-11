@@ -15,7 +15,7 @@ return function(base)
   return state
  end
  local function activate(state,id,context)
-  state.hub_note=nil
+  state.hub_note=nil;state.message=nil
   if id=="packs" then
    local hide,problem=packs.hide_duplicates()
    if problem then state.hub_note=tostring(problem);return end
@@ -52,7 +52,9 @@ return function(base)
    end
   elseif id=="network" and catalog.profile_id=='mixed-all' then
    state.hub_note='Wspólna pula: najpierw testy lokalne. Sieć uruchom w osobnym profilu.'
-  elseif id=='network' then online.open(state)
+  elseif id=='network' then
+   require('base/game/network').next_room=true
+   context.action('network')
   elseif id=="controls" then input_settings.open(state)
   elseif id=="options" then
    state.page="options";state.options=options.current();state.options_focus=1
@@ -144,8 +146,9 @@ return function(base)
    context.fill(x,y,3,32,selected and 255 or 160,selected and 102 or 54,selected and 115 or 74)
    text(context,row[2],x+12,y+7,15,0xf3f7ff)
   end
-  if state.hub_note then text(context,state.hub_note,397,515,13,0xffdc82,"center") end
-  if not state.hub_note then text(context,"WYBIERZ ZESTAW  /  ZAPROŚ GRACZY  /  ROZPOCZNIJ WALKĘ",397,521,12,0x889dbb,"center") end
+  local message=state.hub_note or state.message
+  if message then text(context,tostring(message):sub(1,110),397,515,13,0xffdc82,"center") end
+  if not message then text(context,"WYBIERZ ZESTAW  /  ZAPROŚ GRACZY  /  ROZPOCZNIJ WALKĘ",397,521,12,0x889dbb,"center") end
  end
  function base.describe(state)
   return describe(state).." hub="..tostring(state.hub_enabled==true)..":"..tostring(state.hub_mode)..

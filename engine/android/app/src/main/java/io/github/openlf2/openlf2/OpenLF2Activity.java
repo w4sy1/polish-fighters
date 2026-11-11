@@ -16,6 +16,7 @@ import org.libsdl.app.SDLActivity;
 /** Stages only the project's Lua modules before SDL starts the native entry point. */
 public final class OpenLF2Activity extends SDLActivity {
     private static final String TAG = "OpenLF2";
+    private LanWifiMode lanWifi;
 
     /** Called on entering Bluetooth mode, never on application startup.
      * Native menu wiring is still required; callers recheck after the system dialog.
@@ -68,6 +69,10 @@ public final class OpenLF2Activity extends SDLActivity {
     @Override
     protected String[] getArguments() {
         try {
+            if (getIntent().hasExtra("lan_host")) {
+                return GameLaunchArguments.lan(getFilesDir(), getIntent().getBooleanExtra("lan_host", false),
+                    getIntent().getStringExtra("lan_address"), getIntent().getIntExtra("lan_port", 12345));
+            }
             return GameLaunchArguments.build(getFilesDir(),
                 getIntent().getStringExtra("bluetooth_role"),
                 getIntent().getIntExtra("bluetooth_port", 0));
@@ -77,8 +82,18 @@ public final class OpenLF2Activity extends SDLActivity {
     }
 
     @Override protected void onDestroy() {
+        if (lanWifi != null) lanWifi.pause();
         BluetoothSession.closeCurrent();
         super.onDestroy();
+    }
+    @Override protected void onResume() {
+        super.onResume();
+        if (lanWifi == null) lanWifi = new LanWifiMode(this);
+        lanWifi.resume(getIntent().hasExtra("lan_host"));
+    }
+    @Override protected void onPause() {
+        if (lanWifi != null) lanWifi.pause();
+        super.onPause();
     }
 
     private void copyAssetTree(String assetPath, File destination) throws IOException {

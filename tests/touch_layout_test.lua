@@ -13,7 +13,7 @@ assert(classic.stick.fixed and #classic.buttons==3,'classic: arrows plus exactly
 local modern=pad.create(layout,false,'modern')
 assert(not modern.stick.fixed)
 local function frame(state,touches,mode,screen)
-    return pad.update(state,{touch_active=true,touches=touches,screen=screen},mode)
+    return pad.update(state,{touch_active=true,touches=touches,screen=screen},mode or 'match')
 end
 local attack={id=2,x=modern.buttons[1].x,y=modern.buttons[1].y}
 assert(not frame(modern,{attack}):find('c'),'modern attack waits for release')
@@ -54,4 +54,11 @@ frame(resumed,{attack})
 pad.update(resumed,{touch_active=false})
 frame(resumed,{attack})
 assert(not frame(resumed,{}):find('c'),'held finger across hidden overlay must not fire')
+for _,style in ipairs({'classic','modern'}) do
+ local menu=pad.create(layout,style=='classic',style)
+ local button={id=12,x=menu.buttons[1].x,y=menu.buttons[1].y}
+ assert(frame(menu,{button},'full'):find('c'),'menu attack must confirm immediately in '..style)
+ assert(not menu.aim_finger and not menu.attack_pulse,'menu must not start an aiming gesture')
+ assert(not frame(menu,{},'full'):find('c'),'menu release must not confirm again')
+end
 print('PASS: layout migration, classic multitouch, release aiming, sampling, run and cancellation')

@@ -10,6 +10,7 @@ local actions = {"u", "d", "l", "r", "c", "b", "f"}
 local key_names = {"up", "down", "left", "right", "attack", "jump", "defend"}
 local loaded -- the current settings, for player names
 local default_controller = false
+local default_desktop = false
 
 -- data/control.txt: 4 x 11 integers, then four names ('`' for a space).
 local function read_control_file()
@@ -82,8 +83,9 @@ end
 
 -- The saved settings from config.json, otherwise data/control.txt; `source`/`problem` explain
 -- which and why.
-function controls.load(use_default_controller)
+function controls.load(use_default_controller, desktop_preset)
     if use_default_controller ~= nil then default_controller = use_default_controller end
+    if desktop_preset ~= nil then default_desktop = desktop_preset end
     local stored, problem = engine.read_settings()
     local settings = stored and from_settings(stored.controls)
     if settings then
@@ -95,6 +97,19 @@ function controls.load(use_default_controller)
         if stored and stored.controls ~= nil then problem = "invalid controls in the configuration" end
         settings = read_control_file()
         settings.source = "control.txt"
+          if default_desktop then
+              settings.sets[1].device = constants.input_devices.keyboard
+              settings.sets[1].keys = {87,83,65,68,103,105,104}
+              local used={};for _,key in ipairs(settings.sets[1].keys) do used[key]=true end
+              for player=2,4 do
+                  if settings.sets[player].device==constants.input_devices.keyboard then
+                      for action,key in ipairs(settings.sets[player].keys) do
+                          if used[key] then settings.sets[player].keys[action]=0 end
+                      end
+                  end
+              end
+              settings.source = "WASD / Num 7 attack, 8 defend, 9 jump"
+          end
         if default_controller then
             -- Console builds default the first player to the first controller until saved.
             settings.sets[1].device = constants.input_devices.controller_one

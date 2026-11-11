@@ -36,7 +36,7 @@ public final class BluetoothLobbyActivity extends Activity {
         layout.setOrientation(LinearLayout.VERTICAL); layout.setPadding(32, 12, 32, 12);
         layout.setBackgroundColor(0xff101827);
         status = new TextView(this); status.setTextColor(0xffeeeeee); status.setTextSize(17);
-        status.setText("POLISH FIGHTERS\nBluetooth: wersja próbna dla dwóch telefonów. Najpierw sparuj je w ustawieniach Androida. Na obu zainstaluj ten sam APK.");
+        status.setText("POLISH FIGHTERS\nWi-Fi / hotspot: Android i Windows w jednej sieci. Jeden tworzy pokój, pozostali dołączają. Wybierz ten sam moduł i tę samą wersję gry.");
         layout.addView(status);
         moduleButton = new Button(this);
         moduleButton.setText("WYBIERZ MODUŁ GRY");
@@ -45,8 +45,10 @@ public final class BluetoothLobbyActivity extends Activity {
         refreshModuleLabel();
         button(layout, "GRAJ NA TYM TELEFONIE", () -> launch(null, 0));
         button(layout, "USTAWIENIA", this::showSettings);
-        button(layout, "BLUETOOTH: ZAŁÓŻ GRĘ", () -> connect(true));
-        button(layout, "BLUETOOTH: DOŁĄCZ", () -> connect(false));
+        button(layout, "GRA W SIECI: WI-FI / HOTSPOT", () -> showLan(false));
+        button(layout, "HOTSPOT BLUETOOTH (SIEĆ IP / PAN)", () -> showLan(true));
+        button(layout, "BLUETOOTH RADIO: UTWÓRZ (2 TELEFONY, PRÓBNE)", () -> connect(true));
+        button(layout, "BLUETOOTH RADIO: DOŁĄCZ (2 TELEFONY, PRÓBNE)", () -> connect(false));
         button(layout, "PAROWANIE / USTAWIENIA BLUETOOTH", () -> {
             try { startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)); }
             catch (android.content.ActivityNotFoundException absent) { status.setText("Otwórz ustawienia Bluetooth telefonu i sparuj oba telefony."); }
@@ -63,6 +65,56 @@ public final class BluetoothLobbyActivity extends Activity {
     private void button(LinearLayout layout, String label, Runnable action) {
         Button button = new Button(this); button.setText(label);
         button.setOnClickListener(v -> action.run()); actions.add(button); layout.addView(button);
+    }
+    private void showLan(boolean bluetoothPan) {
+        new AlertDialog.Builder(this).setTitle(bluetoothPan ? "Hotspot Bluetooth / PAN" : "Wi-Fi / hotspot")
+            .setMessage(bluetoothPan
+                ? "Najpierw w ustawieniach systemu włącz udostępnianie Internetu przez Bluetooth i połącz drugie urządzenie z tą siecią. To połączenie TCP po IP, odrębne od próbnego Bluetooth dwóch telefonów. Działa tylko, jeśli oba systemy obsługują PAN."
+                : "Połącz oba urządzenia z tym samym Wi-Fi lub hotspotem. Gospodarz wybiera UTWÓRZ POKÓJ. Drugie urządzenie wybiera DOŁĄCZ i wpisuje IPv4 gospodarza oraz ten sam port TCP.")
+            .setPositiveButton("Utwórz pokój", (d, w) -> lanAddress(true))
+            .setNeutralButton("Dołącz", (d, w) -> lanAddress(false))
+            .setNegativeButton("Powrót", null).show();
+    }
+    private void lanAddress(boolean host) {
+        LinearLayout fields = new LinearLayout(this); fields.setOrientation(LinearLayout.VERTICAL);
+        TextView help = new TextView(this);
+        StringBuilder addresses = new StringBuilder();
+        try {
+            java.util.Enumeration<java.net.NetworkInterface> interfaces = java.net.NetworkInterface.getNetworkInterfaces();
+            while (interfaces != null && interfaces.hasMoreElements()) {
+                java.net.NetworkInterface network = interfaces.nextElement();
+                if (!network.isUp() || network.isLoopback()) continue;
+                java.util.Enumeration<java.net.InetAddress> values = network.getInetAddresses();
+                while (values.hasMoreElements()) {
+                    java.net.InetAddress value = values.nextElement();
+                    if (value instanceof java.net.Inet4Address && value.isSiteLocalAddress())
+                        addresses.append(network.getName()).append(": ").append(value.getHostAddress()).append('\n');
+                }
+            }
+        } catch (java.net.SocketException error) { addresses.append("Nie można odczytać adresów.\n"); }
+        help.setText((host ? "Podaj drugiemu urządzeniu adres interfejsu wspólnej sieci:\n" + addresses
+            : "IP gospodarza: Windows → Ustawienia sieci → Właściwości → IPv4 (lub ipconfig). Telefon → UTWÓRZ POKÓJ.\n")
+            + "Domyślny port TCP: 12345. Zapora gospodarza musi zezwalać grze na połączenia w sieci prywatnej.");
+        fields.addView(help);
+        android.widget.EditText address = new android.widget.EditText(this);
+        address.setHint("IPv4 gospodarza"); address.setInputType(android.text.InputType.TYPE_CLASS_PHONE);
+        if (!host) fields.addView(address);
+        android.widget.EditText port = new android.widget.EditText(this);
+        port.setInputType(android.text.InputType.TYPE_CLASS_NUMBER); port.setText("12345"); fields.addView(port);
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(host ? "Utwórz pokój" : "Dołącz do pokoju")
+            .setView(fields).setPositiveButton("Dalej", null).setNegativeButton("Powrót", null).create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            try {
+                int number = Integer.parseInt(port.getText().toString());
+                String ip = address.getText().toString().trim();
+                GameLaunchArguments.lan(getFilesDir(), host, ip, number);
+                BluetoothSession.closeCurrent(); session = null;
+                Intent game = new Intent(this, OpenLF2Activity.class);
+                game.putExtra("lan_host", host); game.putExtra("lan_address", ip); game.putExtra("lan_port", number);
+                transferred = true; startActivity(game); finish(); dialog.dismiss();
+            } catch (Exception error) { help.setText("Nie można rozpocząć: " + error.getMessage()); }
+        }));
+        dialog.show();
     }
     private void refreshModuleLabel() {
         try { moduleButton.setText("MODUŁ: " + new GamePackSettings(getFilesDir()).label()); }
@@ -133,6 +185,17 @@ public final class BluetoothLobbyActivity extends Activity {
         }
         LinearLayout content = new LinearLayout(this); content.setOrientation(LinearLayout.VERTICAL);
         content.addView(codes); content.addView(duplicates);
+        TextView touchLabel = new TextView(this); touchLabel.setText("Sterowanie dotykowe (wszystkie moduły)");
+        content.addView(touchLabel);
+        android.widget.Spinner touch = new android.widget.Spinner(this);
+        android.widget.ArrayAdapter<String> layouts = new android.widget.ArrayAdapter<>(this,
+            android.R.layout.simple_spinner_item, new String[]{"1. Klasyczny LF", "2. Joystick + celowanie"});
+        layouts.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); touch.setAdapter(layouts);
+        try { touch.setSelection("modern".equals(settings.touchLayout()) ? 1 : 0); }
+        catch (java.io.IOException | org.json.JSONException error) {
+            Toast.makeText(this, "Nie można odczytać sterowania: " + error.getMessage(), Toast.LENGTH_LONG).show(); return;
+        }
+        content.addView(touch);
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Ustawienia")
             .setView(content).setPositiveButton("Zapisz", null)
             .setNegativeButton("Anuluj", null).create();
@@ -140,7 +203,7 @@ public final class BluetoothLobbyActivity extends Activity {
             .setOnClickListener(view -> {
                 try {
                     boolean wasEnabled = settings.enabled();
-                    settings.save(codes.isChecked(), duplicates.isChecked());
+                    settings.save(codes.isChecked(), duplicates.isChecked(), touch.getSelectedItemPosition()==1 ? "modern" : "classic");
                     dialog.dismiss();
                     if (codes.isChecked() && !wasEnabled) {
                         new AlertDialog.Builder(this).setTitle("lamus")

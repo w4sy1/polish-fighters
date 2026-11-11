@@ -22,6 +22,9 @@ class ScriptDataSource {
 public:
     virtual ~ScriptDataSource() = default;
     virtual Result<ScriptValue> read(ScriptData kind, std::string_view path) const = 0;
+    virtual Result<std::string> network_profile() const {
+        return fail(ErrorCode::script, "Network profile provider unavailable");
+    }
 };
 // The part of the game random state a recording keeps: the 3000-entry table and its index.
 struct RandomState {

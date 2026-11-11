@@ -14,7 +14,7 @@ assert(state.hub_edit.sets[1].keys[1]==104 and state.hub_edit.sets[1].keys[5]==1
 screen.activate(state,'num789')
 local preset=state.hub_edit.sets[1]
 assert(preset.keys[1]==87 and preset.keys[2]==83 and preset.keys[3]==65 and preset.keys[4]==68)
-assert(preset.keys[5]==103 and preset.keys[6]==104 and preset.keys[7]==105,'numpad 7/8/9 must not use number row')
+assert(preset.keys[5]==103 and preset.keys[6]==105 and preset.keys[7]==104,'Num 7 attack / 8 defend / 9 jump order is required')
 assert(controls.current().sets[1].keys[5]==101,'preview overwrote saved controls')
 screen.activate(state,'cancel');screen.open(state)
 assert(state.hub_edit.sets[1].keys[5]==101,'cancel did not preserve original bindings')

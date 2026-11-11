@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -71,8 +72,10 @@ public final class GameBootstrapActivity extends Activity {
         progress.setIndeterminate(true);
         status.setText("Przygotowywanie gry i modów…\nPierwsze uruchomienie może potrwać kilka minut.");
         worker.submit(() -> {
+            long started = android.os.SystemClock.elapsedRealtime();
             try {
                 prepare();
+                android.util.Log.i("OpenLF2", "Startup prepare: " + (android.os.SystemClock.elapsedRealtime() - started) + " ms");
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) return;
                     startActivity(new Intent(this, BluetoothLobbyActivity.class));
@@ -124,7 +127,9 @@ public final class GameBootstrapActivity extends Activity {
         }
         File blobs = new File(root, ".blobs");
         if (!blobs.isDirectory() && !blobs.mkdirs()) throw new IOException("Nie można utworzyć katalogu gry.");
-        try (ZipInputStream zip = new ZipInputStream(getAssets().open("game-bundle.zip"))) {
+        // Inflate in Java from a buffered asset stream instead of crossing JNI for
+        // every small inflater read (including skips of already installed blobs).
+        try (ZipInputStream zip = new ZipInputStream(new BufferedInputStream(getAssets().open("game-bundle.zip"), 256 * 1024))) {
             ZipEntry entry = zip.getNextEntry();
             if (entry == null || !entry.getName().equals("manifest.json")) throw new IOException("Brak indeksu paczki gry.");
             byte[] manifestBytes = readLimited(zip, 8 * 1024 * 1024);

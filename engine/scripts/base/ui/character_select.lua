@@ -57,6 +57,11 @@ function selection.create(options)
         elseif mode == constants.modes.battle then team = math.floor(slot / 4) + 1 end
         slots[slot] = {phase = slot_phases.empty, fighter = 0, team = team, latched = true, ready = false}
     end
+    -- A room already knows which device owns each slot; no second join gesture is needed.
+    for _,peer in ipairs(options.participants or {}) do
+        assert(slots[peer.slot], 'Invalid room participant slot')
+        slots[peer.slot].phase = slot_phases.choosing_fighter
+    end
     -- Option values are globals in the original and keep their values between visits.
     local options = previous.options or {row = option_rows.reroll, background = constants.background_rows.random, random_background = true,
         difficulty = 0, music = 0, stage_level = 0}
@@ -538,17 +543,17 @@ local function options_menu(state, previous_menu, context)
         if slot.ready then
             local held = state.held[index] or ""
             local key
-            for _, candidate in ipairs({"u", "d", "r", "l", "c"}) do
+            for _, candidate in ipairs({"u", "d", "r", "l", "c", "b"}) do
                 if pressed(held, candidate) then key = candidate; break end
             end
             if key then
                 keys[key] = trigger(slot, accept) or keys[key]
             else
-                -- Jump neither acts nor releases the latch here.
-                slot.latched = pressed(held, "b")
+                slot.latched = false
             end
         end
     end
+    if keys.b then context.action("title");return end
     if keys.u then
         options.row = options.row - 1
         if options.row < 0 then options.row = option_rows.exit end

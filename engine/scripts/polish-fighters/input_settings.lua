@@ -14,6 +14,21 @@ function screen.hint()
  end
  return "GRACZ 1: ATAK "..screen.key_label(set.keys[5]).."   SKOK "..screen.key_label(set.keys[6]).."   BLOK "..screen.key_label(set.keys[7])
 end
+function screen.selection_hint(touch,style,slot)
+ local who='TY: GRACZ '..((slot or 0)+1)
+ if touch then
+  return {who..' | DOTYK '..(style=='modern' and '2: JOYSTICK + CELOWANIE' or '1: KRZYŻAK'),
+   style=='modern' and 'Ruch: lewy drążek | ATAK: dotknij lub przeciągnij i puść | SKOK: wstecz' or
+    'Ruch: krzyżak | ATAK: wybór / OK | SKOK: cofnij | BLOK: obrona'}
+ end
+ local set=controls.current().sets[1]
+ if set.device~=0 then
+  return {who..' | PAD '..set.device..': RUCH D-PAD / LEWY ANALOG',
+   'ATAK / OK '..(set.buttons[1]+1)..' | SKOK / WSTECZ '..(set.buttons[2]+1)..' | BLOK '..(set.buttons[3]+1)}
+ end
+ return {who..' | RUCH '..screen.key_label(set.keys[1])..' / '..screen.key_label(set.keys[2])..' / '..screen.key_label(set.keys[3])..' / '..screen.key_label(set.keys[4]),
+  'ATAK / OK '..screen.key_label(set.keys[5])..' | SKOK / WSTECZ '..screen.key_label(set.keys[6])..' | BLOK '..screen.key_label(set.keys[7])}
+end
 function screen.shared_keys(state)
  local set=state.hub_edit.sets[state.hub_player];local shared={}
  if set.device~=0 then return shared end
@@ -34,7 +49,7 @@ local function preset(state,kind)
  set.device=0;set.mouse_mode=kind=="mouse"
  if kind=="arrows" then set.keys={38,40,37,39,97,98,99}
  elseif kind=="mouse" then set.keys={87,83,65,68,1,32,2}
- elseif kind=="num789" then set.keys={87,83,65,68,103,104,105}
+ elseif kind=="num789" then set.keys={87,83,65,68,103,105,104}
  else set.keys={87,83,65,68,74,75,76} end
 end
 function screen.rows(state,input)
@@ -50,7 +65,7 @@ function screen.rows(state,input)
   else binding="PRZYCISK "..(set.buttons[row-4]+1) end
   rows[#rows+1]={"bind:"..row,label..": "..binding,35,185+(row-1)*33,430,29}
  end
- rows[#rows+1]={"num789","WASD + NUM 7 / 8 / 9",500,149,265,31}
+ rows[#rows+1]={"num789","WASD | 7 ATAK / 8 BLOK / 9 SKOK",500,149,265,31}
  rows[#rows+1]={"wasd","WASD + J / K / L",500,190,265,31}
  rows[#rows+1]={"arrows","STRZAŁKI + NUM 1 / 2 / 3",500,232,265,31}
  rows[#rows+1]={"mouse","WASD + MYSZ + SPACJA",500,274,265,31}

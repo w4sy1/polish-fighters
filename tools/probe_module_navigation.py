@@ -41,8 +41,7 @@ if __name__ == '__main__':
         (folder / 'package.manifest').write_text('id=qa-module-navigation\nversion=1\napi=1\n'
             'requires=base@1\nrequires=polish-fighters@1\nextend=base/ui/flow|flow.lua\n')
         (folder / 'flow.lua').write_text(FLOW.replace('CASE', case))
-        point = {'profile': '@60_470', 'characters': '@397_16', 'ending': '@397_24',
-                 'paused': '@397_523', 'finished': '@397_523'}[case]
+        point = '@680_20'
         trace = point + ',!,*4' if case != 'paused' else point + ',!,@0_0,@300_300,!,*8'
         command = [str(stage / 'LittleFighters.exe'), '--installer', str(stage / 'LF2_v2.0a.exe'),
                    '--scripts', str(stage / 'scripts'), '--mod', str(stage / 'content-packs/polish-originals'),

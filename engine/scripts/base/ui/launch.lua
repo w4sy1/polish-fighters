@@ -185,7 +185,7 @@ end
 -- value into its text (default: translated).
 local option_rows = {
     {key="touch_layout",label="Touch layout",choices=function() return options.touch_layouts end,
-        display=function(value) return i18n.tr(value=="classic" and "Classic LF" or "Modern joystick") end},
+        display=function(value) return value=="classic" and "1. Klasyczny LF" or "2. Joystick + celowanie" end},
     -- Only hosts that can draw TrueType text have another language to offer; elsewhere the page stays as it was.
     {key = "language", label = "Language", choices = options.available_languages, display = i18n.language_label,
         available = function(features) return features.text end},

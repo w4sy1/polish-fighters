@@ -27,6 +27,9 @@
 #endif
 
 namespace openlf2 {
+void precise_delay(std::uint32_t milliseconds) {
+    SDL_DelayPrecise(static_cast<Uint64>(milliseconds) * 1000000U);
+}
 namespace {
 // The open-file dialog's result. SDL may call back on another thread and after the platform is
 // gone, so the slot lives for the whole process.

@@ -1,5 +1,25 @@
 # Protokół pokoju TCP v1
 
+## Lokalna poprawka LAN — 2026-11-11
+
+Klient może wysłać wejście klatki N razem z sumą kontrolną N−1, bez osobnego
+oczekiwania na `checked`. Serwer przechowuje najwyżej jedno takie wejście na
+uczestnika. Zwolni je dopiero po zgodnych sumach wszystkich uczestników.
+Kolejność, brak powtórek, uprawnienia gospodarza i przerwanie przy rozbieżności
+pozostają sprawdzane. Nie dodano rollbacku ani przewidywania brakujących wejść.
+
+Odcisk stanu nie obejmuje lokalnych możliwości renderera/okna (`filters`), także
+w `match.held`. Te wartości różnią się między Androidem i Windowsem i powodowały
+fałszywe przerwanie rzeczywistego meczu. HP, pozycje i wejścia graczy nadal są
+objęte kontrolą. Przy rozłączeniu ostatnia przyczyna i ograniczony zapis diagnostyczny
+trafiają do `last_network_error` w prywatnym `config.json`; ustawienia są zachowane.
+
+Podstawowy przepływ nie wymaga konta: wybór Wi‑Fi/hotspot lub Bluetooth PAN,
+następnie utworzenie pokoju albo dołączenie przez IPv4 i TCP 12345 (lub `IP:port`).
+Bluetooth PAN wymaga uprzednio skonfigurowanej sieci IP w systemach. Bezpośrednie
+radio Bluetooth dwóch telefonów jest osobną, próbną opcją. Nie potwierdzono go
+testem radiowym. Dokładne wyniki bieżących prób: `MULTIPLAYER-STEROWANIE-2026-11-11.md`.
+
 Stan wersji 0.6: `RoomHost` jest podłączony do lobby, wyboru postaci i symulacji gry. Przetestowano 2–8 osobnych procesów gry na jednym komputerze Linux. Oryginalny `NetworkTransport` zachowuje dotychczasowy tryb dwóch końców.
 
 ## Warstwa transportowa

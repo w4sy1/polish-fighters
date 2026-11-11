@@ -145,10 +145,11 @@ function gamepad.update(state, input, mode)
         return "", false, false
     end
     local touches = input.touches or {}
+    if mode=="full" then state.aim_finger,state.attack_pulse=nil,nil end
     local pressed = {}
     for _, touch in ipairs(touches) do
         local target = target_at(state, touch, mode)
-        if state.style=="modern" and mode~="pause" and target and target.action=="c" then
+        if state.style=="modern" and mode=="match" and target and target.action=="c" then
             if not state.aim_finger and not state.previous_touches[touch.id] then
                 state.aim_finger=touch.id;state.aim_start_x=touch.x;state.aim_start_y=touch.y
                 state.aim_dx,state.aim_dy=0,0
@@ -384,7 +385,10 @@ function gamepad.draw(state, context)
         if button.action=="c" and state.aim_finger then color=button.pressed end
         disc(button_context, button.x, button.y, button.radius, outline[1], outline[2], outline[3])
         disc(button_context, button.x, button.y, button.radius - 6, color[1], color[2], color[3])
-        font.draw(context, button.label, button.x, button.y - 8, nil, disabled and 0x606060 or nil, "center")
+        local label=button.label
+        if state.mode=="full" and button.action=="c" then label='ATAK / OK'
+        elseif state.mode=="full" and button.action=="b" then label='COFNIJ' end
+        font.draw(context, label, button.x, button.y - 8, nil, disabled and 0x606060 or nil, "center")
         end
     end
     if state.aim_finger then

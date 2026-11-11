@@ -257,4 +257,6 @@ Result<std::unique_ptr<Platform>> make_platform(const ResourceSource& resources,
                                                 const std::optional<WindowPlacement>& placement = std::nullopt);
 // The per-user directory for the configuration, created if needed (SDL_GetPrefPath).
 Result<std::filesystem::path> settings_directory();
+// Millisecond network polls must not become coarse OS timer ticks.
+void precise_delay(std::uint32_t milliseconds);
 }

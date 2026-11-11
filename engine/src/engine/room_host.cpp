@@ -24,6 +24,7 @@ struct RoomHost::Impl {
   std::unique_ptr<NetworkTransport> socket;
   std::optional<int> slot;
   std::string input;
+  std::optional<ScriptValue> queued_input;
   Clock::time_point last=Clock::now(),close_at{};
   bool closing=false,dead=false;
  };
@@ -91,6 +92,13 @@ struct RoomHost::Impl {
       (marks && (*marks<0 || *marks>3)) || (*peer.slot!=0 && ((commands && !commands->empty()) || (marks && *marks!=0)))) {
     reject(peer,"only the host may submit global commands");return;
    }
+   // Accept at most the next input while the preceding checksums are in flight.
+   // Simulation still cannot advance until every checksum agrees.
+   if(room.waiting_for_checksums()){
+    if(static_cast<std::uint64_t>(*frame)!=room.frame()){reject(peer,"out-of-order queued input frame");return;}
+    if(peer.queued_input){reject(peer,"duplicate queued input frame");return;}
+    peer.queued_input=value;return;
+   }
    if(*peer.slot==0){functions=commands?*commands:"";unlock=marks?*marks:0;}
    auto tick=room.submit(*peer.slot,static_cast<std::uint64_t>(*frame),*keys);
    if(!tick){reject(peer,tick.error().message);return;}
@@ -103,7 +111,14 @@ struct RoomHost::Impl {
    if(!frame || *frame<0 || !state){reject(peer,"invalid checksum frame");return;}
    auto checked=room.checksum(*peer.slot,static_cast<std::uint64_t>(*frame),*state);
    if(!checked){reject(peer,checked.error().message);if(room.phase()==RoomPhase::aborted)abort();return;}
-   if(!room.waiting_for_checksums())broadcast(object({{"op",ScriptValue{std::string("checked")}},{"frame",ScriptValue{*frame}}}));
+   if(!room.waiting_for_checksums()){
+    broadcast(object({{"op",ScriptValue{std::string("checked")}},{"frame",ScriptValue{*frame}}}));
+    for(auto& waiting:peers){
+     if(waiting.queued_input && !waiting.closing && !waiting.dead){
+      auto input=std::move(*waiting.queued_input);waiting.queued_input.reset();handle(waiting,input);
+     }
+    }
+   }
   }else reject(peer,"unknown operation");
  }
 };

@@ -52,7 +52,7 @@ local function can_drop_replay(state)
         or (state.active == "launch" and state.launch.page == "menu"))
 end
 function flow.create(options)
-    local settings = controls.load(options.default_controller)
+    local settings = controls.load(options.default_controller, options.desktop_controls)
     -- OpenLF2's own options (base/game/options), e.g. the unlocked characters.
     user_options.start()
     local state = {active = "launch", title = title.create(options), options = options,
@@ -180,6 +180,7 @@ local function route(state, input, context)
     elseif requested == "versus" or requested == "stage" or requested == "battle" then
         -- The previous visit's state carries the values the original keeps in globals.
         state.characters = require("base/ui/character_select").create({mode = requested,
+            participants = state.session and state.session.room and state.session.peers or nil,
             previous = state.characters})
         state.active = "characters"
         state.wait_release = true
@@ -305,10 +306,23 @@ function flow.draw(state, context)
     if state.quit_dialog then quit_dialog.draw(state.quit_dialog, context) end
 end
 local function disconnect(state, message)
+    if message and state.session and state.session.room and engine.write_settings then
+        -- Keep only the last bounded failure in private settings, preserving preferences.
+        -- Hex avoids binary RNG bytes making the settings document invalid UTF-8.
+        pcall(function()
+            local document=engine.read_settings() or {}
+            local snapshot=require('polish-fighters/sync_state').snapshot(state):sub(1,32768)
+            document.last_network_error={reason=tostring(message),screen=state.active,
+                frame=state.session.frames,slot=state.session.slot,
+                snapshot_hex=snapshot:gsub('.',function(c) return string.format('%02x',string.byte(c)) end)}
+            engine.write_settings(document)
+        end)
+    end
     if state.session then network.close(state.session) end
     state.session = nil
     controls.replace_names(nil)
-    state.active, state.wait_release = "launch", nil
+    state.active, state.wait_release = "launch", true
+    state.swallow_pointer = true
     state.title = title.create(state.options)
     state.characters, state.championship, state.championship_options, state.battle_config = nil, nil, nil, nil
     state.launch.message = message
@@ -317,6 +331,8 @@ local function disconnect(state, message)
 end
 -- Shared by the optional module launcher; closes a session without exiting the app.
 function flow.return_to_modules(state)
+    if state.network and state.network.session then network.close(state.network.session) end
+    state.network = nil
     if state.match and state.match.match and state.match.match.finished then
         require("base/ui/match_screen").outcome(state.match)
     end
@@ -326,6 +342,7 @@ function flow.return_to_modules(state)
     state.pending_leave, state.return_modules_after_match = nil, nil
     state.launch.page, state.launch.hub_mode = "menu", "root"
     state.launch.hub_classic, state.launch.pf_panel, state.launch.hub_edit, state.launch.hub_online = nil, nil, nil, nil
+    state.launch.hub_pack_edit, state.launch.pf_typing = nil, nil
     state.wait_release, state.swallow_pointer = true, true
 end
 -- Whether Escape (and Android's back button, which the platform reports as Escape) is free to ask about leaving
@@ -339,6 +356,14 @@ end
 -- and `click`, a fresh press of the left button.
 function flow.update(state, raw, context)
     local input = controls.read(controls.current(), raw)
+    -- Local navigation must work even while a network frame is waiting for its peer.
+    input.click = input.button and not state.previous_button
+    input.pointer_x = input.pointer_x or state.pointer_x
+    input.pointer_y = input.pointer_y or state.pointer_y
+    if flow.global_navigation_update and flow.global_navigation_update(state, input, context) then
+        state.previous_button = input.button
+        return
+    end
     i18n.host(input.filters and input.filters.text)
     -- Alt+Enter, from any screen: the fullscreen option flips (and is saved like the options page does).
     if input.toggle_fullscreen and input.filters and input.filters.window then
@@ -463,7 +488,10 @@ function flow.update(state, raw, context)
     if state.quit_dialog then
         -- While the question is open the screen below is frozen.
         local answer = quit_dialog.update(state.quit_dialog, input, context)
-        if answer == "exit" and (state.quit_dialog.kind == "leave" or
+        if answer == "exit" and state.quit_dialog.kind == "modules" and state.session then
+            flow.return_to_modules(state)
+            closed_now = true
+        elseif answer == "exit" and (state.quit_dialog.kind == "leave" or
                 (state.quit_dialog.kind == "modules" and state.active == "match")) then
             -- Leaving the fight is F4, held for two frames after this one so that the match sees it on a frame that
             -- reads the keys (no wait for released keys here: a held F4 would never count as idle).

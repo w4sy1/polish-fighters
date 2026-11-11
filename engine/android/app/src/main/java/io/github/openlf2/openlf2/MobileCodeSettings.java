@@ -34,6 +34,18 @@ final class MobileCodeSettings {
     }
 
     void save(boolean enabled, Boolean hideDuplicates) throws IOException, JSONException {
+        save(enabled, hideDuplicates, null);
+    }
+
+    String touchLayout() throws IOException, JSONException {
+        JSONObject options = read().optJSONObject("options");
+        if (options == null) return "classic";
+        return options.optString("touch_layout", options.optBoolean("digipad", true) ? "classic" : "modern");
+    }
+
+    void save(boolean enabled, Boolean hideDuplicates, String touchLayout) throws IOException, JSONException {
+        if (touchLayout != null && !touchLayout.equals("classic") && !touchLayout.equals("modern"))
+            throw new IllegalArgumentException("Nieprawidłowy układ dotykowy");
         JSONObject document = read();
         JSONObject options = document.optJSONObject("options");
         if (options == null) {
@@ -41,6 +53,10 @@ final class MobileCodeSettings {
             options = new JSONObject();
         }
         options.put("unlock_characters", enabled);
+        if (touchLayout != null) {
+            options.put("touch_layout", touchLayout);
+            options.put("digipad", touchLayout.equals("classic"));
+        }
         document.put("options", options);
         if (hideDuplicates != null) document.put("little_fighters_hide_duplicates", hideDuplicates);
         if (!document.has("version")) document.put("version", 1);

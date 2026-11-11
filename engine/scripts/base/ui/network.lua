@@ -18,13 +18,27 @@ local function inside(input, left, top, right, bottom)
     return input.pointer_x >= left and input.pointer_x <= right and input.pointer_y >= top and input.pointer_y <= bottom
 end
 function screen.create(options)
-    return {session = transport.create(options), page = "choice", address = "", previous_keys = {},
+    return {session = transport.create(options), page = "transport", transport_label = 'Wi-Fi / hotspot', address = "", previous_keys = {},
+        allow_loopback = options.network_role ~= nil,
         nav = navigation.create(), keyboard = false,
         background = (options.menu_seed or 0) % 13 + 1, pointer_x = 0, pointer_y = 0,
         bind = options.network_bind or "0.0.0.0", started = engine.network_time()}
 end
 function screen.begin(state, host, address)
     state.message = nil
+    if not host then
+        local ip,port=address:match('^(.-):(%d+)$')
+        if ip then
+            port=tonumber(port)
+            if port<1 or port>65535 then state.message='Port TCP: 1–65535.';return end
+            state.session.port=port;address=ip
+        end
+        local a,b,c,d=address:match('^(%d+)%.(%d+)%.(%d+)%.(%d+)$')
+        if not a or tonumber(a)>255 or tonumber(b)>255 or tonumber(c)>255 or tonumber(d)>255
+            or (tonumber(a)==127 and not state.allow_loopback) or address=='0.0.0.0' then
+            state.message='Wpisz IPv4 gospodarza (np. 192.168.1.82), opcjonalnie :12345.';return
+        end
+    end
     if transport.start(state.session, host, address) then state.page = "waiting"
     else state.message = state.session.error end
     state.started = engine.network_time()
@@ -70,13 +84,13 @@ function screen.update(state, flow_input, context)
                 if code == virtual_keys.backspace then state.address = state.address:sub(1, -2)
                 else
                     local character = controls.key_character(code, false)
-                    if character and character:match("^[%d.]$") and #state.address < 15 then state.address = state.address .. character end
+                    if character and character:match("^[%d.:]$") and #state.address < 21 then state.address = state.address .. character end
                 end
             end
         end
         -- Text a soft keyboard delivers without key events.
-        for character in input.text:gmatch("[%d.]") do
-            if #state.address < 15 then state.address = state.address .. character end
+        for character in input.text:gmatch("[%d.:]") do
+            if #state.address < 21 then state.address = state.address .. character end
         end
         cancel = cancel or input.click and inside(input, 0x19b, 0x165, 0x231, 0x17e)
         -- Enter connects wherever the focus is (the raw keys: navigation may have taken it).
@@ -88,16 +102,19 @@ function screen.update(state, flow_input, context)
         cancel = cancel or input.click and inside(input, 0x104, 0x150, 0x223, 0x169)
         if input.click and inside(input, 0x104, 0x112, 0x223, 0x12c) then
             sounds.direct(state, "ok")
-            screen.begin(state, true, state.bind)
+            if state.page=='transport' then state.transport_label='Wi-Fi / hotspot';state.page='choice'
+            else screen.begin(state, true, state.bind) end
         elseif input.click and inside(input, 0x104, 0x131, 0x223, 0x14a) then
             sounds.direct(state, "ok")
-            state.page = "join"
+            if state.page=='transport' then state.transport_label='Hotspot Bluetooth / PAN';state.page='choice'
+            else state.page = "join" end
         end
     end
     if cancel then
         transport.close(state.session)
         sounds.direct(state, "cancel")
-        if state.page == "choice" then context.action("launch") else state.page = "choice" end
+        if state.page == "transport" then context.action("launch")
+        elseif state.page=='choice' then state.page='transport' else state.page = "choice" end
     end
     state.previous_keys = flow_input.keys
     -- The on-screen keyboard follows the address field.
@@ -144,8 +161,23 @@ function screen.draw(state, context)
         if inside(input, 0x104, 0x112, 0x223, 0x12c) then sprite(5, 0x103, 0x112) end
         if inside(input, 0x104, 0x131, 0x223, 0x14a) then sprite(6, 0x103, 0x130) end
         if inside(input, 0x104, 0x150, 0x223, 0x169) then sprite(12, 0x149, 0x150) end
+        context.fill(260,274,291,27,16,32,80)
+        context.fill(260,305,291,27,16,32,80)
+        font.gdi(context,state.page=='transport' and 'WI-FI / HOTSPOT' or 'UTWÓRZ POKÓJ',278,280,0xffffff)
+        font.gdi(context,state.page=='transport' and 'HOTSPOT BLUETOOTH / PAN' or 'DOŁĄCZ DO POKOJU',278,311,0xffffff)
     end
-    if state.message then font.gdi(context, i18n.clip(state.message, 94), 10, 510) end
+    font.gdi(context,state.transport_label..': jeden gospodarz, pozostali dołączają.',30,180,0xffffff)
+    if state.page~='lobby' then
+        font.gdi(context,'IP gospodarza: Windows: ipconfig / IPv4; Android: ekran Utwórz pokój.',20,450,0xffffff)
+        font.gdi(context,'Ten sam moduł i wersja gry. Domyślny TCP 12345. Dołącz: IP lub IP:port.',20,470,0xffffff)
+        if state.transport_label=='Hotspot Bluetooth / PAN' then
+            font.gdi(context,'Najpierw połącz urządzenia przez udostępnianie sieci Bluetooth w systemie.',20,430,0xffdc82)
+        end
+    end
+    if state.message then
+        font.gdi(context, i18n.clip(state.message, 94), 10, 500)
+        font.gdi(context,'Sprawdź IP/port, wspólną sieć, izolację Wi-Fi oraz zaporę gospodarza.',10,520,0xffdc82)
+    end
     context.image("pe/lf2_cursor", math.min(state.pointer_x, 0x307), math.min(state.pointer_y + 2, 0x217), true)
 end
 function screen.describe(state)

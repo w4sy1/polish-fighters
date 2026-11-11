@@ -3,7 +3,8 @@
 local sync={}
 local omit={capture=true,display=true,view=true,stage=true,recording=true,record=true,
  sounds=true,sound_events=true,rumble=true,backgrounds=true,fighters=true,
- pointer_x=true,pointer_y=true,nav=true,sparks=true,direct_sounds=true}
+ pointer_x=true,pointer_y=true,nav=true,sparks=true,direct_sounds=true,
+ filters=true} -- Local renderer/window capabilities, also carried in match.held.
 local function serialize(value,seen)
  local kind=type(value)
  if kind=="nil" then return "n" end
@@ -25,7 +26,7 @@ local function serialize(value,seen)
  end
  result[#result+1]="}";seen[value]=nil;return table.concat(result)
 end
-function sync.digest(flow)
+function sync.snapshot(flow)
  local random,index=engine.random_state()
  local fighters,stage_index=require("base/game/stage").random_list()
  local state={active=flow.active,random=random,index=index,stage_fighters=fighters,stage_index=stage_index,unlock=require("base/game/unlock").flags}
@@ -36,6 +37,9 @@ function sync.digest(flow)
 
  elseif flow.active=="battle" or flow.active=="championship" then state.selection=flow[flow.active]
  end
- return assert(engine.state_digest(serialize(state,{})))
+ return serialize(state,{})
+end
+function sync.digest(flow)
+ return assert(engine.state_digest(sync.snapshot(flow)))
 end
 return sync

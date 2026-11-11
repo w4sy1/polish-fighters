@@ -43,6 +43,10 @@ local function read_names(state, bytes)
     return true
 end
 function network.create(options)
+    if not options.network_profile then
+        local profile,problem=engine.network('profile')
+        assert(profile,problem);options.network_profile=profile
+    end
     assert(type(options.network_profile) == "string" and #options.network_profile == 64, "missing network profile")
     return {phase = "idle", received = "", sequence = 0, frames = 0,
         version = options.recording_version, profile = "OpenLF2 TCP 1\n" .. options.network_profile,

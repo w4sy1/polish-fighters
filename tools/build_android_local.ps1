@@ -19,7 +19,7 @@ if (-not (Test-Path (Join-Path $projectRoot 'engine/build/android/assets/game-bu
     throw 'The local mod bundle is missing.'
 }
 if (-not $SkipNative) {
-    $linuxRoot = (& wsl.exe -d $Distro -u root -- wslpath -a $projectRoot).Trim()
+    $linuxRoot = (& wsl.exe -d $Distro -u root -- wslpath -a $projectRoot.Replace('\', '/')).Trim()
     if ($LASTEXITCODE -ne 0) { throw 'Cannot locate the project in WSL.' }
     foreach ($abi in $Abis) {
         if ($abi -notin @('arm64-v8a', 'armeabi-v7a')) { throw "Unsupported test ABI: $abi" }
@@ -28,6 +28,8 @@ if (-not $SkipNative) {
     }
 }
 foreach ($abi in $Abis) {
+    & $python (Join-Path $PSScriptRoot 'check_native_identity.py') (Join-Path $projectRoot "engine/build/android/jniLibs/$abi/libmain.so")
+    if ($LASTEXITCODE -ne 0) { throw "Stale Android native code: $abi. Rebuild without -SkipNative." }
     foreach ($library in @('libmain.so', 'libSDL3.so', 'libc++_shared.so')) {
         if (-not (Test-Path (Join-Path $projectRoot "engine/build/android/jniLibs/$abi/$library"))) {
             throw "Missing requested Android library: $abi/$library"

@@ -72,7 +72,9 @@ struct ResourceBridge {
     bool network_operation(std::string_view operation, std::string_view value, std::uint16_t port) noexcept {
         try {
             pending_network = std::string{};
-            if (operation == "room_host") {
+            if (operation == "profile") {
+                pending_network = data.network_profile();
+            } else if (operation == "room_host") {
                 // capacity:64-byte profile:numeric IPv4; validated again by RoomHost.
                 const auto separator = value.find(':');
                 if (separator == std::string_view::npos || separator != 1 || value.size() < 69 || value[66] != ':') {

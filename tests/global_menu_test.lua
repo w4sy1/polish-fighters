@@ -1,0 +1,22 @@
+local returned,keyboard,actions=0,nil,{}
+local dialog=require('base/ui/quit_dialog')
+local base=dofile(arg[1]..'/engine/scripts/polish-fighters/hub_flow.lua')({
+ create=function() return {launch={}} end,draw=function() end,
+ return_to_modules=function(s) returned=returned+1;s.active='launch';s.session=nil end})
+local context={text_input=function(v) keyboard=v end,action=function(a) actions[#actions+1]=a end}
+for _,page in ipairs({'launch','title','characters','backgrounds','network','battle','championship','ending'}) do
+ local s=base.create({});s.active=page
+ assert(base.global_navigation_update(s,{functions='4',keys={},pointer_x=0,pointer_y=0},context))
+ assert(s.active=='launch' and keyboard==false)
+ assert(not base.global_navigation_update(s,{functions='4',keys={},pointer_x=0,pointer_y=0},context),'held F4 repeated')
+end
+local s=base.create({});s.active='match';s.match={match={finished=false,paused=false}}
+assert(base.global_navigation_update(s,{functions='',click=true,pointer_x=600,pointer_y=20},context))
+assert(s.quit_dialog.kind=='modules','active fight must ask before leaving')
+s.session={};local update=dialog.update
+dialog.update=function() return 'exit' end
+assert(base.global_navigation_update(s,{functions='',keys={}},context))
+assert(not s.session and s.active=='launch','stalled network must allow local return')
+dialog.update=update
+assert(#actions==0,'menu return must not exit application')
+print('PASS global menu: all screen types, F4 edge, touch during fight, stalled network, no quit')

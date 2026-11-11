@@ -4,6 +4,7 @@
 #include "openlf2/engine/application.hpp"
 #include <algorithm>
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <limits>
 #include <span>
@@ -162,6 +163,12 @@ static int run_main(int count, char** values) {
         }
         const std::filesystem::path base(owned.front());
         owned.erase(owned.begin());
+        // Android discards the native standard streams. Keep bounded per-run logs
+        // in app-private storage so startup timings and native errors remain inspectable.
+        const auto error_log = base / "runtime.log";
+        if (std::freopen(error_log.c_str(), "w", stderr) == nullptr) SDL_Log("Could not open native runtime log");
+        const auto trace_log = base / "session.log";
+        if (std::freopen(trace_log.c_str(), "w", stdout) == nullptr) SDL_Log("Could not open native session log");
 #elif defined(__SWITCH__)
         const std::filesystem::path base = "romfs:/";
 #elif defined(__EMSCRIPTEN__)

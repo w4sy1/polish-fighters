@@ -53,7 +53,7 @@ void wait_milliseconds(std::uint32_t milliseconds) {
 #ifdef __EMSCRIPTEN__
     emscripten_sleep(static_cast<unsigned int>(milliseconds));
 #else
-    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+    precise_delay(milliseconds);
 #endif
 }
 double elapsed_ms(std::chrono::steady_clock::time_point start) {
@@ -110,6 +110,7 @@ struct Configuration {
     std::string network_role;
     std::string network_address;
     std::uint16_t network_port = 12345;
+    bool network_room = false;
     bool headless = false;
     bool jit = OPENLF2_DEFAULT_JIT != 0;
     bool help = false;
@@ -416,6 +417,7 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
         if (argument == "--help") config.help = true;
         else if (argument == "--headless") config.headless = true;
         else if (argument == "--hub-menu") config.hub_menu = true;
+        else if (argument == "--room") config.network_room = true;
         else if (argument == "--render-trace") config.render_trace = true;
         else if (argument == "--jit") config.jit = true;
         else if (argument == "--no-jit") config.jit = false;
@@ -545,6 +547,8 @@ private:
 class OriginalDataSource final : public ScriptDataSource {
 public:
     explicit OriginalDataSource(const ResourceSource& resources) : resources_(resources) {}
+    std::function<Result<std::string>()> profile_provider;
+    Result<std::string> network_profile() const override { return profile_provider(); }
     Result<ScriptValue> read(ScriptData kind, std::string_view path) const override {
         if (kind == ScriptData::background) {
             auto parsed = background_data::load(resources_, path);
@@ -860,6 +864,14 @@ private:
 };
 
 Result<void> run(const Configuration& config, std::optional<ProfileRequest>& profile_request) {
+    auto startup_mark = std::chrono::steady_clock::now();
+    const auto startup_stage = [&](std::string_view name) {
+        const auto now = std::chrono::steady_clock::now();
+        std::cerr << "Startup " << name << ": "
+                  << std::chrono::duration_cast<std::chrono::milliseconds>(now - startup_mark).count()
+                  << " ms\n";
+        startup_mark = now;
+    };
     std::vector<std::filesystem::path> packages{config.scripts / "base"};
     // Polish Fighters is bundled with the script tree on desktop and Android.
     const auto bundled = config.scripts / "polish-fighters";
@@ -874,6 +886,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     }
     auto scripts = load_packages(packages);
     if (!scripts) return std::unexpected(scripts.error());
+    startup_stage("packages");
     const auto music_decoder = make_music_decoder();
     // Declared in lifetime order: the window reads resources, which read the archive, which
     // uses the decompressor.
@@ -926,6 +939,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     if (!executable) return std::unexpected(executable.error());
     auto constants = recording_constants(*executable);
     if (!constants) return std::unexpected(constants.error());
+    startup_stage("platform-installer");
     const auto& resources = game_data.attach(std::make_unique<GameResources>(*archive, std::move(*executable), scripts->assets));
     auto bootstrap = read_file(config.scripts / "runtime/bootstrap.lua", 1024 * 1024);
     if (!bootstrap) return std::unexpected(bootstrap.error());
@@ -954,6 +968,10 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     // Settings are host-generated literals; screens decide what an entry point means.
     const auto sources = bundle_source(scripts->modules) + std::string(bootstrap->begin(), bootstrap->end());
     // Content identity excludes local paths/settings and seeds, includes the resolved mod sources.
+    std::optional<std::string> cached_profile;
+    original_data.profile_provider = [&]() -> Result<std::string> {
+    if (cached_profile) return *cached_profile;
+    const auto started = std::chrono::steady_clock::now();
     auto identity = sources + (config.jit ? "\nJIT=1" : "\nJIT=0") + "\nENGINE=" + OPENLF2_ENGINE_SIGNATURE;
     // Equal scripts are not enough: imported fighters/maps may carry different data.
     for (const auto& asset : scripts->assets) {
@@ -965,6 +983,11 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     }
     auto profile = sha256(std::span<const char>(identity.data(), identity.size()));
     if (!profile) return std::unexpected(profile.error());
+    cached_profile = *profile;
+    std::cerr << "Network identity: " << std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - started).count() << " ms\n";
+    return *profile;
+    };
     const auto network_options = std::string(config.headless ? ", network_trace=true" : "") + ", network_port=" + std::to_string(config.network_port) +
         (config.network_role.empty() ? std::string{} : ", network_role=\"" + config.network_role +
             "\", network_address=\"" + config.network_address + "\"");
@@ -977,10 +1000,17 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     }
     profiles_available += "}";
     const auto bundle = "local runtime_settings = {menu_seed=" + std::to_string(menu_seed) + profiles_available +
+#ifdef __ANDROID__
+        ", touch_device=true" +
+#endif
+#ifdef _WIN32
+        ", desktop_controls=true" +
+#endif
+        (config.network_room ? ", network_room=true" : "") +
         (config.headless ? ", headless=true" : "") +
         (config.profile_start ? ", profile_start=true" : "") +
         (config.headless && !config.hub_menu ? ", legacy_menu=true" : "") +
-        ", network_profile=\"" + *profile + "\", recording_version=" + std::to_string(constants->second) + network_options +
+        ", recording_version=" + std::to_string(constants->second) + network_options +
 #if defined(__SWITCH__) || defined(__vita__)
         ", default_controller=true" +
 #else
@@ -993,6 +1023,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     Simulation simulation(std::move(*runtime), !config.headless);
     auto loaded = simulation.load(bundle);
     if (!loaded) return std::unexpected(loaded.error());
+    startup_stage("lua-menu");
     if ((*network)->status() == NetworkStatus::listening) {
         std::cout << "Network listening on " << config.network_address << ':' << (*network)->local_port() << std::endl;
     }
@@ -1015,7 +1046,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
             if (!frame) return std::unexpected(frame.error());
             // A trace frame denotes a committed script tick, not a socket polling attempt.
             while (frame->waiting) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                wait_milliseconds(1);
                 frame = simulation.frame(traced_input);
                 if (!frame) return std::unexpected(frame.error());
             }

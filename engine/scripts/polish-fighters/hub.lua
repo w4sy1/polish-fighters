@@ -31,7 +31,7 @@ function hub.rows(state)
  if state.hub_mode=="profile" then
   return {{"versus","WALKA LOKALNA"},{"stage","KAMPANIA / PRZYGODA"},{"battle_setup","BITWA DRUŻYN"},
     {"championship","TURNIEJ"},{"maps","WYBIERZ MAPĘ"},{"fighters","PORADNIK KOMBOSÓW / POSTACIE"},
-    {"network","KONTA / POKOJE / LAN"},{"controls","USTAWIENIA STEROWANIA"},{"root","MODUŁY / MENU GŁÓWNE"}}
+    {"network","GRA W SIECI / WI-FI"},{"controls","USTAWIENIA STEROWANIA"},{"root","MODUŁY / MENU GŁÓWNE"}}
  end
  local rows={}
  if state.hub_mode~="library" then rows[#rows+1]={"library","WSZYSTKIE MODY / WSPÓLNA PULA"} end
@@ -49,7 +49,7 @@ function hub.rows(state)
  rows[#rows+1]={"controls","USTAWIENIA STEROWANIA"}
  rows[#rows+1]={"options","USTAWIENIA"}
  rows[#rows+1]={"versus","GRA LOKALNA"}
- rows[#rows+1]={"network","KONTA / POKOJE / LAN"}
+ rows[#rows+1]={"network","GRA W SIECI / WI-FI"}
  rows[#rows+1]={"extras","HISTORIA / ODBLOKOWANIA"}
  rows[#rows+1]={"recording","USTAWIENIA NAGRAŃ"}
  rows[#rows+1]={"replay","ODTWÓRZ NAGRANIE"}
