@@ -1,3 +1,10 @@
+# Pelna paczka gry na Dysku Google — 2026-11-11
+
+Przeslano pelny Windows z modulami/zasobami i APK Android, w 18 czesciach danych po maks. 90 MiB oraz z plikami laczenia i instrukcja. Folder Google ma obecnie dostep wlasciciela; publiczne udostepnienie wymaga zmiany przez wlasciciela w interfejsie Drive. Linki i sumy: `tools/distribution/GOOGLE-DOWNLOADS.md`. Metadane Google potwierdzaja przeslane rozmiary; lokalna rekonstrukcja w Windows PowerShell 5.1, SHA256 wynikow, CRC ZIP i uruchomienie samodzielnej paczki bez cache kompilacji PASS. Finalna plynnosc fizycznego Android–Windows i Bluetooth nadal wymagaja proby urzadzen.
+
+Lokalnie pozostawiono najnowszy pelny folder Windows, ZIP, APK i aktualny silnik LAN powiazany z lokalna regula zapory. Do Kosza przeniesiono 13 starszych folderow buildow, 8 starszych paczek, nieudane czesci transferowe oraz wygenerowane `engine/build` i stare wyniki `validation`. Osiem raportow validation zapisanych w Git odtworzono; dane uzytkownika starych instalacji zachowano w ignorowanym userdata/build-cleanup-20261111. Oproznienie Kosza zwolni zajete przez te pliki miejsce. Dodano skrot pulpitu do najnowszej gry.
+
+---
 # Sterowanie, LAN i płynność — test lokalny 2026-11-11
 
 Gałąź robocza `codex/local-leumas-combo-guide-2026-11-11`. Zmiany źródeł i testów zapisano w commicie `16c5a11` i wypchnięto na roboczą gałąź GitHuba; nie utworzono release. F4/przycisk MENU wraca do modułów; wybór dotykowy 1/2 zachowuje się w ekranie walki i wyborze postaci. Wi‑Fi: host TCP 12345 lub klient po IPv4; Android i Windows wcześniej połączyły się fizycznie, ale końcowy APK nie został ponownie sprawdzony na telefonie. Bluetooth PAN/radio nadal niepotwierdzone.
