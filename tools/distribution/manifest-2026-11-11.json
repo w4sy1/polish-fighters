@@ -1,0 +1,122 @@
+[
+  {
+    "output": "PolishFighters-Windows.zip",
+    "sha256": "5ff8eeeaddbe0f0a7e7bdfa16d7df119031f41ff68595aa382aab461b1a20373",
+    "parts": [
+      {
+        "name": "PolishFighters-Windows.zip.001",
+        "bytes": 94371840,
+        "sha256": "d68aada1bc1bcf62cb4c7b309bdb0d2682a0520ac27e2f76c04cde06822100d4",
+        "md5": "774ff76300260f78d2c167b5df946f09"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.002",
+        "bytes": 94371840,
+        "sha256": "0a7df6e7ab42a6a7986da0e4f7bb59d97a788ae07a4d16519016ef9cab8f5596",
+        "md5": "96e65faf6326b580ba683896269ee5aa"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.003",
+        "bytes": 94371840,
+        "sha256": "0bc90fda39f2eccd1eb45388cd150cb3f4851a7d660971850e1b8de05d77e9af",
+        "md5": "81e6faab7bfe745c3e83b2c4ccb27db1"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.004",
+        "bytes": 94371840,
+        "sha256": "afb07fa77fe89813319f72370830c20ece94cbc4415e3b5dc622ac9513bbc750",
+        "md5": "96eb3e8ba0181f4098b2a1243e6e18a1"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.005",
+        "bytes": 94371840,
+        "sha256": "8f178f0175ad1c6de17b5bfdc399030877793a0ea1c900f62c8a40598e28c271",
+        "md5": "76e10809aa633e575a9827a85b32f6f1"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.006",
+        "bytes": 94371840,
+        "sha256": "698619e944dda0c25e5d5ef47ce0350491b64d1159d546111a696616ce024d63",
+        "md5": "279ddcb25064f165f26856a915f27725"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.007",
+        "bytes": 94371840,
+        "sha256": "faefeaf83dcdedb9771987259223cab21c974d1cca070cdaaf2b6596fcef9851",
+        "md5": "6862598f9b01969b9eb7bc0d17099140"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.008",
+        "bytes": 94371840,
+        "sha256": "005b838c69df36fb5ffb7eeefad6e44a3d97e7d7b110cbb58d62e4ce6e4b26ae",
+        "md5": "f07c2b3921ce4bb637faf3968243fbed"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.009",
+        "bytes": 94371840,
+        "sha256": "b93e510fe40ddc573a1c9833686662b33d7b604e26067d4ca58e9ef40342f734",
+        "md5": "3251cbd30f2ffd173f79de0f012fc092"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.010",
+        "bytes": 94371840,
+        "sha256": "c253bff1594223b5eab8f3247f29452cd1cf974d28b71d331636d69574af9602",
+        "md5": "cfb8cb1dddf897d271762a128d56123e"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.011",
+        "bytes": 94371840,
+        "sha256": "5089ded1a43b099114449889e7e44e265f16946589415725dc645dedff0c1e23",
+        "md5": "a84c0b524d4205f11515d40049624ce6"
+      },
+      {
+        "name": "PolishFighters-Windows.zip.012",
+        "bytes": 9204597,
+        "sha256": "259ed70003b5b0582143d030c763e259a3f86d8c66d0accb978bf8b308e4e052",
+        "md5": "ce01b065a56044b08862fc72617bb148"
+      }
+    ]
+  },
+  {
+    "output": "PolishFighters-Android.apk",
+    "sha256": "731e21f4c9f29376abcb126880e4dfff59b0ec1cc9d2a4ddb1a8fdac8ab2b375",
+    "parts": [
+      {
+        "name": "PolishFighters-Android.apk.001",
+        "bytes": 94371840,
+        "sha256": "baaf2d9c867138e7816bccc432c44511db602461dc91cdc78af05b364d9aa80d",
+        "md5": "1fa71923df68d88d5225117726ea4332"
+      },
+      {
+        "name": "PolishFighters-Android.apk.002",
+        "bytes": 94371840,
+        "sha256": "485f84dc80efc0afcbfbc79672fa2dad4ec04a120709ad6c2b88f422b4f2c371",
+        "md5": "d8621fb6219f11e1f30de5b280a13e3a"
+      },
+      {
+        "name": "PolishFighters-Android.apk.003",
+        "bytes": 94371840,
+        "sha256": "3ced55ab780dea5fc4ae83da95dd1a9e3bd5d111bd2f1f4ac9f9456180ebbd83",
+        "md5": "4898777e3148ee093ba45de6eebffe65"
+      },
+      {
+        "name": "PolishFighters-Android.apk.004",
+        "bytes": 94371840,
+        "sha256": "1b5284de034487f17689416d8990b449b7805586387d45709dfa5facb2ca54a2",
+        "md5": "848f5498c7621d1d4452bfa8da168d53"
+      },
+      {
+        "name": "PolishFighters-Android.apk.005",
+        "bytes": 94371840,
+        "sha256": "b21e17c0a007407264fada3245fa26e67e800c87d1fdd355df21796f1d04d100",
+        "md5": "bf1473bd247037cc33603432abd81215"
+      },
+      {
+        "name": "PolishFighters-Android.apk.006",
+        "bytes": 70878290,
+        "sha256": "aaabf03131d38fc7045208ff0eaa60e3ed7697974e3d7e5a39c3d2c2f6a00b6c",
+        "md5": "373c83c43a36d42a5536b53aef09841b"
+      }
+    ]
+  }
+]
