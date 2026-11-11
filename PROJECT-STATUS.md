@@ -1,3 +1,22 @@
+# Pięć poprawek z testów — 0.10.0, 2026-11-11
+
+Kolejno: wybór modułów na Androidzie; ukrycie 50 powtórzeń podstawowych postaci
+w pełnej puli; przejście własnych NPC przez wyjście kampanii; powrót do modułów
+bez zamykania gry; ograniczenie samopowielania LeumasEX/Rudolfa do trzech żywych
+kopii na przywołującego, bez potomków klonów. Bez usuwania rekordów i zasobów.
+VersionCode 10 / 0.10.0-pack-selection-test, niezmienione applicationId i signing.
+15 testów Androida, 30 zestawów Lua, 51 testów Python PASS (jeden SKIP).
+Próby natywne: kampania 7/7, powrót do modułów 5/5, klony 4/4, katalog 4/4 PASS.
+Przekaźnik lokalny i walka dwóch silników 120 klatek PASS. Fizyczny telefon i
+radio Bluetooth wymagają prób użytkownika. Lint: 27 znanych błędów w klasach SDL.
+APK: engine/out/PolishFighters-Android-moduly-2026-11-11.apk.
+Windows: engine/out/PolishFighters-Modules-2026-11-11; skrót pulpitu zaktualizowany
+z zachowaniem dotychczasowej ścieżki ustawień. Osobny ZIP zawiera aktualizację Lua
+do poprzedniej pełnej paczki Windows. Historia wydań pozostawiona.
+Raport: docs/POPRAWKI-0.10-2026-11-11.md; kolejka: docs/KOREKTY-2026-11-11.md.
+
+---
+
 # Bluetooth i ustawienia kodów Android — 2026-11-11
 
 Wersja testowa 0.9.0-bluetooth-test, versionCode 9. Android: ekran startowy →

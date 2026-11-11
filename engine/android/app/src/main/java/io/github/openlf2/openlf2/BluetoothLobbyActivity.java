@@ -27,6 +27,7 @@ public final class BluetoothLobbyActivity extends Activity {
     private final List<Button> actions = new ArrayList<>();
     private BluetoothSession session;
     private boolean transferred;
+    private Button moduleButton;
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
@@ -36,6 +37,11 @@ public final class BluetoothLobbyActivity extends Activity {
         status = new TextView(this); status.setTextColor(0xffeeeeee); status.setTextSize(17);
         status.setText("POLISH FIGHTERS\nBluetooth: wersja próbna dla dwóch telefonów. Najpierw sparuj je w ustawieniach Androida. Na obu zainstaluj ten sam APK.");
         layout.addView(status);
+        moduleButton = new Button(this);
+        moduleButton.setText("WYBIERZ MODUŁ GRY");
+        moduleButton.setOnClickListener(v -> showModules());
+        actions.add(moduleButton); layout.addView(moduleButton);
+        refreshModuleLabel();
         button(layout, "GRAJ NA TYM TELEFONIE", () -> launch(null, 0));
         button(layout, "USTAWIENIA", this::showSettings);
         button(layout, "BLUETOOTH: ZAŁÓŻ GRĘ", () -> connect(true));
@@ -57,11 +63,61 @@ public final class BluetoothLobbyActivity extends Activity {
         Button button = new Button(this); button.setText(label);
         button.setOnClickListener(v -> action.run()); actions.add(button); layout.addView(button);
     }
+    private void refreshModuleLabel() {
+        try { moduleButton.setText("MODUŁ: " + new GamePackSettings(getFilesDir()).label()); }
+        catch (java.io.IOException | org.json.JSONException error) {
+            status.setText("Nie można odczytać wyboru modułów: " + error.getMessage());
+        }
+    }
+
+    private void showModules() {
+        GamePackSettings settings = new GamePackSettings(getFilesDir());
+        String[] labels = java.util.Arrays.copyOf(GamePackSettings.TITLES, GamePackSettings.TITLES.length + 2);
+        labels[labels.length - 2] = "Wszystkie razem";
+        labels[labels.length - 1] = "Dobierz własny zestaw…";
+        new AlertDialog.Builder(this).setTitle("Wybierz moduł gry")
+            .setItems(labels, (dialog, which) -> {
+                if (which == labels.length - 1) { showCustomModules(); return; }
+                try {
+                    settings.save(which == labels.length - 2 ? GamePackSettings.ALL : GamePackSettings.IDS[which],
+                        settings.selection(), settings.hideDuplicates());
+                    refreshModuleLabel();
+                } catch (java.io.IOException | org.json.JSONException | IllegalArgumentException error) {
+                    Toast.makeText(this, "Nie zapisano modułu: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }).setNegativeButton("Anuluj", null).show();
+    }
+
+    private void showCustomModules() {
+        GamePackSettings settings = new GamePackSettings(getFilesDir());
+        final boolean[] selected;
+        try { selected = settings.selection(); }
+        catch (java.io.IOException | org.json.JSONException error) {
+            Toast.makeText(this, "Nie można odczytać modułów: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Dobierz moduły do wspólnej puli")
+            .setMultiChoiceItems(GamePackSettings.TITLES, selected, (window, which, checked) -> selected[which] = checked)
+            .setPositiveButton("Zapisz", null).setNegativeButton("Anuluj", null).create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            try {
+                settings.save(GamePackSettings.CUSTOM, selected, settings.hideDuplicates());
+                refreshModuleLabel(); dialog.dismiss();
+            } catch (java.io.IOException | org.json.JSONException | IllegalArgumentException error) {
+                Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }));
+        dialog.show();
+    }
     private void showSettings() {
         final MobileCodeSettings settings = new MobileCodeSettings(getFilesDir());
         final CheckBox codes = new CheckBox(this);
         codes.setText("Włącz kody — odblokuj ukryte postacie");
         codes.setPadding(32, 24, 32, 24);
+        final GamePackSettings packs = new GamePackSettings(getFilesDir());
+        final CheckBox duplicates = new CheckBox(this);
+        duplicates.setText("Ukryj powtórzenia podstawowych postaci we wspólnej puli");
+        duplicates.setPadding(32, 12, 32, 24);
         try { codes.setChecked(settings.enabled()); }
         catch (java.io.IOException | org.json.JSONException error) {
             new AlertDialog.Builder(this).setTitle("Błąd ustawień")
@@ -69,14 +125,21 @@ public final class BluetoothLobbyActivity extends Activity {
                 .setPositiveButton("OK", null).show();
             return;
         }
+        try { duplicates.setChecked(packs.hideDuplicates()); }
+        catch (java.io.IOException | org.json.JSONException error) {
+            Toast.makeText(this, "Nie można odczytać ustawień: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
+        LinearLayout content = new LinearLayout(this); content.setOrientation(LinearLayout.VERTICAL);
+        content.addView(codes); content.addView(duplicates);
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Ustawienia")
-            .setView(codes).setPositiveButton("Zapisz", null)
+            .setView(content).setPositiveButton("Zapisz", null)
             .setNegativeButton("Anuluj", null).create();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             .setOnClickListener(view -> {
                 try {
                     boolean wasEnabled = settings.enabled();
-                    settings.save(codes.isChecked());
+                    settings.save(codes.isChecked(), duplicates.isChecked());
                     dialog.dismiss();
                     if (codes.isChecked() && !wasEnabled) {
                         new AlertDialog.Builder(this).setTitle("lamus")

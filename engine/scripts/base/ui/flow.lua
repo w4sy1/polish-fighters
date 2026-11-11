@@ -305,7 +305,7 @@ function flow.draw(state, context)
     if state.quit_dialog then quit_dialog.draw(state.quit_dialog, context) end
 end
 local function disconnect(state, message)
-    network.close(state.session)
+    if state.session then network.close(state.session) end
     state.session = nil
     controls.replace_names(nil)
     state.active, state.wait_release = "launch", nil
@@ -314,6 +314,19 @@ local function disconnect(state, message)
     state.launch.message = message
     speed.fast = false
     music.play("bgm/main.wma")
+end
+-- Shared by the optional module launcher; closes a session without exiting the app.
+function flow.return_to_modules(state)
+    if state.match and state.match.match and state.match.match.finished then
+        require("base/ui/match_screen").outcome(state.match)
+    end
+    disconnect(state)
+    unlock.end_replay()
+    state.match, state.battle, state.ending, state.quit_dialog = nil, nil, nil, nil
+    state.pending_leave, state.return_modules_after_match = nil, nil
+    state.launch.page, state.launch.hub_mode = "menu", "root"
+    state.launch.hub_classic, state.launch.pf_panel, state.launch.hub_edit, state.launch.hub_online = nil, nil, nil, nil
+    state.wait_release, state.swallow_pointer = true, true
 end
 -- Whether Escape (and Android's back button, which the platform reports as Escape) is free to ask about leaving
 -- the game: not in a network game, where it disconnects, and not on the launch screen's pages that use it.
@@ -446,14 +459,20 @@ function flow.update(state, raw, context)
     if input.keys[virtual_keys.escape] and not state.escape_held then escape_pressed = true end
     state.escape_held = input.keys[virtual_keys.escape] == true
     local closed_now = false
+    if not state.quit_dialog and flow.overlay_update and flow.overlay_update(state, input, context) then return end
     if state.quit_dialog then
         -- While the question is open the screen below is frozen.
         local answer = quit_dialog.update(state.quit_dialog, input, context)
-        if answer == "exit" and state.quit_dialog.kind == "leave" then
+        if answer == "exit" and (state.quit_dialog.kind == "leave" or
+                (state.quit_dialog.kind == "modules" and state.active == "match")) then
             -- Leaving the fight is F4, held for two frames after this one so that the match sees it on a frame that
             -- reads the keys (no wait for released keys here: a held F4 would never count as idle).
             state.pending_leave = 3
+            if state.quit_dialog.kind == "modules" then state.return_modules_after_match = true end
             state.quit_dialog, state.swallow_pointer, closed_now = nil, true, true
+        elseif answer == "exit" and state.quit_dialog.kind == "modules" then
+            flow.return_to_modules(state)
+            closed_now = true
         elseif answer == "exit" then
             context.action("quit")
         elseif answer == "close" then
@@ -472,6 +491,7 @@ function flow.update(state, raw, context)
         if input.button then input.button, input.click = false, false else state.swallow_pointer = nil end
     end
     if not state.quit_dialog and not closed_now then route(state, input, context) end
+    if state.return_modules_after_match and state.active ~= "match" then flow.return_to_modules(state) end
     if joining_cli then
         if state.network.session.error then error(state.network.session.error) end
         -- CLI traces start at the title; the handshake consumes no trace frames.

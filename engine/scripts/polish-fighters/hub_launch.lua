@@ -17,6 +17,9 @@ return function(base)
  local function activate(state,id,context)
   state.hub_note=nil
   if id=="packs" then
+   local hide,problem=packs.hide_duplicates()
+   if problem then state.hub_note=tostring(problem);return end
+   state.hub_hide_duplicates=hide
    state.hub_pack_edit={}
    for _,entry in ipairs(hub.profiles) do state.hub_pack_edit[entry.id]=not state.hub_selected or state.hub_selected[entry.id]~=false end
    state.hub_mode="packs"
@@ -24,8 +27,9 @@ return function(base)
    local tag=id:sub(8);state.hub_pack_edit[tag]=not state.hub_pack_edit[tag]
   elseif id=="packs_all" then
    for _,entry in ipairs(hub.profiles) do state.hub_pack_edit[entry.id]=true end
+  elseif id=="packs_duplicates" then state.hub_hide_duplicates=not state.hub_hide_duplicates
   elseif id=="packs_save" then
-   local saved,problem=packs.save(hub.profiles,state.hub_pack_edit)
+   local saved,problem=packs.save(hub.profiles,state.hub_pack_edit,state.hub_hide_duplicates)
    if saved then state.hub_selected=state.hub_pack_edit;state.hub_pack_edit=nil;state.hub_mode="library"
    else state.hub_note=tostring(problem) end
   elseif id=="packs_cancel" then state.hub_pack_edit=nil;state.hub_mode="library"

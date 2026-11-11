@@ -18,7 +18,7 @@ final class MobileCodeSettings {
         file = new AtomicFile(new File(directory, "config.json"));
     }
 
-    private JSONObject read() throws IOException, JSONException {
+    JSONObject read() throws IOException, JSONException {
         if (!file.getBaseFile().exists()
                 && !new File(file.getBaseFile().getPath() + ".bak").exists()) return new JSONObject();
         return new JSONObject(new String(file.readFully(), StandardCharsets.UTF_8));
@@ -30,6 +30,10 @@ final class MobileCodeSettings {
     }
 
     void save(boolean enabled) throws IOException, JSONException {
+        save(enabled, null);
+    }
+
+    void save(boolean enabled, Boolean hideDuplicates) throws IOException, JSONException {
         JSONObject document = read();
         JSONObject options = document.optJSONObject("options");
         if (options == null) {
@@ -38,7 +42,12 @@ final class MobileCodeSettings {
         }
         options.put("unlock_characters", enabled);
         document.put("options", options);
+        if (hideDuplicates != null) document.put("little_fighters_hide_duplicates", hideDuplicates);
         if (!document.has("version")) document.put("version", 1);
+        write(document);
+    }
+
+    void write(JSONObject document) throws IOException {
         if (!directory.isDirectory() && !directory.mkdirs()) throw new IOException("Nie można utworzyć ustawień");
         FileOutputStream output = file.startWrite();
         try {

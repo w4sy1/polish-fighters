@@ -11,9 +11,11 @@ assert(packs.save(hub.profiles,selected))
 assert(doc.options.language=='english' and doc.controls.keep)
 assert(packs.read(hub.profiles).bleach==false)
 local rows=hub.rows({hub_mode='root',hub_selected=selected})
-assert(#rows==17)
-for _,row in ipairs(rows) do assert(row[1]~='profile_bleach') end
-assert(#hub.rows({hub_mode='packs',hub_pack_edit=selected})==12)
+assert(#rows==18,'custom mixed selection must not hide standalone modules in the main menu')
+local found=false;for _,row in ipairs(rows) do if row[1]=='profile_bleach' then found=true end end
+assert(found,'returning to modules must allow choosing a previously excluded package')
+for _,row in ipairs(hub.rows({hub_mode='library',hub_selected=selected})) do assert(row[1]~='profile_bleach') end
+assert(#hub.rows({hub_mode='packs',hub_pack_edit=selected})==13)
 for _,entry in ipairs(hub.profiles) do selected[entry.id]=false end
 assert(not packs.save(hub.profiles,selected),'empty launcher selection allowed')
 selected.lf_two=true;fail=true

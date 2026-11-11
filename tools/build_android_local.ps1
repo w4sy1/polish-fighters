@@ -3,9 +3,9 @@ param(
     [string[]]$Abis = @('arm64-v8a', 'armeabi-v7a'),
     [switch]$SkipNative,
     [switch]$SkipBundle,
-    [int]$VersionCode = 9,
-    [string]$VersionName = '0.9.0-bluetooth-test',
-    [string]$ApkName = 'PolishFighters-Android-2026-11-11.apk'
+    [int]$VersionCode = 10,
+    [string]$VersionName = '0.10.0-pack-selection-test',
+    [string]$ApkName = 'PolishFighters-Android-moduly-2026-11-11.apk'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -43,7 +43,7 @@ try {
         Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
     $gradleArguments = @('-p', (Join-Path $projectRoot 'engine/android'), '--no-daemon', '--max-workers=2',
         '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m',
-        "-Popenlf2VersionCode=$VersionCode", "-Popenlf2VersionName=$VersionName", ':app:assembleDebug', ':app:testDebugUnitTest')
+        "-Popenlf2VersionCode=$VersionCode", "-Popenlf2VersionName=$VersionName", ':app:clean', ':app:assembleDebug', ':app:testDebugUnitTest')
     if ($installedNdk) { $gradleArguments += "-Popenlf2NdkVersion=$($installedNdk.Name)" }
     & (Join-Path $projectRoot 'engine/android/gradlew.bat') @gradleArguments
     if ($LASTEXITCODE -ne 0) { throw 'APK packaging failed.' }

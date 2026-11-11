@@ -4,7 +4,7 @@ Własny silnik OpenLF2 z rozszerzeniami Polish Fighters: Windows, źródła Andr
 
 ## Pobranie
 
-**Aktualne wydanie testowe 0.9.0 (2026-11-11): [APK Android i pełna paczka Windows](https://github.com/w4sy1/polish-fighters/releases/tag/mobile-test-2026-11-11).** Android ma okno ustawień z przełącznikiem kodów i komunikatem „lamus”. Bluetooth przygotowano do testów dwóch sparowanych telefonów; radio i fizyczne urządzenia nadal wymagają weryfikacji. [Instrukcja i wyniki testów](docs/TESTY-BLUETOOTH-2026-11-11.md).
+**Aktualne wydanie testowe 0.10.0 (2026-11-11): [APK Android i aktualizacja Windows](https://github.com/w4sy1/polish-fighters/releases/tag/fixes-test-2026-11-11).** Wybór pojedynczych modułów i własnej puli, ukrycie powtórzeń LF2, poprawione przejście kampanii, powrót do wyboru modułów oraz ograniczenie samopowielania klonów. [Instrukcja, pliki i wyniki testów](docs/POPRAWKI-0.10-2026-11-11.md). Pełna paczka Windows jest w [poprzednim wydaniu 0.9.0](https://github.com/w4sy1/polish-fighters/releases/tag/mobile-test-2026-11-11); nowy mały ZIP nakłada dziewięć plików Lua. Fizyczny telefon i radio Bluetooth nadal wymagają prób.
 
 Poniżej starsze paczki źródeł i samego silnika:
 

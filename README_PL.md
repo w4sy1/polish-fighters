@@ -1,9 +1,11 @@
-# Polish Fighters — wydanie testowe 0.9.0, 2026-11-11
+# Polish Fighters — wydanie testowe 0.10.0, 2026-11-11
 
-[Pobierz APK Android i pełną paczkę Windows](https://github.com/w4sy1/polish-fighters/releases/tag/mobile-test-2026-11-11).
+[Pobierz nowe APK i aktualizację Windows](https://github.com/w4sy1/polish-fighters/releases/tag/fixes-test-2026-11-11).
+Pięć poprawek: wybór modułów, filtr powtórzeń, ruch NPC do wyjścia kampanii,
+powrót do modułów bez zamykania aplikacji i zablokowanie rekurencji klonów.
 Na telefonie: **USTAWIENIA → Włącz kody → Zapisz**; po włączeniu pojawia się „lamus”.
 Na PC nadal działa kod `polishfighters`. Bluetooth wymaga dwóch sparowanych telefonów
-z tym samym APK. [Instrukcja i wyniki](docs/TESTY-BLUETOOTH-2026-11-11.md).
+z tym samym APK. [Instrukcja i wyniki](docs/POPRAWKI-0.10-2026-11-11.md).
 Build i testy lokalne przeszły; radio Bluetooth, instalacja i dotyk na urządzeniach
 pozostają do sprawdzenia. Lint zgłasza 27 wcześniejszych błędów w klasach SDL.
 

@@ -1,3 +1,14 @@
+# Wydanie testowe Android 0.10.0 — 2026-11-11
+
+Aktualny wynik: `engine/out/PolishFighters-Android-moduly-2026-11-11.apk`, code 10.
+Piętnaście testów Androida obejmuje wybór wszystkich pojedynczych modułów,
+własnej puli, zachowanie kodów i danych oraz odrzucenie pustego zestawu.
+Skrypt wykonuje czyste pakowanie aplikacji, aby przyrostowy ZIP nie zawierał
+zbędnych pozostałości starego pakietu danych. `-SkipNative` i `-SkipBundle`
+zachowują dotychczasowe znaczenie. Raport: docs/POPRAWKI-0.10-2026-11-11.md.
+
+---
+
 # Wydanie testowe Android 0.9.0 — 2026-11-11
 
 `tools/build_android_local.ps1` domyślnie buduje versionCode 9 / 0.9.0-bluetooth-test

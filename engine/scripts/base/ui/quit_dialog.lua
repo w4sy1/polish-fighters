@@ -21,6 +21,7 @@ local stay_button = {x = panel.x + 156, y = panel.y + 72, width = 120, height = 
 local kinds = {
     exit = {title = "Exit OpenLF2?", confirm = "Exit", stay = "Cancel", variant = constants.font_variants.blue},
     leave = {title = "Leave the fight?", confirm = "Leave", stay = "Continue", variant = constants.font_variants.blue},
+    modules = {title = "Wrocic do wyboru modulow?", confirm = "Wroc", stay = "Zostan", variant = constants.font_variants.blue},
 }
 
 local function area_target(area)

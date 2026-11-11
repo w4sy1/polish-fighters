@@ -48,8 +48,8 @@ android {
         applicationId 'pl.prestigetech.polishfighters'
         minSdk 21
         targetSdk 35
-        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 9
-        versionName project.findProperty('openlf2VersionName') ?: '0.9.0-bluetooth-test'
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 10
+        versionName project.findProperty('openlf2VersionName') ?: '0.10.0-pack-selection-test'
     }
 
     // A fixed key, so each build is signed the same and installs over the previous one; the

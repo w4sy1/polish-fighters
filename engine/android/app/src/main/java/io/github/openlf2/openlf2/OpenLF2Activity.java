@@ -66,26 +66,13 @@ public final class OpenLF2Activity extends SDLActivity {
      */
     @Override
     protected String[] getArguments() {
-        File game = new File(getFilesDir(), "game");
-        if (new File(game, ".ready").isFile()) {
-            String[] base = new String[] {game.getAbsolutePath(),
-                "--installer", new File(game, "LF2_v2.0a.exe").getAbsolutePath(),
-                "--config-dir", new File(getFilesDir(), "settings").getAbsolutePath(),
-                "--mod", new File(game, "content-packs/polish-originals").getAbsolutePath(),
-                "--mod", new File(game, "content-packs/mixed-all").getAbsolutePath()};
-            String role = getIntent().getStringExtra("bluetooth_role");
-            int port = getIntent().getIntExtra("bluetooth_port", 0);
-            if (("host".equals(role) || "join".equals(role)) && port > 0 && port <= 65535) {
-                String[] linked = java.util.Arrays.copyOf(base, base.length + 6);
-                linked[base.length] = "--" + role; linked[base.length + 1] = "127.0.0.1";
-                linked[base.length + 2] = "--port"; linked[base.length + 3] = Integer.toString(port);
-                linked[base.length + 4] = "--mod";
-                linked[base.length + 5] = new File(game, "scripts/bluetooth-room").getAbsolutePath();
-                return linked;
-            }
-            return base;
+        try {
+            return GameLaunchArguments.build(getFilesDir(),
+                getIntent().getStringExtra("bluetooth_role"),
+                getIntent().getIntExtra("bluetooth_port", 0));
+        } catch (IOException | org.json.JSONException error) {
+            throw new IllegalStateException("Nie można odczytać wybranego modułu gry", error);
         }
-        return new String[] {getFilesDir().getAbsolutePath()};
     }
 
     @Override protected void onDestroy() {

@@ -2,6 +2,7 @@ return function(base)
     local control=base.control
     local enter=require("base/game/control").enter_frame
     local runtime=require("polish-originals/runtime")
+    local constants=require("base/game/constants")
     function base.control(state,index,mode,context)
         local value=state.items[index]
         value.pf_self_index=index
@@ -12,6 +13,12 @@ return function(base)
             return
         end
         if value.record.id<410 or value.record.id>415 then return control(state,index,mode,context) end
+        -- The common campaign exit order precedes combat targeting. With no enemy,
+        -- custom combat AI otherwise returns early and blocks the whole party at the gate.
+        if mode==constants.modes.stage and state.stage_run and state.stage_run.last_phase==1
+           and value.hp>0 and value.team~=constants.teams.enemies then
+            return control(state,index,mode,context)
+        end
         for _,key in ipairs({"up","down","left","right","attack","jump","defend"}) do
             value.previous_keys[key]=value.keys[key];value.keys[key]=false
         end
