@@ -3,7 +3,11 @@ return function(base)
     base.profile_id = "polish-originals"
     local load = base.load
     -- The classic bitmap font is ASCII. Preserve Polish names separately for TTF/UI metadata.
-    local names = {[410]="Wasyl",[411]="SZ",[412]="Mega Ninja Jas",[413]="Skibidi Sigma Tata"}
+    local names = {[410]="Wasyl",[411]="SZ",[412]="Mega Ninja Jas",[413]="Skibidi Sigma Tata",[414]="Remonoko",[415]="Kamienny Mech"}
+    local selectable = base.selectable
+    function base.selectable(value)
+        return value.id ~= 415 and value.id ~= 433 and selectable(value)
+    end
     function base.load()
         local fighters = load()
         for _, value in ipairs(fighters) do

@@ -4,11 +4,15 @@ Własny silnik OpenLF2 z rozszerzeniami Polish Fighters: Windows, źródła Andr
 
 ## Pobranie
 
+**Aktualne wydanie testowe 0.9.0 (2026-11-11): [APK Android i pełna paczka Windows](https://github.com/w4sy1/polish-fighters/releases/tag/mobile-test-2026-11-11).** Android ma okno ustawień z przełącznikiem kodów i komunikatem „lamus”. Bluetooth przygotowano do testów dwóch sparowanych telefonów; radio i fizyczne urządzenia nadal wymagają weryfikacji. [Instrukcja i wyniki testów](docs/TESTY-BLUETOOTH-2026-11-11.md).
+
+Poniżej starsze paczki źródeł i samego silnika:
+
 - [Windows — silnik, DLL i skrypty](artifacts/PolishFighters-Windows-core-2026-10-30.zip). Rozpakuj całość i uruchom `Graj-Polish-Fighters.cmd`. Nie przenoś pojedynczego EXE. Przy braku danych aplikacja zaoferuje pobranie przypiętego LF2; możesz też dostarczyć swój `LF2_v2.0a.exe`.
 - [Kod do Android Studio](artifacts/PolishFighters-AndroidStudio-2026-10-30.zip). Otwórz `engine/android` i wybierz Gradle JDK17. [Instrukcja](ANDROID_STUDIO.md).
 - [Sumy SHA256](artifacts/checksums.json).
 
-Repozytorium nie zawiera cudzych danych LF2 ani grafik, dźwięków i zasobów modów. Lokalna pełna paczka Windows z posiadanymi danymi jest osobnym plikiem `delivery/PolishFighters-Windows-2026-10-30.zip`. Foldery `content-packs/*/assets/` pozostają lokalne. Narzędzia importu i pochodzenie zasobów są w repozytorium.
+Historia kodu Git nie zawiera importowanych katalogów danych LF2 i modów; `content-packs/*/assets/` pozostają wyłączone przez `.gitignore`. Paczki do grania są osobnymi plikami wydania. Narzędzia importu i pochodzenie zasobów są w repozytorium.
 
 ## Co sprawdzono 2026-10-30
 

@@ -1,9 +1,9 @@
 {
   "experimental": true,
-  "objects": 932,
+  "objects": 947,
   "maps": 128,
   "assets": 7580,
-  "unique_ids": 932,
+  "unique_ids": 947,
   "packs": [
     {
       "pack": "lf4-turbo",
@@ -964,5 +964,24 @@
       }
     }
   ],
-  "limits": "Generic DAT/opoint and record transforms; EXE/AngelScript behaviors and mixed campaigns are not emulated."
+  "limits": "Generic DAT/opoint and record transforms; EXE/AngelScript behaviors and mixed campaigns are not emulated.",
+  "remonoko_ids": [
+    414,
+    415,
+    427,
+    428,
+    429
+  ],
+  "hero_effect_ids": [
+    430,
+    431,
+    432,
+    433,
+    434,
+    435,
+    436,
+    437,
+    438,
+    439
+  ]
 }

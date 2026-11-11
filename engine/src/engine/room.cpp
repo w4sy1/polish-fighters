@@ -41,7 +41,7 @@ Result<std::optional<RoomTick>> Room::submit(int slot,std::uint64_t frame,std::s
     if(!inputs_.emplace(slot,std::move(buttons)).second)return fail(ErrorCode::format,"duplicate input frame");
     if(inputs_.size()!=peers_.size())return std::optional<RoomTick>{};
     RoomTick tick{frame_,{}};
-    for(const auto& [id,value]:inputs_)tick.inputs[id]=value;
+    for(const auto& [id,value]:inputs_)tick.inputs[static_cast<std::size_t>(id)]=value;
     inputs_.clear();checksum_frame_=frame_++;return std::optional<RoomTick>{std::move(tick)};
 }
 Result<void> Room::checksum(int slot,std::uint64_t frame,std::string value) {

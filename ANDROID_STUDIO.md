@@ -1,3 +1,31 @@
+# Wydanie testowe Android 0.9.0 — 2026-11-11
+
+`tools/build_android_local.ps1` domyślnie buduje versionCode 9 / 0.9.0-bluetooth-test
+i uruchamia sześć testów ustawień Androida w Robolectric. Wymaga JDK17.
+Gotowy plik: `engine/out/PolishFighters-Android-2026-11-11.apk`.
+`-VersionCode`, `-VersionName` i `-ApkName` pozwalają jawnie ustawić kolejną wersję.
+Przy zmianach Java/Lua bez zmian C++ można użyć `-SkipNative`.
+Przełącznik kodów: ekran startowy → USTAWIENIA; komunikat „lamus” po zapisaniu
+włączenia. Pełne wyniki i ograniczenia: `docs/TESTY-BLUETOOTH-2026-11-11.md`.
+
+---
+
+# Budowa lokalna bez Android Studio — 2026-11-07
+
+Gotowy skrypt: `powershell -ExecutionPolicy Bypass -File tools/build_android_local.ps1`.
+Korzysta z istniejącego JDK17/Windows SDK oraz izolowanego WSL `PolishFighters-Build`
+z Conan i NDK r28c. Buduje ARM64 + ARMv7 i dopiero potem pakuje uniwersalny APK.
+Nie tworzy emulatora. `-SkipNative` ponownie pakuje istniejące biblioteki po zmianie
+Lua/grafiki/Java. `-SkipBundle` zachowuje wcześniej przygotowany komplet zasobów.
+`tools/prepare_android_game.py` deduplikuje wszystkie 9 lokalnych pakietów;
+bootstrap weryfikuje SHA256 i instaluje zasoby do prywatnego katalogu aplikacji.
+`tools/check_full_apk.py <apk>` sprawdza oba ABI, zależności ELF, 16 KB dla ARM64,
+CRC i zgodność kompletnego pakietu gry. To nie zastępuje testu na telefonie.
+Nie zmieniono applicationId ani konfiguracji podpisywania. Bluetooth jest próbny,
+dla dwóch wcześniej sparowanych telefonów, przez ekran przed uruchomieniem gry.
+
+---
+
 # Polish Fighters w Android Studio
 
 Otwórz folder `engine/android` przez **File → Open**. Gradle Wrapper8.13 i suma dystrybucji są dołączone. Wybierz **Gradle JDK17**; JDK25 z bieżącego Android Studio nie jest zgodne z Gradle8.13. Nie zmieniaj applicationId `pl.prestigetech.polishfighters`, konfiguracji signing ani namespace istniejącej Activity.

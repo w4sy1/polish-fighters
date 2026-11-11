@@ -127,6 +127,12 @@ cp -R "$root/scripts" "$root/build/android/assets/scripts"
 python3 dist/collect-licenses.py "$root/build/android/assets/licenses" \
     --key ffmpeg --key ffmpeg-notes --key sdl3 --key sdl3-ttf --key freetype --key luajit --key zlib --key bzip2 \
     --key openssl --key libcurl --local "ndk-runtime=$ndk/NOTICE"
+# Cross-build in WSL, then package with the already installed Windows SDK/Gradle.
+# This avoids interpreting Windows local.properties paths inside Linux.
+if [[ "${OPENLF2_ANDROID_NATIVE_ONLY:-0}" == 1 ]]; then
+    echo "Android native libraries, Java, scripts and licenses staged in $root/build/android"
+    exit 0
+fi
 build_type="${OPENLF2_ANDROID_BUILD_TYPE:-debug}"
 case "$build_type" in
     debug|release) ;;

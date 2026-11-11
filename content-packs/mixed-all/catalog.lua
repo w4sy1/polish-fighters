@@ -26,7 +26,7 @@ return function(base)
  end
  function base.selectable(fighter)
   local origin=metadata[fighter.id]
-  local tag=origin and tags[origin.pack] or (fighter.id>=410 and fighter.id<=413 and 'polish_fighters' or 'lf_two')
+  local tag=origin and tags[origin.pack] or (fighter.id>=410 and fighter.id<=415 and 'polish_fighters' or 'lf_two')
   if selected[tag]==false then return false end
   if origin then local family=math.floor(origin.id/10);fighter.hidden=family==3 or family==5 end
   return selectable(fighter)

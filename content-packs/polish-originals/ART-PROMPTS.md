@@ -23,3 +23,37 @@ Reference: „Polish Fighters_ Wasyl kontra Skibidi Sigma Tata.png”. Adult dad
 ## Rzeczywisty wynik i integracja
 
 Wszystkie cztery wyniki mają 1254×1254 RGBA. Model nie zachował sztywnej siatki, szczególnie w dolnych rzędach Wasyla. Ustalono rzeczywiste przedziały rzędów i ręczne wyjątki w generatorze metadanych. PNG nie przycinano, nie skalowano i nie przemalowywano. Skalowanie i odbicie wykonuje renderer silnika przy rysowaniu. Diagnostyczny `render.bmp` powstał przez produkcyjny adapter SDL; nie zastępuje atlasów gry.
+# Remonoko — 2026-11-06
+
+Built-in imagegen, reference: Remonoko concept card based on Remek's drawing.
+Prompt: Create a production 2D game sprite sheet of REMONOKO, matching the boy
+character in reference: short brown hair, red suit, huge steel fist on one arm,
+futuristic fictional pistol in opposite hand. Retro Little Fighter style,
+readable small cartoon fighter. TRANSPARENT BACKGROUND. EXACT 8 columns by 8
+rows, 64 equal square cells, square image 1024x1024. No text, no labels, no grid
+lines. Each pose centered in its own cell with empty padding, full body, same
+character scale and feet baseline. All face right. Rows: 1 eight standing/idle
+variations; 2 eight walking/running poses; 3 eight punch/metal fist and kick
+attacks; 4 eight hurt/block/jump poses; 5 eight falling and lying poses; 6 eight
+rolling and teleport/dash poses; 7 four airborne attacks followed by four stone
+mech full-body poses (same boy encased in bulky gray rock armor with red accents
+and massive stone fists); 8 first five poses firing futuristic pistol /
+transformed huge arm cannon / fire stream, final three cells ONLY separate
+effects: orange small energy bullet, huge glowing orange energy projectile,
+small red glowing ground trap. Do not draw multiple characters in a cell. No
+scenic background, no contact shadow, no card design, no text. Consistent pixel
+art animation poses. Stylized fantasy combat without blood.
+
+Actual output is 1254x1254 RGBA, preserved verbatim as `art/r.png`. The requested
+1024 resolution was not the tool's final resolution; layout uses measured cuts.
+
+## Dedicated mech and hero FX — 2026-11-07
+
+Generated bitmap originals preserved byte-for-byte: `art/m.png` (1262x1246 RGBA,
+8x8 mech poses: idle, walk/run, punches, fire palms, block/hurt, jump/death,
+dash/slam/spin, flame effects) and `art/e.png` (1254x1254 RGBA, 8x8: destructible
+toilet turrets, orange fire, violet eclipse, cyan lightning, healing, rings,
+clone smoke and teleport flashes). Layout uses measured source cuts and
+per-picture scales; 1024 requested resolution was not the delivered image size.
+Transparent backgrounds; no new voices. `layout.lua` also exposes `f` (mech
+fire effects) and `t` (toilet loop) as aliases of these unchanged PNGs.

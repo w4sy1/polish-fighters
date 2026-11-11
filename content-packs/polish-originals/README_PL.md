@@ -1,27 +1,93 @@
-# Cztery postacie Polish Fighters
+# Własne postacie — aktualizacja 2026-11-07
 
-Pakiet dodaje Wasyla (410), Szymonoko/SZ (411), Mega Ninja Jasia (412) i bossa Skibidi Sigma Tatę (413). Oryginalne rekordy LF2 są przed nowymi; ich dane, numery, mapy i zasady odblokowania pozostają zachowane. Nowa czwórka jest dostępna od razu, na końcu listy wyboru. Pozostałe dodatki pozostają osobnymi pakietami.
+Windows: `engine/out/LittleFighters-Heroes-2026-11-06/Graj-Wszystkie-Mody.cmd`.
+Android: `engine/out/PolishFighters-all-mods-Heroes-test.apk`, ARM64 i ARMv7,
+bez Android Studio. Wszystkie 9 lokalnych pakietów, wspólna pula 947 obiektów i 128 map.
+To dotychczas zaimportowana zawartość; nie oznacza pełnego odzyskania każdego oryginalnego moda.
+Nie dodano nowych nagrań głosowych. Starsze paczki i userdata pozostają zachowane.
 
-Aktualna paczka: uruchom `LittleFighters.exe` w `engine/out/LittleFighters-hub-2026-10-31`, następnie wybierz **Polish Fighters**. Nowe menu ma bezpośredni dostęp do ustawień klawiatury, myszy i pada. Starszy katalog `PolishFighters-originals-2026-10-31` zachowuje poprzednią wersję. Nie uruchamiaj instalatora ani oryginalnych EXE dodatków. Plik LF2_v2.0a.exe jest czytany przez nasz silnik jako archiwum danych.
+D = blok, A = atak, J = skok; są to akcje z ustawień gry. Strzałka → oznacza
+kierunek patrzenia. Kombinacje wciskaj kolejno.
 
-SZ strzela również zwykłym atakiem — nie wymaga to kombinacji ani many. Portrety wyboru mają 120×120, ikony HUD 40×45, zgodnie z bazowym LF2. Poprawiono skalę sylwetek, widoczną linię stóp, przypisania pozycji umiejętności i wycinki efektów. Pełna płynność animacji nadal wymaga dopracowania.
+## Remonoko / Remek (414) i Kamienny Mech (415)
 
-W tabeli **D** oznacza akcję blok, **A** atak, **J** skok. To nazwy akcji LF, nie narzucone klawisze klawiatury. Użyj klawiszy/przycisków przypisanych w ustawieniach. Strzałka → oznacza kierunek patrzenia postaci.
+600 HP, prędkość zwykłej formy: chód 6,8, bieg 13,2. Regeneracja 4 HP co
+15 kroków gry oraz odzyskanie 35% otrzymanej straty, do 20 HP na zdarzenie.
+Nie wskrzesza i nie przekracza maksymalnego HP. Regeneracja działa też w mechu.
 
-| Kombinacja | Wasyl | SZ | Mega Ninja Jaś | Sigma Tata |
-|---|---|---|---|---|
-| D → A | Seria niebieskich fal | Seria pocisków | Osiem mieczy | Kule ognia |
-| D ↑ A | Jeden klon | Jeden klon | Śluz | Tupnięcie obszarowe |
-| D ↓ A | Teleport | Teleport i strzał | Teleport | Fala ognia |
-| D → J | Obrotowe kopnięcie | Seria pocisków | Surfowanie na mieczu | Robak |
-| D ↑ J | Duża seria fal | Ogień własny i klona | Huragan ośmiu mieczy | Trzech pomocników |
-| D ↓ J | Duża seria fal | Teleport i salwa | Śluz | Deszcz dziewięciu kul |
-| D J A | Atak kończący | Atak kończący | Huragan mieczy | Salwa królewska |
+| Akcja | Zwykła forma | Mech |
+|---|---|---|
+| A | Strzał i podstawowe ciosy | Cios łapą i ogień z dłoni |
+| D → A | Metalowe BUM, 55 MP | Doskok, początek kombo, 55 MP |
+| potem A, potem A | — | Podbicie 30 MP, ognisty finisz 65 MP |
+| D ↑ A | Mega Strzał 100 MP | Dwie potężne fale ognia |
+| D ↓ A | Metalowy Kop 35 MP | Uderzenie obszarowe i pierścień |
+| D → J | Seria ognia 90 MP | Wachlarz płomieni z rąk |
+| D ↑ J | Teleport 65 MP | Ognisty krąg |
+| D ↓ J | Pułapka 70 MP | Pułapka |
+| D J A | Transformacja 200 MP | Odwołanie formy, 0 MP |
+| J w powietrzu | Dwa dodatkowe skoki | Dwa dodatkowe skoki |
 
-Klon Wasyla/SZ ma połowę maksymalnego HP rodzica. Nie wygasa czasowo; następnego można przywołać dopiero po pokonaniu poprzedniego. Klon walczy podstawowymi atakami i nie tworzy kolejnych klonów. Wasyl odzyskuje do 1/4 ostatniej utraty HP, maksymalnie 8 punktów na krok; umiejętność nie wskrzesza. Śluz zadaje okresowe obrażenia i spowalnia ruch przeciwnika do 60% na ograniczony czas. Boss ma 1500 HP i drugą fazę poniżej połowy HP. W danych Jasia zachowano siłę 2 i trudność 2,5. Klasyczny font wyświetla `Mega Ninja Jas`; pełna nazwa pozostaje w metadanych.
+Mech pozostaje bez limitu czasu aż do śmierci lub odwołania. Ma oddzielne pozy
+chodu, biegu, ciosów, ognia, obrony, trafienia, skoku i upadku. Nie jest osobnym
+wyborem w menu. Ogień łączy pomarańczowe płomienie z turkusowymi brzegami.
+To własny efekt inspirowany charakterem ognistych ataków LF2; nie kopia Firena.
 
-Grafika: cztery wygenerowane atlasowe PNG, zachowane bez przetwarzania pikseli. `layout.lua` wybiera i skaluje rzeczywiste wycinki; część pozycji powtarza rysunki, więc 256 adresów nie oznacza 256 unikalnych animacji. Widoczne mogą być drobne obwódki i fragmenty sąsiadujących efektów. Autorskie sprites nie korzystają jeszcze z opcjonalnego cieniowania postaci. To grywalna wersja eksperymentalna, wymagająca dalszego sprawdzenia płynności i balansu.
+## Szymonoko (411), Mega Ninja Jaś (412), Wasyl (410)
 
-Testy obejmują natywne próby Windows i renderer SDL software. Android/ARM, dotyk w rzeczywistej grze, synchronizacja nowej czwórki przez sieć, odtwarzanie nagrań i pełne kampanie nie zostały potwierdzone w tym etapie.
+Szymonoko: D ↑ A tworzy pełnego klona z 500 HP i 500 MP, AI i umiejętnościami.
+Oryginał może mieć jednego żywego bezpośredniego klona. Ten klon może mieć jednego
+klona drugiej generacji; dalej łańcuch się kończy. Maksymalnie trzy żywe postacie
+w rodzinie, bez wzajemnych obrażeń, także przy drużynie niezależnej.
+Po śmierci dziecka można je ponownie przywołać, z zachowaniem limitu rodziny.
 
-Odtworzenie lokalnych DAT: po umieszczeniu przypiętego LF2 w `../downloads/LF2_v2.0a.exe` uruchom `.build-venv/Scripts/python.exe tools/build_polish_originals.py` z katalogu projektu. Wygenerowane PNG są w `art/`; zasoby zależne od LF2 w `assets/` pozostają lokalne.
+Jaś: co trzecie otrzymane trafienie naprzemiennie uruchamia unik z teleportacją
+lub kontrę błyskawicą; co najmniej 35 kroków między kontrami. Działa na rzeczywistą
+utratę HP, nie na sam kontakt z obroną; nie wskrzesza i nie wyrywa z chwytu.
+
+Wasyl odzyskuje 60% utraconego HP, do 40 HP na zdarzenie, oraz 2 HP co 12 kroków
+przez 120 kroków po trafieniu. Nie wskrzesza. Jego dotychczasowy pojedynczy klon
+pozostaje osobną, słabszą mechaniką; nie dotyczy go nowy łańcuch Szymonoko.
+
+## Skibidi Sigma Tata (413)
+
+1500 HP i zachowana druga faza poniżej połowy HP. Nowy motyw: ciemne kule,
+pierścienie i trwałe ogniste toalety zamiast zwykłych ludzkich pomocników.
+
+| Kombinacja | Moc |
+|---|---|
+| D → A | Trzy kule zaćmienia |
+| D ↑ A | Obszarowa fala uderzeniowa |
+| D ↓ A | Wachlarz ognia |
+| D → J | Seria ognistych pocisków |
+| D ↑ J | Do trzech ognistych toalet |
+| D ↓ J | Deszcz ciemnych kul |
+| D J A | Ładowany finisher: obszarowy wybuch i osiem kul |
+
+Toalety mają po 180 HP, stoją w miejscu, samodzielnie celują i strzelają do
+przeciwników co 40 kroków. Nie wygasają czasowo; znikają po zniszczeniu. Ponowne
+przywołanie uzupełnia brakujące do trzech. Nie ranią właściciela ani swoich toalet.
+Finisher ładuje się 45 kroków, może zostać przerwany trafieniem lub chwytem,
+ma 240 kroków odnowienia. Wybuch zadaje 120 obrażeń przed pozostałymi efektami.
+
+## Android i Bluetooth
+
+APK jest testowy i podpisany kluczem debug. Pierwszy start rozpakowuje wspólne
+zasoby i sprawdza ich sumy SHA256; zostaw około 4 GB wolnego miejsca.
+Ekran startowy umożliwia grę lokalną albo próbne połączenie Bluetooth dwóch telefonów.
+Sparuj telefony w ustawieniach Androida. Na pierwszym wybierz ZAŁÓŻ GRĘ, na drugim
+DOŁĄCZ i nazwę pierwszego telefonu. Na obu użyj identycznego APK. Na Androidzie 12+
+zaakceptuj dostęp do urządzeń w pobliżu. Nie jest wymagany internet ani skanowanie GPS.
+Przy problemie anuluj połączenie i ponów. Gra przez radio i sterowanie na fizycznym
+telefonie nie zostały jeszcze zweryfikowane. Test przekaźnika bajtów nie jest dowodem
+rozgrywki Bluetooth na urządzeniach.
+
+## Odtworzenie i ograniczenia
+
+`.build-venv/Scripts/python.exe tools/build_polish_originals.py` odtwarza DAT z
+przypiętego LF2 i zachowanych PNG, bez zmiany importowanych zasobów.
+`tools/build_windows_portable.ps1` buduje EXE, a `tools/build_android_local.ps1`
+buduje biblioteki w izolowanym WSL i pakuje APK bez Android Studio.
+Szczegóły testów: `validation/hero-update-2026-11-06/REPORT.md`.
+Balans i płynność na telefonach pozostają eksperymentalne. Pełne kampanie,
+międzyplatformowa synchronizacja i nagrania nie są potwierdzone w tym etapie.

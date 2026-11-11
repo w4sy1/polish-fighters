@@ -2,6 +2,10 @@ plugins {
     id 'com.android.application'
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 // Java/resource checks remain available before the cross-build. Never package an
 // APK that looks complete but has no game engine or native SDL dependency.
 def verifyNativeGame = tasks.register('verifyNativeGame') {
@@ -25,15 +29,27 @@ tasks.configureEach {
 }
 
 android {
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
     namespace 'io.github.openlf2.openlf2'
     compileSdk 35
+    if (project.hasProperty('openlf2NdkVersion')) {
+        // Packaging prebuilt libraries can use an already installed host strip tool.
+        ndkVersion project.property('openlf2NdkVersion')
+    }
+
+    androidResources {
+        // game-bundle.zip is already compressed; stream it without another ZIP layer.
+        noCompress += ['zip']
+    }
 
     defaultConfig {
         applicationId 'pl.prestigetech.polishfighters'
         minSdk 21
         targetSdk 35
-        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 6
-        versionName project.findProperty('openlf2VersionName') ?: '0.6.0'
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 9
+        versionName project.findProperty('openlf2VersionName') ?: '0.9.0-bluetooth-test'
     }
 
     // A fixed key, so each build is signed the same and installs over the previous one; the
@@ -65,4 +81,9 @@ android {
             // them with their own key.
         }
     }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
 }

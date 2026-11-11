@@ -19,6 +19,18 @@
       "id": 413,
       "name": "Sigma Tata",
       "path": "mods/polish-originals/b.dat"
+    },
+    {
+      "id": 414,
+      "name": "Remonoko",
+      "path": "mods/polish-originals/r.dat",
+      "hidden": false
+    },
+    {
+      "id": 415,
+      "name": "Kamienny Mech",
+      "path": "mods/polish-originals/m.dat",
+      "hidden": true
     }
   ],
   "original_catalog_preserved": true,
@@ -30,6 +42,19 @@
     423,
     424,
     425,
-    426
+    426,
+    427,
+    428,
+    429,
+    430,
+    431,
+    432,
+    433,
+    434,
+    435,
+    436,
+    437,
+    438,
+    439
   ]
 }

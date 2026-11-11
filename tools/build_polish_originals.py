@@ -92,7 +92,8 @@ def build():
     catalog = read_resource(ROOT.parent/'downloads/LF2_v2.0a.exe', 'data/data.txt')
     manifest = ['id=polish-originals','version=1','api=1','requires=base@1','requires=polish-fighters@1',
                 'extend=base/game/catalog|catalog.lua','module=render|render.lua','module=layout|layout.lua',
-                'module=runtime|runtime.lua','extend=base/game/frame_rules|frame_rules.lua',
+                'module=runtime|runtime.lua','module=remonoko|remonoko.lua','module=heroes|heroes.lua',
+                'extend=base/game/combat|remonoko_combat.lua','extend=base/game/frame_rules|frame_rules.lua',
                 'extend=base/game/match|match.lua','extend=base/game/ai|ai.lua','extend=base/ui/character_select|selection.lua',
                 'extend=base/ui/match_screen|match_screen.lua']
     lines=[]; layout={}; fighters=[]; hashes={}
@@ -201,5 +202,8 @@ pic: {pic} state: 3005 wait: 0 next: 1000 dvx: 0 dvy: 0 dvz: 0 centerx: 40 cente
     (PACK/'asset-checksums.json').write_text(json.dumps(hashes,indent=2)+'\n')
     (PACK/'import-report.json').write_text(json.dumps({'fighters':fighters,'original_catalog_preserved':True,'art_unmodified':True,'helpers':[x[0] for x in HELPERS]},indent=2)+'\n')
     print('Built additive roster: 4 fighters, 7 effects, 256 source rectangles; original catalog preserved')
+    if (art/'r.png').is_file():
+        from build_remonoko import build as add_remonoko
+        add_remonoko()
 
 if __name__=='__main__': build()

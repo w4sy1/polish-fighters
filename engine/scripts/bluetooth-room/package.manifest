@@ -1,0 +1,7 @@
+id=bluetooth-room
+version=1
+api=1
+requires=base@1
+requires=polish-fighters@1
+extend=base/ui/network|network.lua
+extend=base/ui/flow|flow.lua

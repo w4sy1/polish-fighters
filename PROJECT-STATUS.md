@@ -1,3 +1,41 @@
+# Bluetooth i ustawienia kodów Android — 2026-11-11
+
+Wersja testowa 0.9.0-bluetooth-test, versionCode 9. Android: ekran startowy →
+USTAWIENIA → Włącz kody → Zapisz; przy włączeniu okienko „lamus”. Zapis zachowuje
+sterowanie i postęp; można wyłączyć kody lub anulować. PC: kod polishfighters zachowany.
+Windows: engine/out/PolishFighters-Bluetooth-2026-11-11; APK:
+engine/out/PolishFighters-Android-2026-11-11.apk. Podpis i applicationId bez zmian.
+Build Windows/APK, 6 testów Androida, 27 zestawów Lua, 51 testów Python i natywne
+próby postaci PASS (jeden test Python pominięty). Przekaźnik i dwa silniki: 120 klatek
+na stronę, zgodny stan. APK: oba ABI, SHA256 danych, podpis i wyrównanie PASS.
+Lint: 27 znanych błędów w generowanych klasach SDL, zero nowych błędów ustawień.
+Nie potwierdzono radia Bluetooth ani uruchomienia na fizycznych telefonach.
+Szczegóły, pliki i procedura testów: docs/TESTY-BLUETOOTH-2026-11-11.md.
+
+---
+
+# Aktualizacja postaci i APK bez Android Studio — 2026-11-07
+
+Windows: `engine/out/LittleFighters-Heroes-2026-11-06` (nowy EXE z lokalnej kompilacji).
+Android: `engine/out/PolishFighters-all-mods-Heroes-test.apk` (wersja 0.8.0, code 8).
+Stały mech Remonoko, ogień i kombo; 600 HP i regeneracja; pełne klony SZ do drugiej
+generacji; kontry Jasia; regeneracja Wasyla; trwałe toalety i nowy finisher Taty.
+947 obiektów, 128 map, wszystkie 9 obecnych lokalnie pakietów, bez nowych głosów.
+Wcześniejsze braki odzyskiwania modów pozostają.
+
+Przeszły natywne testy sterowania i umiejętności Windows, testy Lua/Python,
+kontrola zachowania 7582 importowanych i 19 wcześniejszych własnych zasobów.
+Android ma rzeczywiste biblioteki ARM64 i ARMv7 skompilowane bez Android Studio.
+Próbny Bluetooth: ekran host/dołącz, sparowane urządzenia, RFCOMM przekazuje
+protokół silnika przez lokalny przekaźnik; test przekaźnika na komputerze.
+Nie potwierdzono instalacji, dotyku ani gry radiowej na fizycznych telefonach.
+Lint Android zgłasza wcześniejsze problemy w generowanych źródłach SDL;
+nie ukryto ich przez wyłączenie kontroli. Szczegóły i finalne wyniki:
+`validation/hero-update-2026-11-06/REPORT.md`.
+Starsze paczki i userdata zachowane. Bez commita, pushu, release i wdrożenia.
+
+---
+
 # Bieżący etap: mieszana pula i klient kont — 2026-10-31
 
 Lokalna instalacja: `engine/out/LittleFighters-mixed-online-2026-10-31`.

@@ -1,7 +1,9 @@
 local root=arg[1]
+package.preload['polish-originals/heroes']=function() return assert(loadfile(root..'/content-packs/polish-originals/heroes.lua'))() end
+package.preload['polish-originals/remonoko']=function() return assert(loadfile(root..'/content-packs/polish-originals/remonoko.lua'))() end
 local runtime=assert(loadfile(root.."/content-packs/polish-originals/runtime.lua"))()
 local function actor(id,team)
-    return {record={id=id,kind=id>=420 and 3 or 0},hp=500,dark_hp=500,max_hp=500,
+    return {record={id=id,kind=id>=420 and id~=433 and 3 or 0},hp=500,dark_hp=500,max_hp=500,mp=500,
       x=100,y=0,z=300,x_int=100,y_int=0,z_int=300,vx=0,vy=0,vz=0,facing=0,team=team or 1,
       frame=0,damage_dealt=0}
 end
@@ -17,7 +19,7 @@ do
     value.mp=500;state.items[10].z=400
     assert(not runtime.ai_move(state,value,state.items[10]),'AI attacked across lanes')
     state.items[10].z=300;value.pf_clone=true
-    assert(not runtime.ai_move(state,value,state.items[10]),'clone selected special')
+    assert(runtime.ai_move(state,value,state.items[10]),'SZ clone lost the full special move set')
     value.pf_clone=nil
     state.items[20]=actor(2,2);state.items[20].x=350
     assert(runtime.ai_target(state,value)==state.items[10],'equal distance target must use lower slot')
@@ -52,7 +54,7 @@ do
     sz.frame=61;runtime.advance(state,0,sz,objects)
     sz.frame=60;runtime.advance(state,0,sz,objects);assert(state.pf_events.basic_shots==2,"next attack did not fire")
 end
-for _,id in ipairs({410,411}) do
+for _,id in ipairs({410}) do
     local state=world(id)
     cast(state,310)
     local twin=assert(state.items[50]);assert(twin.hp==250 and twin.pf_clone and twin.owner==0)
@@ -64,8 +66,8 @@ for _,id in ipairs({410,411}) do
 end
 do
     local state=world(410);local v=state.items[0]
-    runtime.advance(state,0,v,objects);v.hp=460;runtime.advance(state,0,v,objects)
-    assert(v.hp==468 and state.pf_events.healed==8)
+    runtime.advance(state,0,v,objects);state.frame_number=1;v.hp=460;runtime.advance(state,0,v,objects)
+    assert(v.hp==484 and state.pf_events.heal_410==24)
     v.hp=0;runtime.advance(state,0,v,objects);assert(v.hp==0,"healing revived dead fighter")
 end
 do
@@ -88,17 +90,17 @@ do
     assert(boss.hp==1500);boss.hp=700;runtime.advance(state,0,boss,objects)
     assert(boss.pf_phase2 and state.pf_events.boss_phase2==1)
     runtime.advance(state,0,boss,objects);assert(boss.hp==700 and state.pf_events.boss_phase2==1)
-    cast(state,340);assert(state.pf_events.spawn_423==3)
-    local helper=state.items[50];helper.pf_ttl=211;runtime.advance(state,50,helper,objects)
-    assert(state.pf_events.spawn_424==1,"helper does not fire")
-    cast(state,310);assert(state.items[10].hp==445,"stomp has no damage")
+    cast(state,340);assert(state.pf_events.boss_toilets==3)
+    local helper=state.items[50];state.frame_number=40;runtime.advance(state,50,helper,objects)
+    assert(state.pf_events.boss_toilet_fire==1,"toilet does not fire")
+    cast(state,310);assert(state.items[10].hp==440,"stomp has no damage")
     assert(state.items[10].frame==180 and state.items[10].vy<0,"stomp has no knockdown reaction")
-    cast(state,350);assert(state.pf_events.rain_orbs==9,"orb rain count")
+    cast(state,350);assert(state.pf_events.spawn_435==5,"orb rain count")
     local falling=0
     for _,value in pairs(state.items) do
-        if value.record.id==424 and value.y==-180 and value.vy==8 then falling=falling+1 end
+        if value.record.id==435 and value.y==-140 and value.vy==5 then falling=falling+1 end
     end
-    assert(falling==9,"orb rain does not fall from above")
+    assert(falling==5,"orb rain does not fall from above")
 end
 do
     local state=world(410);state.items[10].x=900;state.items[10].z=500

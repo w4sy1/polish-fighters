@@ -2,13 +2,13 @@
 local layout = require("polish-originals/layout")
 local render = {}
 local function key_for(resource)
-    return resource:match("^mods/polish%-originals/([wsjb])%.png$")
+    return resource:match("^mods/polish%-originals/([wsjbrmetf])%.png$")
 end
 function render.wrap(context)
     local wrapped = {}
     for name,method in pairs(context) do wrapped[name]=method end
     local function portrait(resource,x,y,mirrored,tint)
-        local key,kind=resource:match("^mods/polish%-originals/([wsjb])_([hs])%.png$")
+        local key,kind=resource:match("^mods/polish%-originals/([wsjbrmetf])_([hs])%.png$")
         if not key then return false end
         local width,height=120,120
         if kind=="s" then width,height=40,45 end
@@ -19,10 +19,12 @@ function render.wrap(context)
         local info = layout[key_for(resource)]
         if not info then return false end
         local picture = math.floor(source[1]/80) + math.floor(source[2]/80)*8
+        local scale=info.scales and info.scales[picture+1] or info.scale
         local rect = assert(info.rectangles[picture+1], "invalid original character picture")
-        local width, height = math.max(1,math.floor(rect[3]*info.scale)), math.max(1,math.floor(rect[4]*info.scale))
-        local destination_y=picture>=61 and (y+40-height/2) or (y+79-height)
-        if picture<61 then destination_y=destination_y+(info.bottom_padding[picture+1] or 0)*info.scale end
+        local width, height = math.max(1,math.floor(rect[3]*scale)), math.max(1,math.floor(rect[4]*scale))
+        local centered=info.effect or picture>=61
+        local destination_y=centered and (y+40-height/2) or (y+79-height)
+        if not centered then destination_y=destination_y+(info.bottom_padding[picture+1] or 0)*scale end
         context.scaled_sprite(resource,rect,math.floor(x+40-width/2),math.floor(destination_y),width,height,mirrored,tint)
         return true
     end

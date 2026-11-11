@@ -1,3 +1,14 @@
+# Polish Fighters — wydanie testowe 0.9.0, 2026-11-11
+
+[Pobierz APK Android i pełną paczkę Windows](https://github.com/w4sy1/polish-fighters/releases/tag/mobile-test-2026-11-11).
+Na telefonie: **USTAWIENIA → Włącz kody → Zapisz**; po włączeniu pojawia się „lamus”.
+Na PC nadal działa kod `polishfighters`. Bluetooth wymaga dwóch sparowanych telefonów
+z tym samym APK. [Instrukcja i wyniki](docs/TESTY-BLUETOOTH-2026-11-11.md).
+Build i testy lokalne przeszły; radio Bluetooth, instalacja i dotyk na urządzeniach
+pozostają do sprawdzenia. Lint zgłasza 27 wcześniejszych błędów w klasach SDL.
+
+Poniżej zachowana historia wcześniejszych etapów.
+
 # Polish Fighters 0.6: oryginalne menu i LF4 Turbo
 
 Wspólna baza OpenLF2 dla Androida i Windows. Zbudowano pełny silnik Linux x86_64 oraz lokalne wydanie testowe Windows x64. APK Android pozostaje niezbudowane. Nowy pokój LAN jest połączony z menu, wyborem postaci i symulacją meczu. Testy wykonano na osobnych procesach Linux i Windows, jeszcze bez fizycznych telefonów.

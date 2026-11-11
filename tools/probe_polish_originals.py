@@ -12,14 +12,29 @@ PACK=ROOT/'content-packs/polish-originals'
 OUT=ROOT/'validation/polish-originals-2026-10-30'
 PORTABLE=ROOT/'engine/out/PolishFighters-originals-2026-10-31'
 
-def skills(id_):
+def skills(id_, frames=900):
+    layout=json.loads((PACK/'layout.json').read_text())
+    dimensions='{'+','.join('["mods/polish-originals/'+key+'.png"]={'+str(info['width'])+','+str(info['height'])+'}' for key,info in layout.items())+'}'
     folder=OUT/'skills'/str(id_);override=folder/'override';override.mkdir(parents=True,exist_ok=True)
-    (override/'package.manifest').write_text('id=originals-probe\nversion=1\napi=1\nrequires=base@1\nrequires=polish-fighters@1\nrequires=polish-originals@1\nreplace=polish-fighters/settings|settings.lua\nextend=base/ui/match_screen|probe.lua\n')
+    (override/'package.manifest').write_text('id=originals-probe\nversion=1\napi=1\nrequires=base@1\nrequires=polish-fighters@1\nrequires=polish-originals@1\nreplace=polish-fighters/settings|settings.lua\nextend=base/game/ai|stationary.lua\nextend=base/ui/match_screen|probe.lua\n')
+    # Controlled skill targets must not interrupt the human between enter_frame and
+    # before_advance. Actual AI combat is covered separately by real-input probes.
+    (override/'stationary.lua').write_text('''return function(base)
+ function base.control(state,index)
+  local v=state.items[index]
+  for _,key in ipairs({'up','down','left','right','attack','jump','defend'}) do
+   v.previous_keys[key]=v.keys[key];v.keys[key]=false
+  end
+ end
+ return base
+end
+''')
     (override/'settings.lua').write_text(f'return {{allowed_ids={{{id_}}},allow_hidden=true}}\n')
     lua='''return function(base)
  local create,update,draw=base.create,base.update,base.draw
  local enter=require('base/game/control').enter_frame
  local seen,casts,invalid,scaled={},{},{},0
+ local dimensions=DIMENSIONS
  local target_id=TARGET_ID
  function base.create(options)
   local state=create(options)
@@ -63,7 +78,8 @@ def skills(id_):
  function base.draw(state,context,bounds)
   local original=context.scaled_sprite
   context.scaled_sprite=function(resource,rect,x,y,w,h,...)
-   assert(rect[1]>=0 and rect[2]>=0 and rect[1]+rect[3]<=1254 and rect[2]+rect[4]<=1254)
+   local size=dimensions[resource]
+   if size then assert(rect[1]>=0 and rect[2]>=0 and rect[1]+rect[3]<=size[1] and rect[2]+rect[4]<=size[2]) end
    assert(w>0 and h>0 and x==math.floor(x) and y==math.floor(y))
    scaled=scaled+1
    return original(resource,rect,x,y,w,h,...)
@@ -72,28 +88,28 @@ def skills(id_):
   if state.match.frame_number==900 then
    local doc=engine.read_settings() or {}
    doc.originals_probe={id=target_id,frame=900,casts=casts,seen=seen,events=state.match.pf_events,
-    invalid_frames=invalid,scaled_draws=scaled,phase2=state.match.items[0].pf_phase2 or false}
+    invalid_frames=invalid,scaled_draws=scaled,phase2=state.match.items[0].pf_phase2 or false,final_record=state.match.items[0].record.id}
    assert(engine.write_settings(doc))
   end
  end
  return base
 end
-'''.replace('TARGET_ID',str(id_))
+'''.replace('TARGET_ID',str(id_)).replace('DIMENSIONS',dimensions).replace('==900', '=='+str(frames)).replace('frame=900', 'frame='+str(frames))
     (override/'probe.lua').write_text(lua)
     command=[str(PORTABLE/'openlf2.exe'),'--installer',str(PORTABLE/'LF2_v2.0a.exe'),'--scripts',str(ROOT/'engine/scripts'),
       '--mod',str(ROOT/'engine/scripts/polish-fighters'),'--mod',str(PACK),'--mod',str(override),
-      '--seed','42','--input-trace',TRACE.rsplit('*300',1)[0]+'*901','--config-dir',str(folder/'config')]
+      '--seed','42','--input-trace',TRACE.rsplit('*300',1)[0]+'*'+str(frames+1),'--config-dir',str(folder/'config')]
     result=subprocess.run(command,capture_output=True,text=True,timeout=40)
     (folder/'run.log').write_text(result.stdout+result.stderr,encoding='utf-8')
     settings=folder/'config/config.json'
     evidence=json.loads(settings.read_text()).get('originals_probe',{}) if settings.exists() else {}
     events=evidence.get('events',{})
-    passed=result.returncode==0 and evidence.get('frame')==900 and len(evidence.get('casts',{}))==7
+    passed=result.returncode==0 and evidence.get('frame')==frames and len(evidence.get('casts',{}))==7
     passed=passed and not evidence.get('invalid_frames') and evidence.get('scaled_draws',0)>0
     passed=passed and all(events.get(f'skill_{id_}_{frame}',0)>0 for frame in range(300,361,10))
     if id_ in [410,411]: passed=passed and events.get('clones',0)>0
     if id_==412: passed=passed and events.get('spawn_421',0)>=8 and events.get('spawn_422',0)>0
-    if id_==413: passed=passed and evidence.get('phase2') and events.get('spawn_423',0)>0
+    if id_==413: passed=passed and evidence.get('phase2') and events.get('boss_toilets',0)>0 and events.get('boss_ultimate_charge',0)>0
     return {'id':id_,'pass':bool(passed),'exit_code':result.returncode,'evidence':evidence}
 
 def render():

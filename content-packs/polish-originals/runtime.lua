@@ -1,12 +1,14 @@
 -- Additive mechanics, scoped to IDs 410-426; no original fighter data is changed.
 local runtime = {}
+local remonoko = require("polish-originals/remonoko")
+local heroes = require("polish-originals/heroes")
 local function own(value) return value.record.id>=410 and value.record.id<=413 end
 local function event(state,name,count)
     state.pf_events=state.pf_events or {}
     state.pf_events[name]=(state.pf_events[name] or 0)+(count or 1)
 end
 local function enemy(a,b)
-    return a~=b and b.hp>0 and b.record.kind==0 and (a.team==0 or a.team~=b.team)
+    return a~=b and b.hp>0 and b.record.kind==0 and not heroes.family(a,b) and (a.team==0 or a.team~=b.team)
 end
 local function direction(value) return value.facing==0 and 1 or -1 end
 local function relocate(value,x,y,z)
@@ -14,6 +16,7 @@ local function relocate(value,x,y,z)
     value.x_int,value.y_int,value.z_int=math.floor(x),math.floor(y),math.floor(z)
 end
 function runtime.initialize(value)
+    heroes.initialize(value)
     if value.record.id==413 and not value.pf_initialized then
         value.hp,value.dark_hp,value.max_hp=1500,1500,1500
     end
@@ -36,12 +39,13 @@ local function shoot(state,index,value,objects,id,count,speed)
     for n=1,count do
         local offset=(n-(count+1)/2)
         local muzzle_height=value.record.id==413 and 60 or 44
-        local slot=objects.create(state,id,index,0,value.team,math.floor(value.x+direction(value)*35),
+        local slot=objects.create(state,id,value.pf_root or index,0,value.team,math.floor(value.x+direction(value)*35),
             math.floor(value.y-muzzle_height),math.floor(value.z+offset*8),direction(value)*speed,0,offset*.6,value.facing)
         if slot>=0 then
             local effect=state.items[slot]
             effect.pf_ttl=id==422 and 180 or (id==423 and 240 or 90)
             effect.pf_master=index
+            effect.pf_family=value.pf_family
             event(state,"spawn_"..id)
         end
     end
@@ -60,6 +64,7 @@ local function rain(state,index,value,objects)
     end
 end
 local function clone(state,index,value,objects)
+    if value.record.id==411 then return heroes.clone(state,index,value,objects) end
     if value.pf_clone then return end
     for _,other in pairs(state.items) do
         if other.pf_clone and other.pf_master==index and other.hp>0 then return end
@@ -79,11 +84,15 @@ end
 function runtime.ai_target(state,value) return nearest(state,value) end
 -- Pick useful, affordable moves instead of cycling through every skill irrespective of range.
 function runtime.ai_move(state,value,target)
-    if value.pf_clone or value.hp<=0 or value.y<0 or not target then return nil end
+    if remonoko.owns(value) then return remonoko.ai_move(state,value,target) end
+    if (value.pf_clone and value.record.id~=411) or value.hp<=0 or value.y<0 or not target then return nil end
     local dx,dz=math.abs(target.x-value.x),math.abs(target.z-value.z)
     local choices
     if dz>45 then return nil end
     local id=value.record.id
+    if id==411 and (value.mp or 0)>=100 and heroes.clone_allowed(state,value.pf_self_index or value.owner or 0,value) then return 310 end
+    if id==413 and (value.mp or 0)>=230 and not value.pf_sigma_charge and
+       (state.frame_number or 0)>=(value.pf_sigma_ready or 0) and dx<540 then return 360 end
     if id==410 then choices=dx<95 and {330,300} or (dx>260 and {320,300} or {300,340})
     elseif id==411 then choices=dx<95 and {320,300} or {340,300,350}
     elseif id==412 then choices=dx<100 and {310,300} or (dx>260 and {330,320,300} or {300,350})
@@ -133,7 +142,7 @@ local function area(state,index,value,range,damage,slow)
 end
 local function action(state,index,value,objects,frame)
     local id=value.record.id
-    if value.pf_clone then
+    if value.pf_clone and id~=411 then
         -- Clones use basic attacks and a small shot, never recursively clone/ultimate.
         if frame==300 then shoot(state,index,value,objects,id==410 and 420 or 426,1,9) end
         return
@@ -144,7 +153,8 @@ local function action(state,index,value,objects,frame)
         elseif frame==330 then area(state,index,value,95,35,false)
         else shoot(state,index,value,objects,420,frame>=340 and 5 or 3,10) end
     elseif id==411 then
-        if frame==310 then clone(state,index,value,objects)
+        if frame==310 then
+            if not clone(state,index,value,objects) then value.mp=math.min(500,(value.mp or 0)+100) end
         else
             if frame==320 or frame==350 then blink(state,value) end
             shoot(state,index,value,objects,426,frame>=340 and 8 or 3,13)
@@ -162,15 +172,27 @@ local function action(state,index,value,objects,frame)
             shoot(state,index,value,objects,421,1,12)
         else shoot(state,index,value,objects,421,8,11) end
     elseif id==413 then
-        if frame==310 then area(state,index,value,170,55,false)
-        elseif frame==330 then shoot(state,index,value,objects,425,1,5)
-        elseif frame==340 then shoot(state,index,value,objects,423,3,2)
-        elseif frame==350 then rain(state,index,value,objects)
-        else shoot(state,index,value,objects,424,value.pf_phase2 and 5 or 3,8) end
+        if frame==310 then
+            heroes.area(state,index,value,175,60,false,{})
+            heroes.effect(state,index,value,objects,439,0,5)
+        elseif frame==330 then
+            for n=-1,1 do heroes.projectile(state,index,value,objects,434,direction(value)*11,n*1.5) end
+        elseif frame==340 then heroes.summon_toilets(state,index,value,objects)
+        elseif frame==350 then
+            for n=-2,2 do
+                local slot=heroes.projectile(state,index,value,objects,435,direction(value)*8,n)
+                if slot>=0 then state.items[slot].y=-140;state.items[slot].y_int=-140;state.items[slot].vy=5 end
+            end
+        elseif frame==360 then heroes.ultimate(state,index,value,objects)
+        else
+            for n=-1,1 do heroes.projectile(state,index,value,objects,435,direction(value)*9,n*1.4) end
+        end
     end
     event(state,"skill_"..id.."_"..frame)
 end
 function runtime.advance(state,index,value,objects)
+    heroes.advance(state,index,value,objects)
+    remonoko.advance(state,index,value,objects)
     local id=value.record.id
     if own(value) then
         runtime.initialize(value)
@@ -186,12 +208,6 @@ function runtime.advance(state,index,value,objects)
                 end
             else value.pf_basic_shot=nil end
         end
-        if id==410 and value.hp>0 and value.pf_previous_hp and value.hp<value.pf_previous_hp then
-            local amount=math.min(8,math.floor((value.pf_previous_hp-value.hp)/4))
-            value.hp=math.min(value.dark_hp,value.max_hp,value.hp+amount)
-            if amount>0 then event(state,"healed",amount) end
-        end
-        value.pf_previous_hp=value.hp
         if id==413 and value.hp>0 and value.hp<value.max_hp/2 and not value.pf_phase2 then
             value.pf_phase2=true;event(state,"boss_phase2")
         end
@@ -209,14 +225,18 @@ function runtime.advance(state,index,value,objects)
     end
 end
 function runtime.after_control(state,index,value)
+    remonoko.after_control(state,index,value)
     local until_frame=state.pf_slows and state.pf_slows[index]
     if until_frame then
         if (state.frame_number or 0)<=until_frame then value.vx,value.vz=value.vx*.60,value.vz*.60
         else state.pf_slows[index]=nil end
     end
     if value.pf_phase2 then value.vx=math.max(-13,math.min(13,value.vx*1.1)) end
+    if value.pf_sigma_charge then value.vx,value.vz=0,0 end
 end
 function runtime.after_physics(state,index,value)
+    heroes.after_physics(state,index,value)
+    remonoko.after_physics(state,index,value)
     if value.record.id==422 and value.pf_ttl then
         relocate(value,value.x,0,value.z);value.vx,value.vy,value.vz=0,0,0
     elseif value.record.id==423 and value.pf_ttl then
