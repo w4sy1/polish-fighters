@@ -19,6 +19,7 @@ local exit_button = {x = panel.x + 24, y = panel.y + 72, width = 120, height = 2
 local stay_button = {x = panel.x + 156, y = panel.y + 72, width = 120, height = 26}
 -- What each kind of the question says; `variant` is the title's bitmap-font color.
 local kinds = {
+    update = {title = "Dostepna aktualizacja!", confirm = "Pobierz", stay = "Pozniej", variant = constants.font_variants.blue},
     exit = {title = "Exit OpenLF2?", confirm = "Exit", stay = "Cancel", variant = constants.font_variants.blue},
     leave = {title = "Leave the fight?", confirm = "Leave", stay = "Continue", variant = constants.font_variants.blue},
     modules = {title = "Wrocic do wyboru modulow?", confirm = "Wroc", stay = "Zostan", variant = constants.font_variants.blue},

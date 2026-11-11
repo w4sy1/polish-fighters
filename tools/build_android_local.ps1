@@ -3,9 +3,9 @@ param(
     [string[]]$Abis = @('arm64-v8a', 'armeabi-v7a'),
     [switch]$SkipNative,
     [switch]$SkipBundle,
-    [int]$VersionCode = 10,
-    [string]$VersionName = '0.10.0-pack-selection-test',
-    [string]$ApkName = 'PolishFighters-Android-moduly-2026-11-11.apk'
+    [int]$VersionCode = 11,
+    [string]$VersionName = '0.11.0-local',
+    [string]$ApkName = 'PolishFighters-Android-LOCAL-0.11.apk'
 )
 
 $ErrorActionPreference = 'Stop'

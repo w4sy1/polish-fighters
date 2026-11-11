@@ -50,6 +50,7 @@ public final class OpenLF2Activity extends SDLActivity {
             throw new IllegalStateException("Could not stage Lua modules", error);
         }
         super.onCreate(savedInstanceState);
+        GitHubUpdates.attach(this);
     }
 
     @Override

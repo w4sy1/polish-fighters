@@ -31,6 +31,7 @@ public final class BluetoothLobbyActivity extends Activity {
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
+        GitHubUpdates.attach(this);
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL); layout.setPadding(32, 12, 32, 12);
         layout.setBackgroundColor(0xff101827);

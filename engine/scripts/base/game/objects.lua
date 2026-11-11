@@ -160,6 +160,8 @@ function objects.spawn_from_frame(state, index, parent)
         local slot = objects.free_slot(state)
         local record = objects.record(state, point.oid)
         if slot == -1 or not record then break end
+        if record.kind == record_kinds.character and catalog.no_character_summons
+           and catalog.no_character_summons[parent.record.id] then break end
         -- Character copies may fight and fire projectiles, but cannot breed more
         -- characters. A bounded family also covers imported/remapped self-cloners.
         local clone = parent.record.kind == record_kinds.character and record.kind == record_kinds.character

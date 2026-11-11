@@ -7,6 +7,13 @@ return function(base)
     local original_create,original_update,original_draw,original_describe=base.create,base.update,base.draw,base.describe
     local function items(s)
         if s.pf_message then return {{"back","POWROT"}} end
+        if s.pf_panel=="combo-guide" then
+            local guide=require('polish-fighters/combo_guide')
+            local list={{'guide-basics','JAK ROBIĆ KOMBOSY - PODSTAWY'}}
+            for _,id in ipairs(guide.order) do list[#list+1]={'guide:'..id,guide.names[id]} end
+            list[#list+1]={'guide-roster','PRZEGLĄDAJ WSZYSTKIE POSTACIE'}
+            list[#list+1]={'back','POWRÓT'};return list
+        end
         if s.pf_panel=="unlock" then
             return {{"unlock-input",s.pf_typing and ("KOD: "..(s.pf_code or "")) or "WPISZ KOD (KLAWIATURA)"},
                 {"unlock-submit","ZATWIERDZ KOD"},{"progress-info","POSTEP PRZYGODY I NAGRODY"},
@@ -77,7 +84,7 @@ return function(base)
         local title=require("polish-fighters/hub").title(require("base/game/catalog").profile_id)
         return {{"play","GRAJ W "..title:upper()},{"maps","WYBIERZ MAPE"},{"packs","PAKIETY I POSTACIE"},
             {"connection","POLACZENIA: 2-8 URZADZEN"},{"account","KONTO / GOSC"},{"options","USTAWIENIA"},
-            {"touch","STEROWANIE DOTYKOWE"},{"history","HISTORIA ROZGRYWEK"},
+            {"touch","STEROWANIE DOTYKOWE"},{"history","HISTORIA ROZGRYWEK"},{"combo-guide","PORADNIK KOMBOSÓW"},
             {"unlock","ODBLOKOWANIE POSTACI"},{"close","POWROT DO LF2"}}
     end
     function base.create(value)
@@ -90,11 +97,19 @@ return function(base)
         if id=="close" then s.pf_panel=nil
         elseif id=="back" then
             if s.pf_typing then s.pf_typing=false;if c.text_input then c.text_input(false) end end
-            if s.pf_message then s.pf_message=nil
+            if s.pf_message then s.pf_message=nil;s.pf_guide_message=nil
+            elseif s.pf_panel=='combo-guide' then s.pf_panel=nil
+            elseif s.pf_panel=='fighters' and s.pf_back_to_guide then s.pf_panel='combo-guide';s.pf_back_to_guide=nil
             elseif s.pf_panel=="fighters" or s.pf_panel=="campaigns" then s.pf_panel="pack-content"
             elseif s.pf_panel=="pack-content" then s.pf_panel="packs"
             else s.pf_panel="extras" end
         elseif id=="guest" then s.pf_panel=nil
+        elseif id=='guide-basics' then s.pf_message=require('polish-fighters/combo_guide').basics;s.pf_guide_message=true
+        elseif id:sub(1,6)=='guide:' then s.pf_message=require('polish-fighters/combo_guide').message(tonumber(id:sub(7)));s.pf_guide_message=true
+        elseif id=='guide-roster' then
+            local content,problem=model.contents()
+            if content then s.pf_contents=content;s.pf_panel='fighters';s.pf_content_page=1;s.pf_back_to_guide=true
+            else s.pf_message={'BŁĄD KATALOGU',tostring(problem)} end
         elseif id=="unlock-input" then
             s.pf_code="";s.pf_typing=true
             if c.text_input then c.text_input(true) end
@@ -148,6 +163,9 @@ return function(base)
                 if entry.requires_custom_unlock then
                     s.pf_message={"KAMPANIA ZABLOKOWANA","Dodatek ma wlasne warunki odblokowania.","Ich obsluga wymaga jeszcze przeniesienia."}
                 else model.pending_campaign=entry;s.pf_panel=nil;c.action("stage") end
+            elseif s.pf_panel=='fighters' and require('polish-fighters/combo_guide').message(entry.id) then
+                s.pf_message=require('polish-fighters/combo_guide').message(entry.id)
+                s.pf_guide_message=true
             else s.pf_message={s.pf_panel=="fighters" and entry.name or "ETAP KAMPANII",
                 "ID: "..entry.id,"Dane katalogowe; pelna zgodnosc niepotwierdzona."}
             end
@@ -242,7 +260,8 @@ return function(base)
         end
         if mapped.nav.cancel then
             if s.pf_typing then s.pf_typing=false;if c.text_input then c.text_input(false) end end
-            if s.pf_message then s.pf_message=nil elseif s.pf_panel=="extras" then s.pf_panel=nil else s.pf_panel="extras" end
+            if s.pf_guide_message or s.pf_back_to_guide or s.pf_panel=='combo-guide' then activate(s,'back',c)
+            elseif s.pf_message then s.pf_message=nil elseif s.pf_panel=="extras" then s.pf_panel=nil else s.pf_panel="extras" end
         end
     end
     function base.draw(s,c)
@@ -264,12 +283,15 @@ return function(base)
         c.fill(186,164,470,359,16,27,47,220)
         c.fill(186,164,470,2,224,72,92)
         local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOŚĆ",connection="POŁĄCZENIA",touch="STEROWANIE DOTYKOWE",
-            ["pack-content"]="ZAWARTOŚĆ PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA"}
+            ["pack-content"]="ZAWARTOŚĆ PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA",['combo-guide']='PORADNIK KOMBOSÓW'}
         local title=s.pf_message and s.pf_message[1] or titles[s.pf_panel]
         if c.text then c.text(title,421,181,'center',20,0xf0f5ff,nil,nil,true)
         else font.draw(c,title,421,183,4,nil,"center") end
         if s.pf_message then
-            for i=2,#s.pf_message do font.gdi(c,s.pf_message[i],210,270+(i-2)*28,0xffffff) end
+            for i=2,#s.pf_message do
+                if s.pf_guide_message and c.text then c.text(s.pf_message[i],210,255+(i-2)*25,'left',14,0xffffff,nil,nil,true)
+                else font.gdi(c,s.pf_message[i],210,270+(i-2)*28,0xffffff) end
+            end
         end
         for index,entry in ipairs(items(s)) do
             if index==s.pf_hover then c.fill(200,212+(index-1)*25,442,24,42,80,120) end

@@ -977,6 +977,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     }
     profiles_available += "}";
     const auto bundle = "local runtime_settings = {menu_seed=" + std::to_string(menu_seed) + profiles_available +
+        (config.headless ? ", headless=true" : "") +
         (config.profile_start ? ", profile_start=true" : "") +
         (config.headless && !config.hub_menu ? ", legacy_menu=true" : "") +
         ", network_profile=\"" + *profile + "\", recording_version=" + std::to_string(constants->second) + network_options +
@@ -1334,6 +1335,11 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
             if (action == "replay") {
                 auto shown = platform->choose_file(recording_directory->path(), frame->file_dialog.value_or(FileDialogText{}));
                 if (!shown) std::cerr << "Replay: " << shown.error().message << '\n';
+                continue;
+            }
+            if (action == "open_update_release") {
+                auto shown=platform->open_url("https://github.com/w4sy1/polish-fighters/releases");
+                if(!shown)std::cerr<<"Updates: "<<shown.error().message<<'\n';
                 continue;
             }
             if (action == "open_website" || action == "open_original_website"

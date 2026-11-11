@@ -14,6 +14,12 @@ std::size_t receive(char* data,std::size_t size,std::size_t count,void* opaque) 
     if(size!=1 || count>65536-result.size())return 0;
     try { result.append(data,count);return count; } catch(...) {return 0;}
 }
+std::size_t receive_releases(char* data,std::size_t size,std::size_t count,void* opaque) noexcept {
+    auto& result=*static_cast<std::string*>(opaque);
+    constexpr std::size_t limit=512*1024;
+    if(size!=1 || count>limit-result.size())return 0;
+    try {result.append(data,count);return count;}catch(...){return 0;}
+}
 }
 Result<std::string> account_post(std::string_view base,std::string_view operation,
                                  std::string_view body,std::string_view bearer) {
@@ -68,6 +74,28 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
     if(curl_easy_perform(handle.get())!=CURLE_OK)return fail(ErrorCode::io,"Account request failed or timed out");
     long status=0;curl_easy_getinfo(handle.get(),CURLINFO_RESPONSE_CODE,&status);
     if(status<200 || status>=500)return fail(ErrorCode::io,"Account server unavailable");
+    return response;
+}
+Result<std::string> github_releases() {
+    static const Session session;
+    if(session.status!=CURLE_OK)return fail(ErrorCode::dependency,"Update HTTP unavailable");
+    std::unique_ptr<CURL,decltype(&curl_easy_cleanup)> handle(curl_easy_init(),curl_easy_cleanup);
+    if(!handle)return fail(ErrorCode::dependency,"Update HTTP unavailable");
+    std::string response;
+    curl_easy_setopt(handle.get(),CURLOPT_URL,"https://api.github.com/repos/w4sy1/polish-fighters/releases?per_page=5");
+    curl_easy_setopt(handle.get(),CURLOPT_USERAGENT,"PolishFighters-UpdateCheck/1");
+    curl_easy_setopt(handle.get(),CURLOPT_CONNECTTIMEOUT,3L);
+    curl_easy_setopt(handle.get(),CURLOPT_TIMEOUT,5L);
+    curl_easy_setopt(handle.get(),CURLOPT_NOSIGNAL,1L);
+    curl_easy_setopt(handle.get(),CURLOPT_FOLLOWLOCATION,0L);
+    curl_easy_setopt(handle.get(),CURLOPT_WRITEFUNCTION,receive_releases);
+    curl_easy_setopt(handle.get(),CURLOPT_WRITEDATA,&response);
+#if (defined(_WIN32) || defined(__APPLE__)) && defined(CURLSSLOPT_NATIVE_CA)
+    curl_easy_setopt(handle.get(),CURLOPT_SSL_OPTIONS,static_cast<long>(CURLSSLOPT_NATIVE_CA));
+#endif
+    if(curl_easy_perform(handle.get())!=CURLE_OK)return fail(ErrorCode::io,"GitHub update check unavailable");
+    long status=0;curl_easy_getinfo(handle.get(),CURLINFO_RESPONSE_CODE,&status);
+    if(status!=200)return fail(ErrorCode::io,"GitHub update check unavailable");
     return response;
 }
 }

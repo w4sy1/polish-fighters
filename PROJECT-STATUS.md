@@ -1,3 +1,27 @@
+# Wydanie testowe 0.11 — publikacja zatwierdzona 2026-11-11
+
+Użytkownik zatwierdził udostępnienie przygotowanych paczek 0.11.
+Tag: guide-updates-test-2026-11-11. APK i pełny ZIP Windows mają te same
+sumy kontrolne co lokalnie przetestowane pliki. Ograniczenia: brak próby
+na fizycznym telefonie/Bluetooth; 27 istniejących błędów lint SDL.
+Strona wydania: https://github.com/w4sy1/polish-fighters/releases/tag/guide-updates-test-2026-11-11
+
+---
+
+# Lokalna 0.11 — Leumas, poradnik i aktualizacje — 2026-11-11
+
+Zmiany na branchu codex/local-leumas-combo-guide-2026-11-11. LeumasEX bez
+przywoływania postaci; poradnik 42 kombosów pięciu bohaterów i mecha; Windows
+i Android sprawdzają nowe wydania GitHuba przy starcie. Bez nowej publikacji: użytkownik
+chciał najpierw pomysły. Bieżący raport: docs/LOKALNE-0.11-2026-11-11.md.
+33 zestawy Lua, 128 plików składni, 51 Python + 1 SKIP, 21 Android PASS.
+Kompilacja Windows i APK, próby natywne, zawartość i podpis paczek PASS.
+Lokalne paczki 0.11 w engine/out i katalogu outputs bieżącej rozmowy; skrót
+pulpitu wskazuje nowy EXE z zachowaniem starych ustawień. Lint: 27 istniejących błędów SDL.
+Brak testu na fizycznym telefonie i radiu Bluetooth.
+
+---
+
 # Pięć poprawek z testów — 0.10.0, 2026-11-11
 
 Kolejno: wybór modułów na Androidzie; ukrycie 50 powtórzeń podstawowych postaci

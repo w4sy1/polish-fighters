@@ -63,11 +63,7 @@ return function(base)
    state.hub_classic=true
    if id=="extras" then state.pf_panel="extras"
    elseif id=="maps" then state.pf_panel="maps"
-   else
-    local content,problem=require("polish-fighters/dashboard_model").contents()
-    if content then state.pf_contents=content;state.pf_panel="fighters";state.pf_content_page=1
-    else state.hub_note=tostring(problem);state.hub_classic=nil end
-   end
+   else state.pf_panel="combo-guide" end
   else context.action(id) end
  end
  function base.update(state,input,context)

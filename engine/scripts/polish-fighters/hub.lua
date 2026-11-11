@@ -30,7 +30,7 @@ function hub.rows(state)
  end
  if state.hub_mode=="profile" then
   return {{"versus","WALKA LOKALNA"},{"stage","KAMPANIA / PRZYGODA"},{"battle_setup","BITWA DRUŻYN"},
-    {"championship","TURNIEJ"},{"maps","WYBIERZ MAPĘ"},{"fighters","POSTACIE I UMIEJĘTNOŚCI"},
+    {"championship","TURNIEJ"},{"maps","WYBIERZ MAPĘ"},{"fighters","PORADNIK KOMBOSÓW / POSTACIE"},
     {"network","KONTA / POKOJE / LAN"},{"controls","USTAWIENIA STEROWANIA"},{"root","MODUŁY / MENU GŁÓWNE"}}
  end
  local rows={}

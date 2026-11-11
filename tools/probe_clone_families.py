@@ -28,8 +28,26 @@ LUA = '''return function(base)
    if child and child.record.kind==0 then total=total+1;identities[tostring(child.record.id)]=true end
   end
   local doc=engine.read_settings() or {}
+  local expected=(ACTOR==55 or ACTOR==1001) and 0 or 3
+  local projectile_count=0
+  if expected==0 then
+   for number=0,399 do
+    local frame=root.record.frame(number);local point=frame.opoint
+    if point and point.kind>0 and point.oid>0 then
+     local target=objects.record(m,point.oid)
+     if target and target.kind==3 then
+      root.frame=number;root.wait_counter=0;root.hit_lag=0
+      objects.spawn_from_frame(m,0,root)
+      for n=50,399 do if m.items[n] and m.items[n].record.kind==3 then projectile_count=projectile_count+1 end end
+      break
+     end
+    end
+   end
+  end
   doc.qa_clone_family={actor=ACTOR,root_name=fighters[row].name,first_generation=first,
-   all_descendants=total,identities=identities,passed=first==3 and total==3 and identities[tostring(ACTOR)]==true}
+   all_descendants=total,identities=identities,expected_copies=expected,projectile_count=projectile_count,
+   passed=first==expected and total==expected and
+    ((expected==0 and projectile_count>0) or identities[tostring(ACTOR)]==true)}
   assert(engine.write_settings(doc));return s
  end
  return base

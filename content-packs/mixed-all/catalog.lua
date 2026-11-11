@@ -1,5 +1,9 @@
 return function(base)
  local metadata=require('mixed-all/metadata')
+ base.no_character_summons={}
+ for id,origin in pairs(metadata) do
+  if origin.pack=='lf4-turbo' and origin.id==55 then base.no_character_summons[id]=true end
+ end
  local selected=assert(require('polish-fighters/pack_preferences').read(require('polish-fighters/hub').profiles))
  local hide_duplicates,problem=require('polish-fighters/pack_preferences').hide_duplicates()
  assert(not problem,problem)

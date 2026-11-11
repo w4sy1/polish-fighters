@@ -67,6 +67,8 @@ struct ResourceBridge {
     std::optional<Result<std::string>> pending_network;
     std::future<Result<std::string>> account_future;
     std::optional<Result<std::string>> account_result;
+    std::future<Result<std::string>> updates_future;
+    std::optional<Result<std::string>> updates_result;
     bool network_operation(std::string_view operation, std::string_view value, std::uint16_t port) noexcept {
         try {
             pending_network = std::string{};
@@ -462,6 +464,36 @@ int account_operation(lua_State* state) {
     lua_pushboolean(state,1);return 1;
 #endif
 }
+void push_value(lua_State* state, const ScriptValue& value, int depth);
+int updates_operation(lua_State* state) {
+#if defined(__EMSCRIPTEN__) || defined(__ANDROID__)
+    lua_pushnil(state);lua_pushliteral(state,"Updates handled by platform");return 2;
+#else
+    auto* bridge=resource_bridge(state);
+    const auto* action=luaL_checkstring(state,1);
+    if(std::strcmp(action,"poll")==0){
+        if(!bridge->updates_future.valid() || bridge->updates_future.wait_for(std::chrono::seconds(0))!=std::future_status::ready){
+            lua_pushliteral(state,"pending");return 1;
+        }
+        try {bridge->updates_result=bridge->updates_future.get();}
+        catch(...){bridge->updates_result=fail(ErrorCode::io,"Update worker failed");}
+        if(!bridge->updates_result->has_value()){
+            lua_pushnil(state);lua_pushstring(state,bridge->updates_result->error().message.c_str());return 2;
+        }
+        bridge->pending_value=parse_json(bridge->updates_result->value());
+        if (!bridge->pending_value->has_value()) {
+            bridge->pending_value.reset();lua_pushnil(state);return 1;
+        }
+        push_value(state,bridge->pending_value->value(),0);bridge->pending_value.reset();return 1;
+    }
+    if(std::strcmp(action,"start")!=0 || bridge->updates_future.valid()){
+        lua_pushnil(state);lua_pushliteral(state,"Update request already pending");return 2;
+    }
+    try {bridge->updates_future=std::async(std::launch::async,[]{return github_releases();});}
+    catch(...){lua_pushnil(state);lua_pushliteral(state,"Cannot start update check");return 2;}
+    lua_pushboolean(state,1);return 1;
+#endif
+}
 int network_time(lua_State* state) {
     lua_pushnumber(state, std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now().time_since_epoch()).count());
     return 1;
@@ -798,6 +830,7 @@ int open_libraries(lua_State* state) {
         {"openlf2_json_encode", json_encode}, {"openlf2_json_decode", json_decode}, {"openlf2_state_digest", state_digest},
         {"openlf2_network", network_operation}, {"openlf2_network_time", network_time},
         {"openlf2_account", account_operation},
+        {"openlf2_updates", updates_operation},
         {"openlf2_random_state", random_state}, {"openlf2_set_random_state", set_random_state},
         {"openlf2_reset_random_sequence", reset_random_sequence}, {"openlf2_save_recording", save_recording},
         {"openlf2_take_recording", take_recording}, {"openlf2_local_time", local_time}};
