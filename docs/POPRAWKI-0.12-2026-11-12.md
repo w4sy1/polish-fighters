@@ -66,3 +66,21 @@ wraz z tools/{movement-probe,control-navigation-probe}.
 
 Punkt przywracania źródeł zapisano w baseline-source.zip w katalogu rozmowy.
 Zastanych dwóch archiwów w artifacts nie dodawano do commita.
+
+## Publikacja i usunięcie lokalnych wersji
+
+Wydanie: https://github.com/w4sy1/polish-fighters/releases/tag/controls-back-0.12.0-2026-11-12
+Kod źródeł wydania: `3826ab22fc4e99fee71bb28665ba3c274b3b7ac1`.
+Obie paczki mają zgodne rozmiary i SHA256 w metadanych GitHuba;
+pobieranie bez zalogowania sprawdzono żądaniem zakresowym (bez powtórnego
+pobierania całych 1,59 GB). Pełne lokalne archiwa wcześniej zweryfikowano.
+
+- `PolishFighters-Android-0.12-2026-11-12.apk`: 542615045 bajtów, SHA256 `1dad757ac698873c2e57713817230090954523f7230dd1b5ffcf122da6729b61`.
+- `PolishFighters-Windows-FULL-0.12-2026-11-12.zip`: 1046617302 bajtów, SHA256 `71f402c3a26306f8c026ed4215bd63bdf9c500aeaa10702687bddc7466460fb3`.
+
+Po publikacji do Kosza trafiło 9.33 GiB lokalnych wersji i danych generowanych
+oraz dwa nieaktualne skróty. Kosza nie opróżniono. Źródła, zasoby modów i prywatne
+ustawienia pozostały; ustawienia wersji przenośnej skopiowano i sprawdzono hashami
+w `userdata/build-cleanup-20261112-0.12`. Zastane dwa ZIP-y w `artifacts` pozostały.
+Do powtórzenia prób natywnych po sprzątaniu należy pobrać ZIP wydania
+i podać ścieżkę rozpakowanego EXE jako `--engine`; lokalne `engine/out` jest puste.

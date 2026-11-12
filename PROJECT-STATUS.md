@@ -1,4 +1,4 @@
-# Poprawki sterowania i F4 — lokalna 0.12, 2026-11-12
+# Poprawki sterowania i F4 — 0.12.0 opublikowana, 2026-11-12
 
 Atak reaguje przy naciśnięciu w obu układach; F4 / POSTACIE podczas walki wraca
 do wyboru postaci. Wybrany pojedynczy moduł Androida otwiera własne menu.
@@ -8,7 +8,11 @@ natywne ruchu/ataku oraz 2/8 procesów sieciowych PASS; APK 12 / 0.12.0-controls
 zbudowany i testy Androida PASS. Lint ma 27 wcześniejszych błędów SDL.
 Nie odtworzono zgłoszonych lokalnych zacięć na telefonie; ADB bez urządzeń.
 Całe zgłoszenie nie jest jeszcze potwierdzone jako rozwiązane.
-Raport: docs/POPRAWKI-0.12-2026-11-12.md. Publikacja paczek i sprzątanie w toku.
+Raport: docs/POPRAWKI-0.12-2026-11-12.md. Publiczne APK i pełny ZIP: https://github.com/w4sy1/polish-fighters/releases/tag/controls-back-0.12.0-2026-11-12
+Rozmiary i SHA256 GitHuba oraz pobieranie bez logowania potwierdzone.
+Lokalne wersje gry, paczki i wygenerowane katalogi Androida (9.33 GiB)
+przeniesiono do Kosza; dwóch skrótów gry również już nie ma. Kosza nie opróżniono.
+Źródła, zasoby i ustawienia zachowano; kopia ustawień: userdata/build-cleanup-20261112-0.12.
 
 ---
 # Nazwy gałęzi i aktualna wersja — 2026-11-12
