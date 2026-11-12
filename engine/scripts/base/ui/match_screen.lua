@@ -88,7 +88,13 @@ function screen.snapshot(state, snapshot)
 end
 
 function screen.update(state, held, context)
+    if (held.functions or ""):find("4",1,true) then state.back_to_characters=true end
     local result = match.step(state.match, held)
+    if not state.match.replay and (result=="leave" or result=="finished")
+       and state.back_to_characters then
+        context.action("characters_back")
+        return
+    end
     if result == "leave" then
         -- F4 in Championship or during a replay: the game state becomes 10, the title.
         context.action("title")

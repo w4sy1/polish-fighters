@@ -11,7 +11,11 @@ return function(base)
   local state=create(options)
   state.launch.hub_enabled=not options.legacy_menu
   state.launch.hub_available=options.profiles_available
-  state.launch.hub_mode=options.profile_start and "profile" or "root"
+  local saved=engine and engine.read_settings and engine.read_settings() or {}
+  if type(saved)~="table" then saved={} end
+  local chosen=saved.little_fighters_start_profile
+  local single_mobile=options.touch_device and chosen and chosen~='all' and chosen~='custom'
+  state.launch.hub_mode=(options.profile_start or single_mobile) and "profile" or "root"
   state.launch.hub_wait_release=options.profile_start==true
   return state
  end
@@ -29,6 +33,12 @@ return function(base)
   if not visible(state) then return false end
   local x,y,w,h=button_area(state)
   if pressed or (input.click and input.pointer_x>=x and input.pointer_x<=x+w and input.pointer_y>=y and input.pointer_y<=y+h) then
+   if state.active=='match' then
+    -- Send the back action through the same deterministic input as the fight.
+    -- A local menu intercept would strand the other network participant.
+    if not f4 then input.functions=(input.functions or '')..'4' end
+    return false
+   end
    if context.text_input then context.text_input(false) end
    local match=state.active=='match' and state.match.match
    if state.session or (match and not match.finished) then
@@ -52,8 +62,9 @@ return function(base)
    context.text('WSPÓLNY EKRAN | TY: GRACZ '..(state.session.slot+1),8,9,'left',13,0xffffff,nil,nil,true)
   end
   context.fill(x,y,w,h,25,48,80,240)
-  if context.text then context.text('MENU / MODUŁY (F4)',x+w/2,y+7,'center',15,0xffffff,nil,nil,true)
-  else require('base/ui/font').draw(context,'MENU / MODULY (F4)',x+w/2,y+9,1,nil,'center') end
+  local label=state.active=='match' and 'POSTACIE (F4)' or 'MENU / MODUŁY (F4)'
+  if context.text then context.text(label,x+w/2,y+7,'center',15,0xffffff,nil,nil,true)
+  else require('base/ui/font').draw(context,state.active=='match' and 'POSTACIE (F4)' or 'MENU / MODULY (F4)',x+w/2,y+9,1,nil,'center') end
  end
  return base
 end

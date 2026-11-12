@@ -38,7 +38,7 @@ return function(legacy)
   s.phase="connecting";s.deadline=engine.network_time()+timeout;return true
  end
  function room.close(s)
-  engine.network("close");s.phase="idle";s.pending=nil;s.received="";s.frame=nil;s.checked=nil;s.queued_unlock=0;s.queued_actions={};s.observed_actions={};s.queued_action_directions=nil
+  engine.network("close");s.phase="idle";s.pending=nil;s.received="";s.frame=nil;s.checked=nil;s.queued_unlock=0;s.queued_actions={};s.observed_actions={};s.queued_action_directions=nil;s.queued_back=nil;s.observed_back=nil
  end
  function room.ready(s,value) return send(s,{op="ready",value=value}) end
  function room.begin(s) return send(s,{op="start"}) end
@@ -92,6 +92,9 @@ return function(legacy)
   -- until the next packet is sent instead of losing them between two barriers.
   s.queued_actions=s.queued_actions or {}
   s.observed_actions=s.observed_actions or {}
+  local back=(input.functions or ''):find('4',1,true)~=nil
+  if back and not s.observed_back then s.queued_back=true end
+  s.observed_back=back
   for _,action in ipairs({'c','b','f'}) do
    local held=(input[0] or ''):find(action,1,true)~=nil
    if held and not s.observed_actions[action] then
@@ -114,13 +117,14 @@ return function(legacy)
   if not s.pending then
    s.pending=true;s.deadline=engine.network_time()+timeout
    local functions=s.slot==0 and input.functions or ""
+   if s.slot==0 and s.queued_back and not functions:find('4',1,true) then functions=functions..'4' end
    local keys=input[0] or ''
    for _,action in ipairs({'c','b','f'}) do
     if s.queued_actions[action] and not keys:find(action,1,true) then keys=keys..action end
    end
    if not keys:find('[udlr]') then keys=keys..(s.queued_action_directions or '') end
    if not send(s,{op="input",frame=s.frames,keys=keys,functions=functions,unlock=s.slot==0 and s.queued_unlock or 0}) then return nil,s.error end
-   s.queued_actions={};s.queued_action_directions=nil
+   s.queued_actions={};s.queued_action_directions=nil;s.queued_back=nil
    s.queued_unlock=0
   end
   -- The server queues this input behind the previous checksum barrier. Avoid a

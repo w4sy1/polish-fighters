@@ -11,12 +11,22 @@ for _,page in ipairs({'launch','title','characters','backgrounds','network','bat
  assert(not base.global_navigation_update(s,{functions='4',keys={},pointer_x=0,pointer_y=0},context),'held F4 repeated')
 end
 local s=base.create({});s.active='match';s.match={match={finished=false,paused=false}}
-assert(base.global_navigation_update(s,{functions='',click=true,pointer_x=600,pointer_y=20},context))
-assert(s.quit_dialog.kind=='modules','active fight must ask before leaving')
-s.session={};local update=dialog.update
+local touch={functions='',click=true,pointer_x=600,pointer_y=20}
+assert(not base.global_navigation_update(s,touch,context))
+assert(touch.functions=='4' and not s.quit_dialog,'fight back must reach synchronized match input')
+assert(not base.global_navigation_update(s,{functions='4'},context),'F4 in fight must not open modules')
+s.active='title';s.session={}
+base.global_navigation_update(s,{functions=''},context)
+assert(base.global_navigation_update(s,{functions='4'},context))
+assert(s.quit_dialog.kind=='modules')
+local update=dialog.update
 dialog.update=function() return 'exit' end
 assert(base.global_navigation_update(s,{functions='',keys={}},context))
-assert(not s.session and s.active=='launch','stalled network must allow local return')
+assert(not s.session and s.active=='launch','stalled network must allow local return from menus')
 dialog.update=update
+engine={read_settings=function() return {little_fighters_start_profile='lf_four_turbo'} end}
+local mobile=base.create({touch_device=true})
+assert(mobile.launch.hub_mode=='profile','chosen Android module must not open the module list again')
+assert(base.create({}).launch.hub_mode=='root','desktop root must remain available')
 assert(#actions==0,'menu return must not exit application')
 print('PASS global menu: all screen types, F4 edge, touch during fight, stalled network, no quit')

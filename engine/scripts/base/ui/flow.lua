@@ -209,6 +209,21 @@ local function route(state, input, context)
         state.battle = setup.create(state.characters, state.battle_config)
         state.active = "battle"
         state.wait_release = true
+    elseif requested == "characters_back" then
+        local selection=require("base/ui/character_select")
+        if state.characters then
+            state.characters=selection.reset_all(state.characters)
+        else
+            state.characters=selection.create({mode="versus"})
+        end
+        -- Keep room ownership, map, module and match options on the same screen.
+        for _,peer in ipairs(state.session and state.session.room and state.session.peers or {{slot=0}}) do
+            state.characters.slots[peer.slot].phase=constants.character_slot_phases.choosing_fighter
+        end
+        state.match,state.quit_dialog=nil,nil
+        state.active,state.wait_release="characters",true
+        speed.fast=false
+        music.play("bgm/main.wma")
     elseif requested == "characters" then
         -- Reset All / back from the Battle setup: the character menu starts over.
         state.characters = require("base/ui/character_select").reset_all(state.characters)

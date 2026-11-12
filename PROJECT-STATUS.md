@@ -1,3 +1,16 @@
+# Poprawki sterowania i F4 — lokalna 0.12, 2026-11-12
+
+Atak reaguje przy naciśnięciu w obu układach; F4 / POSTACIE podczas walki wraca
+do wyboru postaci. Wybrany pojedynczy moduł Androida otwiera własne menu.
+Usunięto stare znaczniki gotowości po ponownym wyborze. Bufor chroni krótkie ruchy i F4,
+również podczas oczekiwania sieciowego. Testy Lua, Python,
+natywne ruchu/ataku oraz 2/8 procesów sieciowych PASS; APK 12 / 0.12.0-controls
+zbudowany i testy Androida PASS. Lint ma 27 wcześniejszych błędów SDL.
+Nie odtworzono zgłoszonych lokalnych zacięć na telefonie; ADB bez urządzeń.
+Całe zgłoszenie nie jest jeszcze potwierdzone jako rozwiązane.
+Raport: docs/POPRAWKI-0.12-2026-11-12.md. Publikacja paczek i sprzątanie w toku.
+
+---
 # Nazwy gałęzi i aktualna wersja — 2026-11-12
 
 Najnowsza gałąź to `main`; jest też domyślną gałęzią GitHuba. Pozostałe gałęzie: `android-pack-selection-2026-11-11`, `bluetooth-mobile-test-2026-11-11`, `maps-build-2026-10-30`. Zmiana nazw zachowała wszystkie commity i lokalne stany gałęzi; dawne nazwy występują poniżej w historii prac. Zaktualizowano lokalne upstreamy i origin/HEAD.

@@ -611,6 +611,7 @@ function selection.reset_all(state)
     for index = 0, 7 do
         local slot = state.slots[index]
         slot.phase = slot_phases.empty
+        slot.ready = false
         slot.latched = true
         if slot.was_random then slot.fighter = 0 end
     end

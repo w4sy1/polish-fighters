@@ -18,7 +18,7 @@ function screen.selection_hint(touch,style,slot)
  local who='TY: GRACZ '..((slot or 0)+1)
  if touch then
   return {who..' | DOTYK '..(style=='modern' and '2: JOYSTICK + CELOWANIE' or '1: KRZYŻAK'),
-   style=='modern' and 'Ruch: lewy drążek | ATAK: dotknij lub przeciągnij i puść | SKOK: wstecz' or
+   style=='modern' and 'Ruch: lewy drążek | ATAK: naciśnij | SKOK: wstecz' or
     'Ruch: krzyżak | ATAK: wybór / OK | SKOK: cofnij | BLOK: obrona'}
  end
  local set=controls.current().sets[1]

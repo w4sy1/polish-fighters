@@ -149,12 +149,9 @@ function gamepad.update(state, input, mode)
     local pressed = {}
     for _, touch in ipairs(touches) do
         local target = target_at(state, touch, mode)
-        if state.style=="modern" and mode=="match" and target and target.action=="c" then
-            if not state.aim_finger and not state.previous_touches[touch.id] then
-                state.aim_finger=touch.id;state.aim_start_x=touch.x;state.aim_start_y=touch.y
-                state.aim_dx,state.aim_dy=0,0
-            end
-        elseif target and touch.id~=state.aim_finger then pressed[target] = true end
+        -- Both layouts use the original LF2 press-to-attack behavior. Holding
+        -- attack must never wait for release or consume the movement finger.
+        if target and touch.id~=state.finger then pressed[target] = true end
     end
     local pause_held = pressed[state.pause] == true
     local fast_held = pressed[state.fast] == true
@@ -175,7 +172,7 @@ function gamepad.update(state, input, mode)
     if not owner then
         state.finger = nil
         for _, touch in ipairs(touches) do
-            if touch.id~=state.aim_finger and inside_zone(stick.zone, touch.x, touch.y) then
+            if not target_at(state,touch,mode) and inside_zone(stick.zone, touch.x, touch.y) then
                 state.finger, owner = touch.id, touch
                 break
             end
@@ -228,31 +225,6 @@ function gamepad.update(state, input, mode)
         if pressed[button] and (not button.letters or state.available[button.action]) then
             held[button.action] = true
             for _, letter in ipairs(button.letters or {}) do held[letter] = true end
-        end
-    end
-    if state.style=="modern" then
-        local aim=state.aim_finger and by_id[state.aim_finger]
-        if aim then
-            state.aim_dx,state.aim_dy=aim.x-state.aim_start_x,aim.y-state.aim_start_y
-        elseif state.aim_finger then
-            local dx,dy=state.aim_dx,state.aim_dy
-            local direction
-            if dx*dx+dy*dy>=18*18 then
-                if math.abs(dx)>=math.abs(dy) then direction=dx<0 and "l" or "r"
-                else direction=dy<0 and "u" or "d" end
-            end
-            state.attack_pulse={step=1,direction=direction}
-            state.aim_finger=nil
-        end
-        local pulse=state.attack_pulse
-        if pulse then
-            if pulse.direction then
-                held.u,held.d,held.l,held.r=nil,nil,nil,nil
-                held[pulse.direction]=true
-                held.c=pulse.step>=3
-            else held.c=true end
-            pulse.step=pulse.step+1
-            if pulse.step>(pulse.direction and 4 or 2) then state.attack_pulse=nil end
         end
     end
     state.previous_touches={}
