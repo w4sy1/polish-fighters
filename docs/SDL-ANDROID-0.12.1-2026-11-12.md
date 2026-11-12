@@ -64,4 +64,17 @@ Dokumentacja platformy:
 - https://developer.android.com/develop/background-work/background-tasks/broadcasts
 - https://developer.android.com/reference/android/view/InputDevice#isExternal()
 
-Publikacja i sprzątanie nowego APK: w toku.
+## Publikacja i sprzątanie
+
+Publiczne wydanie: https://github.com/w4sy1/polish-fighters/releases/tag/android-sdl-0.12.1-2026-11-12
+Kod wydania: `3bdf1d728cd3e61b8441517f13c800da1001215f`.
+APK: `PolishFighters-Android-0.12.1-SDL-2026-11-12.apk`, 544882567 bajtów.
+SHA256: `44a51ad5563c6e0e46f347f62659d1502442fd8e876550d64118b64aeaed6d4d`.
+Rozmiar i SHA256 w metadanych GitHuba zgodne z lokalnym APK; anonimowe pobieranie
+potwierdzone HTTP 206 przy żądaniu zakresowym, bez ponownego transferu całej gry.
+Certyfikat podpisu 0.12.1 jest taki sam jak 0.12.0. Zawartość DEX zawiera helper poprawki.
+
+Po potwierdzeniu publikacji lokalny APK i katalogi generowane (3.13 GiB)
+przeniesiono do Kosza. `engine/out` jest puste; źródła i prywatne ustawienia zachowano.
+Kosza nie opróżniono. Stare raporty o 27 błędach SDL pozostają historycznym zapisem;
+bieżący wynik 0.12.1 wynosi 0 błędów i 39 ostrzeżeń.

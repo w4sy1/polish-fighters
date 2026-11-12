@@ -1,4 +1,4 @@
-# SDL Android — lokalna 0.12.1, 2026-11-12
+# SDL Android — opublikowana 0.12.1, 2026-11-12
 
 Usunięto 27 błędów Lint SDL: odmowa uprawnień Bluetooth, API pióra i odbiornik USB.
 `lintDebug`: 0 błędów / 39 ostrzeżeń. 43 testy Androida PASS; Python 54 PASS / 1 SKIP.
@@ -6,7 +6,10 @@ APK code 13 / 0.12.1-sdl zbudowany, zawartość, podpis i wyrównanie PASS.
 Poprawka jest nakładana po rozpakowaniu SDL w przygotowaniu lokalnym i Linux/CI.
 Źródła C++ i dane gry niezmienione; Windows pozostaje 0.12.0.
 Bez próby fizycznego Bluetooth/USB i bez potwierdzenia wszystkich zacięć telefonu.
-Raport: docs/SDL-ANDROID-0.12.1-2026-11-12.md. Publikacja i sprzątanie w toku.
+Raport: docs/SDL-ANDROID-0.12.1-2026-11-12.md. Publiczny APK: https://github.com/w4sy1/polish-fighters/releases/tag/android-sdl-0.12.1-2026-11-12
+Rozmiar i SHA256 GitHuba zgodne, pobieranie bez logowania potwierdzone.
+Po publikacji lokalny APK i katalogi generowane (3.13 GiB) przeniesiono do Kosza.
+Źródła i ustawienia pozostały, Kosza nie opróżniano.
 
 ---
 # Poprawki sterowania i F4 — 0.12.0 opublikowana, 2026-11-12
