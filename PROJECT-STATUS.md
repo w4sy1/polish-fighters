@@ -1,3 +1,7 @@
+## 2026-11-13 — dostawa 0.13.0 i usunięcie lokalnych wersji
+
+Pliki Windows (pełny ZIP z EXE) i APK są publiczne: [wydanie testowe 0.13.0](https://github.com/w4sy1/polish-fighters/releases/tag/classic-menu-0.13.0-2026-11-12). GitHub potwierdził rozmiary i SHA256. Na polecenie użytkownika lokalne wersje i kopie kompilacji przeniesiono do Kosza; źródła i ustawienia zachowano. Dalsze testy zatrzymano. Szczegóły: [raport](docs/CLASSIC-MENU-0.13.0-2026-11-12.md).
+
 ## 2026-11-12 — Polish Little Fighters 0.13.0: klasyczne menu (testowe)
 
 Przebudowano główne menu w stylu LF2, siedem trybów, przepływ moduł/gracze, PL/EN, kierunki pada i Android. Zachowano naprawę indeksu ZIP. Dalsze testy zatrzymano na prośbę użytkownika; końcowe poprawki tekstów tylko zbudowano/spakowano. Brak testu fizycznego telefonu i publicznego backendu. Szczegóły, granice dowodów i lista plików: [raport 0.13.0](docs/CLASSIC-MENU-0.13.0-2026-11-12.md).

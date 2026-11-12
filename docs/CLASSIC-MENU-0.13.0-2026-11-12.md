@@ -104,3 +104,12 @@ Pierwsze kliknięcie po zmianie podmenu było przechwytywane przez automatyczne 
 ## Kolejny etap
 
 Testy użytkownika na telefonie i komputerze: pierwsza instalacja/aktualizacja, wybór pojedynczego modułu i puli, klawiatura/pad/dotyk, walka i F4, PL/EN oraz powrót. Następnie poprawki na podstawie rzeczywistych usterek, bez wdrażania publicznego serwera. Bieżąca implementacja odpowiada zakresowi klasycznego menu i integracji istniejących funkcji; nie stanowi ukończenia planowanych usług online ani pełnego audytu każdej mechaniki modów.
+
+## Zakończona dostawa — 2026-11-13
+
+Opublikowano: https://github.com/w4sy1/polish-fighters/releases/tag/classic-menu-0.13.0-2026-11-12
+
+- `PolishLittleFighters-Android-0.13.0-CLASSIC-2026-11-12.apk`: 544938641 bajtów; SHA256 `5df257c9af1810d7a9012bd00b2acd2915aca6ee3eae86d0a98fc5591b918004`. GitHub potwierdził stan uploaded, rozmiar i ten sam digest.
+- `PolishLittleFighters-Windows-FULL-0.13.0-CLASSIC-2026-11-12.zip`: 1035995583 bajtów; SHA256 `8b45f89f2cd2f91188552e19b36a1753eab3e912771ee5bb759162dbfb52c7d3`. GitHub potwierdził stan uploaded, rozmiar i ten sam digest.
+
+Na dodatkowe polecenie użytkownika przeniesiono do Kosza także najnowszą rozpakowaną grę Windows, lokalne APK i ZIP oraz wygenerowane dane/biblioteki Androida i katalog app/build. Nie opróżniano Kosza. Zachowano źródła, oryginalne zasoby projektu, ustawienia, SDK/JDK i dwa nieopublikowane archiwa źródłowe mechaniki. Nie wykonano dalszych testów.
