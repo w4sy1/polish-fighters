@@ -1,3 +1,10 @@
+# Nazwy gałęzi i aktualna wersja — 2026-11-12
+
+Najnowsza gałąź to `main`; jest też domyślną gałęzią GitHuba. Pozostałe gałęzie: `android-pack-selection-2026-11-11`, `bluetooth-mobile-test-2026-11-11`, `maps-build-2026-10-30`. Zmiana nazw zachowała wszystkie commity i lokalne stany gałęzi; dawne nazwy występują poniżej w historii prac. Zaktualizowano lokalne upstreamy i origin/HEAD.
+
+Usunięto do Kosza również odnalezione stare paczki w delivery oraz generowane katalogi Android app/build, build i .gradle. Najnowsza pełna gra, ZIP, APK, zasoby źródłowe i prywatne ustawienia pozostały. ZIP jest skompresowaną dystrybucją; katalog projektu zawiera ponadto rozpakowaną grę, drugą kopię zasobów do budowania i narzędzia.
+
+---
 # Pelna paczka gry na Dysku Google — 2026-11-11
 
 Przeslano pelny Windows z modulami/zasobami i APK Android, w 18 czesciach danych po maks. 90 MiB oraz z plikami laczenia i instrukcja. Folder Google ma obecnie dostep wlasciciela; publiczne udostepnienie wymaga zmiany przez wlasciciela w interfejsie Drive. Linki i sumy: `tools/distribution/GOOGLE-DOWNLOADS.md`. Metadane Google potwierdzaja przeslane rozmiary; lokalna rekonstrukcja w Windows PowerShell 5.1, SHA256 wynikow, CRC ZIP i uruchomienie samodzielnej paczki bez cache kompilacji PASS. Finalna plynnosc fizycznego Android–Windows i Bluetooth nadal wymagaja proby urzadzen.

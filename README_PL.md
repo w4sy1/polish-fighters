@@ -1,3 +1,10 @@
+# Polish Fighters — aktualna wersja
+
+Najnowszy kod jest w domyślnej gałęzi `main`. [Pełna gra Windows i APK Android](https://drive.google.com/drive/folders/1vcpOvSZaoTbZmctIKFq1myZqGjtew2jV) są na Dysku Google. [Instrukcja i sumy kontrolne](tools/distribution/GOOGLE-DOWNLOADS.md). Folder Google ma dostęp właściciela, dopóki właściciel nie włączy udostępniania linkiem.
+
+Poniżej zachowana historia wcześniejszych wydań.
+
+---
 # Polish Fighters — wydanie testowe 0.10.0, 2026-11-11
 
 [Pobierz nowe APK i aktualizację Windows](https://github.com/w4sy1/polish-fighters/releases/tag/fixes-test-2026-11-11).
