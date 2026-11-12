@@ -1,0 +1,18 @@
+return {
+ status='STAN / ZGODNOŚĆ MODUŁÓW', audit_note='Stan plików przy budowie. Obecność zasobów nie oznacza pełnej zgodności mechanik.', assets='Zasoby: ', missing_files='Brakujące pliki: ',
+ battle='BITWA', modules='MODUŁY', online='GRA ONLINE', settings='USTAWIENIA', language='JĘZYK', credits='TWÓRCY', quit='WYJŚCIE',
+ back='WSTECZ', controls='STEROWANIE', video='OBRAZ / DŹWIĘK', extras='HISTORIA / ODBLOKOWANIA', recording='USTAWIENIA NAGRAŃ',
+ versus='VS Mode', stage='Stage Mode', championship='1 on 1 Championship', team_championship='2 on 2 Championship',
+ battle_setup='Battle Mode', demo='Demo', replay='Playback Recording',
+ packs='WŁĄCZ / WYŁĄCZ MODUŁY', mixed='WYBRANE MODUŁY RAZEM [TEST]', all='ZAZNACZ WSZYSTKIE', save='ZAPISZ', cancel='ANULUJ',
+ on='[WŁ.] ', off='[WYŁ.] ', missing=' [BRAK DANYCH]', duplicates_hidden='POWTÓRZENIA LF2: UKRYTE', duplicates_shown='POWTÓRZENIA LF2: WIDOCZNE',
+ players='KONFIGURACJA GRACZY', start='DALEJ: WYBÓR POSTACI', active='AKTYWNY MODUŁ: ',
+ quick='SZYBKA GRA [NIEDOSTĘPNA]', host='UTWÓRZ POKÓJ LAN', join='DOŁĄCZ DO POKOJU LAN', rooms='LISTA POKOI / WŁASNY SERWER', friends='GRA ZE ZNAJOMYMI [NIEDOSTĘPNA]',
+ offline='Brak wdrożonego publicznego serwera. LAN / TCP jest dostępny.',
+ compatibility='Sieć wymaga tego samego modułu i zasobów. Wspólna pula: testy lokalne.',
+ absent_turbo='LF2 Turbo: brak osobnego pakietu', navigation='STRZAŁKI / D-PAD: WYBÓR   ENTER / A: OK   ESC / B: WSTECZ',
+ credit_text='Silnik: OpenLF2. Oryginalna gra: Marti Wong i Starsky Wong.',
+ credit_packs='Autorzy modułów i licencje: dokumentacja dołączonych pakietów.',
+ local_players='Do 4 profili lokalnych; pokój sieciowy do 8 urządzeń. Boty i drużyny na ekranie postaci.',
+ save_error='Nie zapisano ustawień: ',
+}

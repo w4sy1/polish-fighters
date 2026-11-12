@@ -1,26 +1,26 @@
 <resources>
- <color name="pf_background">#090F1D</color><color name="pf_card">#142034</color>
+ <color name="pf_background">#040A41</color><color name="pf_card">#102164</color>
  <color name="pf_red">#FF5262</color><color name="pf_text">#F4F7FC</color><color name="pf_muted">#B6C5D9</color>
- <style name="Theme.PolishFighters" parent="android:style/Theme.Material.NoActionBar.Fullscreen">
-  <item name="android:fontFamily">sans-serif</item><item name="android:colorAccent">@color/pf_red</item>
+ <style name="Theme.PolishFighters" parent="android:style/Theme.Holo.NoActionBar.Fullscreen">
+  <item name="android:fontFamily">monospace</item><item name="android:colorAccent">@color/pf_red</item>
   <item name="android:windowBackground">@drawable/pf_background</item>
   <item name="android:navigationBarColor">@color/pf_background</item><item name="android:statusBarColor">@color/pf_background</item>
   <item name="android:windowActionModeOverlay">true</item>
  </style>
- <style name="PFAction" parent="android:style/Widget.Material.Button.Borderless">
+ <style name="PFAction" parent="android:style/Widget.Button">
   <item name="android:background">@drawable/pf_button</item><item name="android:textColor">@color/pf_text</item>
-  <item name="android:textSize">15sp</item><item name="android:fontFamily">sans-serif-medium</item>
-  <item name="android:minHeight">56dp</item><item name="android:paddingLeft">16dp</item><item name="android:paddingRight">16dp</item>
+  <item name="android:textSize">15sp</item><item name="android:fontFamily">monospace</item>
+  <item name="android:minHeight">0dp</item><item name="android:paddingLeft">16dp</item><item name="android:paddingRight">16dp</item>
   <item name="android:stateListAnimator">@null</item><item name="android:textAllCaps">false</item>
  </style>
- <string name="pf_brand_first">POLISH</string><string name="pf_brand_second">FIGHTERS</string>
+ <string name="pf_brand_first">POLISH LITTLE</string><string name="pf_brand_second">FIGHTERS</string>
  <string name="pf_brand_tag">WEJDŹ DO WALKI</string><string name="pf_brand_caption">Wybierz grę. Zbierz ekipę.
 Rozpocznij walkę.</string>
  <string name="pf_game_label">WYBRANA GRA</string><string name="pf_change_game">Dotknij karty, żeby zmienić grę</string>
  <string name="pf_play">GRAJ NA TYM TELEFONIE</string><string name="pf_play_caption">Bez internetu. Bez czekania na innych.</string>
  <string name="pf_network">GRA ZE ZNAJOMYMI</string><string name="pf_settings">USTAWIENIA</string>
  <string name="pf_ready">Gotowy do gry</string><string name="pf_cancel">ANULUJ POŁĄCZENIE</string>
- <string name="pf_build">ANDROID 0.12.2</string><string name="pf_loading_tag">PRZYGOTOWANIE GRY</string>
+ <string name="pf_build">ANDROID 0.13.0</string><string name="pf_loading_tag">PRZYGOTOWANIE GRY</string>
  <string name="pf_loading_title">Szykujemy arenę</string><string name="pf_loading_initial">Sprawdzamy pliki gry. Pierwsze uruchomienie może potrwać kilka minut.</string>
  <string name="pf_loading_note">Twoje ustawienia i wybrana gra zostają na miejscu.</string>
  <string name="pf_progress_unpack">Rozpakowywanie zasobów: %1$d / %2$d</string>

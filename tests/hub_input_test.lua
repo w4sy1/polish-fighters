@@ -49,7 +49,7 @@ screen.update(state,{keys={[27]=true},pads={}});assert(state.hub_edit,'held Esca
 fail=true;screen.activate(state,'save');assert(state.hub_edit and state.hub_control_message:find('read only'))
 screen.activate(state,'cancel');assert(not state.hub_edit)
 local hub=require('polish-fighters/hub')
-assert(#hub.profiles==9 and #hub.rows({hub_mode='root'})==18)
+assert(#hub.profiles==9 and #hub.rows({hub_mode='root'})==7)
 assert(hub.title('polish-originals')=='Polish Fighters' and hub.title('lf2-classic')=='LF2')
 local flow=dofile(arg[1]..'/engine/scripts/polish-fighters/hub_flow.lua')({create=function() return {launch={}} end})
 assert(flow.create({legacy_menu=true}).launch.hub_enabled==false)

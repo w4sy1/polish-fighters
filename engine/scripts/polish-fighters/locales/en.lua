@@ -1,0 +1,18 @@
+return {
+ status='MODULE STATUS / COMPATIBILITY', audit_note='File audit at build time. Present assets do not prove complete mechanics compatibility.', assets='Assets: ', missing_files='Missing files: ',
+ battle='BATTLE', modules='MODULES', online='ONLINE GAME', settings='SETTINGS', language='LANGUAGE', credits='CREDITS', quit='QUIT',
+ back='BACK', controls='CONTROLS', video='VIDEO / SOUND', extras='HISTORY / UNLOCKS', recording='RECORDING SETTINGS',
+ versus='VS Mode', stage='Stage Mode', championship='1 on 1 Championship', team_championship='2 on 2 Championship',
+ battle_setup='Battle Mode', demo='Demo', replay='Playback Recording',
+ packs='ENABLE / DISABLE MODULES', mixed='SELECTED MODULES TOGETHER [TEST]', all='SELECT ALL', save='SAVE', cancel='CANCEL',
+ on='[ON] ', off='[OFF] ', missing=' [MISSING DATA]', duplicates_hidden='LF2 DUPLICATES: HIDDEN', duplicates_shown='LF2 DUPLICATES: SHOWN',
+ players='PLAYER SETUP', start='NEXT: SELECT CHARACTERS', active='ACTIVE MODULE: ',
+ quick='QUICK GAME [UNAVAILABLE]', host='CREATE LAN ROOM', join='JOIN LAN ROOM', rooms='ROOM LIST / CUSTOM SERVER', friends='FRIENDS [UNAVAILABLE]',
+ offline='No deployed public server. LAN / TCP is available.',
+ compatibility='Network peers need the same module and assets. Mixed pool: local testing.',
+ absent_turbo='LF2 Turbo: no separate package installed', navigation='ARROWS / D-PAD: SELECT   ENTER / A: OK   ESC / B: BACK',
+ credit_text='Engine: OpenLF2. Original game: Marti Wong and Starsky Wong.',
+ credit_packs='Module authors and licences: see the bundled package documentation.',
+ local_players='Up to 4 local profiles; up to 8 network devices. Bots and teams in character selection.',
+ save_error='Could not save settings: ',
+}

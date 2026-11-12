@@ -34,6 +34,7 @@ import org.json.JSONObject;
 
 /** Unpacks the local game on a worker, with progress; SDL starts only when it is ready. */
 public final class GameBootstrapActivity extends Activity {
+    @Override protected void attachBaseContext(android.content.Context base) { super.attachBaseContext(ClassicMenuData.localized(base)); }
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private TextView status;
     private ProgressBar progress;

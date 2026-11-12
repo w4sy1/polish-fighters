@@ -1,3 +1,7 @@
+## 2026-11-12 — Polish Little Fighters 0.13.0: klasyczne menu (testowe)
+
+Przebudowano główne menu w stylu LF2, siedem trybów, przepływ moduł/gracze, PL/EN, kierunki pada i Android. Zachowano naprawę indeksu ZIP. Dalsze testy zatrzymano na prośbę użytkownika; końcowe poprawki tekstów tylko zbudowano/spakowano. Brak testu fizycznego telefonu i publicznego backendu. Szczegóły, granice dowodów i lista plików: [raport 0.13.0](docs/CLASSIC-MENU-0.13.0-2026-11-12.md).
+
 # Android 0.12.2 — naprawa startu i nowy ekran, 2026-11-12
 
 Naprawiono „Brak indeksu paczki gry”: manifest był na końcu ZIP zamiast na początku.

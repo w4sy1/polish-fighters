@@ -29,16 +29,50 @@ public class StartScreenTest {
  @Test public void homeShowsSelectedGameAndStartsLocalPlay() throws Exception {
   try(ActivityController<BluetoothLobbyActivity> controller=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
    BluetoothLobbyActivity activity=controller.get();View root=activity.findViewById(R.id.pf_screen);render(root,"home");
-   Button play=activity.findViewById(R.id.pf_play);assertTrue(play.getWidth()>=200);assertTrue(play.getHeight()>=56);
+   Button play=activity.findViewById(R.id.pf_play);assertTrue(play.getWidth()>=200);assertTrue(play.getHeight()>=24);
    assertEquals(View.GONE,activity.findViewById(R.id.pf_cancel).getVisibility());
-   assertTrue(((Button)activity.findViewById(R.id.pf_module)).getText().toString().startsWith("MODUŁ:"));
-   play.performClick();Intent next=Shadows.shadowOf(activity).getNextStartedActivity();assertTrue(next.getComponent().getClassName().endsWith("OpenLF2Activity"));
+   assertEquals("MODUŁY",((Button)activity.findViewById(R.id.pf_module)).getText().toString());
+   assertTrue(((TextView)activity.findViewById(R.id.pf_status)).getText().toString().startsWith("AKTYWNY MODUŁ:"));
+   play.performClick();assertEquals("battle",new MobileCodeSettings(activity.getFilesDir()).read().getString("little_fighters_start_menu"));Intent next=Shadows.shadowOf(activity).getNextStartedActivity();assertTrue(next.getComponent().getClassName().endsWith("OpenLF2Activity"));
   }
  }
  @Test public void networkModesAreAvailableBehindOneHomeAction() throws Exception {
   try(ActivityController<BluetoothLobbyActivity> controller=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
    BluetoothLobbyActivity activity=controller.get();activity.findViewById(R.id.pf_network).performClick();
-   android.app.AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();assertNotNull(dialog);assertEquals(5,dialog.getListView().getAdapter().getCount());
+   android.app.AlertDialog dialog=ShadowAlertDialog.getLatestAlertDialog();assertNotNull(dialog);assertEquals(6,dialog.getListView().getAdapter().getCount());
+  }
+ }
+ @Test public void languageChangesImmediatelyAndPersistsAcrossActivities() throws Exception {
+  try(ActivityController<BluetoothLobbyActivity> c=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
+   BluetoothLobbyActivity a=c.get();a.findViewById(R.id.pf_en).performClick();
+   assertEquals("BATTLE",((Button)a.findViewById(R.id.pf_play)).getText().toString());
+   assertEquals("english",new MobileCodeSettings(a.getFilesDir()).read().getJSONObject("options").getString("language"));
+   assertEquals("Loading game data",ClassicMenuData.localized(a).getString(R.string.pf_loading_title));
+   render(a.findViewById(R.id.pf_screen),"home-en");
+  }
+  try(ActivityController<BluetoothLobbyActivity> c=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
+   BluetoothLobbyActivity a=c.get();assertEquals("MODULES",((Button)a.findViewById(R.id.pf_module)).getText().toString());
+   a.findViewById(R.id.pf_pl).performClick();assertEquals("BITWA",((Button)a.findViewById(R.id.pf_play)).getText().toString());
+  }
+ }
+ @Test public void allSevenActionsFitSmallLandscapeAndPortrait() throws Exception {
+  try(ActivityController<BluetoothLobbyActivity> c=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
+   View root=c.get().findViewById(R.id.pf_screen);
+   for(int[] size:new int[][]{{640,360},{320,480},{360,640},{1280,720}}){
+    root.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));root.layout(0,0,size[0],size[1]);
+    for(int id:new int[]{R.id.pf_play,R.id.pf_module,R.id.pf_network,R.id.pf_settings,R.id.pf_language,R.id.pf_credits,R.id.pf_quit}){
+     View b=root.findViewById(id);assertTrue(b.getHeight()>=24);assertTrue(b.getWidth()<=size[0]);assertTrue(b.getBottom()<=size[1]);
+    }
+   }
+  }
+ }
+ @Test public void gamepadAActivatesFocusedBattleButton() throws Exception {
+  try(ActivityController<BluetoothLobbyActivity> c=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
+   BluetoothLobbyActivity a=c.get();View button=a.findViewById(R.id.pf_play);button.requestFocus();
+   assertTrue(button.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_A)));
+   assertTrue(button.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_A)));
+   assertEquals("battle",new MobileCodeSettings(a.getFilesDir()).read().getString("little_fighters_start_menu"));
+   assertNotNull(Shadows.shadowOf(a).getNextStartedActivity());
   }
  }
  @Test public void loadingAndErrorUseNewLayout() throws Exception {

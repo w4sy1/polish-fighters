@@ -1,0 +1,18 @@
+<resources>
+<string name="pf_ready">Ready</string><string name="pf_cancel">CANCEL CONNECTION</string>
+<string name="pf_loading_tag">PREPARING GAME</string><string name="pf_loading_title">Loading game data</string>
+<string name="pf_loading_initial">Checking game files. First launch can take several minutes.</string>
+<string name="pf_loading_note">Your settings and selected module are preserved.</string>
+<string name="pf_progress_unpack">Unpacking assets: %1$d / %2$d</string><string name="pf_progress_link">Preparing files: %1$d / %2$d</string>
+<string name="pf_retry">TRY AGAIN</string><string name="pf_update">DOWNLOAD UPDATE</string>
+<string name="pf_error_title">Could not start the game</string><string name="pf_error_help">Retry preparation. If the problem persists, install the latest update.</string>
+<string name="pf_brand_first">POLISH LITTLE</string><string name="pf_brand_second">FIGHTERS</string>
+<string name="pf_brand_tag">POLISH LITTLE FIGHTERS</string><string name="pf_brand_caption">Classic fighting game</string>
+<string name="pf_network">ONLINE GAME</string><string name="pf_settings">SETTINGS</string>
+<string name="pf_no_browser">Open github.com/w4sy1/polish-fighters/releases in your browser and download the latest APK.</string>
+<string name="pf_no_update_browser">No browser found</string>
+<string-array name="pf_connections"><item>Wi-Fi / hotspot</item><item>Bluetooth tethering / PAN</item><item>Bluetooth radio - host (experimental)</item><item>Bluetooth radio - join (experimental)</item><item>Pair Bluetooth devices</item></string-array>
+<string name="pf_change_game">Select MODULES to change the game</string><string name="pf_game_label">SELECTED GAME</string>
+<string name="pf_initial_module">MODULE: LF2</string><string name="pf_play">PLAY ON THIS PHONE</string><string name="pf_play_caption">Local game</string>
+<string name="pf_build">ANDROID 0.13.0</string><string name="pf_percent">%1$d%%</string><string name="pf_zero_percent">0%</string>
+</resources>

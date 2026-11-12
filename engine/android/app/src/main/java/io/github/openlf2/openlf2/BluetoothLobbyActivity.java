@@ -23,11 +23,13 @@ import java.util.List;
 
 /** Offline play and paired-device Bluetooth entry, before native SDL starts. */
 public final class BluetoothLobbyActivity extends Activity {
+    @Override protected void attachBaseContext(android.content.Context base) { super.attachBaseContext(ClassicMenuData.localized(base)); }
     private TextView status;
     private final List<Button> actions = new ArrayList<>();
     private BluetoothSession session;
     private boolean transferred;
     private Button moduleButton;
+    private String language="pl";
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
@@ -40,10 +42,22 @@ public final class BluetoothLobbyActivity extends Activity {
         Button network = findViewById(R.id.pf_network);
         Button settings = findViewById(R.id.pf_settings);
         java.util.Collections.addAll(actions, moduleButton, play, network, settings);
-        play.setOnClickListener(v -> launch(null, 0));
-        network.setOnClickListener(v -> showConnections());
-        settings.setOnClickListener(v -> showSettings());
-        refreshModuleLabel();
+        play.setOnClickListener(v -> launchMenu("battle"));
+        findViewById(R.id.pf_language).setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(t("language"))
+            .setItems(new String[]{"Polski", "English"}, (d,w) -> selectLanguage(w==0?"pl":"en")).setNegativeButton(t("back"),null).show());
+        findViewById(R.id.pf_pl).setOnClickListener(v -> selectLanguage("pl"));
+        findViewById(R.id.pf_en).setOnClickListener(v -> selectLanguage("en"));
+        findViewById(R.id.pf_credits).setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(t("credits"))
+            .setMessage(t("credit_text")+"\n\n"+t("credit_packs")).setPositiveButton(t("back"),null).show());
+        findViewById(R.id.pf_quit).setOnClickListener(v -> finish());
+        network.setOnClickListener(v -> showOnline());
+        settings.setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(t("settings"))
+            .setItems(new String[]{t("controls"),t("video"),"Android / Bluetooth"},(d,w)->{if(w==2)showSettings();else launchMenu(w==0?"controls":"options");})
+            .setNegativeButton(t("back"),null).show());
+        try { org.json.JSONObject opts=new MobileCodeSettings(getFilesDir()).read().optJSONObject("options");
+            language=opts!=null && "english".equals(opts.optString("language"))?"en":"pl";
+        } catch(java.io.IOException | org.json.JSONException error) { status.setText(error.getMessage()); }
+        refreshMenu();
         Button cancel = findViewById(R.id.pf_cancel);
         cancel.setOnClickListener(v -> {
             BluetoothSession.closeCurrent(); session = null;
@@ -53,26 +67,26 @@ public final class BluetoothLobbyActivity extends Activity {
         });
     }
     private void showConnections() {
-        new AlertDialog.Builder(this).setTitle(R.string.pf_network)
-            .setItems(R.array.pf_connections, (dialog, which) -> {
+        new AlertDialog.Builder(this).setTitle(t("online"))
+            .setItems(ClassicMenuData.localized(this).getResources().getStringArray(R.array.pf_connections), (dialog, which) -> {
                 if (which == 0) showLan(false);
                 else if (which == 1) showLan(true);
                 else if (which == 2) connect(true);
                 else if (which == 3) connect(false);
                 else {
                     try { startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)); }
-                    catch (android.content.ActivityNotFoundException absent) { status.setText("Otwórz ustawienia Bluetooth telefonu i sparuj oba telefony."); }
+                    catch (android.content.ActivityNotFoundException absent) { status.setText(tr("Otwórz ustawienia Bluetooth telefonu i sparuj oba telefony.")); }
                 }
-            }).setNegativeButton("Powrót", null).show();
+            }).setNegativeButton(tr("Powrót"), null).show();
     }
     private void showLan(boolean bluetoothPan) {
         new AlertDialog.Builder(this).setTitle(bluetoothPan ? "Hotspot Bluetooth / PAN" : "Wi-Fi / hotspot")
             .setMessage(bluetoothPan
-                ? "Najpierw w ustawieniach systemu włącz udostępnianie Internetu przez Bluetooth i połącz drugie urządzenie z tą siecią. To połączenie TCP po IP, odrębne od próbnego Bluetooth dwóch telefonów. Działa tylko, jeśli oba systemy obsługują PAN."
-                : "Połącz oba urządzenia z tym samym Wi-Fi lub hotspotem. Gospodarz wybiera UTWÓRZ POKÓJ. Drugie urządzenie wybiera DOŁĄCZ i wpisuje IPv4 gospodarza oraz ten sam port TCP.")
-            .setPositiveButton("Utwórz pokój", (d, w) -> lanAddress(true))
-            .setNeutralButton("Dołącz", (d, w) -> lanAddress(false))
-            .setNegativeButton("Powrót", null).show();
+                ? tr("Najpierw w ustawieniach systemu włącz udostępnianie Internetu przez Bluetooth i połącz drugie urządzenie z tą siecią. To połączenie TCP po IP, odrębne od próbnego Bluetooth dwóch telefonów. Działa tylko, jeśli oba systemy obsługują PAN.")
+                : tr("Połącz oba urządzenia z tym samym Wi-Fi lub hotspotem. Gospodarz wybiera UTWÓRZ POKÓJ. Drugie urządzenie wybiera DOŁĄCZ i wpisuje IPv4 gospodarza oraz ten sam port TCP."))
+            .setPositiveButton(tr("Utwórz pokój"), (d, w) -> lanAddress(true))
+            .setNeutralButton(tr("Dołącz"), (d, w) -> lanAddress(false))
+            .setNegativeButton(tr("Powrót"), null).show();
     }
     private void lanAddress(boolean host) {
         LinearLayout fields = new LinearLayout(this); fields.setOrientation(LinearLayout.VERTICAL);
@@ -90,18 +104,18 @@ public final class BluetoothLobbyActivity extends Activity {
                         addresses.append(network.getName()).append(": ").append(value.getHostAddress()).append('\n');
                 }
             }
-        } catch (java.net.SocketException error) { addresses.append("Nie można odczytać adresów.\n"); }
-        help.setText((host ? "Podaj drugiemu urządzeniu adres interfejsu wspólnej sieci:\n" + addresses
-            : "IP gospodarza: Windows → Ustawienia sieci → Właściwości → IPv4 (lub ipconfig). Telefon → UTWÓRZ POKÓJ.\n")
-            + "Domyślny port TCP: 12345. Zapora gospodarza musi zezwalać grze na połączenia w sieci prywatnej.");
+        } catch (java.net.SocketException error) { addresses.append(tr("Nie można odczytać adresów.\n")); }
+        help.setText((host ? tr("Podaj drugiemu urządzeniu adres interfejsu wspólnej sieci:\n") + addresses
+            : tr("IP gospodarza: Windows → Ustawienia sieci → Właściwości → IPv4 (lub ipconfig). Telefon → UTWÓRZ POKÓJ.\n"))
+            + tr("Domyślny port TCP: 12345. Zapora gospodarza musi zezwalać grze na połączenia w sieci prywatnej."));
         fields.addView(help);
         android.widget.EditText address = new android.widget.EditText(this);
-        address.setHint("IPv4 gospodarza"); address.setInputType(android.text.InputType.TYPE_CLASS_PHONE);
+        address.setHint(tr("IPv4 gospodarza")); address.setInputType(android.text.InputType.TYPE_CLASS_PHONE);
         if (!host) fields.addView(address);
         android.widget.EditText port = new android.widget.EditText(this);
         port.setInputType(android.text.InputType.TYPE_CLASS_NUMBER); port.setText("12345"); fields.addView(port);
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(host ? "Utwórz pokój" : "Dołącz do pokoju")
-            .setView(fields).setPositiveButton("Dalej", null).setNegativeButton("Powrót", null).create();
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(host ? tr("Utwórz pokój") : tr("Dołącz do pokoju"))
+            .setView(fields).setPositiveButton("Dalej", null).setNegativeButton(tr("Powrót"), null).create();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             try {
                 int number = Integer.parseInt(port.getText().toString());
@@ -111,23 +125,55 @@ public final class BluetoothLobbyActivity extends Activity {
                 Intent game = new Intent(this, OpenLF2Activity.class);
                 game.putExtra("lan_host", host); game.putExtra("lan_address", ip); game.putExtra("lan_port", number);
                 transferred = true; startActivity(game); finish(); dialog.dismiss();
-            } catch (Exception error) { help.setText("Nie można rozpocząć: " + error.getMessage()); }
+            } catch (Exception error) { help.setText(tr("Nie można rozpocząć: ") + error.getMessage()); }
         }));
         dialog.show();
     }
+    private String tr(String text) {
+        if(!language.equals("en"))return text;
+        return ClassicMenuData.read(this).optJSONObject("android_en").optString(text,text);
+    }
+    private String t(String key) { return ClassicMenuData.text(this,language,key); }
+    private void refreshMenu() {
+        int[] ids={R.id.pf_play,R.id.pf_module,R.id.pf_network,R.id.pf_settings,R.id.pf_language,R.id.pf_credits,R.id.pf_quit};
+        String[] keys={"battle","modules","online","settings","language","credits","quit"};
+        for(int i=0;i<ids.length;i++) ((Button)findViewById(ids[i])).setText(t(keys[i]));
+        findViewById(R.id.pf_pl).setSelected(language.equals("pl"));findViewById(R.id.pf_en).setSelected(language.equals("en"));
+        ((Button)findViewById(R.id.pf_cancel)).setText(ClassicMenuData.localized(this).getText(R.string.pf_cancel));
+        refreshModuleLabel();
+    }
     private void refreshModuleLabel() {
-        try { moduleButton.setText("MODUŁ: " + new GamePackSettings(getFilesDir()).label()); }
-        catch (java.io.IOException | org.json.JSONException error) {
-            status.setText("Nie można odczytać wyboru modułów: " + error.getMessage());
-        }
+        try { status.setText(t("active")+tr(new GamePackSettings(getFilesDir()).label())); }
+        catch(java.io.IOException | org.json.JSONException error) { status.setText(error.getMessage()); }
+    }
+    private void selectLanguage(String id) {
+        try {
+            MobileCodeSettings store=new MobileCodeSettings(getFilesDir());org.json.JSONObject doc=store.read();
+            org.json.JSONObject opts=doc.optJSONObject("options");if(opts==null)opts=new org.json.JSONObject();
+            opts.put("language",id.equals("en")?"english":"polish");opts.put("font_antialiasing",false);doc.put("options",opts);store.write(doc);
+            language=id;refreshMenu();
+        } catch(java.io.IOException | org.json.JSONException error) { status.setText(t("save_error")+error.getMessage()); }
+    }
+    private void launchMenu(String menu) {
+        try {
+            MobileCodeSettings store=new MobileCodeSettings(getFilesDir());org.json.JSONObject doc=store.read();
+            doc.put("little_fighters_start_menu",menu);store.write(doc);launch(null,0);
+        } catch(java.io.IOException | org.json.JSONException error) {status.setText(t("save_error")+error.getMessage());}
+    }
+    private void showOnline() {
+        new AlertDialog.Builder(this).setTitle(t("online"))
+            .setItems(new String[]{t("quick"),t("host"),t("join"),t("rooms"),t("friends"),"Wi-Fi / Bluetooth"},(d,w)->{
+                if(w==0||w==4)new AlertDialog.Builder(this).setMessage(t("offline")).setPositiveButton(t("back"),null).show();
+                else if(w==1)lanAddress(true);else if(w==2)lanAddress(false);else if(w==3)launchMenu("online");else showConnections();
+            }).setNegativeButton(t("back"),null).show();
     }
 
     private void showModules() {
         GamePackSettings settings = new GamePackSettings(getFilesDir());
         String[] labels = java.util.Arrays.copyOf(GamePackSettings.TITLES, GamePackSettings.TITLES.length + 2);
-        labels[labels.length - 2] = "Wszystkie razem";
-        labels[labels.length - 1] = "Dobierz własny zestaw…";
-        new AlertDialog.Builder(this).setTitle("Wybierz moduł gry")
+        labels[labels.length - 2] = tr("Wszystkie razem");
+        labels[labels.length - 1] = tr("Dobierz własny zestaw…");
+        new AlertDialog.Builder(this).setTitle(tr("Wybierz moduł gry"))
             .setItems(labels, (dialog, which) -> {
                 if (which == labels.length - 1) { showCustomModules(); return; }
                 try {
@@ -135,9 +181,9 @@ public final class BluetoothLobbyActivity extends Activity {
                         settings.selection(), settings.hideDuplicates());
                     refreshModuleLabel();
                 } catch (java.io.IOException | org.json.JSONException | IllegalArgumentException error) {
-                    Toast.makeText(this, "Nie zapisano modułu: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, tr("Nie zapisano modułu: ") + error.getMessage(), Toast.LENGTH_LONG).show();
                 }
-            }).setNegativeButton("Anuluj", null).show();
+            }).setNegativeButton(tr("Anuluj"), null).show();
     }
 
     private void showCustomModules() {
@@ -145,18 +191,18 @@ public final class BluetoothLobbyActivity extends Activity {
         final boolean[] selected;
         try { selected = settings.selection(); }
         catch (java.io.IOException | org.json.JSONException error) {
-            Toast.makeText(this, "Nie można odczytać modułów: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, tr("Nie można odczytać modułów: ") + error.getMessage(), Toast.LENGTH_LONG).show();
             return;
         }
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Dobierz moduły do wspólnej puli")
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(tr("Dobierz moduły do wspólnej puli"))
             .setMultiChoiceItems(GamePackSettings.TITLES, selected, (window, which, checked) -> selected[which] = checked)
-            .setPositiveButton("Zapisz", null).setNegativeButton("Anuluj", null).create();
+            .setPositiveButton(tr("Zapisz"), null).setNegativeButton(tr("Anuluj"), null).create();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
             try {
                 settings.save(GamePackSettings.CUSTOM, selected, settings.hideDuplicates());
                 refreshModuleLabel(); dialog.dismiss();
             } catch (java.io.IOException | org.json.JSONException | IllegalArgumentException error) {
-                Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, tr(error.getMessage()), Toast.LENGTH_LONG).show();
             }
         }));
         dialog.show();
@@ -164,40 +210,40 @@ public final class BluetoothLobbyActivity extends Activity {
     private void showSettings() {
         final MobileCodeSettings settings = new MobileCodeSettings(getFilesDir());
         final CheckBox codes = new CheckBox(this);
-        codes.setText("Włącz kody — odblokuj ukryte postacie");
+        codes.setText(tr("Włącz kody — odblokuj ukryte postacie"));
         codes.setPadding(32, 24, 32, 24);
         final GamePackSettings packs = new GamePackSettings(getFilesDir());
         final CheckBox duplicates = new CheckBox(this);
-        duplicates.setText("Ukryj powtórzenia podstawowych postaci we wspólnej puli");
+        duplicates.setText(tr("Ukryj powtórzenia podstawowych postaci we wspólnej puli"));
         duplicates.setPadding(32, 12, 32, 24);
         try { codes.setChecked(settings.enabled()); }
         catch (java.io.IOException | org.json.JSONException error) {
-            new AlertDialog.Builder(this).setTitle("Błąd ustawień")
-                .setMessage("Nie można odczytać ustawień: " + error.getMessage())
+            new AlertDialog.Builder(this).setTitle(tr("Błąd ustawień"))
+                .setMessage(tr("Nie można odczytać ustawień: ") + error.getMessage())
                 .setPositiveButton("OK", null).show();
             return;
         }
         try { duplicates.setChecked(packs.hideDuplicates()); }
         catch (java.io.IOException | org.json.JSONException error) {
-            Toast.makeText(this, "Nie można odczytać ustawień: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, tr("Nie można odczytać ustawień: ") + error.getMessage(), Toast.LENGTH_LONG).show();
             return;
         }
         LinearLayout content = new LinearLayout(this); content.setOrientation(LinearLayout.VERTICAL);
         content.addView(codes); content.addView(duplicates);
-        TextView touchLabel = new TextView(this); touchLabel.setText("Sterowanie dotykowe (wszystkie moduły)");
+        TextView touchLabel = new TextView(this); touchLabel.setText(tr("Sterowanie dotykowe (wszystkie moduły)"));
         content.addView(touchLabel);
         android.widget.Spinner touch = new android.widget.Spinner(this);
         android.widget.ArrayAdapter<String> layouts = new android.widget.ArrayAdapter<>(this,
-            android.R.layout.simple_spinner_item, new String[]{"1. Klasyczny LF", "2. Joystick"});
+            android.R.layout.simple_spinner_item, new String[]{tr("1. Klasyczny LF"), "2. Joystick"});
         layouts.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); touch.setAdapter(layouts);
         try { touch.setSelection("modern".equals(settings.touchLayout()) ? 1 : 0); }
         catch (java.io.IOException | org.json.JSONException error) {
-            Toast.makeText(this, "Nie można odczytać sterowania: " + error.getMessage(), Toast.LENGTH_LONG).show(); return;
+            Toast.makeText(this, tr("Nie można odczytać sterowania: ") + error.getMessage(), Toast.LENGTH_LONG).show(); return;
         }
         content.addView(touch);
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Ustawienia")
-            .setView(content).setPositiveButton("Zapisz", null)
-            .setNegativeButton("Anuluj", null).create();
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(tr("Ustawienia"))
+            .setView(content).setPositiveButton(tr("Zapisz"), null)
+            .setNegativeButton(tr("Anuluj"), null).create();
         dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             .setOnClickListener(view -> {
                 try {
@@ -206,11 +252,11 @@ public final class BluetoothLobbyActivity extends Activity {
                     dialog.dismiss();
                     if (codes.isChecked() && !wasEnabled) {
                         new AlertDialog.Builder(this).setTitle("lamus")
-                            .setMessage("Kody włączone. Ukryte postacie odblokowane.")
+                            .setMessage(tr("Kody włączone. Ukryte postacie odblokowane."))
                             .setPositiveButton("Graj", null).show();
                     }
                 } catch (java.io.IOException | org.json.JSONException error) {
-                    Toast.makeText(this, "Nie zapisano ustawień: " + error.getMessage(),
+                    Toast.makeText(this, tr("Nie zapisano ustawień: ") + error.getMessage(),
                         Toast.LENGTH_LONG).show();
                 }
             }));
@@ -221,37 +267,37 @@ public final class BluetoothLobbyActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 31 && checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 4202);
-            status.setText("Zezwól na połączenie z urządzeniami w pobliżu, a następnie wybierz tryb ponownie.");
+            status.setText(tr("Zezwól na połączenie z urządzeniami w pobliżu, a następnie wybierz tryb ponownie."));
             return;
         }
         BluetoothManager manager = (BluetoothManager)getSystemService(BLUETOOTH_SERVICE);
         BluetoothAdapter adapter = manager == null ? null : manager.getAdapter();
-        if (adapter == null) { status.setText("Ten telefon nie udostępnia Bluetooth. Wybierz grę lokalną."); return; }
+        if (adapter == null) { status.setText(tr("Ten telefon nie udostępnia Bluetooth. Wybierz grę lokalną.")); return; }
         try {
             if (!adapter.isEnabled()) {
                 startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 4203);
-                status.setText("Włącz Bluetooth i ponownie wybierz tryb."); return;
+                status.setText(tr("Włącz Bluetooth i ponownie wybierz tryb.")); return;
             }
             if (host) { start(adapter, null); return; }
             List<BluetoothDevice> peers = new ArrayList<>(adapter.getBondedDevices());
-            if (peers.isEmpty()) { status.setText("Brak sparowanych urządzeń. Sparuj oba telefony w ustawieniach Bluetooth."); return; }
+            if (peers.isEmpty()) { status.setText(tr("Brak sparowanych urządzeń. Sparuj oba telefony w ustawieniach Bluetooth.")); return; }
             String[] labels = new String[peers.size()];
             for (int i=0; i<peers.size(); i++) {
                 BluetoothDevice device = peers.get(i);
                 labels[i] = (device.getName() == null ? "Telefon" : device.getName()) + "\n" + device.getAddress();
             }
-            new AlertDialog.Builder(this).setTitle("Wybierz telefon, który założył grę")
+            new AlertDialog.Builder(this).setTitle(tr("Wybierz telefon, który założył grę"))
                 .setItems(labels, (dialog, index) -> start(adapter, peers.get(index)))
-                .setNegativeButton("Anuluj", null).show();
+                .setNegativeButton(tr("Anuluj"), null).show();
         } catch (SecurityException error) {
-            status.setText("Brak zgody na Bluetooth. Sprawdź uprawnienia aplikacji w ustawieniach Androida.");
+            status.setText(tr("Brak zgody na Bluetooth. Sprawdź uprawnienia aplikacji w ustawieniach Androida."));
         }
     }
     private void start(BluetoothAdapter adapter, BluetoothDevice peer) {
         findViewById(R.id.pf_cancel).setVisibility(android.view.View.VISIBLE);
         for (Button action : actions) action.setEnabled(false);
-        status.setText(peer == null ? "Czekam na drugi telefon. Na nim wybierz DOŁĄCZ."
-            : "Łączenie z drugim telefonem…");
+        status.setText(peer == null ? tr("Czekam na drugi telefon. Na nim wybierz DOŁĄCZ.")
+            : tr("Łączenie z drugim telefonem…"));
         session = BluetoothSession.create();
         final BluetoothSession attempt = session;
         session.start(adapter, peer, new BluetoothSession.Listener() {
@@ -263,7 +309,7 @@ public final class BluetoothLobbyActivity extends Activity {
                 if (transferred) {
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                 } else if (!isFinishing() && !isDestroyed()) {
-                    status.setText(message + "\nMożesz ponowić połączenie.");
+                    status.setText(message + tr("\nMożesz ponowić połączenie."));
                     for (Button action : actions) action.setEnabled(true);
                 }
             }); }

@@ -16,44 +16,48 @@ function hub.title(profile)
  for _,entry in ipairs(hub.profiles) do if entry.profile==profile then return entry.title end end
  return "Little Fighters"
 end
+local L=require('polish-fighters/menu_locale').text
+local L=require('polish-fighters/menu_locale').text
 function hub.rows(state)
- if state.hub_mode=="packs" then
+ local mode=state.hub_mode
+ local function row(id,key) return {id,L(key or id)} end
+ if mode=='root' or mode==nil then
+  return {row('battle'),row('library','modules'),row('online'),row('settings'),row('language'),row('credits'),row('quit')}
+ elseif mode=='profile' or mode=='battle' then
+  local rows={}
+  for _,id in ipairs({'versus','stage','championship','team_championship','battle_setup','demo','replay'}) do rows[#rows+1]=row('mode_'..id,id) end
+  rows[#rows+1]=row('root','back');return rows
+ elseif mode=='status' then
+  local rows={};local inventory=require('polish-fighters/module_inventory')
+  for _,entry in ipairs(hub.profiles) do
+   local data=inventory[entry.id] or {missing=1}
+   rows[#rows+1]={'status_'..entry.id,entry.title..' / '..L('missing_files')..data.missing}
+  end
+  rows[#rows+1]={'unavailable',L('absent_turbo')};rows[#rows+1]=row('library','back');return rows
+ elseif mode=='settings' then
+  return {row('controls'),row('options','video'),row('recording'),row('extras'),row('root','back')}
+ elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
+ elseif mode=='credits' then return {row('root','back')}
+ elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}
+ elseif mode=='online' then
+  return {row('unavailable','quick'),row('network','host'),row('network','join'),row('account','rooms'),row('unavailable','friends'),row('root','back')}
+ elseif mode=='packs' then
   local rows={}
   for _,entry in ipairs(hub.profiles) do
-   rows[#rows+1]={"toggle_"..entry.id,(state.hub_pack_edit[entry.id]~=false and "[WŁ.] " or "[WYŁ.] ")..entry.title}
+   local missing=state.hub_available and state.hub_available[entry.id]==false
+   rows[#rows+1]={'toggle_'..entry.id,(state.hub_pack_edit[entry.id]~=false and L('on') or L('off'))..entry.title..(missing and L('missing') or '')}
   end
-  rows[#rows+1]={"packs_all","ZAZNACZ WSZYSTKIE"}
-  rows[#rows+1]={"packs_duplicates",state.hub_hide_duplicates~=false and "POWTÓRZENIA LF2: UKRYTE" or "POWTÓRZENIA LF2: WIDOCZNE"}
-  rows[#rows+1]={"packs_save","ZAPISZ WYBÓR"}
-  rows[#rows+1]={"packs_cancel","ANULUJ"}
-  return rows
- end
- if state.hub_mode=="profile" then
-  return {{"versus","WALKA LOKALNA"},{"stage","KAMPANIA / PRZYGODA"},{"battle_setup","BITWA DRUŻYN"},
-    {"championship","TURNIEJ"},{"maps","WYBIERZ MAPĘ"},{"fighters","PORADNIK KOMBOSÓW / POSTACIE"},
-    {"network","GRA W SIECI / WI-FI"},{"controls","USTAWIENIA STEROWANIA"},{"root","MODUŁY / MENU GŁÓWNE"}}
+  rows[#rows+1]=row('packs_all','all')
+  rows[#rows+1]=row('packs_duplicates',state.hub_hide_duplicates~=false and 'duplicates_hidden' or 'duplicates_shown')
+  rows[#rows+1]=row('status');rows[#rows+1]=row('packs_save','save');rows[#rows+1]=row('packs_cancel','cancel');return rows
  end
  local rows={}
- if state.hub_mode~="library" then rows[#rows+1]={"library","WSZYSTKIE MODY / WSPÓLNA PULA"} end
  for _,entry in ipairs(hub.profiles) do
-  if state.hub_mode~="library" or not state.hub_selected or state.hub_selected[entry.id]~=false then
-  local available=state.hub_available and state.hub_available[entry.id]
-  rows[#rows+1]={"profile_"..entry.id,entry.title:upper()..(available==false and " [BRAK PAKIETU]" or "")}
+  if not state.hub_selected or state.hub_selected[entry.id]~=false then
+   rows[#rows+1]={'profile_'..entry.id,entry.title..(state.hub_available and state.hub_available[entry.id]==false and L('missing') or '')}
   end
  end
- if state.hub_mode=="library" then
-  rows[#rows+1]={"packs","DOBIERZ AKTYWNE PAKIETY"}
-  rows[#rows+1]={"profile_mixed","WSZYSTKIE RAZEM — TRYB TESTOWY"}
-  rows[#rows+1]={"root","POWRÓT"};return rows
- end
- rows[#rows+1]={"controls","USTAWIENIA STEROWANIA"}
- rows[#rows+1]={"options","USTAWIENIA"}
- rows[#rows+1]={"versus","GRA LOKALNA"}
- rows[#rows+1]={"network","GRA W SIECI / WI-FI"}
- rows[#rows+1]={"extras","HISTORIA / ODBLOKOWANIA"}
- rows[#rows+1]={"recording","USTAWIENIA NAGRAŃ"}
- rows[#rows+1]={"replay","ODTWÓRZ NAGRANIE"}
- rows[#rows+1]={"quit","WYJŚCIE"}
+ rows[#rows+1]=row('packs');rows[#rows+1]=row('profile_mixed','mixed');rows[#rows+1]=row('status');rows[#rows+1]=row(state.hub_pending_mode and 'battle' or 'root','back')
  return rows
 end
 return hub

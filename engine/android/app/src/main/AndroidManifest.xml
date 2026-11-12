@@ -13,7 +13,7 @@
     <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
-    <application android:label="Polish Fighters" android:icon="@mipmap/ic_launcher" android:theme="@style/Theme.PolishFighters"
+    <application android:label="POLISH LITTLE FIGHTERS" android:icon="@mipmap/ic_launcher" android:theme="@style/Theme.PolishFighters"
         android:hasCode="true" android:extractNativeLibs="true">
         <activity android:name=".OpenLF2Activity" android:exported="false"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode"

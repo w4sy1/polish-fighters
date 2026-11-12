@@ -16,7 +16,20 @@ return function(base)
   local chosen=saved.little_fighters_start_profile
   local single_mobile=options.touch_device and chosen and chosen~='all' and chosen~='custom'
   state.launch.hub_mode=(options.profile_start or single_mobile) and "profile" or "root"
+  state.launch.hub_preselected=options.profile_start or single_mobile
   state.launch.hub_wait_release=options.profile_start==true
+  local menu=saved.little_fighters_start_menu
+  if menu=='battle' or menu=='settings' or menu=='online' or menu=='controls' or menu=='options' then
+   state.launch.hub_mode=menu;saved.little_fighters_start_menu=nil;engine.write_settings(saved)
+   if menu=='controls' then state.launch.hub_mode='settings';require('polish-fighters/input_settings').open(state.launch)
+   elseif menu=='options' then state.launch.hub_mode='settings';state.launch.page='options';state.launch.options=require('base/game/options').current();state.launch.options_focus=1 end
+  end
+  local pending=saved.little_fighters_pending_mode
+  local valid={versus=true,stage=true,championship=true,team_championship=true,battle_setup=true}
+  if valid[pending] then
+   state.launch.hub_pending_mode=pending;state.launch.hub_mode='players'
+   saved.little_fighters_pending_mode=nil;engine.write_settings(saved)
+  end
   return state
  end
  function base.global_navigation_update(state,input,context)
@@ -31,6 +44,13 @@ return function(base)
    return true
   end
   if not visible(state) then return false end
+  local escape=input.keys and input.keys[27]
+  local back=escape and not state.hub_escape_held
+  state.hub_escape_held=escape
+  if back and not state.session and (state.active=='characters' or state.active=='battle' or state.active=='championship') then
+   state.active='launch';state.launch.page='menu';state.launch.hub_mode='players';state.wait_release=true
+   return true
+  end
   local x,y,w,h=button_area(state)
   if pressed or (input.click and input.pointer_x>=x and input.pointer_x<=x+w and input.pointer_y>=y and input.pointer_y<=y+h) then
    if state.active=='match' then
@@ -49,8 +69,13 @@ return function(base)
   return false
  end
  function base.draw(state,context)
+  if context.text then
+   local original=context;context={};for key,value in pairs(original) do context[key]=value end
+   function context.text(value,...) return original.text(require('polish-fighters/menu_locale').translate(value),...) end
+  end
+  context.pf_selection_hint=state.launch and state.launch.hub_enabled and state.active=='characters'
   draw(state,context)
-  if not visible(state) then return end
+  if not visible(state) or state.active=='launch' then return end
   local x,y,w,h=button_area(state)
   if state.active=='characters' and context.text then
    local lines=require('polish-fighters/input_settings').selection_hint(

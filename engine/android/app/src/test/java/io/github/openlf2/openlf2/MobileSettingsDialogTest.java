@@ -42,6 +42,9 @@ public class MobileSettingsDialogTest {
             assertNotNull(open);
             open.performClick();
             Shadows.shadowOf(Looper.getMainLooper()).idle();
+            AlertDialog menu = ShadowAlertDialog.getLatestAlertDialog();
+            android.widget.ListView list=menu.getListView();list.performItemClick(list.getAdapter().getView(2,null,list),2,2);
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
             AlertDialog settings = ShadowAlertDialog.getLatestAlertDialog();
             CheckBox checkbox = (CheckBox)find(settings.getWindow().getDecorView(), CheckBox.class, null);
             assertNotNull(checkbox);
@@ -63,6 +66,9 @@ public class MobileSettingsDialogTest {
             BluetoothLobbyActivity activity = controller.get();
             new MobileCodeSettings(activity.getFilesDir()).save(false);
             find(activity.getWindow().getDecorView(), Button.class, "USTAWIENIA").performClick();
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            AlertDialog menu = ShadowAlertDialog.getLatestAlertDialog();
+            android.widget.ListView list=menu.getListView();list.performItemClick(list.getAdapter().getView(2,null,list),2,2);
             Shadows.shadowOf(Looper.getMainLooper()).idle();
             AlertDialog settings = ShadowAlertDialog.getLatestAlertDialog();
             ((CheckBox)find(settings.getWindow().getDecorView(), CheckBox.class, null)).performClick();

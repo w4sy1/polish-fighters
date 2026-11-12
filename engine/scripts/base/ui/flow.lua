@@ -364,7 +364,10 @@ end
 -- the game: not in a network game, where it disconnects, and not on the launch screen's pages that use it.
 local function escape_free(state)
     if state.session then return false end
-    if state.active == "launch" then return state.launch.page == "menu" and not state.launch.pf_panel end
+    if state.active == "launch" then
+        if state.launch.hub_enabled and (state.launch.hub_mode~='root' or state.launch.hub_edit or state.launch.hub_online) then return false end
+        return state.launch.page == "menu" and not state.launch.pf_panel
+    end
     return true
 end
 -- raw: the host's input; screens get it per player slot, with the last known pointer position

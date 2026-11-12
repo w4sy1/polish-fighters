@@ -75,7 +75,16 @@ local function from_settings(section)
             if not integer(player.buttons[index], 0, 31) then return nil end
             buttons[index] = player.buttons[index]
         end
-        sets[set] = {device = player.device, keys = keys, buttons = buttons, mouse_mode=player.mouse_mode==true}
+        local directions={'u','d','l','r'}
+        if player.directions~=nil then
+            if type(player.directions)~='table' then return nil end
+            for i=1,4 do
+                local direction=player.directions[i]
+                if direction~='u' and direction~='d' and direction~='l' and direction~='r' then return nil end
+                directions[i]=direction
+            end
+        end
+        sets[set] = {device = player.device, keys = keys, buttons = buttons, mouse_mode=player.mouse_mode==true,directions=directions}
         names[set] = player.name
     end
     return {sets = sets, names = names}
@@ -152,7 +161,7 @@ function controls.copy(settings)
     for set = 1, 4 do
         local original = settings.sets[set]
         copy.sets[set] = {device = original.device, mouse_mode=original.mouse_mode==true, keys = {unpack(original.keys)},
-            buttons = {unpack(original.buttons)}}
+            buttons = {unpack(original.buttons)}, directions={unpack(original.directions or {'u','d','l','r'})}}
         copy.names[set] = settings.names[set]
     end
     return copy
@@ -165,6 +174,13 @@ function controls.conflicts(settings)
     for slot,set in ipairs(settings.sets) do
         local seen={}
         local keyboard=set.device==constants.input_devices.keyboard
+        if not keyboard then
+            local dirs={}
+            for index,direction in ipairs(set.directions or {'u','d','l','r'}) do
+                if dirs[direction] then found[#found+1]={player=slot,first=dirs[direction],second=index,value=direction,keyboard=false}
+                else dirs[direction]=index end
+            end
+        end
         local bindings=keyboard and set.keys or set.buttons
         for index,value in ipairs(bindings) do
             -- Keyboard zero means unassigned; gamepad button zero is a real button.
@@ -184,7 +200,7 @@ function controls.save(settings)
     local conflicts=controls.conflicts(settings)
     if #conflicts>0 then
         local conflict=conflicts[1]
-        return nil,string.format("Player %d: duplicate control %d",conflict.player,conflict.value)
+        return nil,string.format("Player %d: duplicate control %s",conflict.player,conflict.value)
     end
     local document = engine.read_settings()
     if type(document) ~= "table" then document = {} end
@@ -192,7 +208,7 @@ function controls.save(settings)
     for set = 1, 4 do
         local source = settings.sets[set]
         local player = {name = settings.names[set], device = source.device, mouse_mode=source.mouse_mode==true,
-            buttons = {source.buttons[1], source.buttons[2], source.buttons[3]}}
+            buttons = {source.buttons[1], source.buttons[2], source.buttons[3]},directions={unpack(source.directions or {'u','d','l','r'})}}
         for index, name in ipairs(key_names) do player[name] = source.keys[index] end
         players[set] = player
     end
@@ -225,7 +241,7 @@ local function map_keys(settings, input)
             local pad = input.pads[set.device]
             if pad then
                 local letters = {}
-                for index, direction in ipairs({"u", "d", "l", "r"}) do
+                for index, direction in ipairs(set.directions or {"u", "d", "l", "r"}) do
                     if pad.dirs[direction] and not input[slot]:find(actions[index], 1, true) then letters[#letters + 1] = actions[index] end
                 end
                 for index = 5, 7 do

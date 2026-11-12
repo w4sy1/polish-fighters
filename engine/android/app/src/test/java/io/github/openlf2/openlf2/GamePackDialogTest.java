@@ -22,7 +22,7 @@ import org.robolectric.shadows.ShadowToast;
 public class GamePackDialogTest {
     @org.junit.Before public void disableUpdateNetwork() { GitHubUpdates.resetForTest(); }
     private Button moduleButton(View root) {
-        if (root instanceof Button && ((Button)root).getText().toString().startsWith("MODUŁ:")) return (Button)root;
+        if (root instanceof Button && root.getId()==R.id.pf_module) return (Button)root;
         if (root instanceof ViewGroup) {
             ViewGroup group = (ViewGroup)root;
             for (int i = 0; i < group.getChildCount(); i++) {
@@ -48,7 +48,7 @@ public class GamePackDialogTest {
             choose(ShadowAlertDialog.getLatestAlertDialog(), 0);
             GamePackSettings settings = new GamePackSettings(activity.getFilesDir());
             assertEquals("polish_fighters", settings.mode());
-            assertTrue(open.getText().toString().contains("Polish Fighters"));
+            assertTrue(((android.widget.TextView)activity.findViewById(R.id.pf_status)).getText().toString().contains("Polish Fighters"));
             open.performClick(); Shadows.shadowOf(Looper.getMainLooper()).idle();
             choose(ShadowAlertDialog.getLatestAlertDialog(), GamePackSettings.IDS.length);
             assertEquals(GamePackSettings.ALL, settings.mode());

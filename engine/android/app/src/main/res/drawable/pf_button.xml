@@ -1,1 +1,6 @@
-<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#405A7698"><item android:drawable="@drawable/pf_card"/></ripple>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+ <item android:state_pressed="true" android:drawable="@drawable/pf_primary"/>
+ <item android:state_focused="true" android:drawable="@drawable/pf_primary"/>
+ <item android:state_selected="true" android:drawable="@drawable/pf_primary"/>
+ <item android:drawable="@drawable/pf_card"/>
+</selector>

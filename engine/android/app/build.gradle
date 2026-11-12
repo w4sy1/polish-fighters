@@ -67,8 +67,8 @@ android {
         applicationId 'pl.prestigetech.polishfighters'
         minSdk 21
         targetSdk 35
-        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 14
-        versionName project.findProperty('openlf2VersionName') ?: '0.12.2-start'
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 15
+        versionName project.findProperty('openlf2VersionName') ?: '0.13.0-classic-test'
     }
 
     // A fixed key, so each build is signed the same and installs over the previous one; the

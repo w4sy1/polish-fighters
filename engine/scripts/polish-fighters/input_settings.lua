@@ -17,7 +17,7 @@ end
 function screen.selection_hint(touch,style,slot)
  local who='TY: GRACZ '..((slot or 0)+1)
  if touch then
-  return {who..' | DOTYK '..(style=='modern' and '2: JOYSTICK + CELOWANIE' or '1: KRZYŻAK'),
+  return {who..' | DOTYK '..(style=='modern' and '2: JOYSTICK' or '1: KRZYŻAK'),
    style=='modern' and 'Ruch: lewy drążek | ATAK: naciśnij | SKOK: wstecz' or
     'Ruch: krzyżak | ATAK: wybór / OK | SKOK: cofnij | BLOK: obrona'}
  end
@@ -61,7 +61,7 @@ function screen.rows(state,input)
  for row,label in ipairs(actions) do
   local binding
   if set.device==0 then binding=screen.key_label(set.keys[row])
-  elseif row<=4 then binding="D-PAD / LEWY ANALOG"
+  elseif row<=4 then binding='D-PAD / ANALOG: '..(set.directions or {'u','d','l','r'})[row]:upper()
   else binding="PRZYCISK "..(set.buttons[row-4]+1) end
   rows[#rows+1]={"bind:"..row,label..": "..binding,35,185+(row-1)*33,430,29}
  end
@@ -85,8 +85,7 @@ function screen.activate(state,id)
   else set.device=(set.device+1)%5;set.mouse_mode=false end
  elseif id:sub(1,5)=="bind:" then
   local row=tonumber(id:sub(6))
-  if set.device==0 or row>4 then state.hub_capture={row=row,armed=false}
-  else state.hub_control_message="Kierunki pada obsługuje D-pad i lewy analog." end
+  state.hub_capture={row=row,armed=false}
  elseif id=="wasd" or id=="arrows" or id=="mouse" or id=="num789" then preset(state,id)
  elseif id=="defaults" then state.hub_edit=controls.defaults()
  elseif id=="resolve" then
@@ -121,11 +120,15 @@ function screen.update(state,input)
    end
   else
    local pad=input.pads and input.pads[set.device]
-   for button=0,31 do if pad and pad.buttons[button] then pressed=button;break end end
+   if capture.row<=4 then
+    for _,direction in ipairs({'u','d','l','r'}) do if pad and pad.dirs and pad.dirs[direction] then pressed=direction;break end end
+   else for button=0,31 do if pad and pad.buttons[button] then pressed=button;break end end end
   end
   if pressed==nil then capture.armed=true
   elseif capture.armed then
-   if set.device==0 then set.keys[capture.row]=pressed else set.buttons[capture.row-4]=pressed end
+   if set.device==0 then set.keys[capture.row]=pressed
+   elseif capture.row<=4 then set.directions=set.directions or {'u','d','l','r'};set.directions[capture.row]=pressed
+   else set.buttons[capture.row-4]=pressed end
    state.hub_capture=nil
   end
   return

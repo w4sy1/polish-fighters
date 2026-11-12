@@ -30,13 +30,15 @@ return function(base)
     human.x_int,human.x,computer.x_int,computer.x=200,200,400,400
     computer.z_int,computer.z=human.z_int,human.z
     human.blink,computer.blink=0,0
-    local ai_moved,ai_attack=false,false
+    local ai_moved,ai_attack,ai_action=false,false,false
+    local initial_hp=human.hp
     for tick=1,300 do
      match.step(ai_match,{functions='',keys={}})
      if math.abs(computer.x_int-400)>5 then ai_moved=true end
      if computer.keys.attack then ai_attack=true end
+     if computer.record.frame(computer.frame).state==3 then ai_action=true end
     end
-    results[#results+1]=tostring(fighter.id)..':'..tostring(fighter.name)..':move='..tostring(moved)..':attack='..tostring(attacking)..':ai_move='..tostring(ai_moved)..':ai_attack='..tostring(ai_attack)
+    results[#results+1]=tostring(fighter.id)..':'..tostring(fighter.name)..':move='..tostring(moved)..':attack='..tostring(attacking)..':ai_move='..tostring(ai_moved)..':ai_attack='..tostring(ai_attack)..':ai_action='..tostring(ai_action)..':ai_damage='..tostring(human.hp<initial_hp)
    end
   end
   state.probe_results=table.concat(results,'\n')
