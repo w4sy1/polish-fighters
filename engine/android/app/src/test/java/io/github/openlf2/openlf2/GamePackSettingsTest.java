@@ -29,6 +29,15 @@ public class GamePackSettingsTest {
         assertTrue(settings.hideDuplicates());
     }
 
+    @Test public void visibleDefaultGameIsSavedBeforeEngineLaunch() throws Exception {
+        readyGame();
+        MobileCodeSettings settings = new MobileCodeSettings(temporary.getRoot());
+        settings.write(new JSONObject("{\"controls\":{\"keep\":true}}"));
+        GameLaunchArguments.build(temporary.getRoot(), null, 0);
+        assertEquals("lf_two", settings.read().getString("little_fighters_start_profile"));
+        assertTrue(settings.read().getJSONObject("controls").getBoolean("keep"));
+    }
+
     @Test public void everySingleModuleLaunchesExactlyThatModule() throws Exception {
         File game = readyGame();
         GamePackSettings settings = new GamePackSettings(temporary.getRoot());

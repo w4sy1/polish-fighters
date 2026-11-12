@@ -33,7 +33,9 @@ final class GameLaunchArguments {
         add(args, "--installer", new File(game, "LF2_v2.0a.exe"));
         add(args, "--scripts", new File(game, "scripts"));
         add(args, "--config-dir", new File(files, "settings"));
-        String mode = new GamePackSettings(files).mode();
+        GamePackSettings settings = new GamePackSettings(files);
+        String mode = settings.mode();
+        settings.save(mode, settings.selection(), settings.hideDuplicates());
         if (GamePackSettings.ALL.equals(mode) || GamePackSettings.CUSTOM.equals(mode)) {
             add(args, "--mod", new File(game, "content-packs/polish-originals"));
             add(args, "--mod", new File(game, "content-packs/mixed-all"));

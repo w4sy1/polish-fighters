@@ -1,0 +1,5 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/pf_screen" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:background="@drawable/pf_background" android:clipToPadding="false">
+ <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp" android:gravity="center_vertical">
+  <include layout="@layout/pf_brand" android:layout_width="match_parent" android:layout_height="wrap_content"/><Space android:layout_width="1dp" android:layout_height="24dp"/><include layout="@layout/pf_loading_card" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+ </LinearLayout>
+</ScrollView>

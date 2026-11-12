@@ -12,6 +12,7 @@ import subprocess
 from pathlib import Path
 from zipfile import ZipFile
 from prepare_android_game import ROOT
+from verify_game_bundle import validate_bundle
 
 SYSTEM_LIBS = {'libc.so', 'libm.so', 'libdl.so', 'liblog.so', 'libandroid.so',
                'libEGL.so', 'libGLESv1_CM.so', 'libGLESv2.so', 'libGLESv3.so',
@@ -65,6 +66,7 @@ def main(apk, output_dir=None):
                                    sha256=hashlib.sha256(data).hexdigest()))
             results[abi] = checks
         local = ROOT / 'engine/build/android/assets/game-bundle.zip'
+        bundle_checks = validate_bundle(local, (local.parent / 'game-bundle.id').read_text().strip())
         source_hash = hashlib.sha256()
         with local.open('rb') as stream:
             while block := stream.read(1024 * 1024): source_hash.update(block)
@@ -78,7 +80,7 @@ def main(apk, output_dir=None):
     report = dict(pass_=True, apk=str(apk), bytes=Path(apk).stat().st_size,
                   sha256=digest, abis=results, full_game_bundle_matches=True,
                   zip_crc=True, packaging_overhead_bytes=overhead,
-                  bluetooth_classes_present=True, device_tested=False)
+                  bluetooth_classes_present=True, device_tested=False, bundle_stream_contract=bundle_checks)
     (output / 'apk-checks.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps({k: v for k, v in report.items() if k != 'abis'}, indent=2))
 

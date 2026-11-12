@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+ <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pf_game_label" android:textSize="11sp" android:letterSpacing="0.10" android:textColor="@color/pf_muted"/>
+ <Button android:id="@+id/pf_module" style="@style/PFAction" android:layout_width="match_parent" android:layout_height="60dp" android:layout_marginTop="7dp" android:text="@string/pf_initial_module" android:gravity="center_vertical|start" android:maxLines="2" android:backgroundTint="@null"/>
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="@string/pf_change_game" android:textColor="@color/pf_muted" android:textSize="11sp"/>
+ <Button android:id="@+id/pf_play" style="@style/PFAction" android:layout_width="match_parent" android:layout_height="68dp" android:layout_marginTop="15dp" android:background="@drawable/pf_primary" android:backgroundTint="@null" android:text="@string/pf_play" android:textSize="17sp"/>
+ <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="@string/pf_play_caption" android:textSize="11sp" android:textColor="@color/pf_muted" android:gravity="center"/>
+ <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="14dp" android:orientation="horizontal">
+  <Button android:id="@+id/pf_network" style="@style/PFAction" android:layout_width="0dp" android:layout_weight="1.25" android:layout_height="match_parent" android:text="@string/pf_network" android:textSize="12sp" android:backgroundTint="@null"/>
+  <Space android:layout_width="10dp" android:layout_height="1dp"/>
+  <Button android:id="@+id/pf_settings" style="@style/PFAction" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:text="@string/pf_settings" android:textSize="12sp" android:backgroundTint="@null"/>
+ </LinearLayout>
+ <TextView android:id="@+id/pf_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/pf_ready" android:textSize="12sp" android:textColor="#6CE1C3" android:accessibilityLiveRegion="polite"/>
+ <Button android:id="@+id/pf_cancel" style="@style/PFAction" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="8dp" android:visibility="gone" android:text="@string/pf_cancel" android:backgroundTint="@null"/>
+</LinearLayout>

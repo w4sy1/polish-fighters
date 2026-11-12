@@ -75,6 +75,9 @@ def bundle(files, destination):
             archive.write(source, 'blobs/' + digest)
             if index and index % 1000 == 0:
                 print(f'Packed {index}/{len(blobs)} unique payloads', flush=True)
+    with ZipFile(target) as check:
+        if check.infolist()[0].filename != 'manifest.json':
+            raise ValueError('Android requires manifest.json as the first ZIP entry')
     if target.stat().st_size >= 2_000_000_000:
         raise ValueError('Bundle exceeds single-APK size budget; do not package it')
     (destination / 'game-bundle.id').write_text(bundle_id + '\n', encoding='ascii')

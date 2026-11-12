@@ -9,11 +9,13 @@ import os
 from pathlib import Path
 from zipfile import ZipFile
 from prepare_android_game import ROOT, PACKS
+from verify_game_bundle import validate_bundle
 
 
 def main(output_dir=None):
     assets = ROOT / 'engine/build/android/assets'
     output = Path(output_dir) if output_dir else ROOT / 'validation/android-apk-2026-11-06'
+    validate_bundle(assets / 'game-bundle.zip', (assets / 'game-bundle.id').read_text().strip())
     target = output / 'unpacked-game'
     blobs = target / '.blobs'
     blobs.mkdir(parents=True, exist_ok=True)

@@ -1,3 +1,14 @@
+# Android 0.12.2 — naprawa startu i nowy ekran, 2026-11-12
+
+Naprawiono „Brak indeksu paczki gry”: manifest był na końcu ZIP zamiast na początku.
+Paczka wygenerowana ponownie; walidacja sprawdza kolejność i wszystkie payloady.
+Gotowy APK przeszedł rzeczywisty kod przygotowania gry na pustym katalogu w teście JVM.
+Gradle odrzuca błędną kolejność indeksu. 52 przypadki Androida PASS, Python 57 PASS / 1 SKIP.
+Lint 0 błędów / 35 ostrzeżeń. Nowe ekrany przygotowania i startu Androida wyrenderowane i sprawdzone.
+APK code 14 / 0.12.2-start. Bez prób fizycznego telefonu; kod C++ i Windows bez zmian.
+Raport: docs/START-ANDROID-0.12.2-2026-11-12.md. Publikacja i sprzątanie w toku.
+
+---
 # SDL Android — opublikowana 0.12.1, 2026-11-12
 
 Usunięto 27 błędów Lint SDL: odmowa uprawnień Bluetooth, API pióra i odbiornik USB.

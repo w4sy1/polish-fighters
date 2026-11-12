@@ -32,39 +32,38 @@ public final class BluetoothLobbyActivity extends Activity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         GitHubUpdates.attach(this);
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL); layout.setPadding(32, 12, 32, 12);
-        layout.setBackgroundColor(0xff101827);
-        status = new TextView(this); status.setTextColor(0xffeeeeee); status.setTextSize(17);
-        status.setText("POLISH FIGHTERS\nWi-Fi / hotspot: Android i Windows w jednej sieci. Jeden tworzy pokój, pozostali dołączają. Wybierz ten sam moduł i tę samą wersję gry.");
-        layout.addView(status);
-        moduleButton = new Button(this);
-        moduleButton.setText("WYBIERZ MODUŁ GRY");
+        setContentView(R.layout.activity_game_home);
+        status = findViewById(R.id.pf_status);
+        moduleButton = findViewById(R.id.pf_module);
         moduleButton.setOnClickListener(v -> showModules());
-        actions.add(moduleButton); layout.addView(moduleButton);
+        Button play = findViewById(R.id.pf_play);
+        Button network = findViewById(R.id.pf_network);
+        Button settings = findViewById(R.id.pf_settings);
+        java.util.Collections.addAll(actions, moduleButton, play, network, settings);
+        play.setOnClickListener(v -> launch(null, 0));
+        network.setOnClickListener(v -> showConnections());
+        settings.setOnClickListener(v -> showSettings());
         refreshModuleLabel();
-        button(layout, "GRAJ NA TYM TELEFONIE", () -> launch(null, 0));
-        button(layout, "USTAWIENIA", this::showSettings);
-        button(layout, "GRA W SIECI: WI-FI / HOTSPOT", () -> showLan(false));
-        button(layout, "HOTSPOT BLUETOOTH (SIEĆ IP / PAN)", () -> showLan(true));
-        button(layout, "BLUETOOTH RADIO: UTWÓRZ (2 TELEFONY, PRÓBNE)", () -> connect(true));
-        button(layout, "BLUETOOTH RADIO: DOŁĄCZ (2 TELEFONY, PRÓBNE)", () -> connect(false));
-        button(layout, "PAROWANIE / USTAWIENIA BLUETOOTH", () -> {
-            try { startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)); }
-            catch (android.content.ActivityNotFoundException absent) { status.setText("Otwórz ustawienia Bluetooth telefonu i sparuj oba telefony."); }
-        });
-        Button cancel = new Button(this); cancel.setText("ANULUJ POŁĄCZENIE");
+        Button cancel = findViewById(R.id.pf_cancel);
         cancel.setOnClickListener(v -> {
             BluetoothSession.closeCurrent(); session = null;
             for (Button action : actions) action.setEnabled(true);
-            status.setText("Anulowano. Możesz zagrać lokalnie albo ponowić Bluetooth.");
+            cancel.setVisibility(android.view.View.GONE);
+            status.setText(R.string.pf_ready);
         });
-        layout.addView(cancel);
-        ScrollView scroll = new ScrollView(this); scroll.addView(layout); setContentView(scroll);
     }
-    private void button(LinearLayout layout, String label, Runnable action) {
-        Button button = new Button(this); button.setText(label);
-        button.setOnClickListener(v -> action.run()); actions.add(button); layout.addView(button);
+    private void showConnections() {
+        new AlertDialog.Builder(this).setTitle(R.string.pf_network)
+            .setItems(R.array.pf_connections, (dialog, which) -> {
+                if (which == 0) showLan(false);
+                else if (which == 1) showLan(true);
+                else if (which == 2) connect(true);
+                else if (which == 3) connect(false);
+                else {
+                    try { startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS)); }
+                    catch (android.content.ActivityNotFoundException absent) { status.setText("Otwórz ustawienia Bluetooth telefonu i sparuj oba telefony."); }
+                }
+            }).setNegativeButton("Powrót", null).show();
     }
     private void showLan(boolean bluetoothPan) {
         new AlertDialog.Builder(this).setTitle(bluetoothPan ? "Hotspot Bluetooth / PAN" : "Wi-Fi / hotspot")
@@ -189,7 +188,7 @@ public final class BluetoothLobbyActivity extends Activity {
         content.addView(touchLabel);
         android.widget.Spinner touch = new android.widget.Spinner(this);
         android.widget.ArrayAdapter<String> layouts = new android.widget.ArrayAdapter<>(this,
-            android.R.layout.simple_spinner_item, new String[]{"1. Klasyczny LF", "2. Joystick + celowanie"});
+            android.R.layout.simple_spinner_item, new String[]{"1. Klasyczny LF", "2. Joystick"});
         layouts.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); touch.setAdapter(layouts);
         try { touch.setSelection("modern".equals(settings.touchLayout()) ? 1 : 0); }
         catch (java.io.IOException | org.json.JSONException error) {
@@ -249,6 +248,7 @@ public final class BluetoothLobbyActivity extends Activity {
         }
     }
     private void start(BluetoothAdapter adapter, BluetoothDevice peer) {
+        findViewById(R.id.pf_cancel).setVisibility(android.view.View.VISIBLE);
         for (Button action : actions) action.setEnabled(false);
         status.setText(peer == null ? "Czekam na drugi telefon. Na nim wybierz DOŁĄCZ."
             : "Łączenie z drugim telefonem…");

@@ -38,39 +38,37 @@ public final class GameBootstrapActivity extends Activity {
     private TextView status;
     private ProgressBar progress;
     private Button retry;
+    private TextView percent, loadingTitle, loadingNote;
+    private Button updates;
 
     @Override protected void onCreate(Bundle savedState) {
         super.onCreate(savedState);
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER);
-        layout.setPadding(48, 24, 48, 24);
-        layout.setBackgroundColor(0xff101827);
-        TextView title = new TextView(this);
-        title.setText("POLISH FIGHTERS");
-        title.setTextColor(0xffeeeeee);
-        title.setTextSize(26);
-        layout.addView(title);
-        status = new TextView(this);
-        status.setTextColor(0xffdddddd);
-        status.setTextSize(17);
-        status.setPadding(0, 24, 0, 24);
-        layout.addView(status);
-        progress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
-        layout.addView(progress, new LinearLayout.LayoutParams(-1, -2));
-        retry = new Button(this);
-        retry.setText("SPRÓBUJ PONOWNIE");
-        retry.setVisibility(android.view.View.GONE);
+        setContentView(R.layout.activity_game_bootstrap);
+        status = findViewById(R.id.pf_status);
+        progress = findViewById(R.id.pf_progress);
+        retry = findViewById(R.id.pf_retry);
+        updates = findViewById(R.id.pf_updates);
+        percent = findViewById(R.id.pf_loading_percent);
+        loadingTitle = findViewById(R.id.pf_loading_title);
+        loadingNote = findViewById(R.id.pf_loading_note);
         retry.setOnClickListener(v -> begin());
-        layout.addView(retry);
-        setContentView(layout);
+        updates.setOnClickListener(v -> {
+            try { startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/w4sy1/polish-fighters/releases/latest"))); }
+            catch (android.content.ActivityNotFoundException absent) { status.setText(R.string.pf_no_browser); }
+        });
         begin();
     }
 
     private void begin() {
         retry.setVisibility(android.view.View.GONE);
+        updates.setVisibility(android.view.View.GONE);
+        loadingTitle.setText(R.string.pf_loading_title);
+        loadingNote.setText(R.string.pf_loading_note);
+        progress.setVisibility(android.view.View.VISIBLE);
+        percent.setVisibility(android.view.View.VISIBLE);
         progress.setIndeterminate(true);
-        status.setText("Przygotowywanie gry i modów…\nPierwsze uruchomienie może potrwać kilka minut.");
+        percent.setText(getString(R.string.pf_percent, 0));
+        status.setText(R.string.pf_loading_initial);
         worker.submit(() -> {
             long started = android.os.SystemClock.elapsedRealtime();
             try {
@@ -86,7 +84,12 @@ public final class GameBootstrapActivity extends Activity {
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) return;
                     progress.setIndeterminate(false);
-                    status.setText("Nie udało się przygotować gry.\n" + error.getMessage());
+                    progress.setVisibility(android.view.View.GONE);
+                    percent.setVisibility(android.view.View.GONE);
+                    loadingTitle.setText(R.string.pf_error_title);
+                    loadingNote.setText(R.string.pf_error_help);
+                    status.setText(error.getMessage());
+                    updates.setVisibility(android.view.View.VISIBLE);
                     retry.setVisibility(android.view.View.VISIBLE);
                 });
             }
@@ -110,15 +113,23 @@ public final class GameBootstrapActivity extends Activity {
         return result.toString();
     }
 
+    interface BundleSource { InputStream open(String name) throws IOException; }
+    interface BundleProgress { void update(boolean linking, int current, int total); }
+
     private void prepare() throws IOException, JSONException, NoSuchAlgorithmException {
+        prepareBundle(name -> getAssets().open(name), getFilesDir(), this::showProgress);
+    }
+
+    static void prepareBundle(BundleSource bundleSource, File filesDirectory, BundleProgress report)
+            throws IOException, JSONException, NoSuchAlgorithmException {
         final String version;
-        try (InputStream id = getAssets().open("game-bundle.id")) {
+        try (InputStream id = bundleSource.open("game-bundle.id")) {
             version = new String(readLimited(id, 128), StandardCharsets.US_ASCII).trim();
         } catch (FileNotFoundException absent) {
             return; // The original, unbundled build retains its normal download flow.
         }
         if (!version.matches("[0-9a-f]{64}")) throw new IOException("Nieprawidłowy identyfikator paczki.");
-        File root = new File(getFilesDir(), "game");
+        File root = new File(filesDirectory, "game");
         File marker = new File(root, ".ready");
         if (marker.isFile()) {
             try (InputStream old = new FileInputStream(marker)) {
@@ -129,7 +140,7 @@ public final class GameBootstrapActivity extends Activity {
         if (!blobs.isDirectory() && !blobs.mkdirs()) throw new IOException("Nie można utworzyć katalogu gry.");
         // Inflate in Java from a buffered asset stream instead of crossing JNI for
         // every small inflater read (including skips of already installed blobs).
-        try (ZipInputStream zip = new ZipInputStream(new BufferedInputStream(getAssets().open("game-bundle.zip"), 256 * 1024))) {
+        try (ZipInputStream zip = new ZipInputStream(new BufferedInputStream(bundleSource.open("game-bundle.zip"), 256 * 1024))) {
             ZipEntry entry = zip.getNextEntry();
             if (entry == null || !entry.getName().equals("manifest.json")) throw new IOException("Brak indeksu paczki gry.");
             byte[] manifestBytes = readLimited(zip, 8 * 1024 * 1024);
@@ -158,7 +169,7 @@ public final class GameBootstrapActivity extends Activity {
                     if (!blob.isFile() || blob.length() != size) missingBytes += size;
                 }
             }
-            long free = new StatFs(getFilesDir().getPath()).getAvailableBytes();
+            long free = new StatFs(filesDirectory.getPath()).getAvailableBytes();
             if (free < missingBytes + 256L * 1024 * 1024) {
                 throw new IOException("Za mało miejsca. Potrzeba jeszcze około "
                         + ((missingBytes + 256L * 1024 * 1024) / (1024 * 1024)) + " MB.");
@@ -191,9 +202,11 @@ public final class GameBootstrapActivity extends Activity {
                     rename(partial, target);
                 }
                 unpacked++;
-                if (unpacked % 50 == 0) showProgress(unpacked, sizes.size());
+                if (unpacked % 50 == 0) report.update(false, unpacked, sizes.size());
             }
             for (int n = 0; n < files.length(); n++) {
+                if (Thread.currentThread().isInterrupted()) throw new IOException("Przygotowanie przerwane.");
+                if (n % 50 == 0) report.update(true, n, files.length());
                 JSONObject item = files.getJSONObject(n);
                 File blob = new File(blobs, item.getString("sha256"));
                 if (!blob.isFile() || blob.length() != item.getLong("bytes")) throw new IOException("Niekompletna paczka gry.");
@@ -219,6 +232,7 @@ public final class GameBootstrapActivity extends Activity {
                 output.write(version.getBytes(StandardCharsets.US_ASCII));
             }
             rename(ready, marker);
+            report.update(true, files.length(), files.length());
         }
     }
 
@@ -227,14 +241,16 @@ public final class GameBootstrapActivity extends Activity {
         catch (ErrnoException error) { throw new IOException("Nie można zapisać " + target.getName(), error); }
     }
 
-    private void showProgress(int current, int total) {
+    private void showProgress(boolean linking, int current, int total) {
         runOnUiThread(() -> {
             if (isFinishing() || isDestroyed()) return;
+            int value = total == 0 ? 100 : (int)((long)current * 100 / total);
+            int completed = linking ? 85 + value * 15 / 100 : value * 85 / 100;
             progress.setIndeterminate(false);
-            progress.setMax(total);
-            progress.setProgress(current);
-            status.setText("Przygotowywanie gry i wszystkich modów: " + current + "/" + total
-                    + "\nPliki wspólne są zapisywane tylko raz.");
+            progress.setMax(100);
+            progress.setProgress(completed);
+            percent.setText(getString(R.string.pf_percent, completed));
+            status.setText(getString(linking ? R.string.pf_progress_link : R.string.pf_progress_unpack, current, total));
         });
     }
 

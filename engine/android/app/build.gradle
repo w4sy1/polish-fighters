@@ -22,6 +22,25 @@ def verifyNativeGame = tasks.register('verifyNativeGame') {
                 }
             }
         }
+        // The Android bootstrap consumes this ZIP sequentially. CRC alone does
+        // not prove that manifest.json is at the beginning of the stream.
+        def bundle = file('../../build/android/assets/game-bundle.zip')
+        def bundleId = file('../../build/android/assets/game-bundle.id')
+        if (bundle.exists() || bundleId.exists()) {
+            if (!bundle.isFile() || !bundleId.isFile()) throw new GradleException('Niekompletna paczka gry.')
+            bundle.withInputStream { raw ->
+                def stream = new java.util.zip.ZipInputStream(new BufferedInputStream(raw))
+                try {
+                    def first = stream.nextEntry
+                    if (first == null || first.name != 'manifest.json')
+                        throw new GradleException('manifest.json musi byc pierwszym wpisem paczki gry.')
+                    byte[] index = stream.readNBytes(8 * 1024 * 1024 + 1)
+                    if (index.length > 8 * 1024 * 1024) throw new GradleException('Za duzy indeks paczki gry.')
+                    def actual = java.security.MessageDigest.getInstance('SHA-256').digest(index).collect { String.format('%02x', it & 0xff) }.join()
+                    if (actual != bundleId.text.trim()) throw new GradleException('Indeks paczki gry ma niezgodna sume SHA256.')
+                } finally { stream.close() }
+            }
+        }
     }
 }
 tasks.configureEach {
@@ -48,8 +67,8 @@ android {
         applicationId 'pl.prestigetech.polishfighters'
         minSdk 21
         targetSdk 35
-        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 13
-        versionName project.findProperty('openlf2VersionName') ?: '0.12.1-sdl'
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 14
+        versionName project.findProperty('openlf2VersionName') ?: '0.12.2-start'
     }
 
     // A fixed key, so each build is signed the same and installs over the previous one; the
