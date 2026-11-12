@@ -1,0 +1,228 @@
+--- a/org/libsdl/app/HIDDeviceBLESteamController.java
++++ b/org/libsdl/app/HIDDeviceBLESteamController.java
+@@ -116,7 +116,7 @@
+                 case CHR_READ:
+                     chr = getCharacteristic(mUuid);
+                     //Log.v(TAG, "Reading characteristic " + chr.getUuid());
+-                    if (!mGatt.readCharacteristic(chr)) {
++                    if (!SDLAndroidCompat.readCharacteristic(mGatt, chr)) {
+                         Log.e(TAG, "Unable to read characteristic " + mUuid.toString());
+                         mResult = false;
+                         break;
+@@ -127,7 +127,7 @@
+                     chr = getCharacteristic(mUuid);
+                     //Log.v(TAG, "Writing characteristic " + chr.getUuid() + " value=" + HexDump.toHexString(value));
+                     chr.setValue(mValue);
+-                    if (!mGatt.writeCharacteristic(chr)) {
++                    if (!SDLAndroidCompat.writeCharacteristic(mGatt, chr)) {
+                         Log.e(TAG, "Unable to write characteristic " + mUuid.toString());
+                         mResult = false;
+                         break;
+@@ -152,9 +152,12 @@
+                                 return;
+                             }
+ 
+-                            mGatt.setCharacteristicNotification(chr, true);
++                            if (!SDLAndroidCompat.setCharacteristicNotification(mGatt, chr, true)) {
++                                mResult = false;
++                                return;
++                            }
+                             cccd.setValue(value);
+-                            if (!mGatt.writeDescriptor(cccd)) {
++                            if (!SDLAndroidCompat.writeDescriptor(mGatt, cccd)) {
+                                 Log.e(TAG, "Unable to write descriptor " + mUuid.toString());
+                                 mResult = false;
+                                 return;
+@@ -229,12 +232,12 @@
+     private BluetoothGatt connectGatt(boolean managed) {
+         if (Build.VERSION.SDK_INT >= 23 /* Android 6.0 (M) */) {
+             try {
+-                return mDevice.connectGatt(mManager.getContext(), managed, this, TRANSPORT_LE);
++                return SDLAndroidCompat.connectGatt(mDevice, mManager.getContext(), managed, this, TRANSPORT_LE);
+             } catch (Exception e) {
+-                return mDevice.connectGatt(mManager.getContext(), managed, this);
++                return SDLAndroidCompat.connectGatt(mDevice, mManager.getContext(), managed, this);
+             }
+         } else {
+-            return mDevice.connectGatt(mManager.getContext(), managed, this);
++            return SDLAndroidCompat.connectGatt(mDevice, mManager.getContext(), managed, this);
+         }
+     }
+ 
+@@ -257,13 +260,13 @@
+             return BluetoothProfile.STATE_DISCONNECTED;
+         }
+ 
+-        return btManager.getConnectionState(mDevice, BluetoothProfile.GATT);
++        return SDLAndroidCompat.getConnectionState(btManager, mDevice, BluetoothProfile.GATT);
+     }
+ 
+     void reconnect() {
+ 
+         if (getConnectionState() != BluetoothProfile.STATE_CONNECTED) {
+-            mGatt.disconnect();
++            SDLAndroidCompat.disconnect(mGatt);
+             mGatt = connectGatt();
+         }
+ 
+@@ -285,7 +288,7 @@
+                     // to try to recover.
+                     Log.v(TAG, "Chromebook: We are in a very bad state; the controller shows as connected in the underlying Bluetooth layer, but we never received a callback.  Forcing a reconnect.");
+                     mIsReconnecting = true;
+-                    mGatt.disconnect();
++                    SDLAndroidCompat.disconnect(mGatt);
+                     mGatt = connectGatt(false);
+                     break;
+                 }
+@@ -297,7 +300,7 @@
+                     else {
+                         Log.v(TAG, "Chromebook: We are connected to a controller, but never discovered services.  Trying to recover.");
+                         mIsReconnecting = true;
+-                        mGatt.disconnect();
++                        SDLAndroidCompat.disconnect(mGatt);
+                         mGatt = connectGatt(false);
+                         break;
+                     }
+@@ -312,7 +315,7 @@
+                 Log.v(TAG, "Chromebook: We have either been disconnected, or the Chromebook BtGatt.ContextMap bug has bitten us.  Attempting a disconnect/reconnect, but we may not be able to recover.");
+ 
+                 mIsReconnecting = true;
+-                mGatt.disconnect();
++                SDLAndroidCompat.disconnect(mGatt);
+                 mGatt = connectGatt(false);
+                 break;
+ 
+@@ -409,7 +412,7 @@
+             Log.e(TAG, "Chromebook: Discovered services were empty; this almost certainly means the BtGatt.ContextMap bug has bitten us.");
+             mIsConnected = false;
+             mIsReconnecting = true;
+-            mGatt.disconnect();
++            SDLAndroidCompat.disconnect(mGatt);
+             mGatt = connectGatt(false);
+         }
+ 
+@@ -544,7 +547,7 @@
+                 mHandler.post(new Runnable() {
+                     @Override
+                     public void run() {
+-                        mGatt.discoverServices();
++                        SDLAndroidCompat.discoverServices(mGatt);
+                     }
+                 });
+             }
+@@ -564,7 +567,7 @@
+                 Log.v(TAG, "onServicesDiscovered returned zero services; something has gone horribly wrong down in Android's Bluetooth stack.");
+                 mIsReconnecting = true;
+                 mIsConnected = false;
+-                gatt.disconnect();
++                SDLAndroidCompat.disconnect(gatt);
+                 mGatt = connectGatt(false);
+             } else {
+                 if (getProductId() == TRITON_BLE_PID) {
+@@ -573,7 +576,7 @@
+                     //
+                     // 517 is basically a "magic number" as far as Android's bluetooth code is concerned, so do not change
+                     // this value. It is functionally "please enable data length extensions" on some Android builds.
+-                    mGatt.requestMtu(517);
++                    SDLAndroidCompat.requestMtu(mGatt, 517);
+                 }
+ 
+                 probeService(this);
+@@ -641,7 +644,7 @@
+                 // For the original controller, we need to manually enter Valve mode.
+                 Log.v(TAG, "Writing report characteristic to enter valve mode");
+                 reportChr.setValue(enterValveMode);
+-                mGatt.writeCharacteristic(reportChr);
++                SDLAndroidCompat.writeCharacteristic(mGatt, reportChr);
+             }
+         }
+     }
+@@ -697,7 +700,7 @@
+             return mProductId;
+         }
+ 
+-        if (mDevice.getName().startsWith("Steam Ctrl")) {
++        if (SDLAndroidCompat.getName(mDevice).startsWith("Steam Ctrl")) {
+             // We're a newer Triton device
+             mProductId = TRITON_BLE_PID;
+         } else {
+@@ -815,8 +818,8 @@
+ 
+         BluetoothGatt g = mGatt;
+         if (g != null) {
+-            g.disconnect();
+-            g.close();
++            SDLAndroidCompat.disconnect(g);
++            SDLAndroidCompat.close(g);
+             mGatt = null;
+         }
+         mManager = null;
+--- a/org/libsdl/app/HIDDeviceManager.java
++++ b/org/libsdl/app/HIDDeviceManager.java
+@@ -193,11 +193,9 @@
+         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+         filter.addAction(HIDDeviceManager.ACTION_USB_PERMISSION);
+-        if (Build.VERSION.SDK_INT >= 33) { /* Android 13.0 (TIRAMISU) */
+-            mContext.registerReceiver(mUsbBroadcast, filter, Context.RECEIVER_EXPORTED);
+-        } else {
+-            mContext.registerReceiver(mUsbBroadcast, filter);
+-        }
++        // USB system broadcasts and this app's permission PendingIntent do not need external senders.
++        androidx.core.content.ContextCompat.registerReceiver(mContext, mUsbBroadcast, filter,
++            androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED);
+ 
+         for (UsbDevice usbDevice : mUsbManager.getDeviceList().values()) {
+             handleUsbDeviceAttached(usbDevice);
+@@ -461,7 +459,7 @@
+         ArrayList<BluetoothDevice> disconnected = new ArrayList<BluetoothDevice>();
+         ArrayList<BluetoothDevice> connected = new ArrayList<BluetoothDevice>();
+ 
+-        List<BluetoothDevice> currentConnected = mBluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
++        List<BluetoothDevice> currentConnected = SDLAndroidCompat.getConnectedDevices(mBluetoothManager, BluetoothProfile.GATT);
+ 
+         for (BluetoothDevice bluetoothDevice : currentConnected) {
+             if (!mLastBluetoothDevices.contains(bluetoothDevice)) {
+@@ -504,6 +502,10 @@
+                 return false;
+             }
+             HIDDeviceBLESteamController device = new HIDDeviceBLESteamController(this, bluetoothDevice);
++            if (device.getGatt() == null) {
++                device.shutdown();
++                return false;
++            }
+             int id = device.getId();
+             mBluetoothDevices.put(bluetoothDevice, device);
+             mDevicesById.put(id, device);
+@@ -534,17 +536,17 @@
+         }
+ 
+         // If the device has no local name, we really don't want to try an equality check against it.
+-        if (bluetoothDevice.getName() == null) {
++        if (SDLAndroidCompat.getName(bluetoothDevice) == null) {
+             return false;
+         }
+ 
+         // Steam Controllers will always support Bluetooth Low Energy
+-        if ((bluetoothDevice.getType() & BluetoothDevice.DEVICE_TYPE_LE) == 0) {
++        if ((SDLAndroidCompat.getType(bluetoothDevice) & BluetoothDevice.DEVICE_TYPE_LE) == 0) {
+             return false;
+         }
+ 
+         // Match on the name either the original Steam Controller or the new second-generation one advertise with.
+-        return bluetoothDevice.getName().equals("SteamController") || bluetoothDevice.getName().startsWith("Steam Ctrl");
++        return SDLAndroidCompat.getName(bluetoothDevice).equals("SteamController") || SDLAndroidCompat.getName(bluetoothDevice).startsWith("Steam Ctrl");
+     }
+ 
+     private void close() {
+--- a/org/libsdl/app/SDLControllerManager.java
++++ b/org/libsdl/app/SDLControllerManager.java
+@@ -985,7 +985,7 @@
+     @Override
+     int getPenDeviceType(InputDevice penDevice)
+     {
+-        if (penDevice == null) {
++        if (penDevice == null || Build.VERSION.SDK_INT < 29) {
+             return SDL_PEN_DEVICE_TYPE_UNKNOWN;
+         }
+ 

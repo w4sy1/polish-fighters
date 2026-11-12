@@ -117,6 +117,7 @@ curl --fail --location --retry 3 \
 echo "30d4aa2b3037718142b32dffd4e72f917ebb6cc5227150e7bb9c45efb2153aeb  $sdl_archive" | sha256sum --check
 tar -xzf "$sdl_archive" -C "$root/build/android/sdl-java" --strip-components=6 \
     SDL3-3.4.14/android-project/app/src/main/java/org/libsdl/app
+python3 "$root/../tools/apply_sdl_android_compat.py" --root "$root/.."
 
 # Launcher icons rendered from the project's single SVG (nothing of them is committed).
 python3 "$root/tools/icons/make_icons.py" "$root/build/android/icons"

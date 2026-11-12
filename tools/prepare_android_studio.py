@@ -35,10 +35,12 @@ def prepare(root=ROOT):
             target=stage/'sdl-java'/relative;target.parent.mkdir(parents=True,exist_ok=True)
             target.write_bytes(tar.extractfile(member).read());count+=1
     if count<5:raise ValueError('SDL Java source missing')
+    # Reapplied to freshly extracted, hash-verified sources on every build.
+    subprocess.run([sys.executable, str(root/'tools/apply_sdl_android_compat.py'), '--root', str(root)], check=True)
     subprocess.run([sys.executable,str(engine/'tools/icons/make_icons.py'),str(stage/'icons')],check=True)
     shutil.copytree(stage/'icons/android/res',stage/'res',dirs_exist_ok=True)
     shutil.copytree(engine/'scripts',stage/'assets/scripts',dirs_exist_ok=True)
-    proof={'sdl_source':SDL_URL,'sdl_sha256':SDL_SHA,'java_files':count,
+    proof={'sdl_source':SDL_URL,'sdl_sha256':SDL_SHA,'java_files':count+1,'android_compat_patch':'sdl3-3.4.14-android.patch',
            'native_arm64_library_present':(stage/'jniLibs/arm64-v8a/libmain.so').is_file(),
            'scope':'Java/resources and own Lua source preparation, not native Android runtime verification'}
     (stage/'studio-preparation.json').write_text(json.dumps(proof,indent=2)+'\n')
