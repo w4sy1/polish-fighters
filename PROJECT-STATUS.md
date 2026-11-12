@@ -6,7 +6,10 @@ Gotowy APK przeszedł rzeczywisty kod przygotowania gry na pustym katalogu w te�
 Gradle odrzuca błędną kolejność indeksu. 52 przypadki Androida PASS, Python 57 PASS / 1 SKIP.
 Lint 0 błędów / 35 ostrzeżeń. Nowe ekrany przygotowania i startu Androida wyrenderowane i sprawdzone.
 APK code 14 / 0.12.2-start. Bez prób fizycznego telefonu; kod C++ i Windows bez zmian.
-Raport: docs/START-ANDROID-0.12.2-2026-11-12.md. Publikacja i sprzątanie w toku.
+Raport: docs/START-ANDROID-0.12.2-2026-11-12.md. Wydanie publiczne: https://github.com/w4sy1/polish-fighters/releases/tag/android-start-0.12.2-2026-11-12
+SHA256 i pobieranie bez logowania potwierdzone. Lokalny APK i jego kopie wyjsciowe
+(1.01 GiB) przeniesiono do Kosza. Zweryfikowane dane budowy i biblioteki pozostaja
+do kolejnego zamowionego etapu klasycznego menu; Kosza nie oprozniano.
 
 ---
 # SDL Android — opublikowana 0.12.1, 2026-11-12

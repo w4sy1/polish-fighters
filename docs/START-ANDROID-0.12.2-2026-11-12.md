@@ -65,4 +65,12 @@ Nie wykonano fizycznej próby telefonu, walki, Bluetooth ani USB; ADB nie wykaza
 urządzenia. Próba JVM potwierdza przygotowanie danych z APK i poprawne argumenty,
 nie stanowi wykonania natywnego silnika ARM na telefonie.
 
-Publikacja i sprzątanie: w toku.
+## Publikacja
+
+Publiczne wydanie: https://github.com/w4sy1/polish-fighters/releases/tag/android-start-0.12.2-2026-11-12
+Kod wydania: `08343933e23263ee02350fd4b40ea0d068e30fb5`. SHA256 i rozmiary wszystkich paczek
+zgodne z metadanymi GitHuba; pobieranie bez logowania potwierdzone HTTP 206.
+Opisy Androida 0.12.0 i 0.12.1 oznaczono ostrzeżeniem o błędzie startu i linkiem naprawy.
+Lokalny APK oraz kopie wyjściowe (1.01 GiB) przeniesiono do Kosza; źródła
+i ustawienia zachowano. Dane do budowy i biblioteki pozostawiono na czas następnego
+zamówionego etapu klasycznego menu. Kosza nie opróżniono.
