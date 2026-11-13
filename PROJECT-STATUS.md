@@ -1,14 +1,14 @@
-## 2026-11-13 — poprawki wyglądu menu LF2 (lokalne)
+## 2026-11-13 — 0.16.0 menu LF2 i importer Androida (wydanie testowe)
 
 Główne menu gry korzysta teraz z oryginalnego tła, logo i bitmapowej czcionki
 Little Fighter 2; zachowano nawigację oraz przepływy. Ekran Androidowego katalogu
 i importera dopasowano do palety i pikselowych przycisków gry. Scraper nadal otwiera
 strony projektów; ZIP użytkownik pobiera na stronie i wybiera systemowym selektorem.
-Nie dodano automatycznego pobierania. Pełne testy Python: 70 PASS / 1 SKIP;
-testy Lua menu, sterowania i scrapera: PASS; składnia 145 plików: PASS. JDK 17
-pozwolił uruchomić Gradle; pełna kompilacja zatrzymała się na brakujących
-wygenerowanych plikach SDLActivity i bibliotekach silnika. Brak APK i telefonu, więc
-wygląd i dotyk na Androidzie niepotwierdzone.
+Nie dodano automatycznego pobierania. Wydanie testowe: [0.16.0](https://github.com/w4sy1/polish-fighters/releases/tag/classic-menu-0.16.0-2026-11-13).
+Python: 70 PASS / 1 SKIP; Lua menu, sterowania i scrapera: PASS; składnia
+145 skryptów: PASS. GitHub Actions: Windows installer i APK ARM64 zbudowane;
+APK kontrolowany skryptem projektu i podpisem. Brak telefonu — wygląd i dotyk
+na fizycznym Androidzie niepotwierdzone.
 
 ## 2026-11-13 — wznowienie audytu 0.14 / Android Mod Browser 0.15 (lokalne)
 

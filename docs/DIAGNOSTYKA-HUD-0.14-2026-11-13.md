@@ -229,9 +229,15 @@ otwiera strony projektów. Nie dodano pobierania ZIP ani automatycznej instalacj
 
 Weryfikacja tej poprawki: testy Lua `classic_menu_test.lua`, `hub_input_test.lua`,
 `mod_browser_test.lua`, `global_menu_test.lua` PASS; składnia Lua 145 plików PASS;
-pełny zestaw Python 70 PASS, 1 SKIP (uprawnienia symlink w Windows). Gradle
-8.13 początkowo odrzucił JDK 25; potem użyto istniejącego JDK 17. Kompilacja
-zatrzymała się na brakujących wygenerowanych plikach SDLActivity i bibliotekach
-silnika. Nie powstał APK i nie było testu na telefonie. W rezultacie faktyczny
-wygląd/przepływ na Androidzie nie jest potwierdzony. Te zmiany nie są publikacją
-ani wydaniem ukończonym; kluczowe testy urządzenia i paczek nadal pozostają.
+pełny zestaw Python 70 PASS, 1 SKIP (uprawnienia symlink w Windows). GitHub Actions
+na commit `258e273` zbudował Windows installer i APK ARM64; workflow zweryfikował
+APK. Lokalnie potwierdzono `versionCode=18`, nazwę `0.16.0-classic-menu-test`,
+podpis APK i sumę. Brak testu na telefonie: rzeczywisty wygląd, dotyk, instalacja
+aktualizacji i rozgrywka nie są potwierdzone. Nie twierdzimy, że pierwotne błędy
+sterowania zostały naprawione na sprzęcie. Scraper nadal otwiera stronę, ZIP trzeba
+pobrać ręcznie i wskazać w importerze; importer obsługuje transferowe paczki z
+konwertera, a zgodność dowolnych modów nie jest potwierdzona.
+
+Publiczne wydanie testowe: [0.16.0](https://github.com/w4sy1/polish-fighters/releases/tag/classic-menu-0.16.0-2026-11-13).
+APK SHA-256 `f2bab9f724a8ba979d6c3b4def2dd61302c2209604f089f9efcf079eda6733e7`;
+Windows installer SHA-256 `e040f7234349df26f98ba60ede5c085ecc96582abd9114377d6283af42c03cbe`.
