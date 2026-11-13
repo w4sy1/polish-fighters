@@ -44,7 +44,9 @@ def inventory(root=ROOT):
                 if not source.is_file():
                     raise FileNotFoundError(source)
                 files[f'content-packs/{name}/{path.as_posix()}'] = source
-    licenses = root / 'engine/out/LittleFighters-Remonoko-2026-11-06/licenses'
+    licenses = root / 'engine/build/licenses'
+    if not licenses.is_dir():
+        licenses = root / 'engine/out/LittleFighters-Remonoko-2026-11-06/licenses'
     for source in licenses.rglob('*'):
         if source.is_file():
             files['licenses/' + source.relative_to(licenses).as_posix()] = source

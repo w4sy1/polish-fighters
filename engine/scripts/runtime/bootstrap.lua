@@ -16,6 +16,7 @@ local reset_random_sequence = openlf2_reset_random_sequence
 local save_recording, take_recording = openlf2_save_recording, openlf2_take_recording
 local local_time = openlf2_local_time
 local build_label = openlf2_build_label
+local application_version='0.14.0-diagnostics-test'
 local new_table = jit and require("table.new")
 local function new_array(capacity)
     if new_table then return new_table(capacity, 0) end
@@ -103,9 +104,92 @@ load_module = function(name)
     return exported
 end
 
-local screen = load_module("base/ui/flow")
-local i18n = load_module("base/i18n/i18n")
-local state = screen.create(runtime_settings or {menu_seed = 0})
+local screen, i18n, state
+-- Runtime-owned and bounded: never part of synchronized gameplay snapshots.
+local recent_events, last_event = {}, nil
+local function diagnostic_context()
+    local match = state and state.match and state.match.match
+    local run = match and match.stage_run
+    local catalog = module_cache["base/game/catalog"] or {}
+    local fighters, objects = {}, 0
+    for slot, value in pairs(match and match.items or {}) do
+        objects = objects + 1
+        if type(slot)=="number" and slot>=0 and slot<8 then
+            fighters[#fighters+1]={slot=slot,id=value.record and value.record.id}
+        end
+    end
+    table.sort(fighters,function(a,b) return a.slot<b.slot end)
+    return {screen=state and state.active or "startup",profile=catalog.profile_id,
+        mode=match and match.mode,campaign=run and (run.source_path or catalog.stage_path),
+        stage=run and run.id,phase=run and run.phase,frame=match and match.frame_number,
+        fighters=fighters,object_count=objects}
+end
+local function note_event()
+    local match=state and state.match and state.match.match
+    local run=match and match.stage_run
+    local key=table.concat({state and state.active or 'startup',tostring(run and run.id),tostring(run and run.phase)},':')
+    local changed=key~=last_event
+    local heartbeat=match and match.frame_number and match.frame_number%300==0
+    if changed or heartbeat then
+        local context=diagnostic_context()
+        last_event=key;recent_events[#recent_events+1]=context
+        if #recent_events>16 then table.remove(recent_events,1) end
+        pcall(function()
+            local doc=read_settings() or {}
+            local report={};for field,value in pairs(context) do if field~='events' then report[field]=value end end
+            report.events={};for index,event in ipairs(recent_events) do
+                local entry={};for field,value in pairs(event) do if field~='events' then entry[field]=value end end
+                report.events[index]=entry
+            end
+            report.version=application_version;report.native_version=build_label;report.time=local_time and local_time() or 'unknown'
+            doc.polish_fighters_last_session=report;write_settings(doc)
+        end)
+    end
+end
+local function report_failure(problem)
+    -- A broken/read-only configuration must never hide the original failure.
+    pcall(function()
+        local context=diagnostic_context()
+        local message=tostring(problem):sub(1,12000):gsub("https?://%S+","[URL]")
+        for _,key in ipairs({"token","password","secret","authorization"}) do
+            local pattern=key:gsub('%a',function(c) return '['..c..c:upper()..']' end)
+            message=message:gsub("("..pattern.."%s*[:=]%s*)%S+","%1[REDACTED]")
+        end
+        message=message:gsub('[Bb]earer%s+%S+','Bearer [REDACTED]')
+        local modules,seen={},{}
+        for _,declaration in ipairs(declarations) do
+            local id=declaration[3]:match("^([^/]+)/")
+            if id and not seen[id] then modules[#modules+1]=id;seen[id]=true end
+        end
+        table.sort(modules)
+        local document=read_settings()
+        if type(document)~="table" then document={} end
+        context.version=application_version;context.native_version=build_label or 'unknown'
+        context.platform=jit and jit.os or "unknown"
+        context.architecture=jit and jit.arch or "unknown"
+        context.system_version='not exposed by runtime'
+        context.controllers={}
+        local controls=module_cache['base/ui/controls']
+        if controls and controls.current then
+            local settings=controls.current()
+            for index,value in ipairs(type(settings)=='table' and settings.sets or {}) do
+                context.controllers[#context.controllers+1]={slot=index-1,device=value.device}
+            end
+        end
+        context.lua_memory_kib=collectgarbage("count")
+        context.time=local_time and local_time() or "unknown"
+        context.traceback=message;context.modules=modules;context.events=recent_events
+        document.polish_fighters_last_crash=context
+        write_settings(document)
+    end)
+end
+local started,problem=protected_call(function()
+    screen=load_module("base/ui/flow")
+    i18n=load_module("base/i18n/i18n")
+    recent_events[#recent_events+1]=diagnostic_context()
+    state=screen.create(runtime_settings or {menu_seed=0})
+end,traceback)
+if not started then report_failure(problem);error(problem) end
 -- Private frame protocol: fixed-size numeric opcodes, matching FrameOpcode in
 -- the Lua adapter. Reuse one flat buffer; the host validates each field once.
 local FrameOpcode = {
@@ -220,8 +304,9 @@ function openlf2_describe()
 end
 
 function openlf2_frame(input)
+    note_event()
     local success, output, size = protected_call(function() return render(input) end, traceback)
-    if not success then error(output) end
+    if not success then report_failure(output);error(output) end
     return output, size
 end
 return "ready"

@@ -82,15 +82,14 @@ function heroes.initialize(v)
  end
 end
 function heroes.clone_allowed(s,i,v)
- if v.record.id~=411 or (v.pf_clone_depth or 0)>=2 then return false end
- local root=v.pf_root or i;local active=0
+ if v.record.id~=411 or v.hp<=0 or v.pf_clone or (v.pf_clone_depth or 0)>0 then return false end
+ local root=v.pf_root or i
  for j,t in pairs(s.items) do
   if t.hp>0 and t.record.id==411 then
-   if t.pf_clone and t.pf_master==i then return false end
-   if j==root or t.pf_root==root then active=active+1 end
+   if t.pf_clone and (t.pf_root==root or t.pf_master==i) then return false end
   end
  end
- return active<3
+ return true
 end
 function heroes.clone(s,i,v,objects)
  if not heroes.clone_allowed(s,i,v) then return false end

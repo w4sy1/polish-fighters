@@ -46,3 +46,12 @@ assert(not network.exchange(s,{[0]='',functions=''},0,'digest'))
 assert(messages[#messages].functions=='4','short F4 lost across pending network frame')
 assert(not s.queued_back,'F4 repeated after sending')
 print('PASS short F4 survives a pending network frame')
+network.next_room=true
+s=network.create({network_profile=string.rep('a',64)});s.phase='ready';s.slot=1;s.pending=true;s.deadline=30000
+network.exchange(s,{[0]='f',functions=''},0,'digest')
+network.exchange(s,{[0]='udlrc',functions=''},0,'digest')
+s.frame={inputs={'','','','','','','',''}}
+assert(network.exchange(s,{[0]='',functions=''},0,'digest'))
+s.sent_checksum=0;s.checked=0
+network.exchange(s,{[0]='',functions=''},0,'digest')
+assert(messages[#messages].keys=='udlrc','network wait corrupted queued command')

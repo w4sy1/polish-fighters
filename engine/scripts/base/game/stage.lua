@@ -54,6 +54,7 @@ local function stage_list(path)
 end
 
 local empty_phase = {bound = -1, music = "", when_clear_goto_phase = -1, entry_count = 0, entries = {}}
+function stage.list(path) return stage_list(path) end
 local function stage_data(run) return stage_list(run.source_path)[run.id] or {phase_count = -1, phases = {}} end
 local function phase_data(run, index) return stage_data(run).phases[index] or empty_phase end
 
@@ -138,6 +139,12 @@ local function spawn(state, run, entry, runtime, slot)
 end
 
 local function next_stage(state, run)
+    -- Campaign checkpoints start without summons from the previous section.
+    -- Scan live objects rather than keeping a counter that can outlive a match.
+    for index = constants.first_spawned_slot, constants.item_slots - 1 do
+        local value = state.items[index]
+        if value and value.record.id == 411 and value.pf_clone then objects.remove(state, index) end
+    end
     run.id = run.id + 1
     run.go, run.result, run.last_phase, run.phase, run.survival = 70, 0, 0, -1, -1
     run.runtime = {}
@@ -160,7 +167,11 @@ local function next_stage(state, run)
     end
     for index = 0, constants.item_slots - 1 do
         local value = state.items[index]
-        if value then value.order_x, value.order_z = constants.no_order, constants.no_order end
+        if value then
+            value.order_x, value.order_z = constants.no_order, constants.no_order
+            value.team_command,value.team_command_owner=nil,nil
+            value.team_anchor_x,value.team_anchor_z=nil,nil
+        end
     end
     local counts = {}
     for index = constants.first_spawned_slot, constants.item_slots - 1 do
@@ -174,6 +185,7 @@ local function next_stage(state, run)
             end
         end
     end
+    require('base/game/campaign_save').capture(state)
 end
 
 -- Black shutter bars: eleven 794-wide bars 43 px apart from y 135.
@@ -247,9 +259,11 @@ function stage.update(state, run)
                         (run.source_path and not stage_list(run.source_path)[(group+1)*10]) then
                         -- After the last group the original shows the ending (state 300).
                         run.ending = true
+                        require('base/game/campaign_save').capture(state,true)
                     else
                         run.id = (group * 5 + 5) * 2
                         run.next_group = true
+                        require('base/game/campaign_save').capture(state)
                     end
                     state.round_counter = constants.round_counters.finished
                     return display

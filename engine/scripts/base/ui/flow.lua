@@ -151,7 +151,19 @@ local function route(state, input, context)
         context.action("quit")
         return
     end
-    if requested == "network" then
+    if requested=='resume_campaign' and not state.session then
+        local saved,problem=require('base/game/campaign_save').options(catalog.profile_id)
+        if saved then
+            state.match=require('base/ui/match_screen').create(saved)
+            state.active='match';state.wait_release=true
+        else
+            state.launch.hud.message=tostring(problem)
+        end
+    elseif requested=='training' and not state.session then
+        state.characters=require('base/ui/character_select').create({mode='versus',previous=state.characters})
+        state.training_requested=true;state.active='characters';state.wait_release=true
+    elseif requested == "network" then
+        state.training_requested=nil
         state.network = require("base/ui/network").create(state.options)
         state.active = "network"
     elseif requested == "network_ready" then
@@ -178,6 +190,7 @@ local function route(state, input, context)
         state.session = nil
         controls.replace_names(nil)
     elseif requested == "versus" or requested == "stage" or requested == "battle" then
+        state.training_requested=nil
         -- The previous visit's state carries the values the original keeps in globals.
         state.characters = require("base/ui/character_select").create({mode = requested,
             participants = state.session and state.session.room and state.session.peers or nil,
@@ -193,6 +206,7 @@ local function route(state, input, context)
         else
             options = require("base/ui/character_select").match_options(state.characters)
         end
+        if state.training_requested and not state.session then options.training=true end
         state.match = require("base/ui/match_screen").create(with_recording(state, options))
         state.active = "match"
         state.wait_release = true
@@ -440,7 +454,7 @@ function flow.update(state, raw, context)
     local available = {}
     for _, chord in ipairs({"da", "dj", "daj"}) do available[chord] = control.chord_available(fighter, chord) end
     touch_gamepad.set_available(state.touch_gamepad, available)
-    local touched, pause_held, fast_held = touch_gamepad.update(state.touch_gamepad,
+    local touched, pause_held, fast_held, team_command = touch_gamepad.update(state.touch_gamepad,
         active_screen and gamepad_input or {touch_active = false, screen = input.screen}, mode)
     -- The pause button is F1; the match toggles on its press.
     if pause_held and state.active == "match" and not input.functions:find("1", 1, true) then
@@ -454,6 +468,14 @@ function flow.update(state, raw, context)
         if touched:find(letter, 1, true) and not input[0]:find(letter, 1, true) then input[0] = input[0] .. letter end
     end
     local local_keys = input.keys
+    if team_command then input[0]=require('base/game/team_commands').signals[team_command] end
+    if state.active=='match' and state.match then
+        if state.auto_advance_match~=state.match then
+            state.auto_advance_match=state.match;state.auto_advance_driver={}
+        end
+        input[0]=require('base/game/campaign_advance').input(state.auto_advance_driver,
+            state.match.match,input[0],shown_options.auto_advance)
+    end
     if state.session then
         unlock.observe(input)
         if not state.session.pending then input.unlock_bits = unlock.take_pending() end

@@ -92,6 +92,8 @@ return function(legacy)
   -- until the next packet is sent instead of losing them between two barriers.
   s.queued_actions=s.queued_actions or {}
   s.observed_actions=s.observed_actions or {}
+  local command=require('base/game/team_commands').decode(input[0] or '')
+  if command then s.queued_command=require('base/game/team_commands').signals[command] end
   local back=(input.functions or ''):find('4',1,true)~=nil
   if back and not s.observed_back then s.queued_back=true end
   s.observed_back=back
@@ -123,7 +125,9 @@ return function(legacy)
     if s.queued_actions[action] and not keys:find(action,1,true) then keys=keys..action end
    end
    if not keys:find('[udlr]') then keys=keys..(s.queued_action_directions or '') end
+   keys=s.queued_command or keys
    if not send(s,{op="input",frame=s.frames,keys=keys,functions=functions,unlock=s.slot==0 and s.queued_unlock or 0}) then return nil,s.error end
+   s.queued_command=nil
    s.queued_actions={};s.queued_action_directions=nil;s.queued_back=nil
    s.queued_unlock=0
   end

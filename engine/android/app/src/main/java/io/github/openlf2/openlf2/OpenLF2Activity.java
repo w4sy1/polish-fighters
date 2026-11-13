@@ -17,6 +17,11 @@ import org.libsdl.app.SDLActivity;
 public final class OpenLF2Activity extends SDLActivity {
     private static final String TAG = "OpenLF2";
     private LanWifiMode lanWifi;
+    @Override protected void main() {
+        GameDiagnostics.write(this, "launch-last.txt", "Native engine launch\n" + android.os.Build.VERSION.RELEASE);
+        int result = SDLActivity.nativeRunMain(getMainSharedObject(), getMainFunction(), getArguments());
+        if (result != 0) GameDiagnostics.write(this, "native-return.txt", "Native engine exit code: " + result);
+    }
 
     /** Called on entering Bluetooth mode, never on application startup.
      * Native menu wiring is still required; callers recheck after the system dialog.
@@ -42,6 +47,7 @@ public final class OpenLF2Activity extends SDLActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        GameDiagnostics.install(this);
         try {
             if (!new File(getFilesDir(), "game/.ready").isFile()) {
                 copyAssetTree("scripts", new File(getFilesDir(), "scripts"));

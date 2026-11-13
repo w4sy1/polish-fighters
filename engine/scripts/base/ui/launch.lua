@@ -293,6 +293,11 @@ local function options_page(state, input)
     add(state, {"fill", panel.x, panel.y, panel.width, panel.height, 0xa0, 0xa0, 0xc0})
     add(state, {"fill", panel.x + 2, panel.y + 2, panel.width - 4, panel.height - 4, 0x10, 0x20, 0x50})
     bold(state, i18n.tr("Options"), panel.x + 0x1e, panel.y + 0x14, constants.font_variants.blue)
+    if button(state,input,{x=panel.x+350,y=panel.y+14,width=120,height=26},"EDYTOR HUD",state.option_open) then
+        state.hud=require('base/ui/hud_editor').create(state.options)
+        state.page='hud'
+        return
+    end
     local values = state.options
     -- Alt+Enter (handled by the flow) changed the saved option: the page follows.
     if input.fullscreen_set ~= nil then values.fullscreen = input.fullscreen_set end
@@ -637,6 +642,7 @@ local function navigation_page(state)
             end
             return {page = "options_list", targets = list, default = current + 1}
         end
+        list[#list+1]=target(layout.panel.x+350,layout.panel.y+14,layout.panel.x+470,layout.panel.y+40)
         for _, area in ipairs({layout.ok, layout.cancel}) do
             list[#list + 1] = target(area.x, area.y, area.x + area.width, area.y + area.height)
         end
@@ -652,6 +658,17 @@ local function navigation_page(state)
 end
 
 function screen.update(state, flow_input, context)
+    if state.page=='diagnostics' then
+        if require('base/ui/diagnostics').update(state.diagnostics,flow_input)=='back' then state.page='menu' end
+        return
+    end
+    if state.page=='hud' then
+        local result=require('base/ui/hud_editor').update(state.hud,flow_input)
+        if result=='apply' or result=='cancel' then
+            state.page='options';state.options=options.current();state.hud=nil
+        end
+        return
+    end
     state.display = {}
     state.features = flow_input.filters
     local input = flow_input
@@ -695,6 +712,8 @@ function screen.update(state, flow_input, context)
 end
 
 function screen.draw(state, context)
+    if state.page=='diagnostics' then require('base/ui/diagnostics').draw(state.diagnostics,context);return end
+    if state.page=='hud' then require('base/ui/hud_editor').draw(state.hud,context);return end
     context.viewport(constants.screen.width, constants.screen.height, 16, 32, 108)
     for _, command in ipairs(state.display) do
         local kind = command[1]

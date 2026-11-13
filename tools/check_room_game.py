@@ -5,9 +5,9 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def port():
  with socket.socket() as sock:sock.bind(('127.0.0.1',0));return sock.getsockname()[1]
-def case(engine,installer,count,probe=False,menu=False,pack=None,unlock=False,output_dir=None,own=False):
+def case(engine,installer,count,probe=False,menu=False,pack=None,unlock=False,output_dir=None,own=False,clone_probe=False):
  started=time.monotonic()
- config=ROOT/'tools/room-check/config.lua';config.write_text('return {players='+str(count)+',damage_probe='+str(probe).lower()+',menu='+str(menu).lower()+',own='+str(own).lower()+'}\n')
+ config=ROOT/'tools/room-check/config.lua';config.write_text('return {players='+str(count)+',damage_probe='+str(probe).lower()+',menu='+str(menu).lower()+',own='+str(own).lower()+',clone_probe='+str(clone_probe).lower()+'}\n')
  listen_port=port()
  common=[str(Path(engine).resolve()),'--installer',str(Path(installer).resolve()),'--scripts',str(ROOT/'engine/scripts'),'--mod',str(ROOT/'engine/scripts/polish-fighters'),'--mod',str(ROOT/'tools/room-check'),'--port',str(listen_port)]
  if pack:common+=['--mod',str(ROOT/'content-packs'/pack)]
@@ -15,7 +15,7 @@ def case(engine,installer,count,probe=False,menu=False,pack=None,unlock=False,ou
  label=f'{count}-devices'+('-desync' if probe else '')+('-menu' if menu else '')+('-'+pack if pack else '')+('-unlock' if unlock else '')
  try:
   for i in range(count):
-   trace=('rbc' if i%2==0 else 'lbf')+'*120'
+   trace='udlrc*2,*118' if clone_probe else ('rbc' if i%2==0 else 'lbf')+'*120'
    if unlock and i==0:
     marks=[]
     for key in [76,70,50,190,78,69,84]:marks.extend(['#'+str(key),''])
@@ -44,6 +44,7 @@ def case(engine,installer,count,probe=False,menu=False,pack=None,unlock=False,ou
    if p.returncode:print(text[-2200:])
   passed=all(v['desync'] for v in results) if probe else all(v['exit']==0 and v['match'] and v['digest'] for v in results) and len({v['digest'] for v in results})==1
   if unlock:passed=passed and all(v['unlocked'] for v in results)
+  if clone_probe:passed=passed and all('clone_limit_pass=true' in (out/f'{label}-{i}.log').read_text() for i in range(count))
   print(label,'PASS' if passed else 'FAIL',flush=True)
   return {'devices':count,'probe':probe,'passed':passed,'elapsed_seconds':round(time.monotonic()-started,3),'processes':results}
  except subprocess.TimeoutExpired:
@@ -58,9 +59,9 @@ def case(engine,installer,count,probe=False,menu=False,pack=None,unlock=False,ou
   for p in processes:
    if p.poll() is None:p.kill();p.wait()
 def main():
- p=argparse.ArgumentParser();p.add_argument('--engine',required=True);p.add_argument('--installer',required=True);p.add_argument('--counts',default='2,3,4,5,6,7,8');p.add_argument('--probe',action='store_true');p.add_argument('--menu',action='store_true');p.add_argument('--pack');p.add_argument('--unlock',action='store_true');p.add_argument('--output-dir',type=Path,default=ROOT/'validation/room-game');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--engine',required=True);p.add_argument('--installer',required=True);p.add_argument('--counts',default='2,3,4,5,6,7,8');p.add_argument('--probe',action='store_true');p.add_argument('--menu',action='store_true');p.add_argument('--pack');p.add_argument('--unlock',action='store_true');p.add_argument('--clone-probe',action='store_true');p.add_argument('--output-dir',type=Path,default=ROOT/'validation/room-game');a=p.parse_args()
  config=ROOT/'tools/room-check/config.lua';original=config.read_bytes()
- try:results=[case(a.engine,a.installer,int(n),a.probe,a.menu,a.pack,a.unlock,a.output_dir) for n in a.counts.split(',')]
+ try:results=[case(a.engine,a.installer,int(n),a.probe,a.menu,a.pack,a.unlock,a.output_dir,clone_probe=a.clone_probe) for n in a.counts.split(',')]
  finally:config.write_bytes(original)
  (a.output_dir/('desync-results.json' if a.probe else 'unlock-results.json' if a.unlock else 'menu-results.json' if a.menu else a.pack+'-results.json' if a.pack else 'results.json')).write_text(json.dumps(results,indent=2)+'\n')
  return 0 if all(v['passed'] for v in results) else 1

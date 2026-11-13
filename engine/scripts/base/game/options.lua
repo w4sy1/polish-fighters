@@ -37,7 +37,7 @@ end
 -- button's `right` from the right edge, and `bottom` from the bottom edge. Sizes are radii.
 -- `touch.tolerance` is the press tolerance.
 local gamepad_defaults = {
-    stick = {left = 125, bottom = 110, radius = 56},
+    stick = {left = 125, bottom = 110, radius = 56, deadzone = 0.25, sensitivity = 1, fixed = 0},
     -- The digipad (a fixed cross) used instead of the stick when `digipad` is on; `radius` is the
     -- length of its arms (the cross is twice that wide); `left` and `bottom` keep it clear of the edges.
     dpad = {left = 160, bottom = 160, radius = 110},
@@ -52,6 +52,7 @@ local gamepad_defaults = {
     pause = {right = 30, top = 30, radius = 16},
     -- Small fast-forward button in the top left corner: `left` and `top` count from those edges.
     fast = {left = 30, top = 30, radius = 16},
+    commands = {left = 85, top = 30, radius = 24},
     -- Chords of defend (D), jump (J) and attack (A), a column on the right edge; disabled unless
     -- the character has the move.
     da = {right = 72, bottom = 250, radius = 26},
@@ -83,8 +84,12 @@ local function copy_gamepad(layout)
             result[name][key] = value
         end
     end
+    result.stick.deadzone=math.max(0.05,math.min(0.9,result.stick.deadzone))
+    result.stick.sensitivity=math.max(0.25,math.min(3,result.stick.sensitivity))
+    result.stick.fixed=result.stick.fixed>=0.5 and 1 or 0
     return result
 end
+function options.normalize_gamepad(layout) return copy_gamepad(layout) end
 local function angle(value, default, low, high)
     if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then return default end
     return math.max(low, math.min(high, value))
@@ -93,7 +98,7 @@ local function copy(values)
     local style=values.touch_layout
     if style~="classic" and style~="modern" then style=values.digipad==false and "modern" or "classic" end
     return {battlefield_layout = values.battlefield_layout == "expand" and "expand" or defaults.battlefield_layout,
-        touch_layout=style,
+        touch_layout=style,auto_advance=values.auto_advance==true,
         gamepad = copy_gamepad(values.gamepad),unlock_characters = values.unlock_characters,
         upscaling_filter = valid_filter(values.upscaling_filter) and values.upscaling_filter or defaults.upscaling_filter,
         fullscreen = values.fullscreen, digipad = style=="classic", show_fps = values.show_fps, rumble = values.rumble,
@@ -112,6 +117,7 @@ function options.load()
     local document = engine.read_settings()
     local saved = type(document) == "table" and document.options
     local values = copy(defaults)
+    if type(saved)=='table' then values.auto_advance=saved.auto_advance==true end
     if type(saved) == "table" then
         if type(saved.character_shading) == "boolean" then values.character_shading = saved.character_shading end
         if type(saved.projected_shadows) == "boolean" then values.projected_shadows = saved.projected_shadows end

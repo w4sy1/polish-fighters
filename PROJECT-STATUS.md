@@ -1,3 +1,12 @@
+## 2026-11-13 — 0.14.0: diagnostyka, jeden klon SZ, HUD i kampania (testowe)
+
+Dodano lokalne raporty i kontekst gry, diagnostykę Android Java/exit oraz eksport Windows, limit jednego klona Szymonoko bez rekurencji, edytor HUD/profile, CMD, auto przejścia, checkpointy i trening. Przyczyna zgłaszanych zamknięć LF4/PolishF NIE została odtworzona ani potwierdzona jako naprawiona; użytkownik zaakceptował zebranie logów na obu platformach.
+
+49 zestawów Lua PASS; Python 60 PASS/1 SKIP; Android 57 PASS/1 SKIP, Gradle i lint PASS (0 błędów/55 ostrzeżeń), APK code 16. Natywne próby Windows: HUD/trening/klony/zapis/brakujący zasób, przejście ON/OFF/manual, 2 i 8 procesów TCP z klonami/komendami PASS. Po 25 odcinków LF4/PolishF przeszło wspomagane QA, bez potwierdzenia naturalnego ukończenia ani telefonu. Silnik C++ niezmieniony; zgodne biblioteki wydania 0.13.0 wykorzystano ponownie. Niedokończonego Mod Managera z drugiego czatu nie dołączono.
+
+Pełny raport, statusy zakresu, ograniczenia i instrukcja logów: [0.14.0](docs/DIAGNOSTYKA-HUD-0.14-2026-11-13.md). Cały pierwotny zakres pozostaje częściowo niewykonany, zwłaszcza testy fizycznych urządzeń, wszystkie zdolności/balans, nowa natywna martwa strefa pada i pełna rozbudowa modów.
+
+---
 ## 2026-11-13 — dostawa 0.13.0 i usunięcie lokalnych wersji
 
 Pliki Windows (pełny ZIP z EXE) i APK są publiczne: [wydanie testowe 0.13.0](https://github.com/w4sy1/polish-fighters/releases/tag/classic-menu-0.13.0-2026-11-12). GitHub potwierdził rozmiary i SHA256. Na polecenie użytkownika lokalne wersje i kopie kompilacji przeniesiono do Kosza; źródła i ustawienia zachowano. Dalsze testy zatrzymano. Szczegóły: [raport](docs/CLASSIC-MENU-0.13.0-2026-11-12.md).

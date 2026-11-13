@@ -64,10 +64,11 @@ end
 -- options: mode, difficulty, background row (100 = random), fighters (catalog list),
 -- backgrounds (catalog list), slots[0..7] = {kind = "human"|"computer"|nil, fighter, team}.
 function match.create(options)
+    require('base/game/training').prepare(options)
     local state = {mode = options.mode, difficulty = options.difficulty, running = true,
         items = {}, counter_12 = 0, counter_3 = 0, shake = 0,
         camera = 0, camera_step = 0, frame_number = 0, input_phase = 0,
-        random_game = options.demo ~= nil, ai_skill = 0,
+        random_game = options.demo ~= nil, ai_skill = 0,training=options.training==true and not options.network and not options.replay,
         round_counter = 0, winner = -1, elapsed = 0, finished = false,
         paused = false, pause_request = false, pause_next = false, cheat_lock = 0,
         heal_all = false, weapon_command = 0, function_counts = {[6] = 0, [7] = 0, [8] = 0, [9] = 0}}
@@ -345,6 +346,7 @@ local function read_input(state, held)
             for _, key in ipairs(item.keys) do value.previous_keys[key] = value.keys[key] end
             if state.input_phase == 0 then
                 local keys = held[index] or ""
+                keys=require('base/game/team_commands').input(state,index,keys)
                 value.keys.up = keys:find("u", 1, true) ~= nil
                 value.keys.down = keys:find("d", 1, true) ~= nil
                 value.keys.left = keys:find("l", 1, true) ~= nil
@@ -361,7 +363,12 @@ local function read_input(state, held)
         if value then
             if value.record.kind == record_kinds.character then
                 if not scan and ai.prepare then scan = ai.prepare(state) end
-                ai.control(state, index, state.mode, scan)
+                if state.training and index==11 then
+                    for _,key in ipairs(item.keys) do value.previous_keys[key]=value.keys[key];value.keys[key]=false end
+                elseif not require('base/game/team_commands').control(state,index)
+                   and not require('base/game/campaign_advance').follow(state,index) then
+                    ai.control(state, index, state.mode, scan)
+                end
             elseif value.record.frame(value.frame).hits.Fa > 0 then
                 objects.update(state, index)
                 scan = nil
@@ -725,6 +732,7 @@ end
 
 -- Returns "finished", "leave" (F4 in Championship), "paused" or nil.
 function match.step(state, held)
+    require('base/game/training').reset(state)
     state.frame_number = state.frame_number + 1
     state.held = held
     state.input_phase = (state.input_phase + 1) % 2

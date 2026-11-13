@@ -52,7 +52,7 @@ public final class BluetoothLobbyActivity extends Activity {
         findViewById(R.id.pf_quit).setOnClickListener(v -> finish());
         network.setOnClickListener(v -> showOnline());
         settings.setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(t("settings"))
-            .setItems(new String[]{t("controls"),t("video"),"Android / Bluetooth"},(d,w)->{if(w==2)showSettings();else launchMenu(w==0?"controls":"options");})
+            .setItems(new String[]{t("controls"),t("video"),"Android / Bluetooth","Diagnostyka / Diagnostics"},(d,w)->{if(w==3)GameDiagnostics.show(this);else if(w==2)showSettings();else launchMenu(w==0?"controls":"options");})
             .setNegativeButton(t("back"),null).show());
         try { org.json.JSONObject opts=new MobileCodeSettings(getFilesDir()).read().optJSONObject("options");
             language=opts!=null && "english".equals(opts.optString("language"))?"en":"pl";

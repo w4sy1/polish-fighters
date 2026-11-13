@@ -26,6 +26,8 @@ function hub.rows(state)
  elseif mode=='profile' or mode=='battle' then
   local rows={}
   for _,id in ipairs({'versus','stage','championship','team_championship','battle_setup','demo','replay'}) do rows[#rows+1]=row('mode_'..id,id) end
+  rows[#rows+1]={'resume_campaign','WZNOW KAMPANIE / RESUME'}
+  rows[#rows+1]={'training','TRENING / TRAINING'}
   rows[#rows+1]=row('root','back');return rows
  elseif mode=='status' then
   local rows={};local inventory=require('polish-fighters/module_inventory')
@@ -35,7 +37,7 @@ function hub.rows(state)
   end
   rows[#rows+1]={'unavailable',L('absent_turbo')};rows[#rows+1]=row('library','back');return rows
  elseif mode=='settings' then
-  return {row('controls'),row('options','video'),row('recording'),row('extras'),row('root','back')}
+  return {row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'},row('root','back')}
  elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
  elseif mode=='credits' then return {row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}

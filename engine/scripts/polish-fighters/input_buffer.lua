@@ -17,6 +17,12 @@ function buffer.prepare(state,held)
  for slot=0,7 do
   local pending=state.pf_input_pending[slot] or {}
   local keys=held[slot] or ""
+  local command=require('base/game/team_commands').decode(keys)
+  if command then pending={command=keys} end
+  if pending.command then
+   copy[slot]=pending.command
+   if sampled then state.pf_input_pending[slot]=nil else state.pf_input_pending[slot]=pending end
+  else
   local directions=keys:gsub('[^udlr]','')
   if directions~='' then pending.directions=directions end
   if sampled and directions=='' and pending.directions then keys=keys..pending.directions end
@@ -26,6 +32,7 @@ function buffer.prepare(state,held)
   end
   copy[slot]=keys
   if sampled then state.pf_input_pending[slot]=nil else state.pf_input_pending[slot]=pending end
+  end
  end
  return copy
 end

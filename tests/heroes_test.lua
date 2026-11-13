@@ -53,12 +53,10 @@ do
  assert(heroes.clone(s,0,v,objects));local child=s.items[10]
  assert(child.pf_clone and child.hp==500 and child.mp==500 and child.pf_clone_depth==1)
  assert(not heroes.clone(s,0,v,objects),'root summoned a second living child')
- assert(heroes.clone(s,10,child,objects));local grand=s.items[12]
- assert(grand.pf_clone_depth==2 and grand.pf_root==0 and grand.hp==500)
- assert(not heroes.clone(s,12,grand,objects),'unbounded clone recursion')
- assert(not heroes.enemy(v,child) and not heroes.enemy(v,grand),'clones attack their family')
+ assert(not heroes.clone(s,10,child,objects),'clone created a descendant')
+ assert(not heroes.enemy(v,child),'clone attacks its family')
  child.hp=0;assert(heroes.clone(s,0,v,objects),'cannot replace dead first-generation clone')
- assert(not heroes.clone_allowed(s,14,s.items[14]),'family exceeded three living units')
+ assert(not heroes.clone_allowed(s,0,v),'family exceeded one living clone')
  local independent=world(411);independent.items[0].team=0
  assert(heroes.clone(independent,0,independent.items[0],objects))
  assert(not heroes.enemy(independent.items[0],independent.items[10]),'independent clones attack owner')
@@ -86,4 +84,4 @@ do
  b.frame=180;heroes.advance(interrupted,0,b,objects)
  assert(not b.pf_sigma_charge and interrupted.pf_events.boss_ultimate_interrupted==1)
 end
-print('PASS heroes: persistent health buffs, regeneration/death/caps, alternating ninja counters, full two-generation clones/family safety, persistent destructible turrets and charged/interruptible ultimate')
+print('PASS heroes: persistent health buffs, regeneration/death/caps, alternating ninja counters, single clone/family safety, persistent destructible turrets and charged/interruptible ultimate')

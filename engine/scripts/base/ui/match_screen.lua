@@ -19,6 +19,12 @@ local replay_lines, mode_line
 -- options: see base/game/match create().
 function screen.create(options)
     local state = {match = match.create(options)}
+    for index,saved in pairs(options.checkpoint_vitals or {}) do
+        local value=state.match.items[index]
+        if value then
+            value.hp,value.dark_hp,value.max_hp,value.mp=saved.hp,saved.dark_hp,saved.max_hp,saved.mp
+        end
+    end
     local snapshots, next_snapshot = {{items = {}}, {items = {}}}, 1
     state.match.capture = function(current)
         local snapshot = screen.snapshot(current, snapshots[next_snapshot])
@@ -565,6 +571,14 @@ function screen.draw(state, context, window_bounds)
         if current.replay_status then replay_lines(context, current) end
     end
     mode_line(context, current, replaying)
+    local save_error=require('base/game/campaign_save').last_error
+    if current.stage_run and save_error then font.draw(context,'BLAD ZAPISU: '..tostring(save_error):sub(1,90),8,174) end
+    if current.training then
+        context.fill(0,100,794,66,10,20,35,230)
+        for index,line in ipairs(require('base/game/training').lines(current)) do
+            font.draw(context,line,8,104+(index-1)*19)
+        end
+    end
 end
 
 return screen

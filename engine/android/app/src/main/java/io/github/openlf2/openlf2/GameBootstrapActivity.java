@@ -44,6 +44,7 @@ public final class GameBootstrapActivity extends Activity {
 
     @Override protected void onCreate(Bundle savedState) {
         super.onCreate(savedState);
+        GameDiagnostics.install(this);
         setContentView(R.layout.activity_game_bootstrap);
         status = findViewById(R.id.pf_status);
         progress = findViewById(R.id.pf_progress);

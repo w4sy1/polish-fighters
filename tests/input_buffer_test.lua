@@ -19,3 +19,8 @@ for _,paused in ipairs({false,true}) do
  assert(buffer.prepare(state,{[0]='',functions=''}).functions=='4','short F4 lost, paused='..tostring(paused))
 end
 print('PASS: short movement/actions survive sampling, immediate reversal, release, F4 while paused')
+local s={input_phase=0}
+buffer.prepare(s,{[0]='f',functions=''})
+buffer.prepare(s,{[0]='udlrc',functions=''})
+s.input_phase=1
+assert(buffer.prepare(s,{[0]='',functions=''})[0]=='udlrc','pending defense corrupted team command')

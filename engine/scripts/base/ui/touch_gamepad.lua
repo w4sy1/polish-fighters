@@ -32,7 +32,8 @@ local function build_stick(config, screen, digipad)
     end
     return {zone = {left = screen.left, top = y - 150 * scale, right = x + 205 * scale, bottom = y + 80 * scale},
         default_x = x, default_y = y, radius = radius, travel = 60 * scale,
-        deadzone = 14 * scale, threshold = 0.4, run_distance = 51 * scale, run_rearm_distance = 30 * scale,
+        deadzone = radius * (config.deadzone or 0.25), sensitivity = config.sensitivity or 1,
+        fixed_center = config.fixed == 1, threshold = 0.4, run_distance = 51 * scale, run_rearm_distance = 30 * scale,
         knob = math.floor(24 * scale), knob_inner = math.floor(18 * scale)}
 end
 -- Right action buttons: attack is primary/biggest (thumb rests there); jump/defend are reached
@@ -87,6 +88,13 @@ local function fit(state, screen)
     local fast = state.layout.fast
     state.fast = {x = screen.left + math.floor(fast.left), y = screen.top + math.floor(fast.top),
         radius = math.floor(fast.radius)}
+    local commands=state.layout.commands or {left=85,top=30,radius=24}
+    state.commands={x=screen.left+commands.left,y=screen.top+commands.top,radius=commands.radius}
+    state.command_choices={}
+    for i,entry in ipairs({{'come','ZA MNA / COME'},{'stay','ZOSTAN / STAY'},
+        {'attack','ATAKUJ / ATTACK'},{'defend','BRON / DEFEND'}}) do
+        state.command_choices[i]={command=entry[1],label=entry[2],x=screen.left+125,y=screen.top+55+i*52,radius=24}
+    end
     state.buttons = build_buttons(state.layout, screen,state.style)
     if not state.finger then
         state.base_x, state.base_y = state.stick.default_x, state.stick.default_y
@@ -112,12 +120,18 @@ function gamepad.set_available(state, available) state.available = available end
 -- The button (or the pause button) a finger presses: the one whose edge is nearest, as long as
 -- the finger is within `tolerance` pixels of it, so a slightly missed press still counts.
 local function target_at(state, touch, mode)
+    if mode=='match' and state.command_open then
+        for _,choice in ipairs(state.command_choices) do
+            if math.abs(touch.x-choice.x)<=110 and math.abs(touch.y-choice.y)<=23 then return choice end
+        end
+    end
     local best, best_gap
     local function consider(target)
         local gap = math.sqrt((touch.x - target.x) ^ 2 + (touch.y - target.y) ^ 2) - target.radius
         if gap <= state.tolerance and (not best_gap or gap < best_gap) then best, best_gap = target, gap end
     end
     if mode ~= "full" then consider(state.pause); consider(state.fast) end
+    if mode=='match' then consider(state.commands) end
     if mode ~= "pause" then
         for _, button in ipairs(state.buttons) do
             if not button.letters or state.available[button.action] then consider(button) end
@@ -135,8 +149,12 @@ function gamepad.update(state, input, mode)
     fit(state, input.screen or default_screen)
     local stick, buttons = state.stick, state.buttons
     local screen = state.screen
+    state.command_signal=nil
+    if state.confirmation_ticks then state.confirmation_ticks=state.confirmation_ticks-1 end
     state.visible = input.touch_active == true
     if not state.visible then
+        state.command_open=nil
+        state.previous_touches={}
         state.finger, state.held = nil, {}
         state.aim_finger,state.attack_pulse=nil,nil
         state.run_armed,state.run_pulse=nil,nil
@@ -149,6 +167,13 @@ function gamepad.update(state, input, mode)
     local pressed = {}
     for _, touch in ipairs(touches) do
         local target = target_at(state, touch, mode)
+        if target and not state.previous_touches[touch.id] then
+            if target==state.commands then state.command_open=not state.command_open
+            elseif target.command then
+                state.command_signal=target.command;state.command_open=false
+                state.command_confirmation=target.label;state.confirmation_ticks=75
+            end
+        end
         -- Both layouts use the original LF2 press-to-attack behavior. Holding
         -- attack must never wait for release or consume the movement finger.
         if target and touch.id~=state.finger then pressed[target] = true end
@@ -177,7 +202,7 @@ function gamepad.update(state, input, mode)
                 break
             end
         end
-        if owner and not stick.fixed then
+        if owner and not stick.fixed and not stick.fixed_center then
             state.base_x = clamp(owner.x, screen.left + stick.radius, screen.right - stick.radius)
             state.base_y = clamp(owner.y, screen.top + stick.radius, screen.bottom - stick.radius)
         end
@@ -185,6 +210,7 @@ function gamepad.update(state, input, mode)
     local held = {}
     if owner then
         local dx, dy = owner.x - state.base_x, owner.y - state.base_y
+        dx,dy=dx*(stick.sensitivity or 1),dy*(stick.sensitivity or 1)
         local distance = math.sqrt(dx * dx + dy * dy)
         if distance > 0 then
             local travel = math.min(distance, stick.travel)
@@ -192,7 +218,7 @@ function gamepad.update(state, input, mode)
         else
             state.knob_x, state.knob_y = state.base_x, state.base_y
         end
-        if distance >= stick.deadzone then
+        if distance > 0 and distance >= stick.deadzone then
             if dx / distance > stick.threshold then held.r = true end
             if dx / distance < -stick.threshold then held.l = true end
             if dy / distance > stick.threshold then held.d = true end
@@ -234,7 +260,7 @@ function gamepad.update(state, input, mode)
     for _, letter in ipairs({"u", "d", "l", "r", "c", "b", "f"}) do
         if held[letter] then letters[#letters + 1] = letter end
     end
-    return table.concat(letters), pause_held, fast_held
+    return table.concat(letters), pause_held, fast_held,state.command_signal
 end
 
 -- A circle approximated by horizontal strips (no rounded primitive exists),
@@ -331,6 +357,18 @@ function gamepad.draw(state, context)
     if state.mode ~= "full" then
         draw_pause(state, button_context)
         draw_fast(state, button_context)
+    end
+    if state.mode=='match' then
+        disc(button_context,state.commands.x,state.commands.y,state.commands.radius,40,90,110)
+        font.draw(context,'CMD',state.commands.x,state.commands.y-7,nil,nil,'center')
+        if state.command_open then
+            for _,choice in ipairs(state.command_choices) do
+                button_context.fill(choice.x-110,choice.y-23,220,46,35,75,110)
+                font.draw(context,choice.label,choice.x,choice.y-7,nil,nil,'center')
+            end
+        elseif (state.confirmation_ticks or 0)>0 then
+            font.draw(context,state.command_confirmation,397,65,nil,nil,'center')
+        end
     end
     if state.mode == "pause" then
         context.overlay(false)

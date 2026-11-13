@@ -12,6 +12,11 @@ return function(flow)
    local catalog=require("base/game/catalog");local fighters=catalog.load();local slots={}
    for _,peer in ipairs(s.session.peers) do
     local selected=peer.slot%#fighters+1
+    if require('room-check/config').clone_probe then
+     selected=nil
+     for row,fighter in ipairs(fighters) do if fighter.id==411 then selected=row;break end end
+     assert(selected,'Szymonoko missing in clone network fixture')
+    end
     if require("room-check/config").own then
      selected=nil
      for row,fighter in ipairs(fighters) do if fighter.id==410+peer.slot%4 then selected=row;break end end
@@ -22,6 +27,18 @@ return function(flow)
    s.match=require("base/ui/match_screen").create({mode=0,difficulty=0,background=0,
     fighters=fighters,backgrounds=catalog.backgrounds(),slots=slots,network=true})
    s.active="match";s.wait_release=nil
+   if require('room-check/config').clone_probe then
+    local heroes=require('polish-originals/heroes');local objects=require('base/game/objects')
+    for _,peer in ipairs(s.session.peers) do
+     local m=s.match.match;local owner=m.items[peer.slot]
+     assert(heroes.clone(m,peer.slot,owner,objects))
+     assert(not heroes.clone(m,peer.slot,owner,objects),'network owner exceeded one clone')
+    end
+    for slot,child in pairs(s.match.match.items) do
+     if child.pf_clone then assert(not heroes.clone(s.match.match,slot,child,objects),'network clone created a descendant') end
+    end
+    s.clone_limit_pass=true
+   end
   end
   if s.session and s.test_match and require("room-check/config").damage_probe and s.session.slot==1 and s.match.match.frame_number==5 then
    s.match.match.items[1].hp=s.match.match.items[1].hp-1
@@ -30,6 +47,7 @@ return function(flow)
  end
  function flow.describe(s)
   local detail=describe(s)
+  if s.clone_limit_pass then detail=detail..' clone_limit_pass=true' end
   if s.test_match or s.session then
    detail=detail.." room_slot="..s.network.session.slot.." room_digest="..require("polish-fighters/sync_state").digest(s)
    local m=s.match and s.match.match or {items={}}

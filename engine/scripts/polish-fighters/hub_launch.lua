@@ -28,6 +28,11 @@ return function(base)
   elseif id:sub(1,7)=='status_' then
    local item=require('polish-fighters/module_inventory')[id:sub(8)]
    state.hub_note=locale.text('assets')..item.assets..' / '..locale.text('missing_files')..item.missing
+  elseif id=='resume_campaign' then
+   local saved,problem=require('base/game/campaign_save').options(catalog.profile_id)
+   if saved then context.action(id) else state.hub_note=tostring(problem) end
+  elseif id=='training' then context.action(id)
+  elseif id=='diagnostics' then state.page='diagnostics';state.diagnostics=require('base/ui/diagnostics').create()
   elseif id=='unavailable' then state.hub_note=locale.text('offline')
   elseif id=='account' then online.open(state)
   elseif id:sub(1,5)=='mode_' then
