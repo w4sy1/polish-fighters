@@ -1,5 +1,4 @@
 import importlib.util
-import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -63,7 +62,7 @@ class InventoryTests(unittest.TestCase):
         def run(args, **kwargs):
             calls.append((args, kwargs)); return Result()
         self.assertEqual(pf.launch(binary, installer, run=run), 0)
-        self.assertEqual(os.path.normcase(calls[0][0][0]), os.path.normcase(str(binary)))
+        self.assertTrue(Path(calls[0][0][0]).samefile(binary))
         self.assertIn('--mod', calls[0][0])
         self.assertEqual(Path(calls[0][0][-1]), pf.ROOT / 'engine/scripts/polish-fighters')
         self.assertNotIn('shell', calls[0][1])

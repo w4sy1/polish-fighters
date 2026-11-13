@@ -130,7 +130,7 @@ class Library:
 
     def package_path(self, pack_id):
         path = self.home / 'installed' / identifier(pack_id)
-        if path.resolve() != path: raise ValueError('Package path is linked outside the managed library')
+        if has_link_component(path): raise ValueError('Package path is linked outside the managed library')
         return path
 
     def hashes(self, directory):
