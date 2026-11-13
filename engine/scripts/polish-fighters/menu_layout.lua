@@ -1,9 +1,9 @@
--- All coordinates are in the engine's existing 794 x 550 logical viewport.
+-- Coordinates follow the original LF2 start menu's narrow centred text column.
 local layout={}
 function layout.box(index,count)
- if count<=8 then return 221,141+(index-1)*43,352,37 end
- local column=math.floor((index-1)/8)
- return 30+column*384,141+(index-1)%8*41,366,35
+ if count<=10 then return 147,207+(index-1)*28,500,23 end
+ local column=math.floor((index-1)/10)
+ return 133+column*285,207+(index-1)%10*28,260,23
 end
-function layout.language(index) return 653+(index-1)*65,514,59,28 end
+function layout.language(index) return 653+(index-1)*65,510,59,25 end
 return layout

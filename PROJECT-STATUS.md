@@ -1,3 +1,15 @@
+## 2026-11-13 — poprawki wyglądu menu LF2 (lokalne)
+
+Główne menu gry korzysta teraz z oryginalnego tła, logo i bitmapowej czcionki
+Little Fighter 2; zachowano nawigację oraz przepływy. Ekran Androidowego katalogu
+i importera dopasowano do palety i pikselowych przycisków gry. Scraper nadal otwiera
+strony projektów; ZIP użytkownik pobiera na stronie i wybiera systemowym selektorem.
+Nie dodano automatycznego pobierania. Pełne testy Python: 70 PASS / 1 SKIP;
+testy Lua menu, sterowania i scrapera: PASS; składnia 145 plików: PASS. JDK 17
+pozwolił uruchomić Gradle; pełna kompilacja zatrzymała się na brakujących
+wygenerowanych plikach SDLActivity i bibliotekach silnika. Brak APK i telefonu, więc
+wygląd i dotyk na Androidzie niepotwierdzone.
+
 ## 2026-11-13 — wznowienie audytu 0.14 / Android Mod Browser 0.15 (lokalne)
 
 Dodano Androidowy ekran źródeł i importer ograniczony do paczek `mod-<24 hex>`

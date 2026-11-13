@@ -215,3 +215,23 @@ Pelna lista (49 plikow):
 - tools/probe_gameplay_update.py
 - tools/room-check/flow.lua
 - tools/Start-Game.ps1
+## Uzupełnienie — menu gry i importer Androida (2026-11-13)
+
+W osobnej lokalnej poprawce główne menu hub używa teraz tła, dwóch fragmentów
+logo i bitmapowej czcionki z oryginalnego UI LF2, zamiast przyciemnionego tła,
+nowego nagłówka i prostokątnych kart. Zachowano identyfikatory wierszy,
+nawigację, wybór języka i przepływy gry. Pozycje menu są wyśrodkowane w szerokiej
+kolumnie, a test pilnuje użycia oryginalnej grafiki i braku nowych wypełnionych
+kart. Ekran `AndroidModsActivity` otrzymał tę samą granatowo-niebieską paletę
+i przyciski `ClassicButton`; zachowuje bezpieczne sprawdzanie źródeł, systemowy
+selektor ZIP, walidację/import, status, błędy i wybór modułu. Scraper nadal
+otwiera strony projektów. Nie dodano pobierania ZIP ani automatycznej instalacji.
+
+Weryfikacja tej poprawki: testy Lua `classic_menu_test.lua`, `hub_input_test.lua`,
+`mod_browser_test.lua`, `global_menu_test.lua` PASS; składnia Lua 145 plików PASS;
+pełny zestaw Python 70 PASS, 1 SKIP (uprawnienia symlink w Windows). Gradle
+8.13 początkowo odrzucił JDK 25; potem użyto istniejącego JDK 17. Kompilacja
+zatrzymała się na brakujących wygenerowanych plikach SDLActivity i bibliotekach
+silnika. Nie powstał APK i nie było testu na telefonie. W rezultacie faktyczny
+wygląd/przepływ na Androidzie nie jest potwierdzony. Te zmiany nie są publikacją
+ani wydaniem ukończonym; kluczowe testy urządzenia i paczek nadal pozostają.

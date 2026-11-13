@@ -5,11 +5,11 @@ return function(base)
  local input_settings=require("polish-fighters/input_settings")
  local catalog=require("base/game/catalog")
  local font=require("base/ui/font")
+ local variants=require("base/game/constants").font_variants
  local options=require("base/game/options")
  local packs=require("polish-fighters/pack_preferences")
  local locale=require('polish-fighters/menu_locale')
  local layout=require('polish-fighters/menu_layout')
- local pixels=require('polish-fighters/pixel_font')
  local sounds=require('base/game/sounds')
  local online=require('polish-fighters/online_screen')
  local mods=require('polish-fighters/mod_browser')
@@ -147,7 +147,7 @@ return function(base)
   if previous and previous~=state.hub_hover and state.hub_hover then sounds.direct(state,'pass') end
   if mapped.nav.cancel and state.hub_mode~='root' then
    if state.hub_mode=='packs' then state.hub_pack_edit=nil;state.hub_mode='library'
-   elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,12,0xffdc82,'center')
+   elseif state.hub_mode=='status' then state.hub_note=locale.text('audit_note')
   elseif state.hub_mode=='players' then state.hub_mode='library'
    elseif state.hub_mode=='library' and state.hub_pending_mode then state.hub_mode='battle'
    else state.hub_mode='root';state.hub_pending_mode=nil end
@@ -156,31 +156,29 @@ return function(base)
   for _,sound in ipairs(sounds.flush(state)) do context.sound(sound.resource,sound.volume,sound.pan) end
  end
 
- local function text(context,value,x,y,size,color,align)
-  if context.text then context.text(value,x,y,align or "left",size,color,nil,nil,false)
-  else font.draw(context,value,x,y,1,nil,align) end
+ local function text(context,value,x,y,variant,align)
+  font.draw(context,value,x,y,variant or variants.white,nil,align)
  end
  function base.draw(state,context)
   if state.hub_enabled and state.hub_mods then return mods.draw(state,context) end
   if not state.hub_enabled or state.page~="menu" or state.hub_classic then return draw(state,context) end
   if state.hub_online then return online.draw(state,context) end
-  context.viewport(794,550,4,10,65)
+  -- Use the same scenic backdrop, logo art, and bitmap font as LF2's own
+  -- launch menu. Keep the artwork bright; the old blue wash and modern cards
+  -- obscured the original interface.
+  context.viewport(794,550,16,32,108)
   context.image('pe/menu_back'..(state.background or 0),0,0,true)
-  context.fill(0,0,794,550,4,10,65,170)
-  pixels.draw(context,'POLISH LITTLE FIGHTERS',397,29,4,0xf5f7ff,'center')
-  context.fill(244,75,306,3,243,243,255)
-  context.fill(316,80,246,3,230,30,45)
+  context.sprite('pe/menu_clip',{0,41,434,80},155,96,true)
+  context.sprite('pe/menu_clip',{434,41,62,68},589,96,true)
   local heading=state.hub_edit and locale.text('controls') or
    locale.text(({root='battle',profile='battle',library='modules',packs='modules',players='players'})[state.hub_mode] or state.hub_mode or 'battle')
-  if state.hub_mode~='root' and not state.hub_edit then pixels.draw(context,heading,397,108,2,0xb9ceff,'center') end
+  if state.hub_mode~='root' and not state.hub_edit then text(context,heading,397,181,variants.blue,'center') end
   if state.hub_edit then
    local set=state.hub_edit.sets[state.hub_player]
-   text(context,"Wybierz gracza, urządzenie i kliknij akcję do przypisania.",397,80,14,0xaac0dd,"center")
+   text(context,"Wybierz gracza, urządzenie i kliknij akcję do przypisania.",397,199,variants.blue,"center")
    for index,row in ipairs(input_settings.rows(state,{})) do
     local selected=row[1]=="player:"..state.hub_player or index==state.hub_input_hover
-    context.fill(row[3],row[4],row[5],row[6],selected and 201 or 122,selected and 219 or 157,255)
-    context.fill(row[3]+2,row[4]+2,row[5]-4,row[6]-4,selected and 50 or 16,selected and 78 or 33,selected and 155 or 100)
-    text(context,row[2],row[3]+10,row[4]+7,14,0xffffff)
+    text(context,row[2],row[3]+row[5]/2,row[4]+4,selected and variants.white or variants.blue,"center")
    end
    local message=state.hub_control_message
    if state.hub_capture then message="Naciśnij nowy klawisz / przycisk. ESC anuluje."
@@ -188,34 +186,28 @@ return function(base)
     message="Pad "..set.device..": "..(state.hub_connected_pads and state.hub_connected_pads[set.device] and "WYKRYTY" or "NIEWYKRYTY - podłącz kontroler")
    end
    if not message and #input_settings.shared_keys(state)>0 then message="Wspólne klawisze graczy. Użyj USUŃ KOLIZJE Z INNYMI." end
-   if message then text(context,message,397,440,14,0xffdc82,"center") end
+   if message then text(context,message,397,480,variants.yellow,"center") end
    return
-  end
-  local function button(x,y,w,h,label,selected,scale)
-   context.fill(x,y,w,h,selected and 201 or 122,selected and 219 or 157,255)
-   context.fill(x+2,y+2,w-4,h-4,selected and 50 or 16,selected and 78 or 33,selected and 155 or 100)
-   pixels.draw(context,label,x+w/2,y+math.floor((h-7*(scale or 2))/2),scale or 2,0xf4f5ff,'center')
   end
   local rows=hub.rows(state)
   for index,row in ipairs(rows) do
    local x,y,w,h=layout.box(index,#rows)
-   local count=0;for _ in row[2]:gmatch('[%z\1-\127\194-\244][\128-\191]*') do count=count+1 end
-   button(x,y,w,h,row[2],index==state.hub_hover,count>29 and 1 or 2)
+   text(context,row[2],x+w/2,y+3,index==state.hub_hover and variants.white or variants.blue,'center')
   end
   for index,id in ipairs({'pl','en'}) do
    local x,y,w,h=layout.language(index)
-   button(x,y,w,h,id:upper(),locale.id()==id,2)
+   text(context,id:upper(),x+w/2,y+4,locale.id()==id and variants.white or variants.blue,'center')
   end
-  text(context,locale.text('active')..hub.title(catalog.profile_id),20,490,12,0xbdcced)
+  text(context,locale.text('active')..hub.title(catalog.profile_id),16,492,variants.blue)
   if state.hub_mode=='credits' then
-   text(context,locale.text('credit_text'),397,235,16,0xffffff,'center')
-   text(context,locale.text('credit_packs'),397,280,14,0xffffff,'center')
-  elseif state.hub_mode=='online' then text(context,locale.text('offline'),397,416,13,0xffdc82,'center')
-  elseif state.hub_mode=='library' then text(context,locale.text('absent_turbo'),397,479,12,0xffdc82,'center')
-  elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,12,0xffdc82,'center')
-  elseif state.hub_mode=='players' then text(context,locale.text('local_players'),397,370,13,0xffffff,'center') end
+   text(context,locale.text('credit_text'),397,235,variants.white,'center')
+   text(context,locale.text('credit_packs'),397,280,variants.white,'center')
+  elseif state.hub_mode=='online' then text(context,locale.text('offline'),397,416,variants.yellow,'center')
+  elseif state.hub_mode=='library' then text(context,locale.text('absent_turbo'),397,479,variants.yellow,'center')
+  elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,variants.yellow,'center')
+  elseif state.hub_mode=='players' then text(context,locale.text('local_players'),397,370,variants.white,'center') end
   local message=state.hub_note or state.message
-  text(context,tostring(message or locale.text('navigation')):sub(1,110),20,527,11,message and 0xffdc82 or 0x9caedb)
+  text(context,tostring(message or locale.text('navigation')):sub(1,92),16,520,message and variants.yellow or variants.blue)
 
  end
  function base.describe(state)

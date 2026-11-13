@@ -12,6 +12,7 @@ import org.json.JSONObject;
 /** Native clickable/focusable button, painted with the same project-owned glyphs as Lua. */
 public final class ClassicButton extends Button {
     private final Paint paint = new Paint();
+    public ClassicButton(Context context) { this(context,null); }
     public ClassicButton(Context context, AttributeSet attrs) { super(context, attrs); }
     @Override public boolean onKeyDown(int keyCode,android.view.KeyEvent event) {
         if(keyCode==android.view.KeyEvent.KEYCODE_BUTTON_A && isEnabled()) {setPressed(true);return true;}
