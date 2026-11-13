@@ -132,6 +132,9 @@ function navigation.apply(state, input, spec)
         state.focus = spec.remember and state.remembered[page] or default
         if spec.autofocus then state.mode = "focus" end
     end
+    -- The on-screen stick and OK button are navigation controls, not a pointer
+    -- moved over the overlay. Use the current menu focus on their first press.
+    if input.touch_navigation then state.mode = "focus" end
     if locked or #targets == 0 then return view end
 
     local moving = fresh.u or fresh.d or fresh.l or fresh.r

@@ -27,6 +27,11 @@ jobs:
           name: PolishFighters-Windows-x64
           path: engine/out/PolishFighters-Windows-x64.exe*
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PolishFighters-Windows-x64-runtime
+          path: engine/out/OpenLF2-Windows-x64/
+          if-no-files-found: error
   android:
     runs-on: ubuntu-24.04
     timeout-minutes: 360

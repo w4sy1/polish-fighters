@@ -38,7 +38,12 @@ foreach ($abi in $Abis) {
 }
 $previousJava = $env:JAVA_HOME
 try {
-    $env:JAVA_HOME = Join-Path $projectRoot 'engine/build/studio-jdk17/jdk-17.0.18+8'
+    $jdkRoot = Join-Path $projectRoot 'engine/build/studio-jdk17'
+    $jdk = Get-ChildItem -LiteralPath $jdkRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -like 'jdk-17*' -and (Test-Path (Join-Path $_.FullName 'bin/javac.exe')) } |
+        Sort-Object Name -Descending | Select-Object -First 1
+    if (-not $jdk) { throw "JDK 17 is missing in $jdkRoot." }
+    $env:JAVA_HOME = $jdk.FullName
     $sdkRoot = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { Join-Path $env:LOCALAPPDATA 'Android/Sdk' }
     $installedNdk = Get-ChildItem -LiteralPath (Join-Path $sdkRoot 'ndk') -Directory |
         Where-Object { Test-Path (Join-Path $_.FullName 'toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-strip.exe') } |
@@ -49,7 +54,9 @@ try {
     if ($installedNdk) { $gradleArguments += "-Popenlf2NdkVersion=$($installedNdk.Name)" }
     & (Join-Path $projectRoot 'engine/android/gradlew.bat') @gradleArguments
     if ($LASTEXITCODE -ne 0) { throw 'APK packaging failed.' }
-    $apk = Join-Path $projectRoot 'engine/out' $ApkName
+    $out = Join-Path $projectRoot 'engine/out'
+    New-Item -ItemType Directory -Force -Path $out | Out-Null
+    $apk = Join-Path $out $ApkName
     Copy-Item -LiteralPath (Join-Path $projectRoot 'engine/android/app/build/outputs/apk/debug/app-debug.apk') -Destination $apk
     Write-Output "Built APK: $apk"
     Get-FileHash -LiteralPath $apk -Algorithm SHA256

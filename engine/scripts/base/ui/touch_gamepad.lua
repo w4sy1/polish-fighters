@@ -45,10 +45,10 @@ local function build_buttons(layout, screen, style)
         -- Keep attack easy to hit on a phone even when an older saved profile
         -- still has the original 44 px button. Other saved button sizes remain intact.
         local radius = math.floor(config.radius)
-        if action == "c" then radius = math.max(radius, 56) end
+        if action == "c" then radius = math.max(radius, 64) end
         return {action = action, letters = letters, label = label, x = screen.right - math.floor(config.right),
             y = screen.bottom - math.floor(config.bottom), radius = radius,
-            hit_radius = action == "c" and math.max(radius + 22, 78) or radius,
+            hit_radius = action == "c" and math.max(radius + 22, 86) or radius,
             fill = fill, pressed = pressed}
     end
     local list = {button("c", "ATAK", {90, 45, 40}, {170, 80, 65}), button("b", "SKOK", {40, 80, 50}, {80, 160, 100}),
@@ -126,6 +126,13 @@ local function target_at(state, touch, mode)
         for _,choice in ipairs(state.command_choices) do
             if math.abs(touch.x-choice.x)<=110 and math.abs(touch.y-choice.y)<=23 then return choice end
         end
+    end
+    -- The entire drawn ATTACK disc belongs to ATTACK, even where its larger
+    -- saved layout overlaps the forgiving hit area of another action.
+    if mode ~= "pause" then
+        local attack = state.buttons[1]
+        local dx, dy = touch.x - attack.x, touch.y - attack.y
+        if dx * dx + dy * dy <= attack.radius * attack.radius then return attack end
     end
     local best, best_gap
     local function consider(target)

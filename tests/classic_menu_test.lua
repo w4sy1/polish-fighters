@@ -8,6 +8,16 @@ local options=require('base/game/options');options.load()
 local hub=require('polish-fighters/hub')
 local layout=require('polish-fighters/menu_layout')
 local locale=require('polish-fighters/menu_locale')
+local navigation=require('base/ui/navigation')
+local nav=navigation.create()
+local menu_targets={navigation.target(200,100,300,130),navigation.target(200,150,300,180)}
+local first=navigation.apply(nav,{keys={[13]=true},gamepad={},pointer_x=900,pointer_y=450,
+ touch_navigation=true},{page='touch-menu',targets=menu_targets,default=1})
+assert(first.click and first.focused==1,'first touch OK must confirm the current menu row')
+navigation.apply(nav,{keys={},gamepad={},pointer_x=900,pointer_y=450},{page='touch-menu',targets=menu_targets})
+local down=navigation.apply(nav,{keys={[40]=true},gamepad={},pointer_x=-100,pointer_y=480,
+ touch_navigation=true},{page='touch-menu',targets=menu_targets})
+assert(down.focused==2,'first joystick movement must change the menu row')
 local shell=dofile(arg[1]..'/engine/scripts/polish-fighters/hub_launch.lua')({create=function() return {page='menu'} end,update=function() end,draw=function() end,describe=function() return '' end})
 local state=shell.create({});state.hub_enabled=true;state.hub_mode='root'
 local requested
@@ -57,8 +67,12 @@ for _,mode in ipairs({'root','battle','library','packs','players','settings','on
 end
 local commands=0
 state.hub_mode='status';state.hub_enabled=true;state.page='menu';state.hub_edit=nil
+require('base/i18n/i18n').host(true)
 shell.draw(state,{viewport=function() end,image=function() commands=commands+1 end,
- fill=function() commands=commands+1 end,sprite=function() commands=commands+1 end,text=function() commands=commands+1 end})
+ fill=function() commands=commands+1 end,sprite=function() commands=commands+1 end,text=function(_,x,y)
+ assert(x==math.floor(x) and y==math.floor(y),'translated menu sent fractional coordinates to the native renderer')
+ commands=commands+1 end})
+require('base/i18n/i18n').host(false)
 assert(commands<4096,'module list exceeded native renderer command limit')
 local artwork,words,fills=0,0,0
 state.hub_mode='root';state.hub_hover=1

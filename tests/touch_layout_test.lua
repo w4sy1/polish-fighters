@@ -18,13 +18,15 @@ end
 local function touch(button,id) return {id=id,x=button.x,y=button.y} end
 for _,state in ipairs({classic,modern}) do
  local attack=touch(state.buttons[1],2)
- assert(state.buttons[1].radius>=56,'old saved profiles must get a larger visible attack button')
- assert(state.buttons[1].hit_radius>=78,'attack needs a forgiving touch area around the visible circle')
+ assert(state.buttons[1].radius>=64,'old saved profiles must get a larger visible attack button')
+ assert(state.buttons[1].hit_radius>=86,'attack needs a forgiving touch area around the visible circle')
  assert(frame(state,{attack}):find('c'),'attack must respond on finger down')
  assert(frame(state,{attack}):find('c'),'holding attack must remain active')
  assert(not frame(state,{}):find('c'),'release must not generate a delayed attack')
  local edge=touch(state.buttons[1],3);edge.x=edge.x+state.buttons[1].radius
  assert(frame(state,{edge}):find('c'),'entire visible attack circle, including its edge, must register')
+ local upper=touch(state.buttons[1],31);upper.y=upper.y-state.buttons[1].radius
+ assert(frame(state,{upper}):find('c'),'overlap with SKOK must not steal the visible attack edge')
  frame(state,{})
  local forgiving=touch(state.buttons[1],4);forgiving.x=forgiving.x+state.buttons[1].radius+15
  assert(frame(state,{forgiving}):find('c'),'near-edge attack taps must be forgiving on touchscreens')

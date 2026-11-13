@@ -1145,6 +1145,9 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     bool accept_replay_drop = initial_frame->replay_drop.value_or(false);
     // Taps, typed text and controller buttons that came and went between two script frames.
     bool pressed = false;
+    // A short finger press may be observed by a platform poll before the next
+    // script frame. Keep its first position until that frame consumes it.
+    std::map<int, TouchPoint> pending_touches;
     bool toggle_fullscreen = false; // Alt+Enter
     std::string typed;
     GamepadButtons gamepad;
@@ -1171,6 +1174,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
             if (key_downs.size() < 256) key_downs.push_back(code);
         }
         pressed = pressed || input.pressed;
+        for (const auto& touch : input.touches) pending_touches.try_emplace(touch.id, touch);
         toggle_fullscreen = toggle_fullscreen || input.toggle_fullscreen;
         if (typed.size() + input.text.size() <= 256) typed += input.text;
         gamepad.up = gamepad.up || input.gamepad.up;
@@ -1267,16 +1271,18 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
             }
             if (!draining) pads.clear();
         }
-        // Then " h" for a touch-driven UI (an on-screen gamepad): '1' or '0' for whether the
-        // pointer above last moved by touch, then each held finger as its id, x and y, comma
-        // separated (not accumulated across polls, like the pointer above: a finger lifted
-        // between two script frames never reaches a script frame as held).
-        if (input.touch_active || !input.touches.empty()) {
-            held += input.touch_active ? " h1" : " h0";
-            for (const auto& touch : input.touches) {
+        // Then " h" for touch input. Current fingers use their latest position;
+        // a finger released between polls and this script frame uses its down
+        // position once. Preserve separate ids for simultaneous touches.
+        std::map<int, TouchPoint> frame_touches = pending_touches;
+        for (const auto& touch : input.touches) frame_touches[touch.id] = touch;
+        if (input.touch_active || !frame_touches.empty()) {
+            held += (input.touch_active || !pending_touches.empty()) ? " h1" : " h0";
+            for (const auto& [id, touch] : frame_touches) {
                 held += ',' + std::to_string(touch.id) + ':' + std::to_string(touch.x) + ':' + std::to_string(touch.y);
             }
         }
+        if (!draining) pending_touches.clear();
         // Then " e" and the window edges in viewport coordinates (left,top,right,bottom), beyond the
         // viewport when the picture is letterboxed.
         if (input.screen.right > input.screen.left && input.screen.bottom > input.screen.top) {

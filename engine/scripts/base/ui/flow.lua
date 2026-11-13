@@ -451,6 +451,15 @@ function flow.update(state, raw, context)
         gamepad_input = {touch_active = true, screen = input.screen,
             touches = input.button and {{id = 0, x = input.pointer_x, y = input.pointer_y}} or {}}
     end
+    -- A phone must show the combat controls and team commands before the first
+    -- touch. Visibility does not synthesize held input when there are no fingers.
+    if active_screen and state.options.touch_device then
+        if gamepad_input == input then
+            gamepad_input = {}
+            for key, value in pairs(input) do gamepad_input[key] = value end
+        end
+        gamepad_input.touch_active = true
+    end
     -- Chord buttons are enabled by what player 1's fighter can do right now.
     local fighter = state.active == "match" and state.match and state.match.match and state.match.match.items[0] or nil
     local available = {}
@@ -471,7 +480,7 @@ function flow.update(state, raw, context)
         if touched:find(letter, 1, true) then
             if launch_touch then
                 local key = ({u=virtual_keys.up,d=virtual_keys.down,l=virtual_keys.left,r=virtual_keys.right,c=virtual_keys.enter,b=virtual_keys.escape})[letter]
-                if key then input.keys[key]=true end
+                if key then input.keys[key]=true; input.touch_navigation=true end
             elseif not input[0]:find(letter, 1, true) then input[0] = input[0] .. letter end
         end
     end
