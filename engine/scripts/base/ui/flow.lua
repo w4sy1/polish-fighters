@@ -34,7 +34,9 @@ end
 -- the on-screen gamepad only has something to drive there ("full"); while a match is paused or
 -- replaying only its pause button shows ("pause"); in a live match it shows too ("match").
 local function gamepad_mode(state)
-    if state.active == "network" then return nil end
+    -- Launch pages already support direct touch on their original LF2 artwork.
+    -- The combat overlay obscures their options and control settings.
+    if state.active == "network" or state.active == "launch" or state.active == "title" then return nil end
     if state.active == "match" then
         local match = state.match.match
         -- Paused or replaying: only the pause button stays, to resume.

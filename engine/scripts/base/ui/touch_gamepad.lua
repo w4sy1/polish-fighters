@@ -9,6 +9,7 @@
 -- overlay so it can sit in the bars.
 local constants = require("base/game/constants")
 local font = require("base/ui/font")
+local i18n = require("base/i18n/i18n")
 local gamepad = {}
 
 -- Left floating joystick: a finger down in the zone recenters the base; direction comes from
@@ -89,9 +90,12 @@ local function fit(state, screen)
     local commands=state.layout.commands or {left=85,top=30,radius=24}
     state.commands={x=screen.left+commands.left,y=screen.top+commands.top,radius=math.max(commands.radius,36)}
     state.command_choices={}
-    for i,entry in ipairs({{'come','ZA MNA / COME'},{'stay','ZOSTAN / STAY'},
-        {'attack','ATAKUJ / ATTACK'},{'defend','BRON / DEFEND'}}) do
-        state.command_choices[i]={command=entry[1],label=entry[2],x=screen.left+125,y=screen.top+55+i*52,radius=24}
+    for i,entry in ipairs({{'come','ZA MNĄ / COME','ZA MNA / COME'},
+        {'stay','ZOSTAŃ / STAY','ZOSTAN / STAY'},
+        {'attack','ATAKUJ / ATTACK','ATAKUJ / ATTACK'},
+        {'defend','BROŃ / DEFEND','BRON / DEFEND'}}) do
+        state.command_choices[i]={command=entry[1],label=entry[2],fallback=entry[3],
+            x=screen.left+125,y=screen.top+55+i*52,radius=24}
     end
     state.buttons = build_buttons(state.layout, screen,state.style)
     if not state.finger then
@@ -184,7 +188,8 @@ function gamepad.update(state, input, mode)
             if target==state.commands then state.command_open=not state.command_open
             elseif target.command then
                 state.command_signal=target.command;state.command_open=false
-                state.command_confirmation=target.label;state.confirmation_ticks=75
+                state.command_confirmation=target.label;state.command_confirmation_fallback=target.fallback
+                state.confirmation_ticks=75
             end
         end
         -- Both layouts use the original LF2 press-to-attack behavior. Holding
@@ -376,10 +381,12 @@ function gamepad.draw(state, context)
         if state.command_open then
             for _,choice in ipairs(state.command_choices) do
                 button_context.fill(choice.x-110,choice.y-23,220,46,35,75,110)
-                font.draw(context,choice.label,choice.x,choice.y-7,nil,nil,'center')
+                font.draw(context,i18n.active() and choice.label or choice.fallback,
+                    choice.x,choice.y-7,nil,nil,'center')
             end
         elseif (state.confirmation_ticks or 0)>0 then
-            font.draw(context,state.command_confirmation,397,65,nil,nil,'center')
+            font.draw(context,i18n.active() and state.command_confirmation or state.command_confirmation_fallback,
+                397,65,nil,nil,'center')
         end
     end
     if state.mode == "pause" then

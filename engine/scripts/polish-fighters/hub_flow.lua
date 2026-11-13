@@ -9,20 +9,32 @@ return function(base)
  end
  function base.create(options)
   local state=create(options)
-  state.launch.hub_enabled=not options.legacy_menu
+  local active_profile=require('base/game/catalog').profile_id
+  -- LF2 opens its own original menu and screen flow. Other packs keep the
+  -- module hub, which is needed for their pack and multiplayer controls.
+  state.launch.hub_enabled=not options.legacy_menu and (options.hub_menu or active_profile~='lf2-classic')
   state.launch.hub_available=options.profiles_available
   local saved=engine and engine.read_settings and engine.read_settings() or {}
   if type(saved)~="table" then saved={} end
   local chosen=saved.little_fighters_start_profile
   local single_mobile=options.touch_device and chosen and chosen~='all' and chosen~='custom'
-  local active_profile=require('base/game/catalog').profile_id
   local managed_profile=type(active_profile)=='string' and active_profile:match('^mod%-')~=nil
   state.launch.hub_custom_profile=managed_profile and active_profile or nil
   state.launch.hub_mode=(options.profile_start or single_mobile or managed_profile) and "profile" or "root"
   state.launch.hub_preselected=options.profile_start or single_mobile or managed_profile
   state.launch.hub_wait_release=options.profile_start==true
   local menu=saved.little_fighters_start_menu
-  if menu=='battle' or menu=='settings' or menu=='online' or menu=='controls' or menu=='options' then
+  if not state.launch.hub_enabled then
+   if menu=='options' or menu=='settings' then
+    state.launch.page='options';state.launch.options=require('base/game/options').current()
+   elseif menu=='controls' then
+    local controls=require('base/ui/controls')
+    state.launch.page='controls';state.launch.name_player=0
+    state.launch.editing=controls.copy(controls.current());state.launch.previous_keys={}
+   elseif menu=='online' then state.launch.page='network' end
+   if menu then saved.little_fighters_start_menu=nil;engine.write_settings(saved) end
+  end
+  if state.launch.hub_enabled and (menu=='battle' or menu=='settings' or menu=='online' or menu=='controls' or menu=='options') then
    state.launch.hub_mode=menu;saved.little_fighters_start_menu=nil;engine.write_settings(saved)
    if menu=='controls' then state.launch.hub_mode='settings';require('polish-fighters/input_settings').open(state.launch)
    elseif menu=='options' then state.launch.hub_mode='settings';state.launch.page='options';state.launch.options=require('base/game/options').current();state.launch.options_focus=1 end
@@ -39,6 +51,12 @@ return function(base)
   local f4=(input.functions or ''):find('4',1,true)~=nil
   local pressed=f4 and not state.hub_f4_held
   state.hub_f4_held=f4
+  if pressed and not state.launch.hub_enabled and state.active=='launch' and
+     state.launch.page=='menu' and require('base/game/catalog').profile_id=='lf2-classic' then
+   state.launch.hub_enabled=true;state.launch.hub_mode='root'
+   state.launch.hub_wait_release=true
+   return true
+  end
   -- A local disconnect must remain possible while a peer is stalled.
   if state.quit_dialog and state.quit_dialog.kind=='modules' and state.session then
    local answer=require('base/ui/quit_dialog').update(state.quit_dialog,input,context)
@@ -47,6 +65,11 @@ return function(base)
    return true
   end
   if not visible(state) then return false end
+  if pressed and state.active=='launch' and state.launch.page=='menu' and
+     state.launch.hub_mode=='root' and require('base/game/catalog').profile_id=='lf2-classic' then
+   state.launch.hub_enabled=false
+   return true
+  end
   local escape=input.keys and input.keys[27]
   local back=escape and not state.hub_escape_held
   state.hub_escape_held=escape

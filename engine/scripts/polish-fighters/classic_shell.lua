@@ -242,7 +242,8 @@ return function(base)
             if s.pf_typing and not (input.nav and input.nav.cancel) and not input.click then return end
         end
         if not s.pf_panel then
-            local enter=input.click and input.pointer_x>=260 and input.pointer_x<=535 and input.pointer_y>=414 and input.pointer_y<=444
+            local enter=require('base/game/catalog').profile_id~='lf2-classic' and input.click and
+                input.pointer_x>=260 and input.pointer_x<=535 and input.pointer_y>=414 and input.pointer_y<=444
             local f10=input.keys[121] and not s.pf_f10
             s.pf_f10=input.keys[121]
             if enter or f10 then s.pf_panel="extras";return end
@@ -267,7 +268,7 @@ return function(base)
     function base.draw(s,c)
         if not s.pf_panel or s.page~="menu" then
             original_draw(s,c)
-            if s.page=="menu" then
+            if s.page=="menu" and require('base/game/catalog').profile_id~='lf2-classic' then
                 font.draw(c,"POLISH FIGHTERS - DODATKI [F10]",397,422,2,nil,"center")
             end
             return

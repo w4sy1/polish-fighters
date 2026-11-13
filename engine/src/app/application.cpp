@@ -1008,6 +1008,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
 #endif
         (config.network_room ? ", network_room=true" : "") +
         (config.headless ? ", headless=true" : "") +
+        (config.hub_menu ? ", hub_menu=true" : "") +
         (config.profile_start ? ", profile_start=true" : "") +
         (config.headless && !config.hub_menu ? ", legacy_menu=true" : "") +
         ", recording_version=" + std::to_string(constants->second) + network_options +
