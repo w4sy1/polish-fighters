@@ -12,7 +12,9 @@
 
 - Pełny zestaw Python: 70 testów zaliczonych, 1 pominięty z powodu uprawnień Windows do symlinków.
 - Pełny zestaw Lua: 145 skryptów składniowych i wszystkie testy przepływów zaliczone, w tym wejście dotykowe, zwolnienie, AI komend drużyny i buforowanie w multiplayer.
-- Pakiety APK i Windows są budowane w GitHub Actions; wynik oraz sumy kontrolne będą dopisane po pobraniu artefaktów.
+- GitHub Actions `43423711823`: kompilacje Android ARM64 i Windows x64 zakończone sukcesem; kontrola APK i identyfikatora aplikacji również zaliczona.
+- APK: `versionCode=19`, `versionName=0.17.0-touch-input-test`, podpis v1/v2 zweryfikowany. SHA-256: `0dafda969032881b915c3ccdce8726ea660e48c0b4c3e988ec5de5c64dc7496e`.
+- Instalator Windows: `0.17.0`. SHA-256: `2fafadb10b688ff06773cde1d5e7c5f3cd714b3d2930441cf7a7cad9361d6e0c`.
 - Nie podłączono fizycznego telefonu. Działanie na urządzeniu i odczucie przycisku wymagają testu sprzętowego; wydanie pozostaje testowe.
 
 ## Zakres ekranów
