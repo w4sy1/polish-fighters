@@ -254,8 +254,8 @@ class Library:
         """Create a transfer ZIP for the Android importer from a verified converted package."""
         pack_id = identifier(pack_id)
         destination = Path(destination).absolute()
-        parent = destination.parent.resolve(strict=True)
-        if parent != destination.parent or destination.exists() or destination.is_symlink():
+        parent = destination.parent
+        if not parent.is_dir() or has_link_component(parent) or destination.exists() or destination.is_symlink():
             raise ValueError('Export destination must be new and have a real, existing parent')
         self.verify(pack_id)
         source = self.package_path(pack_id)
