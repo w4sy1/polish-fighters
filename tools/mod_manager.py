@@ -5,7 +5,7 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
-from mod_archive import inspect_zip, extract_zip
+from mod_archive import inspect_zip, extract_zip, has_link_component
 from import_legacy import convert
 from mod_downloads import Queue
 from mod_sources import discover, sources
@@ -24,8 +24,8 @@ def import_zip(archive, destination, pack_id, data_only=False):
     if not re.fullmatch(r'[a-z][a-z0-9-]{1,40}', pack_id):
         raise ValueError('Invalid package ID')
     destination = Path(destination).absolute()
-    parent = destination.parent.resolve(strict=True)
-    if parent != destination.parent or destination.exists() or destination.is_symlink():
+    parent = destination.parent
+    if not parent.is_dir() or has_link_component(parent) or destination.exists() or destination.is_symlink():
         raise ValueError('Destination must be new and have a real, existing parent')
     preview = inspect_zip(archive, data_only=data_only)
     if len(preview['legacy_roots']) != 1:

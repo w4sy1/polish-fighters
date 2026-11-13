@@ -17,6 +17,15 @@ DATA_SUFFIXES = {'.dat', '.txt', '.bmp', '.png', '.jpg', '.jpeg', '.wav', '.ogg'
 RESERVED = re.compile(r'^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)', re.I)
 
 
+def has_link_component(path):
+    """Reject symlinks/junctions without treating Windows 8.3 aliases as links."""
+    candidate = Path(path).absolute()
+    for part in (candidate, *candidate.parents):
+        if part.is_symlink() or (hasattr(part, 'is_junction') and part.is_junction()):
+            return True
+    return False
+
+
 def safe_name(raw):
     if '\\' in raw or '\x00' in raw or ':' in raw or raw.startswith('/'):
         raise ValueError('Unsafe ZIP path: ' + repr(raw))
@@ -77,8 +86,8 @@ def extract_zip(archive, destination, data_only=False):
     archive = Path(archive).resolve(strict=True)
     report = inspect_zip(archive, data_only=data_only)
     destination = Path(destination).absolute()
-    parent = destination.parent.resolve(strict=True)
-    if parent != destination.parent or destination.exists() or destination.is_symlink():
+    parent = destination.parent
+    if not parent.is_dir() or has_link_component(parent) or destination.exists() or destination.is_symlink():
         raise ValueError('Destination must be new and have a real, existing parent')
     if shutil.disk_usage(parent).free < report['total_bytes'] + 16 * 1024 * 1024:
         raise ValueError('Insufficient free disk space')

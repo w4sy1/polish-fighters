@@ -10,6 +10,10 @@ from audit_content import audit
 
 class ContentAuditTest(unittest.TestCase):
     def test_existing_packs_have_full_catalogs(self):
+        if any(not (ROOT / 'content-packs' / name / 'assets').is_dir()
+               or not any((ROOT / 'content-packs' / name / 'assets').rglob('*'))
+               for name in ('ntsd', 'lf4-turbo')):
+            self.skipTest('Imported game data is local/ignored and is not available on CI')
         for name, count in [('ntsd', 42), ('lf4-turbo', 32)]:
             report = audit(ROOT / 'content-packs' / name)
             self.assertEqual(report['fighters'], count)

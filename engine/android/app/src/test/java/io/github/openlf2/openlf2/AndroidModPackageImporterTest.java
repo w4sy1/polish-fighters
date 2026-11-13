@@ -33,7 +33,7 @@ public class AndroidModPackageImporterTest {
         return bytes.toByteArray();
     }
     private static void put(ZipOutputStream zip,String name,String content)throws Exception {zip.putNextEntry(new ZipEntry(name));zip.write(content.getBytes(StandardCharsets.UTF_8));zip.closeEntry();}
-    private File readyRoot() throws Exception {File root=temporary.newFolder("files");File game=new File(root,"game");assertTrue(game.mkdirs());assertTrue(new File(game,".ready").createNewFile());return root;}
+    private File readyRoot() throws Exception {File root=temporary.newFolder();File game=new File(root,"game");assertTrue(game.mkdirs());assertTrue(new File(game,".ready").createNewFile());return root;}
 
     @Test public void importsOnlyConverterPackageAndMakesItSelectable() throws Exception {
         File root=readyRoot();

@@ -16,7 +16,7 @@ import uuid
 import zipfile
 from pathlib import Path
 from mod_downloads import worker_lock
-from mod_archive import inspect_zip
+from mod_archive import inspect_zip, has_link_component
 
 MAX_STATE = 2 * 1024 * 1024
 
@@ -58,11 +58,11 @@ class Library:
     def __init__(self, home):
         self.home = Path(home).absolute()
         self.home.mkdir(parents=True, exist_ok=True)
-        if self.home.resolve() != self.home: raise ValueError('Library root cannot use links or junctions')
+        if has_link_component(self.home): raise ValueError('Library root cannot use links or junctions')
         for name in ('installed', 'versions', 'history', 'profiles'):
             folder = self.home / name
             folder.mkdir(exist_ok=True)
-            if folder.resolve() != folder: raise ValueError('Managed directories cannot use links or junctions')
+            if has_link_component(folder): raise ValueError('Managed directories cannot use links or junctions')
         self.state = self.home / 'library.json'
 
     @contextlib.contextmanager
