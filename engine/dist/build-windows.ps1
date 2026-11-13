@@ -68,7 +68,7 @@ Invoke-Checked 'python' @((Join-Path $root 'dist/collect-licenses.py'),
     '--key', 'libcurl')
 
 # The installer (Inno Setup, dist/windows/openlf2.iss) is the artifact; the staged package above is its content.
-$version = '0.16.0' # Polish Fighters version; upstream engine version is preserved in CMake.
+$version = '0.17.0' # Polish Fighters version; upstream engine version is preserved in CMake.
 if (-not $version) { throw 'The project version was not found in CMakeLists.txt.' }
 
 # Wizard pictures and the icon, drawn from the project's SVG.

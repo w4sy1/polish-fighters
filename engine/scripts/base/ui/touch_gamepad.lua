@@ -42,8 +42,13 @@ local function build_buttons(layout, screen, style)
         local config = layout[action]
         local letters = chord_letters[action]
         label = label or chord_labels[action]
+        -- Keep attack easy to hit on a phone even when an older saved profile
+        -- still has the original 44 px button. Other saved button sizes remain intact.
+        local radius = math.floor(config.radius)
+        if action == "c" then radius = math.max(radius, 56) end
         return {action = action, letters = letters, label = label, x = screen.right - math.floor(config.right),
-            y = screen.bottom - math.floor(config.bottom), radius = math.floor(config.radius),
+            y = screen.bottom - math.floor(config.bottom), radius = radius,
+            hit_radius = action == "c" and math.max(radius + 22, 78) or radius,
             fill = fill, pressed = pressed}
     end
     local list = {button("c", "ATAK", {90, 45, 40}, {170, 80, 65}), button("b", "SKOK", {40, 80, 50}, {80, 160, 100}),
@@ -82,7 +87,7 @@ local function fit(state, screen)
     state.fast = {x = screen.left + math.floor(fast.left), y = screen.top + math.floor(fast.top),
         radius = math.floor(fast.radius)}
     local commands=state.layout.commands or {left=85,top=30,radius=24}
-    state.commands={x=screen.left+commands.left,y=screen.top+commands.top,radius=commands.radius}
+    state.commands={x=screen.left+commands.left,y=screen.top+commands.top,radius=math.max(commands.radius,36)}
     state.command_choices={}
     for i,entry in ipairs({{'come','ZA MNA / COME'},{'stay','ZOSTAN / STAY'},
         {'attack','ATAKUJ / ATTACK'},{'defend','BRON / DEFEND'}}) do
@@ -126,8 +131,9 @@ local function target_at(state, touch, mode)
     local function consider(target)
         local distance = math.sqrt((touch.x - target.x) ^ 2 + (touch.y - target.y) ^ 2)
         local allowance = (target == state.pause or target == state.fast or target == state.commands) and state.tolerance or 0
-        if distance <= target.radius + allowance and (not best_gap or distance-target.radius < best_gap) then
-            best, best_gap = target, distance-target.radius
+        local hit_radius = target.hit_radius or target.radius
+        if distance <= hit_radius + allowance and (not best_gap or distance-hit_radius < best_gap) then
+            best, best_gap = target, distance-hit_radius
         end
     end
     if mode ~= "full" then consider(state.pause); consider(state.fast) end
@@ -359,7 +365,7 @@ function gamepad.draw(state, context)
     end
     if state.mode=='match' then
         disc(button_context,state.commands.x,state.commands.y,state.commands.radius,40,90,110)
-        font.draw(context,'CMD',state.commands.x,state.commands.y-7,nil,nil,'center')
+        font.draw(context,'KOMENDY',state.commands.x,state.commands.y-7,nil,nil,'center')
         if state.command_open then
             for _,choice in ipairs(state.command_choices) do
                 button_context.fill(choice.x-110,choice.y-23,220,46,35,75,110)

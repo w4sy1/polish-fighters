@@ -523,6 +523,12 @@ public:
         input.screen = screen_extent();
         input.touches.reserve(touches_.size());
         for (const auto& [finger, point] : touches_) input.touches.push_back(point);
+        // Preserve a down/up tap that arrived between two polls for one script
+        // frame. Without this edge buffer, short phone taps disappear entirely.
+        for (const auto& [finger, point] : queued_touch_downs_) {
+            if (!touches_.contains(finger)) input.touches.push_back(point);
+        }
+        queued_touch_downs_.clear();
         window_placement();
         return input;
     }
@@ -1092,7 +1098,9 @@ private:
         } else {
             auto entry = touches_.find(finger.fingerID);
             const int id = entry != touches_.end() ? entry->second.id : next_touch_id_++;
-            touches_[finger.fingerID] = TouchPoint{id, static_cast<int>(std::floor(x)), static_cast<int>(std::floor(y))};
+            const TouchPoint point{id, static_cast<int>(std::floor(x)), static_cast<int>(std::floor(y))};
+            touches_[finger.fingerID] = point;
+            if (type == SDL_EVENT_FINGER_DOWN) queued_touch_downs_[finger.fingerID] = point;
             pointer_from_touch_ = true;
         }
         if (inside) {
@@ -1244,6 +1252,9 @@ private:
     // Every held finger, keyed by SDL's own id; `TouchPoint::id` is a small id this adapter
     // assigns instead, stable while that finger stays down.
     std::map<SDL_FingerID, TouchPoint> touches_;
+    // A finger can go down and up between polls. Keep its initial point until one snapshot
+    // carries the press to Lua; an already-held finger is emitted from `touches_` instead.
+    std::map<SDL_FingerID, TouchPoint> queued_touch_downs_;
     int next_touch_id_ = 1;
     // The previous poll's controller state, to tell a fresh press from one already held (see
     // gamepad_pressed/pads_pressed).
