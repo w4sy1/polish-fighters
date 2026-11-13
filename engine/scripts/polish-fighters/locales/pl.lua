@@ -1,4 +1,6 @@
 return {
+ current_mod='BIEŻĄCY MOD: ',
+ mods='KATALOG MODÓW',
  status='STAN / ZGODNOŚĆ MODUŁÓW', audit_note='Stan plików przy budowie. Obecność zasobów nie oznacza pełnej zgodności mechanik.', assets='Zasoby: ', missing_files='Brakujące pliki: ',
  battle='BITWA', modules='MODUŁY', online='GRA ONLINE', settings='USTAWIENIA', language='JĘZYK', credits='TWÓRCY', quit='WYJŚCIE',
  back='WSTECZ', controls='STEROWANIE', video='OBRAZ / DŹWIĘK', extras='HISTORIA / ODBLOKOWANIA', recording='USTAWIENIA NAGRAŃ',

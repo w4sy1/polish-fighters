@@ -16,7 +16,7 @@ local reset_random_sequence = openlf2_reset_random_sequence
 local save_recording, take_recording = openlf2_save_recording, openlf2_take_recording
 local local_time = openlf2_local_time
 local build_label = openlf2_build_label
-local application_version='0.14.0-diagnostics-test'
+local application_version='0.15.0-mod-browser-test'
 local new_table = jit and require("table.new")
 local function new_array(capacity)
     if new_table then return new_table(capacity, 0) end

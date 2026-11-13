@@ -134,6 +134,10 @@ public final class BluetoothLobbyActivity extends Activity {
         return ClassicMenuData.read(this).optJSONObject("android_en").optString(text,text);
     }
     private String t(String key) { return ClassicMenuData.text(this,language,key); }
+    @Override protected void onResume() {
+        super.onResume();
+        if(status!=null) refreshModuleLabel();
+    }
     private void refreshMenu() {
         int[] ids={R.id.pf_play,R.id.pf_module,R.id.pf_network,R.id.pf_settings,R.id.pf_language,R.id.pf_credits,R.id.pf_quit};
         String[] keys={"battle","modules","online","settings","language","credits","quit"};
@@ -170,15 +174,21 @@ public final class BluetoothLobbyActivity extends Activity {
 
     private void showModules() {
         GamePackSettings settings = new GamePackSettings(getFilesDir());
-        String[] labels = java.util.Arrays.copyOf(GamePackSettings.TITLES, GamePackSettings.TITLES.length + 2);
-        labels[labels.length - 2] = tr("Wszystkie razem");
-        labels[labels.length - 1] = tr("Dobierz własny zestaw…");
+        java.util.List<String> rows=new java.util.ArrayList<>(java.util.Arrays.asList(GamePackSettings.TITLES));
+        java.util.List<String> imported=settings.imported();
+        for(String id:imported) rows.add("Zaimportowany / Imported: "+id.substring(4,12));
+        rows.add(tr("Wszystkie razem"));rows.add(tr("Dobierz własny zestaw…"));rows.add("Szukaj i importuj mody / Browse and import mods");
+        String[] labels=rows.toArray(new String[0]);
         new AlertDialog.Builder(this).setTitle(tr("Wybierz moduł gry"))
             .setItems(labels, (dialog, which) -> {
-                if (which == labels.length - 1) { showCustomModules(); return; }
+                if(which==labels.length-1) { startActivity(new Intent(this,AndroidModsActivity.class));return; }
+                if (which == labels.length - 2) { showCustomModules(); return; }
                 try {
-                    settings.save(which == labels.length - 2 ? GamePackSettings.ALL : GamePackSettings.IDS[which],
-                        settings.selection(), settings.hideDuplicates());
+                    String selected;
+                    if(which<GamePackSettings.IDS.length) selected=GamePackSettings.IDS[which];
+                    else if(which<GamePackSettings.IDS.length+imported.size()) selected=imported.get(which-GamePackSettings.IDS.length);
+                    else selected=GamePackSettings.ALL;
+                    settings.save(selected,settings.selection(),settings.hideDuplicates());
                     refreshModuleLabel();
                 } catch (java.io.IOException | org.json.JSONException | IllegalArgumentException error) {
                     Toast.makeText(this, tr("Nie zapisano modułu: ") + error.getMessage(), Toast.LENGTH_LONG).show();

@@ -23,14 +23,7 @@ local function build_stick(config, screen, digipad)
     local x, y = screen.left + math.floor(config.left), screen.bottom - math.floor(config.bottom)
     local radius = math.floor(config.radius)
     local scale = radius / 56
-    if digipad then
-        -- A fixed cross: a finger within a margin of it steers, with 8 directions as on the stick, and
-        -- running is the player's own double tap, so there is no run pulse.
-        return {zone = {left = x - radius * 1.4, top = y - radius * 1.4, right = x + radius * 1.4, bottom = y + radius * 1.4},
-            default_x = x, default_y = y, radius = radius, travel = radius, deadzone = 14 * scale, threshold = 0.4,
-            run_distance = math.huge, run_rearm_distance = 0, knob = 0, knob_inner = 0, fixed = true}
-    end
-    return {zone = {left = screen.left, top = y - 150 * scale, right = x + 205 * scale, bottom = y + 80 * scale},
+    return {zone = {left = screen.left, top = y - radius, right = x + radius, bottom = y + radius},
         default_x = x, default_y = y, radius = radius, travel = 60 * scale,
         deadzone = radius * (config.deadzone or 0.25), sensitivity = config.sensitivity or 1,
         fixed_center = config.fixed == 1, threshold = 0.4, run_distance = 51 * scale, run_rearm_distance = 30 * scale,
@@ -103,14 +96,18 @@ local function fit(state, screen)
 end
 
 function gamepad.create(layout, digipad, style)
-    style=style or (digipad and "classic" or "modern")
-    local state = {layout = layout, style=style,digipad = style=="classic", held = {}, available = {}, visible = false, run_pulse_step = 0}
+    -- The cross was the source of the old-profile regression. Always render and
+    -- hit-test the same circular stick, including for profiles saved by 0.14.
+    local state = {layout = layout, style=style or "modern",digipad = false, held = {}, available = {}, visible = false, run_pulse_step = 0}
     fit(state, default_screen)
     return state
 end
 
 local function clamp(value, low, high) return math.max(low, math.min(high, value)) end
-local function inside_zone(zone, x, y) return x >= zone.left and x <= zone.right and y >= zone.top and y <= zone.bottom end
+local function inside_zone(stick, x, y)
+    local dx,dy=x-stick.default_x,y-stick.default_y
+    return dx*dx+dy*dy<=stick.radius*stick.radius
+end
 
 -- Which chord buttons ("da", "dj", "daj") are enabled; the others cannot be pressed.
 function gamepad.set_available(state, available) state.available = available end
@@ -127,8 +124,11 @@ local function target_at(state, touch, mode)
     end
     local best, best_gap
     local function consider(target)
-        local gap = math.sqrt((touch.x - target.x) ^ 2 + (touch.y - target.y) ^ 2) - target.radius
-        if gap <= state.tolerance and (not best_gap or gap < best_gap) then best, best_gap = target, gap end
+        local distance = math.sqrt((touch.x - target.x) ^ 2 + (touch.y - target.y) ^ 2)
+        local allowance = (target == state.pause or target == state.fast or target == state.commands) and state.tolerance or 0
+        if distance <= target.radius + allowance and (not best_gap or distance-target.radius < best_gap) then
+            best, best_gap = target, distance-target.radius
+        end
     end
     if mode ~= "full" then consider(state.pause); consider(state.fast) end
     if mode=='match' then consider(state.commands) end
@@ -197,14 +197,13 @@ function gamepad.update(state, input, mode)
     if not owner then
         state.finger = nil
         for _, touch in ipairs(touches) do
-            if not target_at(state,touch,mode) and inside_zone(stick.zone, touch.x, touch.y) then
+            if not target_at(state,touch,mode) and inside_zone(stick, touch.x, touch.y) then
                 state.finger, owner = touch.id, touch
                 break
             end
         end
         if owner and not stick.fixed and not stick.fixed_center then
-            state.base_x = clamp(owner.x, screen.left + stick.radius, screen.right - stick.radius)
-            state.base_y = clamp(owner.y, screen.top + stick.radius, screen.bottom - stick.radius)
+            state.base_x, state.base_y = stick.default_x, stick.default_y
         end
     end
     local held = {}

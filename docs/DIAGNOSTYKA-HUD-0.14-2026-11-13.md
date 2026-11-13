@@ -1,5 +1,48 @@
 # Polish Little Fighters 0.14.0 — wydanie testowe
 
+## Wznowienie prac — 2026-11-13
+
+Audyt źródeł po zgłoszeniu problemów wykazał, że ekran `launch` wyłączał
+gamepad dotykowy, mimo że zawiera menu BITWA/STAGE/KAMPANIA. Na ekranie wyboru
+postaci dotyk był kierowany do nawigacji myszy zamiast do akcji gracza. Naprawiono
+routing: w menu ATAK mapuje się na Enter, a w wyborze postaci na oryginalne `c`;
+strzałki joysticka trafiają do odpowiedniego odbiornika ekranu. W walce nadal
+używany jest oryginalny zestaw przycisków i kombinacji LF2.
+
+Joystick rysuje się i przyjmuje dotyk jako koło także dla profili zapisanych
+w 0.14 z `digipad=true`; strefa rozpoczęcia ruchu jest kołowa, a po puszczeniu
+palca wejście znika. Hit-test przycisków akcji obejmuje dokładnie cały promień
+widocznego koła (nie dodaje marginesu poza kołem). Zachowano zapisany wariant
+trzech/sześciu przycisków akcji; historyczne pole `digipad` jest normalizowane
+do `false` przy zapisie ustawień.
+
+Weryfikacja lokalna: 48 zestawów Lua PASS (w tym profile/migracja, dotyk,
+krótkie wejścia, komendy i istniejące wejście hubu), składnia 145 plików PASS.
+Pełny zestaw Pythona: 68 PASS, 1 SKIP. Zaktualizowano wygenerowany Android
+`classic-menu.json`, aby zawierał teksty z lokalnego Mod Managera. Nie ma
+podłączonego telefonu (`adb devices` puste); nie potwierdzono fizycznego dotyku.
+Nie zbudowano jeszcze kompletnych paczek Windows/APK.
+
+Uzupełnienie wznowienia: dodano ekran Androida „Szukaj i importuj mody”. Scraper
+działa tylko po wyborze źródła, sprawdza `robots.txt`, ogranicza przekierowania
+do skonfigurowanej domeny HTTPS i pokazuje wyłącznie strony projektów. Nie
+oznacza linków jako pobrań zweryfikowanych. Rzeczywiste sprawdzenie desktopowego
+scrapera: ModDB zwrócił kandydatów i elementy nawigacji (te ostatnie odfiltrowano
+w wersji Android); LF Empire/forum wymagały dłuższego odstępu; strona Ultimate
+Fighters zawierała w opisie zewnętrzny krótki link, którego scraper nie uznał za
+bezpieczne pobranie. Android umożliwia wybór ZIP z systemowego selektora i
+instalację paczki konwertera `mod-<24 hex>` z limitem plików/rozmiaru, kontrolą
+ścieżek oraz odrzuceniem EXE/DLL i obcych skryptów. Desktopowy Mod Manager ma
+przycisk „Eksportuj na Androida” dla zainstalowanych paczek. Surowe archiwa modów
+trzeba przekonwertować wcześniej na komputerze; automatycznego pobierania
+zweryfikowanych archiwów ani surowej konwersji na Androidzie nie ma.
+
+Wersja Androida podniesiona do code 17 / `0.15.0-mod-browser-test`. Workflow
+Android został rozszerzony o `testDebugUnitTest` i `lintDebug` przed buildem.
+Lokalnie: Lua 48 zestawów PASS / 145 plików składni PASS; Python 69 PASS / 1
+SKIP. Próba lokalnego Gradle nie ruszyła z powodu JDK 25 (projekt wymaga JDK 17);
+testów Android Java nie potwierdzono lokalnie. Telefon nadal niedostępny.
+
 Aktualizacja dodaje lokalną diagnostykę, ogranicza Szymonoko do jednego klona,
 rozbudowuje sterowanie dotykowe, zapis kampanii i trening. **Nie potwierdza
 usunięcia zgłaszanych awarii LF4/PolishF.** Nie udało się ich odtworzyć w
@@ -57,7 +100,7 @@ przyczyny przy kolejnym wystąpieniu, prawdopodobnie na obu platformach.
 | Walka LF4 | Leumas EX, pięć rozdziałów po 3000 klatek, gracz sztucznie chroniony przed śmiercią: bez awarii; nie ukończono wszystkich walk |
 | Auto przejścia | Natywny pusty etap z prawdziwym ruchem i AI, bez teleportacji: automat ON/OFF oraz ręczne anulowanie PASS; stary klon znika po przejściu |
 | Klony i sieć | 2 i 8 osobnych procesów TCP na jednym laptopie, prawdziwe klony i komendy, identyczne końcowe skróty stanu: PASS |
-| HUD/trening/zapis | Natywne próby z rzeczywistymi zasobami i zrzutami; limit klonów, odrodzenie przeciwnika, wznowienie i awaryjny poprzedni checkpoint: PASS |
+| HUD/trening/zapis | Natywne próby z rzeczywistymi zasobami i zrzutami; testy Lua sterowania PASS. Fizyczny dotyk wciąż niezweryfikowany. |
 | Brakujący zasób | Celowo brakujący zasób przy starcie: czytelny błąd i lokalny raport PASS |
 | Raport błędu | Celowy wyjątek Lua: zapis kontekstu/stosu i maskowanie tokenu PASS; pierwotny błąd nie jest ukrywany |
 | Eksport Windows | Windows PowerShell 5.1: poprawny JSON z samymi polami diagnostycznymi PASS |
@@ -74,7 +117,9 @@ na obu ABI Androida. Nowy Java/Lua i pełne APK zostały zbudowane lokalnie.
 |---|---|
 | Rozbieżność limitu Szymonoko i rekurencja | NAPRAWIONE I PRZETESTOWANE |
 | Leumas EX i zachowanie pocisków | NAPRAWIONE I PRZETESTOWANE (istniejąca poprawka zweryfikowana) |
-| HUD, multitouch, joystick, komendy, trening | ZAIMPLEMENTOWANE, WYMAGA TESTU NA URZĄDZENIU |
+| Sterowanie dotykowe i wybór postaci | Poprawiono routing, okrągły joystick i hit-test ataku w źródłach; testy Lua PASS, wymaga testu telefonu |
+| Komendy drużyny | Zachowano dymki, AI i bit wejścia sieciowego; testy Lua PASS, renderowanie/touch w kampanii wymaga testu telefonu |
+| Android scraper/importer | GUI źródeł i importu ograniczonej paczki konwertera dodane lokalnie; testy/build Android i użycie urządzenia niepotwierdzone; brak pobierania zweryfikowanych archiwów i konwersji surowych ZIP na telefonie |
 | Auto przejścia, sojusznicy i checkpointy | ZAIMPLEMENTOWANE, WYMAGA TESTU NA URZĄDZENIU |
 | Raporty i kontekst Lua/Windows | NAPRAWIONE I PRZETESTOWANE |
 | Diagnostyka Java/natywna Androida | ZAIMPLEMENTOWANE, WYMAGA TESTU NA URZĄDZENIU |
@@ -110,7 +155,7 @@ ale nie zastępują minidumpu. Checkpointy są w jednym pliku ustawień: całkow
 uszkodzenie tego pliku wymaga niezależnej kopii użytkownika. GUI i fizyczny
 dotyk, kontrolery, dźwięk oraz długie kampanie nadal wymagają próby sprzętu.
 
-## Pliki zmienione
+## Pliki zmienione w wydaniu 0.14
 
 Pełna lista plików źródłowych i testów jest w końcowym commicie wydania.
 Główne miejsca: `engine/scripts/base/game/{team_commands,campaign_advance,

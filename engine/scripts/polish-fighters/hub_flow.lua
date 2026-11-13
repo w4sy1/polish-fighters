@@ -15,8 +15,11 @@ return function(base)
   if type(saved)~="table" then saved={} end
   local chosen=saved.little_fighters_start_profile
   local single_mobile=options.touch_device and chosen and chosen~='all' and chosen~='custom'
-  state.launch.hub_mode=(options.profile_start or single_mobile) and "profile" or "root"
-  state.launch.hub_preselected=options.profile_start or single_mobile
+  local active_profile=require('base/game/catalog').profile_id
+  local managed_profile=type(active_profile)=='string' and active_profile:match('^mod%-')~=nil
+  state.launch.hub_custom_profile=managed_profile and active_profile or nil
+  state.launch.hub_mode=(options.profile_start or single_mobile or managed_profile) and "profile" or "root"
+  state.launch.hub_preselected=options.profile_start or single_mobile or managed_profile
   state.launch.hub_wait_release=options.profile_start==true
   local menu=saved.little_fighters_start_menu
   if menu=='battle' or menu=='settings' or menu=='online' or menu=='controls' or menu=='options' then

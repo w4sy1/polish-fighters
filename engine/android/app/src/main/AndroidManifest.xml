@@ -18,6 +18,8 @@
         <activity android:name=".OpenLF2Activity" android:exported="false"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode"
             android:screenOrientation="sensorLandscape" />
+        <activity android:name=".AndroidModsActivity" android:exported="false"
+            android:screenOrientation="sensorLandscape" />
         <activity android:name=".GameBootstrapActivity" android:exported="true"
             android:screenOrientation="sensorLandscape"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode">

@@ -34,7 +34,7 @@ end
 -- the on-screen gamepad only has something to drive there ("full"); while a match is paused or
 -- replaying only its pause button shows ("pause"); in a live match it shows too ("match").
 local function gamepad_mode(state)
-    if state.active == "launch" or state.active == "network" then return nil end
+    if state.active == "network" then return nil end
     if state.active == "match" then
         local match = state.match.match
         -- Paused or replaying: only the pause button stays, to resume.
@@ -414,6 +414,8 @@ function flow.update(state, raw, context)
     -- The on-screen gamepad drives player 1's slot, merged here before a networked match sends
     -- input[0]. It only reads fingers on screens it drives, releasing/hiding otherwise.
     local mode = gamepad_mode(state)
+    -- The Little Fighters hub and launch menu use the same key navigation as
+    -- character selection. Route touch directions and ATAK into that input.
     local active_screen = mode ~= nil
     if state.touch_options_revision~=user_options.revision() then
         state.touch_gamepad=touch_gamepad.create(shown_options.gamepad,shown_options.digipad,shown_options.touch_layout)
@@ -464,8 +466,14 @@ function flow.update(state, raw, context)
     if fast_held and state.active == "match" and not input.functions:find("5", 1, true) then
         input.functions = input.functions .. "5"
     end
+    local launch_touch = state.active == "launch" and mode == "full"
     for _, letter in ipairs({"u", "d", "l", "r", "c", "b", "f"}) do
-        if touched:find(letter, 1, true) and not input[0]:find(letter, 1, true) then input[0] = input[0] .. letter end
+        if touched:find(letter, 1, true) then
+            if launch_touch then
+                local key = ({u=virtual_keys.up,d=virtual_keys.down,l=virtual_keys.left,r=virtual_keys.right,c=virtual_keys.enter,b=virtual_keys.escape})[letter]
+                if key then input.keys[key]=true end
+            elseif not input[0]:find(letter, 1, true) then input[0] = input[0] .. letter end
+        end
     end
     local local_keys = input.keys
     if team_command then input[0]=require('base/game/team_commands').signals[team_command] end

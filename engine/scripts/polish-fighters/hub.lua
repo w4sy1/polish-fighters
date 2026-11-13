@@ -14,6 +14,7 @@ hub.profiles={
 function hub.title(profile)
  if profile=='mixed-all' then return 'Polish Fighters: wszystkie mody' end
  for _,entry in ipairs(hub.profiles) do if entry.profile==profile then return entry.title end end
+ if type(profile)=='string' and profile:match('^mod%-') then return 'MOD '..profile:sub(5,16) end
  return "Little Fighters"
 end
 local L=require('polish-fighters/menu_locale').text
@@ -54,12 +55,13 @@ function hub.rows(state)
   rows[#rows+1]=row('status');rows[#rows+1]=row('packs_save','save');rows[#rows+1]=row('packs_cancel','cancel');return rows
  end
  local rows={}
+ if state.hub_custom_profile then rows[#rows+1]={'profile_current',L('current_mod')..state.hub_custom_profile:sub(5,16)} end
  for _,entry in ipairs(hub.profiles) do
   if not state.hub_selected or state.hub_selected[entry.id]~=false then
    rows[#rows+1]={'profile_'..entry.id,entry.title..(state.hub_available and state.hub_available[entry.id]==false and L('missing') or '')}
   end
  end
- rows[#rows+1]=row('packs');rows[#rows+1]=row('profile_mixed','mixed');rows[#rows+1]=row('status');rows[#rows+1]=row(state.hub_pending_mode and 'battle' or 'root','back')
+ rows[#rows+1]=row('mods');rows[#rows+1]=row('packs');rows[#rows+1]=row('profile_mixed','mixed');rows[#rows+1]=row('status');rows[#rows+1]=row(state.hub_pending_mode and 'battle' or 'root','back')
  return rows
 end
 return hub

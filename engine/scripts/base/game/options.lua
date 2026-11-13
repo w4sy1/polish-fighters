@@ -59,7 +59,7 @@ local gamepad_defaults = {
     dj = {right = 72, bottom = 165, radius = 26},
     daj = {right = 72, bottom = 80, radius = 26},
 }
-local defaults = {battlefield_layout = "classic", gamepad = gamepad_defaults, unlock_characters = false, upscaling_filter = "linear", fullscreen = false, digipad = true, show_fps = false,
+local defaults = {battlefield_layout = "classic", gamepad = gamepad_defaults, unlock_characters = false, upscaling_filter = "linear", fullscreen = false, digipad = false, show_fps = false,
     rumble = false, show_gamepad = false, language = "polish", font_antialiasing = true,
     character_shading = false, projected_shadows = false,
     light_azimuth = -50, light_elevation = 70, shadow_blur = 2, shadow_opacity = 0.275}
@@ -101,7 +101,7 @@ local function copy(values)
         touch_layout=style,auto_advance=values.auto_advance==true,
         gamepad = copy_gamepad(values.gamepad),unlock_characters = values.unlock_characters,
         upscaling_filter = valid_filter(values.upscaling_filter) and values.upscaling_filter or defaults.upscaling_filter,
-        fullscreen = values.fullscreen, digipad = style=="classic", show_fps = values.show_fps, rumble = values.rumble,
+        fullscreen = values.fullscreen, digipad = false, show_fps = values.show_fps, rumble = values.rumble,
         show_gamepad = values.show_gamepad, font_antialiasing = values.font_antialiasing,
         character_shading = values.character_shading == true,
         projected_shadows = values.projected_shadows == true,
@@ -136,12 +136,13 @@ function options.load()
         values.fullscreen = saved.fullscreen
     end
     if type(saved) == "table" and type(saved.digipad) == "boolean" then
-        values.digipad = saved.digipad
         values.touch_layout=saved.digipad and "classic" or "modern"
     end
     if type(saved)=="table" and (saved.touch_layout=="classic" or saved.touch_layout=="modern") then
         values.touch_layout=saved.touch_layout
     end
+    -- The legacy preference now selects action layout only; joystick is always circular.
+    values.digipad=false
     if type(saved) == "table" and type(saved.show_fps) == "boolean" then
         values.show_fps = saved.show_fps
     end

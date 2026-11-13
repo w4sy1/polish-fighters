@@ -12,6 +12,7 @@ return function(base)
  local pixels=require('polish-fighters/pixel_font')
  local sounds=require('base/game/sounds')
  local online=require('polish-fighters/online_screen')
+ local mods=require('polish-fighters/mod_browser')
  function base.create(value)
   local state=create(value);state.hub_navigation=nav.create()
   local selected,problem=packs.read(hub.profiles)
@@ -35,6 +36,7 @@ return function(base)
   elseif id=='diagnostics' then state.page='diagnostics';state.diagnostics=require('base/ui/diagnostics').create()
   elseif id=='unavailable' then state.hub_note=locale.text('offline')
   elseif id=='account' then online.open(state)
+  elseif id=='mods' then mods.open(state)
   elseif id:sub(1,5)=='mode_' then
    local mode=id:sub(6)
    if mode=='demo' or mode=='replay' then context.action(mode)
@@ -58,6 +60,8 @@ return function(base)
    else state.hub_note=tostring(problem) end
   elseif id=="packs_cancel" then state.hub_pack_edit=nil;state.hub_mode="library"
   elseif id=="root" or id=="library" then state.hub_mode=id;if id=="root" then state.hub_pending_mode=nil end
+  elseif id=='profile_current' and state.hub_custom_profile then
+   state.hub_preselected=true;state.hub_mode=state.hub_pending_mode and 'players' or 'profile'
   elseif id:sub(1,8)=="profile_" then
    local tag=id:sub(9)
    local audit=require('polish-fighters/module_inventory')[tag]
@@ -115,6 +119,7 @@ return function(base)
   end
   if state.hub_edit then return input_settings.update(state,input) end
   if state.hub_online then return online.update(state,input,context) end
+  if state.hub_mods then return mods.update(state,input,context) end
   if state.page~="menu" then return update(state,input,context) end
   if state.hub_classic then
    update(state,input,context)
@@ -156,6 +161,7 @@ return function(base)
   else font.draw(context,value,x,y,1,nil,align) end
  end
  function base.draw(state,context)
+  if state.hub_enabled and state.hub_mods then return mods.draw(state,context) end
   if not state.hub_enabled or state.page~="menu" or state.hub_classic then return draw(state,context) end
   if state.hub_online then return online.draw(state,context) end
   context.viewport(794,550,4,10,65)

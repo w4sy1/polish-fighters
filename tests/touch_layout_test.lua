@@ -1,15 +1,15 @@
-local document={options={digipad=false},other='preserved'}
+local document={options={digipad=true,touch_layout='classic'},other='preserved'}
 engine={read_settings=function() return document end,write_settings=function(value) document=value;return true end}
 local options=require('base/game/options')
-assert(options.current().touch_layout=='modern','migrate old joystick preference')
+assert(options.current().touch_layout=='classic' and not options.current().digipad,'migrate saved cross profile to circular joystick')
 local values=options.current();values.touch_layout='classic'
-assert(options.save(values) and options.load().touch_layout=='classic' and options.current().digipad)
+assert(options.save(values) and options.load().touch_layout=='classic' and not options.current().digipad)
 values.touch_layout='modern';assert(options.save(values) and not options.current().digipad)
 assert(document.other=='preserved')
 local pad=require('base/ui/touch_gamepad')
 local layout=options.default_gamepad()
 local classic=pad.create(layout,true,'classic')
-assert(classic.stick.fixed and #classic.buttons==3,'classic: arrows plus exactly three buttons')
+assert(not classic.stick.fixed and #classic.buttons==3,'old profiles use a circular stick and preserve base actions')
 local modern=pad.create(layout,false,'modern')
 assert(not modern.stick.fixed)
 local function frame(state,touches,mode,screen)
@@ -21,6 +21,9 @@ for _,state in ipairs({classic,modern}) do
  assert(frame(state,{attack}):find('c'),'attack must respond on finger down')
  assert(frame(state,{attack}):find('c'),'holding attack must remain active')
  assert(not frame(state,{}):find('c'),'release must not generate a delayed attack')
+ local edge=touch(state.buttons[1],3);edge.x=edge.x+state.buttons[1].radius
+ assert(frame(state,{edge}):find('c'),'entire visible attack circle, including its edge, must register')
+ frame(state,{})
  local x,y=state.stick.default_x,state.stick.default_y
  frame(state,{{id=1,x=x,y=y}})
  local held=frame(state,{{id=1,x=x+35,y=y},{id=2,x=attack.x,y=attack.y}})

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {"id": "lfe", "name": "Little Fighter Empire", "hosts": ["www.lf-empire.de", "lf-empire.de"], "indexes": ["https://www.lf-empire.de/lfe-fileplanet/versions", "https://www.lf-empire.de/lfe-fileplanet/mods"], "adapter": "lfe"},
+    {"id": "moddb", "name": "ModDB", "hosts": ["www.moddb.com", "moddb.com"], "indexes": ["https://www.moddb.com/games/little-fighter-21/mods"], "adapter": "moddb"},
+    {"id": "lfe-forum", "name": "LF Empire Forum", "hosts": ["lf-empire.de", "www.lf-empire.de"], "indexes": ["https://lf-empire.de/forum/"], "adapter": "forum"},
+    {"id": "ultimate", "name": "Ultimate Fighters", "hosts": ["theultimatefighters.forumotion.com"], "indexes": ["https://theultimatefighters.forumotion.com/t26p25-lf2-mods-all"], "adapter": "ultimate"}
+  ]
+}

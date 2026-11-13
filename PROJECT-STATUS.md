@@ -1,3 +1,30 @@
+## 2026-11-13 — wznowienie audytu 0.14 / Android Mod Browser 0.15 (lokalne)
+
+Dodano Androidowy ekran źródeł i importer ograniczony do paczek `mod-<24 hex>`
+utworzonych konwerterem. Scraper używa HTTPS, sprawdza robots.txt, odrzuca
+przekierowania i linki poza skonfigurowaną domenę; pokazuje strony projektów,
+nie archiwa do pobrania. Wybór ZIP jest systemowy; walidacja ogranicza ścieżki,
+rozmiary i pliki wykonywalne/obce skrypty, a zainstalowane paczki trafiają do
+wyboru modułów. Surowe ZIP trzeba nadal przekonwertować na komputerze. Zgodność
+modów niepotwierdzona. Desktopowy Mod Manager eksportuje już zainstalowaną
+paczkę do formatu transferowego `.lfmod.zip` rozumianego przez Androida.
+
+Lua: 48 zestawów PASS / 145 plików składni PASS. Python: 69 PASS / 1 SKIP.
+Gradle lokalnie zablokowany przez JDK 25 zamiast wymaganego JDK 17; workflow CI
+uruchamia teraz testDebugUnitTest i lintDebug przed APK. Bez testu telefonu;
+ADB puste. Nie należy ogłaszać naprawy sterowania jako potwierdzonej na Androidzie.
+Publikacja i sprzątanie oczekują na wynik CI i potwierdzenie paczek GitHub.
+Szczegóły: docs/DIAGNOSTYKA-HUD-0.14-2026-11-13.md.
+
+Poprawiono wykryty routing gamepada na menu BITWA i wyborze postaci, wymuszono
+kołową strefę i rysowanie joysticka również dla ustawień zapisanych w 0.14 oraz
+zawężono hit-test przycisków akcji do całego widocznego koła. Testy Lua: 48 PASS,
+składnia 145 plików PASS. Python: 68 PASS, 1 SKIP. Włączono wygenerowany zasób
+Android zgodny z lokalnymi tekstami Mod Managera. Mod Manager został przejrzany,
+przetestowany i włączony w tym zakresie, w tym eksport ZIP do Androida. Telefon/ADB
+niedostępny; sterowanie nie ma testu fizycznego. Szczegóły i granice:
+docs/DIAGNOSTYKA-HUD-0.14-2026-11-13.md.
+
 ## 2026-11-13 — 0.14.0: diagnostyka, jeden klon SZ, HUD i kampania (testowe)
 
 Dodano lokalne raporty i kontekst gry, diagnostykę Android Java/exit oraz eksport Windows, limit jednego klona Szymonoko bez rekurencji, edytor HUD/profile, CMD, auto przejścia, checkpointy i trening. Przyczyna zgłaszanych zamknięć LF4/PolishF NIE została odtworzona ani potwierdzona jako naprawiona; użytkownik zaakceptował zebranie logów na obu platformach.
@@ -7,6 +34,16 @@ Dodano lokalne raporty i kontekst gry, diagnostykę Android Java/exit oraz ekspo
 Pełny raport, statusy zakresu, ograniczenia i instrukcja logów: [0.14.0](docs/DIAGNOSTYKA-HUD-0.14-2026-11-13.md). Cały pierwotny zakres pozostaje częściowo niewykonany, zwłaszcza testy fizycznych urządzeń, wszystkie zdolności/balans, nowa natywna martwa strefa pada i pełna rozbudowa modów.
 
 ---
+## 2026-11-13 — Mod Manager, etap 3 (dodatkowe środki, BEZ TESTÓW)
+
+Dodano zarządzaną bibliotekę, profile i aktywację, kontrole konfliktów/zmienionych plików, aktualizacje ZIP, usunięcie z kopią i przywracanie. GUI ma podgląd zawartości przed importem i zakładkę pakietów. Tryb danych pomija EXE/DLL/skrypty, nie wypakowuje ani nie uruchamia ich. Dodano plan/uruchamianie zaufanego EXE gry z osobnymi ustawieniami i --mod oraz rozpoznanie bieżącego mod-* w menu gry. Bez testów, uruchamiania funkcji, buildów i publikacji. Zgodność rozgrywki niepotwierdzona. Nadal brak pełnego GUI zarządzania w silniku/Androidzie i scalania pełnych konwersji. Szczegóły, pliki i ograniczenia: docs/MOD-MANAGER-STAGE-3.md.
+## 2026-11-13 — Mod Manager, etap 2 (nieprzetestowany, lokalny)
+
+Dodano adaptery źródeł i transport HTTPS, trwałą kolejkę pobierania SQLite (postęp, pauza/wznowienie/anulowanie, historia, SHA-256), polecenia CLI i osobne desktopowe GUI z katalogiem, źródłami, pobieraniem i importem ZIP. Uzupełniono potwierdzone metadane stron 5 z 103 wpisów; plików nie pobierano i nie potwierdzano zgodności. Na polecenie użytkownika NIE uruchamiano testów, GUI, buildów ani downloadera. Cały Mod Manager nadal nieukończony: brak integracji pobierania/importu w silniku i Androidzie, profili, aktywacji i konfliktów. Bez commitu/push/release. Opis i wznowienie: docs/MOD-MANAGER-STAGE-2.md. Próg zatrzymania: 30% pozostałego limitu.
+## 2026-11-13 — Mod Manager, etap 1 (lokalnie, bez publikacji)
+
+Rejestr wszystkich 103 pozycji specyfikacji, przeglądarka MODUŁY → KATALOG MODÓW (PL/EN, kategorie, wyszukiwanie, strony i karty), analiza bezpiecznych ZIP oraz izolowany import CLI istniejącym konwerterem LF2. Bez wymyślonych linków i bez oznaczania zgodności jako potwierdzonej.
+Nowe testy Python 8 PASS, istniejący importer 8 PASS; pełny zestaw 44 testów Lua PASS i składnia 139 plików PASS. Zaktualizowano oczekiwaną liczbę akcji biblioteki po dodaniu katalogu. Bez testów urządzeń, budowania EXE/APK i kontroli wizualnej uruchomionej gry. Brak downloadera, źródeł internetowych, importu z GUI, profili i aktywacji nowych paczek; cały Mod Manager pozostaje nieukończony. Zatrzymano po około 10 p.p. limitu; pliki bez commitu. Szczegóły i wznowienie: docs/MOD-MANAGER-STAGE-1.md.
 ## 2026-11-13 — dostawa 0.13.0 i usunięcie lokalnych wersji
 
 Pliki Windows (pełny ZIP z EXE) i APK są publiczne: [wydanie testowe 0.13.0](https://github.com/w4sy1/polish-fighters/releases/tag/classic-menu-0.13.0-2026-11-12). GitHub potwierdził rozmiary i SHA256. Na polecenie użytkownika lokalne wersje i kopie kompilacji przeniesiono do Kosza; źródła i ustawienia zachowano. Dalsze testy zatrzymano. Szczegóły: [raport](docs/CLASSIC-MENU-0.13.0-2026-11-12.md).

@@ -1,4 +1,6 @@
 return {
+ current_mod='CURRENT MOD: ',
+ mods='MOD CATALOGUE',
  status='MODULE STATUS / COMPATIBILITY', audit_note='File audit at build time. Present assets do not prove complete mechanics compatibility.', assets='Assets: ', missing_files='Missing files: ',
  battle='BATTLE', modules='MODULES', online='ONLINE GAME', settings='SETTINGS', language='LANGUAGE', credits='CREDITS', quit='QUIT',
  back='BACK', controls='CONTROLS', video='VIDEO / SOUND', extras='HISTORY / UNLOCKS', recording='RECORDING SETTINGS',

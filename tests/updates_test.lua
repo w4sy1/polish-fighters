@@ -4,9 +4,9 @@ local function release(v,asset)
  assets={{name=asset or 'PolishFighters-Windows.zip',state='uploaded'}}}
 end
 assert(not updates.select({release('0.10.0'),release('0.11.0'),release('0.12.0')}))
-assert(not updates.select({release('0.14.0')}),'installed version must not advertise itself as an update')
-local newer=release('0.15.0');assert(updates.select({newer})==newer)
-assert(not updates.select({release('0.15.0','Android.apk')}))
+assert(not updates.select({release('0.15.0')}),'installed version must not advertise itself as an update')
+local newer=release('0.16.0');assert(updates.select({newer})==newer)
+assert(not updates.select({release('0.16.0','Android.apk')}))
 newer.draft=true;assert(not updates.select({newer}));newer.draft=false
 newer.html_url='https://evil.invalid';assert(not updates.select({newer}))
 assert(not updates.select(false))

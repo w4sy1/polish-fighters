@@ -146,6 +146,7 @@ fi
 if [[ -n "${OPENLF2_ANDROID_VERSION_NAME:-}" ]]; then
     gradle_args+=("-Popenlf2VersionName=$OPENLF2_ANDROID_VERSION_NAME")
 fi
+gradle "${gradle_args[@]}" :app:testDebugUnitTest :app:lintDebug
 gradle "${gradle_args[@]}" "assemble${build_type^}"
 
 artifact="$root/out/PolishFighters-Android-$abi.apk"
