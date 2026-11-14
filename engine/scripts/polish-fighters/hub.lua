@@ -23,7 +23,9 @@ function hub.rows(state)
  local mode=state.hub_mode
  local function row(id,key) return {id,L(key or id)} end
  if mode=='root' or mode==nil then
-  return {row('battle'),row('library','modules'),row('online'),row('settings'),row('language'),row('credits'),row('quit')}
+  local rows={row('battle'),row('library','modules'),row('online'),row('settings'),row('language'),row('credits'),row('quit')}
+  if state.hub_touch_entry then rows[#rows+1]={'classic','POWRÓT DO LF2 / BACK'} end
+  return rows
  elseif mode=='profile' or mode=='battle' then
   local rows={}
   for _,id in ipairs({'versus','stage','championship','team_championship','battle_setup','demo','replay'}) do rows[#rows+1]=row('mode_'..id,id) end

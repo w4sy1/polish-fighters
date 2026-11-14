@@ -42,6 +42,7 @@ return function(base)
    if mode=='demo' or mode=='replay' then context.action(mode)
    else state.hub_pending_mode=mode;state.hub_mode=state.hub_preselected and 'players' or 'library' end
   elseif id=='start_mode' then context.action(state.hub_pending_mode=='battle_setup' and 'battle' or state.hub_pending_mode or 'versus')
+  elseif id=='classic' then state.hub_enabled=false;state.hub_mode='root'
   elseif id=="packs" then
    local hide,problem=packs.hide_duplicates()
    if problem then state.hub_note=tostring(problem);return end

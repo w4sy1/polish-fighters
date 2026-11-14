@@ -60,7 +60,8 @@ function flow.create(options)
     local state = {active = "launch", title = title.create(options), options = options,
         launch = require("base/ui/launch").create({menu_seed = options.menu_seed, problem = settings.problem}),
         pointer_x = 0, pointer_y = 0, previous_button = false, volume_frames = 0,
-        touch_gamepad = touch_gamepad.create(user_options.current().gamepad, user_options.current().digipad), mouse_touch = false,
+        touch_gamepad = touch_gamepad.create(user_options.current().gamepad, user_options.current().digipad,
+            user_options.current().touch_layout,options.touch_device), mouse_touch = false,
         -- Optional mouse input can stand in for touch while testing the on-screen gamepad.
         mouse_touch_enabled = options.mouse_touch == true}
     music.play("bgm/main.wma")
@@ -420,7 +421,8 @@ function flow.update(state, raw, context)
     -- character selection. Route touch directions and ATAK into that input.
     local active_screen = mode ~= nil
     if state.touch_options_revision~=user_options.revision() then
-        state.touch_gamepad=touch_gamepad.create(shown_options.gamepad,shown_options.digipad,shown_options.touch_layout)
+        state.touch_gamepad=touch_gamepad.create(shown_options.gamepad,shown_options.digipad,
+            shown_options.touch_layout,state.options.touch_device)
         state.touch_options_revision=user_options.revision()
     end
     -- Mouse-as-touch stays active after release, like a held touch; real input or touch ends it.

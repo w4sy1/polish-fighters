@@ -38,23 +38,36 @@ local chords = {"da", "dj", "daj"}
 local chord_letters = {da = {"f", "c"}, dj = {"f", "b"}, daj = {"f", "b", "c"}}
 local chord_labels = {da = "D+A", dj = "D+J", daj = "D+J+A"}
 local chord_fill, chord_pressed = {70, 55, 95}, {130, 105, 190}
-local function build_buttons(layout, screen, style)
+-- The old saved default puts the enlarged attack hit area across the other actions.
+-- Keep the saved profile untouched, but present its controls at the corrected positions.
+local old_defaults = {c={188,92,44},b={180,186,32},f={282,150,32},
+    da={72,250,26},dj={72,165,26},daj={72,80,26}}
+local android_defaults = {c={89,105,48},b={89,240,38},f={239,125,38}}
+local function build_buttons(layout, screen, style, android, right_edge)
+    local old_profile = true
+    for action, old in pairs(old_defaults) do
+        local config=layout[action]
+        if not config or config.right~=old[1] or config.bottom~=old[2] or config.radius~=old[3] then
+            old_profile=false;break
+        end
+    end
     local function button(action, label, fill, pressed)
         local config = layout[action]
+        if android and old_profile and android_defaults[action] then
+            local revised=android_defaults[action]
+            config={right=revised[1],bottom=revised[2],radius=revised[3]}
+        end
         local letters = chord_letters[action]
         label = label or chord_labels[action]
-        -- Keep attack easy to hit on a phone even when an older saved profile
-        -- still has the original 44 px button. Other saved button sizes remain intact.
         local radius = math.floor(config.radius)
-        if action == "c" then radius = math.max(radius, 64) end
-        return {action = action, letters = letters, label = label, x = screen.right - math.floor(config.right),
+        return {action = action, letters = letters, label = label, x = right_edge - math.floor(config.right),
             y = screen.bottom - math.floor(config.bottom), radius = radius,
-            hit_radius = action == "c" and math.max(radius + 22, 86) or radius,
+            hit_radius = radius,
             fill = fill, pressed = pressed}
     end
-    local list = {button("c", "ATAK", {90, 45, 40}, {170, 80, 65}), button("b", "SKOK", {40, 80, 50}, {80, 160, 100}),
-        button("f", "BLOK", {40, 55, 90}, {75, 105, 175})}
-    if style=="modern" then
+    local list = {button("c", "ATAK", {175, 35, 40}, {240, 80, 85}), button("b", "SKOK", {30, 140, 45}, {85, 210, 95}),
+        button("f", "BLOK", {35, 75, 170}, {80, 135, 230})}
+    if style=="modern" and not android then
         for _, button_action in ipairs(chords) do list[#list + 1] = button(button_action, nil, chord_fill, chord_pressed) end
     end
     return list
@@ -77,6 +90,7 @@ local function fit(state, screen)
     end
     state.screen = screen
     state.finger,state.aim_finger,state.attack_pulse=nil,nil,nil
+    state.targets={}
     state.run_armed,state.run_pulse=nil,nil
     state.previous_touches=state.previous_touches or {}
     state.stick = build_stick(state.digipad and state.layout.dpad or state.layout.stick, screen, state.digipad)
@@ -87,27 +101,29 @@ local function fit(state, screen)
     local fast = state.layout.fast
     state.fast = {x = screen.left + math.floor(fast.left), y = screen.top + math.floor(fast.top),
         radius = math.floor(fast.radius)}
+    local right_edge=state.android and math.min(screen.right,constants.screen.width+115) or screen.right
     local commands=state.layout.commands or {left=85,top=30,radius=24}
-    state.commands={x=screen.left+commands.left,y=screen.top+commands.top,radius=math.max(commands.radius,36)}
+    state.commands=state.android and {x=right_edge-70,y=screen.top+95,radius=34} or
+        {x=screen.left+commands.left,y=screen.top+commands.top,radius=math.max(commands.radius,36)}
     state.command_choices={}
-    for i,entry in ipairs({{'come','ZA MNĄ / COME','ZA MNA / COME'},
-        {'stay','ZOSTAŃ / STAY','ZOSTAN / STAY'},
-        {'attack','ATAKUJ / ATTACK','ATAKUJ / ATTACK'},
-        {'defend','BROŃ / DEFEND','BRON / DEFEND'}}) do
+    for i,entry in ipairs({{'come','ZA MNĄ','ZA MNA'}, {'stay','ZOSTAŃ','ZOSTAN'},
+        {'defend','BROŃ','BRON'}, {'attack','ATAKUJ','ATAKUJ'}}) do
         state.command_choices[i]={command=entry[1],label=entry[2],fallback=entry[3],
-            x=screen.left+125,y=screen.top+55+i*52,radius=24}
+            x=state.android and right_edge-70-i*74 or screen.left+75+i*68,
+            y=state.android and screen.top+165 or screen.top+105,radius=state.android and 28 or 30}
     end
-    state.buttons = build_buttons(state.layout, screen,state.style)
+    state.buttons = build_buttons(state.layout, screen,state.style,state.android,right_edge)
     if not state.finger then
         state.base_x, state.base_y = state.stick.default_x, state.stick.default_y
         state.knob_x, state.knob_y = state.base_x, state.base_y
     end
 end
 
-function gamepad.create(layout, digipad, style)
+function gamepad.create(layout, digipad, style, android)
     -- The cross was the source of the old-profile regression. Always render and
     -- hit-test the same circular stick, including for profiles saved by 0.14.
-    local state = {layout = layout, style=style or "modern",digipad = false, held = {}, available = {}, visible = false, run_pulse_step = 0}
+    local state = {layout = layout, style=style or "modern",android=android==true,
+        digipad = false, held = {}, available = {}, visible = false, run_pulse_step = 0}
     fit(state, default_screen)
     return state
 end
@@ -128,23 +144,17 @@ function gamepad.set_available(state, available) state.available = available end
 local function target_at(state, touch, mode)
     if mode=='match' and state.command_open then
         for _,choice in ipairs(state.command_choices) do
-            if math.abs(touch.x-choice.x)<=110 and math.abs(touch.y-choice.y)<=23 then return choice end
+            local dx,dy=touch.x-choice.x,touch.y-choice.y
+            if dx*dx+dy*dy<=choice.radius*choice.radius then return choice end
         end
-    end
-    -- The entire drawn ATTACK disc belongs to ATTACK, even where its larger
-    -- saved layout overlaps the forgiving hit area of another action.
-    if mode ~= "pause" then
-        local attack = state.buttons[1]
-        local dx, dy = touch.x - attack.x, touch.y - attack.y
-        if dx * dx + dy * dy <= attack.radius * attack.radius then return attack end
     end
     local best, best_gap
     local function consider(target)
         local distance = math.sqrt((touch.x - target.x) ^ 2 + (touch.y - target.y) ^ 2)
         local allowance = (target == state.pause or target == state.fast or target == state.commands) and state.tolerance or 0
         local hit_radius = target.hit_radius or target.radius
-        if distance <= hit_radius + allowance and (not best_gap or distance-hit_radius < best_gap) then
-            best, best_gap = target, distance-hit_radius
+        if distance <= hit_radius + allowance and (not best_gap or distance/hit_radius < best_gap) then
+            best, best_gap = target, distance/hit_radius
         end
     end
     if mode ~= "full" then consider(state.pause); consider(state.fast) end
@@ -172,6 +182,7 @@ function gamepad.update(state, input, mode)
     if not state.visible then
         state.command_open=nil
         state.previous_touches={}
+        state.targets={}
         state.finger, state.held = nil, {}
         state.aim_finger,state.attack_pulse=nil,nil
         state.run_armed,state.run_pulse=nil,nil
@@ -183,7 +194,11 @@ function gamepad.update(state, input, mode)
     if mode=="full" then state.aim_finger,state.attack_pulse=nil,nil end
     local pressed = {}
     for _, touch in ipairs(touches) do
-        local target = target_at(state, touch, mode)
+        local target = state.targets[touch.id]
+        if not state.previous_touches[touch.id] then
+            target=target_at(state,touch,mode)
+            state.targets[touch.id]=target
+        end
         if target and not state.previous_touches[touch.id] then
             if target==state.commands then state.command_open=not state.command_open
             elseif target.command then
@@ -194,8 +209,14 @@ function gamepad.update(state, input, mode)
         end
         -- Both layouts use the original LF2 press-to-attack behavior. Holding
         -- attack must never wait for release or consume the movement finger.
-        if target and touch.id~=state.finger then pressed[target] = true end
+        if target and touch.id~=state.finger then
+            local dx,dy=touch.x-target.x,touch.y-target.y
+            if dx*dx+dy*dy<=target.radius*target.radius then pressed[target]=true end
+        end
     end
+    local live={}
+    for _,touch in ipairs(touches) do live[touch.id]=true end
+    for id in pairs(state.targets) do if not live[id] then state.targets[id]=nil end end
     local pause_held = pressed[state.pause] == true
     local fast_held = pressed[state.fast] == true
     state.pause_held, state.fast_held, state.mode = pause_held, fast_held, mode
@@ -215,7 +236,7 @@ function gamepad.update(state, input, mode)
     if not owner then
         state.finger = nil
         for _, touch in ipairs(touches) do
-            if not target_at(state,touch,mode) and inside_zone(stick, touch.x, touch.y) then
+            if not state.targets[touch.id] and inside_zone(stick, touch.x, touch.y) then
                 state.finger, owner = touch.id, touch
                 break
             end
@@ -380,7 +401,7 @@ function gamepad.draw(state, context)
         font.draw(context,'KOMENDY',state.commands.x,state.commands.y-7,nil,nil,'center')
         if state.command_open then
             for _,choice in ipairs(state.command_choices) do
-                button_context.fill(choice.x-110,choice.y-23,220,46,35,75,110)
+                disc(button_context,choice.x,choice.y,choice.radius,35,75,110)
                 font.draw(context,i18n.active() and choice.label or choice.fallback,
                     choice.x,choice.y-7,nil,nil,'center')
             end

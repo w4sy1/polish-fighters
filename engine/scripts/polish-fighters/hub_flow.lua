@@ -7,6 +7,9 @@ return function(base)
  local function button_area(state)
   return 574,6,214,32
  end
+ local function classic_module_area()
+  return 8,472,180,34
+ end
  function base.create(options)
   local state=create(options)
   local active_profile=require('base/game/catalog').profile_id
@@ -51,9 +54,17 @@ return function(base)
   local f4=(input.functions or ''):find('4',1,true)~=nil
   local pressed=f4 and not state.hub_f4_held
   state.hub_f4_held=f4
-  if pressed and not state.launch.hub_enabled and state.active=='launch' and
+  local classic_touch=state.options and state.options.touch_device and input.click and
+   state.active=='launch' and state.launch.page=='menu' and not state.launch.hub_enabled
+  if classic_touch then
+   local x,y,w,h=classic_module_area()
+   classic_touch=input.pointer_x>=x and input.pointer_x<=x+w and
+    input.pointer_y>=y and input.pointer_y<=y+h
+  end
+  if (pressed or classic_touch) and not state.launch.hub_enabled and state.active=='launch' and
      state.launch.page=='menu' and require('base/game/catalog').profile_id=='lf2-classic' then
    state.launch.hub_enabled=true;state.launch.hub_mode='root'
+   state.launch.hub_touch_entry=state.options and state.options.touch_device or false
    state.launch.hub_wait_release=true
    return true
   end
@@ -101,7 +112,17 @@ return function(base)
   end
   context.pf_selection_hint=state.launch and state.launch.hub_enabled and state.active=='characters'
   draw(state,context)
-  if not visible(state) or state.active=='launch' then return end
+  if not visible(state) then
+   if state.active=='launch' and state.launch and state.launch.page=='menu' and
+      state.options and state.options.touch_device and require('base/game/catalog').profile_id=='lf2-classic' then
+    local x,y,w,h=classic_module_area()
+    context.fill(x,y,w,h,16,32,108,220)
+    require('base/ui/font').draw(context,'MODULY (F4)',x+w/2,y+10,
+     require('base/game/constants').font_variants.white,nil,'center')
+   end
+   return
+  end
+  if state.active=='launch' then return end
   local x,y,w,h=button_area(state)
   if state.active=='characters' and context.text then
    local lines=require('polish-fighters/input_settings').selection_hint(

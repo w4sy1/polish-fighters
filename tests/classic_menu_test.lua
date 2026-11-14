@@ -34,6 +34,9 @@ local function back()
  shell.update(state,{keys={},gamepad={},pointer_x=0,pointer_y=0},context)
 end
 assert(#hub.rows(state)==7)
+state.hub_touch_entry=true;assert(#hub.rows(state)==8)
+click('classic');assert(not state.hub_enabled and state.hub_mode=='root')
+state.hub_enabled=true;state.hub_touch_entry=nil
 click('battle');assert(#hub.rows(state)==10)
 for _,mode in ipairs({'versus','stage','championship','team_championship','battle_setup'}) do
  state.hub_preselected=false;state.hub_mode='battle';click('mode_'..mode);assert(state.hub_mode=='library' and state.hub_pending_mode==mode)

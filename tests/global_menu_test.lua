@@ -35,5 +35,14 @@ assert(base.global_navigation_update(classic,{functions='4'},context) and classi
 base.global_navigation_update(classic,{functions=''},context)
 assert(base.global_navigation_update(classic,{functions='4'},context) and not classic.launch.hub_enabled,
  'F4 should return from modules to the original LF2 menu')
+local touch_classic=base.create({touch_device=true});touch_classic.active='launch';touch_classic.launch.page='menu'
+touch_classic.options={touch_device=true}
+assert(not base.global_navigation_update(touch_classic,{functions='',click=true,pointer_x=250,pointer_y=490},context),
+ 'touch outside the modules label must keep the original menu')
+assert(base.global_navigation_update(touch_classic,{functions='',click=true,pointer_x=185,pointer_y=505},context)
+ and touch_classic.launch.hub_enabled and touch_classic.launch.hub_mode=='root',
+ 'the full modules label must open the existing module hub on Android')
+assert(require('polish-fighters/hub').rows(touch_classic.launch)[8][1]=='classic',
+ 'touch users need a visible way back to the LF2 menu')
 assert(#actions==0,'menu return must not exit application')
 print('PASS global menu: all screen types, F4 edge, touch during fight, stalled network, no quit')

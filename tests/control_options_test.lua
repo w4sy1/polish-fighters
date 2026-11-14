@@ -44,7 +44,7 @@ local config=options.default_gamepad()
 config.appearance.opacity=0.25
 local state=pad.create(config,true)
 local held=pad.update(state,{touch_active=true,touches={
-    {id=1,x=125,y=405},{id=2,x=606,y=458}
+    {id=1,x=125,y=405},{id=2,x=state.buttons[1].x,y=state.buttons[1].y}
 }})
 assert(held:find('u') and held:find('c'),'move and attack must work simultaneously')
 local alphas={}
