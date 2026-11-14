@@ -40,6 +40,19 @@ end
 function title.update(state, held, context)
     state.pointer_x, state.pointer_y = held.pointer_x, held.pointer_y
     local input = navigation.sample(state.input, held)
+    if held.click then
+        local x, y = held.pointer_x, held.pointer_y - state.vertical_offset
+        for index, frame in ipairs(highlighted) do
+            if x >= frame[5] and x <= frame[5] + frame[3] and
+                y >= frame[6] and y <= frame[6] + frame[4] then
+                state.selection = index - 1
+                if not (state.replay_disabled and state.selection == constants.title_entries.replay) then
+                    input = input .. "c"
+                end
+                break
+            end
+        end
+    end
     if input == "u" or input == "d" or input == "c" then state.key_list = 0 end
     -- Original code processes up before down, then confirm in each input snapshot.
     if input:find("u", 1, true) then
