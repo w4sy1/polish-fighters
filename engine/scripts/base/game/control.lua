@@ -86,6 +86,16 @@ local sequences = {
     {"down_press", "D", "jump_press", "j", "Dj"},
     {"jump_press", "j", "attack_press", "a", "ja"},
 }
+-- The sequence begins with Defend, which moves the fighter to the frame its hit_d names (the
+-- defend stance): walking and running frames often carry no combo fields themselves. Candidate
+-- hit tables to look a combo field up in: the current frame's own, then (if it has one) its
+-- defend stance's.
+local function hit_candidates(value)
+    local frame = value.record.frame(value.frame)
+    local candidates = {frame.hits}
+    if frame.hits.d ~= 0 then candidates[2] = value.record.frame(frame.hits.d).hits end
+    return candidates
+end
 -- Whether a chord of defend (d), jump (j) and attack (a) ("da", "dj", "daj") could start
 -- a move for `value`'s fighter in its current frame, whatever the direction: D+A is any of the
 -- Defend, direction, Attack sequences (hit_Fa, hit_Ua, hit_Da), D+J likewise with Jump (hit_Fj,
@@ -94,24 +104,45 @@ local chord_hits = {da = {"Fa", "Ua", "Da"}, dj = {"Fj", "Uj", "Dj"}, daj = {"ja
 function control.chord_available(value, chord)
     local fields = value and chord_hits[chord]
     if not fields then return false end
-    -- The sequence begins with Defend, which moves the fighter to the frame its hit_d names (the
-    -- defend stance): walking and running frames often carry no combo fields themselves.
-    local frame = value.record.frame(value.frame)
-    local candidates = {frame.hits}
-    if frame.hits.d ~= 0 then candidates[2] = value.record.frame(frame.hits.d).hits end
-    for _, hits in ipairs(candidates) do
+    for _, hits in ipairs(hit_candidates(value)) do
         for _, field in ipairs(fields) do
             if hits[field] ~= 0 and value.weapon ~= record_kinds.heavy_item and (field ~= "ja" or value.transform == -1) then return true end
         end
     end
     return chord == "daj" and value.twin == fusion_merged
 end
+-- Direction letters used both by `exclusions` above and here, to find the held key a
+-- same-tick chord's direction must come from.
+local chord_directions = {R = "right", L = "left", U = "up", D = "down"}
 local completed_sequence = constants.combo_states.complete
 local function recognize(match, value, index)
     local spec = sequences[index]
     local state = value.sequences[index]
     local advanced = false
     if state == sequence_idle and value.defend_press == input_press_frames then state, advanced = sequence_defend_pressed, true end
+    -- Touch's D+A/D+J chord buttons (and any device whose Defend and the action key land in the
+    -- same sampled tick) press both at once instead of tapping Defend, then a direction, then
+    -- the action; by the time this runs the generic hit_d continuation in control.step may not
+    -- have moved the fighter into the defend stance yet (Defend and the action tie on press
+    -- freshness, so neither wins there), so this looks the move up the same way chord_available
+    -- promised it was available: on the current frame or its defend stance. Only fires on the
+    -- exact tick Defend became pressed (`advanced`), so the classic three-tap timing below is
+    -- unaffected, and only while a direction is actually held, so a directionless D+A still does
+    -- nothing.
+    if state == sequence_defend_pressed and advanced and value[spec[3]] == input_press_frames then
+        local direction_key = chord_directions[spec[2]]
+        if direction_key and value.keys[direction_key] and value.weapon ~= record_kinds.heavy_item then
+            for _, hits in ipairs(hit_candidates(value)) do
+                local target = hits[spec[5]]
+                if target ~= 0 then
+                    control.enter_frame(match, value, target)
+                    if spec[6] then value.facing = spec[6] end
+                    value.sequences[index] = sequence_idle
+                    return
+                end
+            end
+        end
+    end
     if state == sequence_defend_pressed then
         if value[spec[1]] == input_press_frames then state, advanced = sequence_second_pressed, true
         elseif interrupted(value, "d", advanced) then state = sequence_idle end
@@ -121,8 +152,15 @@ local function recognize(match, value, index)
         elseif interrupted(value, spec[2], advanced) then state = sequence_idle end
     end
     if state == completed_sequence then
-        local frame = value.record.frame(value.frame)
-        local target = frame.hits[spec[5]]
+        -- Same reasoning as the chord check above: when Defend and the second key (here Jump,
+        -- for the D+J+A chord) land in the same tick as Defend itself, control.step's hit_d
+        -- continuation has not yet moved the fighter into the defend stance (it also ties on
+        -- press freshness), so look the move up the same way chord_available promised it was
+        -- available, not only on the fighter's current frame.
+        local target = 0
+        for _, hits in ipairs(hit_candidates(value)) do
+            if hits[spec[5]] ~= 0 then target = hits[spec[5]]; break end
+        end
         if index == combo_jump_attack then
             if value.record.id == constants.fighter_ids.louis and target == 300 and value.hp > 177 and unlock.flags.characters == 0 then
                 value.sequences[index] = state
