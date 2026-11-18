@@ -42,7 +42,10 @@ local chord_fill, chord_pressed = {70, 55, 95}, {130, 105, 190}
 -- Keep the saved profile untouched, but present its controls at the corrected positions.
 local old_defaults = {c={188,92,44},b={180,186,32},f={282,150,32},
     da={72,250,26},dj={72,165,26},daj={72,80,26}}
-local android_defaults = {c={89,105,48},b={89,240,38},f={239,125,38}}
+-- 2026-11-18: pulled jump/block into a tight cluster around attack (Brawl Stars style)
+-- instead of the old spread-out layout; distances keep >=10px clearance beyond each
+-- pair's combined radii so simultaneous presses stay unambiguous.
+local android_defaults = {c={89,105,48},b={89,205,38},f={180,165,38}}
 local function build_buttons(layout, screen, style, android, right_edge)
     local old_profile = true
     for action, old in pairs(old_defaults) do
