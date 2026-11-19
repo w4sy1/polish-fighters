@@ -41,6 +41,18 @@ do
  v.hp=0;assert(heroes.heal(s,0,v,objects,40)==0 and v.hp==0)
 end
 do
+ -- "Drugi oddech": one-time bonus heal (on top of the existing reactive heal)
+ -- the first time Wasyl drops to 20% of max HP in a life.
+ local s=world(410);local v=s.items[0];heroes.advance(s,0,v,objects)
+ v.hp=50;s.frame_number=2;heroes.advance(s,0,v,objects)
+ -- react(): +40 (50->90); second wind: +floor(500*0.15)=75 (90->165).
+ assert(v.hp==165 and s.pf_events.wasyl_reactive_heal==1 and s.pf_events.wasyl_second_wind==1,
+  'Wasyl second wind did not trigger alongside the existing reactive heal at 20% HP')
+ v.hp=50;s.frame_number=3;heroes.advance(s,0,v,objects)
+ assert(v.hp==90 and s.pf_events.wasyl_second_wind==1,'Wasyl second wind fired a second time in the same life')
+ v.hp=0;heroes.advance(s,0,v,objects);assert(v.hp==0,'dead Wasyl must not be healed')
+end
+do
  local s=world(412);local v=s.items[0];heroes.advance(s,0,v,objects)
  for n=1,3 do s.frame_number=n*40;v.hp=v.hp-10;heroes.advance(s,0,v,objects) end
  assert(s.pf_events.jas_counter_teleport==1 and v.x<180 and v.y==0,'third hit did not teleport')
@@ -60,6 +72,17 @@ do
  local independent=world(411);independent.items[0].team=0
  assert(heroes.clone(independent,0,independent.items[0],objects))
  assert(not heroes.enemy(independent.items[0],independent.items[10]),'independent clones attack owner')
+end
+do
+ -- "Wsparcie po stracie klona": the owner gets a one-time MP surge when their
+ -- clone falls; does not revive the clone and does not repeat.
+ local s=world(411);local v=s.items[0];v.mp=100
+ assert(heroes.clone(s,0,v,objects));local child=s.items[10]
+ child.hp=0;heroes.advance(s,10,child,objects)
+ assert(v.mp==250 and s.pf_events.sz_clone_fallen_surge==1,'owner did not get an MP surge when the clone fell')
+ heroes.advance(s,10,child,objects)
+ assert(v.mp==250 and s.pf_events.sz_clone_fallen_surge==1,'MP surge fired more than once for the same fallen clone')
+ assert(child.hp==0,'fallen clone must not be revived by the surge')
 end
 do
  local s=world(413);local v=s.items[0];v.hp,v.max_hp,v.dark_hp=1500,1500,1500

@@ -171,6 +171,25 @@ function heroes.advance(s,i,v,objects)
    if (id==414 or id==415) and n%15==0 then heroes.heal(s,i,v,objects,4) end
    if id==410 and n<=(v.pf_recovery_until or -1) and n%12==0 then heroes.heal(s,i,v,objects,2) end
    if id==411 and v.pf_clone and v.mp>=150 and n%3==0 then v.mp=math.min(500,v.mp+1) end
+   -- "Drugi oddech" (inspired by desperation/power-up mechanics such as John's or
+   -- Rudolf's): once per life, Wasyl gets a single bonus heal when critically low.
+   -- Additive only; does not touch any existing combo or its MP cost.
+   if id==410 and not v.pf_second_wind and v.hp<=math.floor(v.max_hp*0.20) then
+    v.pf_second_wind=true
+    heroes.heal(s,i,v,objects,math.floor(v.max_hp*0.15))
+    event(s,'wasyl_second_wind')
+   end
+  end
+  -- "Wsparcie po stracie klona" (inspired by Rudolf's bond with his wolves): when a
+  -- Szymonoko clone falls, its owner gets a one-time MP surge. Fires once per clone,
+  -- does not revive the clone and does not change any existing combo behavior.
+  if id==411 and v.pf_clone and v.hp<=0 and not v.pf_fallen_surge_given then
+   v.pf_fallen_surge_given=true
+   local owner=s.items[v.pf_master]
+   if owner and owner.hp>0 then
+    owner.mp=math.min(500,(owner.mp or 0)+150)
+    event(s,'sz_clone_fallen_surge')
+   end
   end
   v.pf_last_health=v.hp
   if id==413 and v.pf_sigma_charge then

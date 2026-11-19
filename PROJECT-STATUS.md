@@ -1,3 +1,110 @@
+## 2026-11-19 — realny dostęp do lf-empire.de/Ultimate Fighters, 2 nowe prawdziwe adresy pobierania, potwierdzony limit robots.txt
+
+Po zmianie przez użytkownika dozwolonych domen konta, lf-empire.de i
+theultimatefighters.forumotion.com są realnie dostępne (HTTP 200, sprawdzone przez
+`curl --cacert ~/.ccr/ca-bundle.crt` przez proxy tej sesji). ModDB wciąż zwraca 403 - to
+własna zagadka antybotowa Cloudflare tej strony, nie blokada konta; zgodnie z zasadami
+nie próbowano jej obchodzić.
+
+Na pełnej liście `lfe-fileplanet/versions` (18 pozycji) znaleziono i zweryfikowano
+realne strony/pliki dla trzech modów z oryginalnej listy użytkownika:
+- "Naruto LF2 v2.0" - prawdziwy plik `LF2_Naruto.zip` (24 572 933 B, `Content-Type:
+  application/zip`, potwierdzone nagłówkami HTTP), opis i lista postaci (Naruto, Sasuke,
+  Iruka, Mizuki, Kakashi, Chunnin, Shinobi, Gaara, Sakura, Haku, Demon Brothers, Rock Lee,
+  Konohamaru, Zabuza, Ebisu) wpisane do `data/mods/catalog.json`.
+- "Wrestle Little Fighter v1.35 - Above Limit" - prawdziwy plik `WLF2_AL.zip`
+  (23 974 106 B), autor lin1987, wpisany do katalogu.
+- "Reinforced Little Fighter 2" - plik `LF2_Reinforced.zip` (8 926 299 B) potwierdzony
+  (wcześniej był tylko `page_found_file_not_verified`, teraz realnie zweryfikowany
+  nagłówkami pobierania).
+"Naruto: The Setting Dawn (NTSD)" jest na liście, ale jego strona na lf-empire.de nie
+podaje linku do archiwum - tylko link do zewnętrznej strony zespołu
+(`http://ntsd.open-board.com/`), poza skonfigurowanymi źródłami.
+
+Przepuszczono realny plik `LF2_Reinforced.zip` przez właściwy kod projektu
+(`mod_downloads.Queue.add()` + `.run()`, nie atrapę) - i odkryto rzeczywiste,
+udokumentowane ograniczenie: `robots.txt` lf-empire.de zawiera `Crawl-delay: 60`, co
+`mod_http.check_robots()` poprawnie odczytuje jako przekroczenie limitu 30 s i blokuje
+automatyczne pobieranie z komunikatem "Source requires a longer delay; use its page
+manually" - to samo, co wcześniej blokowało `mod_sources.discover('lfe')`. To jest
+poprawne, zamierzone zachowanie (zgodność z polityką serwisu), nie błąd - i obejmuje też
+samo pobieranie plików, nie tylko wyszukiwanie. W efekcie Mod Manager może **wykryć i
+zweryfikować** pliki na lf-empire.de (co właśnie zrobiono ręcznie, jednorazowo, przez
+`WebFetch`/`curl`), ale nie może ich **masowo, automatycznie ściągać** - to wymaga ręcznej
+akcji z poziomu strony, zgodnie z komunikatem błędu.
+
+`theultimatefighters.forumotion.com` ma `Crawl-delay: 2` (bez blokady), ale adapter
+`ultimate` w `mod_sources.py` wyciąga z niego tylko ogólne linki platformy Forumotion, nie
+prawdziwą treść wątku z modami - to pozostaje nierozwiązane.
+
+Zaktualizowano `data/mods/catalog.json` (3 wpisy z realnymi `download_url`/`size_bytes`) i
+przebudowano wygenerowany `engine/scripts/polish-fighters/mod_catalog.lua` przez
+`tools/generate_mod_catalog.py` (plik generowany, nigdy edytowany ręcznie). Poprawiono
+jeden przestarzały asercja w `tests/test_mod_manager.py`, która zakładała, że *żaden* mod
+nigdy nie ma `download_url` - teraz sprawdza to per-ID, zgodnie z nowym, prawdziwym stanem
+katalogu. Wynik: Lua 98 PASS/0 FAIL, Python 96 PASS/1 SKIP - bez regresji.
+
+## 2026-11-18 — trzy nowe pasywne zdolności (bez nowych klatek/sprite'ów) i potwierdzenie blokady sieci
+
+Na wyraźną zgodę użytkownika dodano trzy nowe, w pełni addytywne mechaniki dla postaci
+410/411/413, inspirowane klasycznymi wojownikami LF2, bez tworzenia nowej kombinacji
+przycisków, nowej klatki animacji czy nowego sprite'a (bo to wymaga przypiętego
+`downloads/LF2_v2.0a.exe`, którego ta sesja nie ma): Wasyl "Drugi oddech" (jednorazowe
+dodatkowe leczenie przy 20% HP, inspirowane mechanikami typu John/Rudolf), Szymonoko
+"Wsparcie po stracie klona" (+150 many właścicielowi po śmierci klona, inspirowane
+więzią Rudolfa z wilkami) i Skibidi Sigma Tata "Deszcz strzał" (podłączenie istniejącej,
+ale dotąd nieużywanej funkcji `rain()` do wejścia w fazę 2, inspirowane Arrow Rain
+Henry'ego - zero nowych assetów, ten sam projectile id 424). Żadna istniejąca
+kombinacja/klatka/koszt many nie została zmieniona. Dodano testy dowodzące działania
+każdej z nich (nie tylko "nic nie zepsuto") i naprawiono jedną istniejącą asercję w
+`polish_originals_test.lua`, która zakładała, że pierwsza wieżyczka bossa trafia zawsze
+na slot 50 - teraz szuka jej po `record.id`. Wynik: Lua 70 PASS/145 składnia PASS, Python
+97 PASS/1 SKIP - bez regresji.
+
+Potwierdzono też realnie (nie teoretycznie), że ta sesja nie ma dostępu sieciowego do
+żadnego skonfigurowanego źródła modów - `mod_sources.discover('lfe')` zwraca "Name or
+service not known" dla lf-empire.de (DNS blokowany przez whitelistę środowiska). Żaden
+prawdziwy mod z oryginalnego zlecenia (Naruto, Dragon Ball/Beerus/Jiren, Wrestler LF i
+inne) nie został i nie mógł zostać w tej sesji znaleziony, pobrany ani zaimportowany.
+Poradnik kombosów: tekst D/A/J jest już celowo niezależny od platformy/przypisania
+klawiszy (nazwy akcji, nie klawisze/przyciski dotykowe) - to już spełnia wymóg
+pozostawania poprawnym po zmianie sterowania; fizyczny telefon wciąż niedostępny do
+potwierdzenia wizualnego/dotykowego, jak w poprzednich sesjach.
+
+## 2026-11-18 — audyt kombosów/poradnika i testy bezpieczeństwa Mod Managera (lokalnie)
+
+Audyt priorytetowy (kombosy → poradnik → Mod Manager) w tej sesji cloud nie miał dostępu
+do przypiętego `downloads/LF2_v2.0a.exe` ani do żadnych binarnych DAT/sprite'ów (środowisko
+chmurowe, bez lokalnych plików użytkownika) — to blokuje `tools/check_combo_guide.py`
+(porównanie poradnika z rzeczywistymi DAT) oraz jakiekolwiek bezpieczne dodawanie nowych
+kombosów/animacji bez wymyślania danych. Nie dodano żadnych nowych kombosów ani zmian w
+heroes.lua/remonoko.lua/combo_guide.lua: nie da się ich zweryfikować w tym środowisku, a
+projekt zakazuje deklarowania nieprzetestowanych funkcji. Potwierdzono za to, że poradnik
+("PORADNIK KOMBOSÓW") oraz 6 wpisów (410-415, w tym dwie formy Remonoko) są już
+zaimplementowane i przechodzą `combo_guide_test.lua`; w repozytorium nie znaleziono innych
+autorskich postaci poza tymi sześcioma.
+
+Mod Manager: przegląd kodu (`mod_archive.py`, `mod_downloads.py`, `mod_http.py`,
+`mod_sources.py`, `mod_library.py`, `mod_manager.py`) nie wykrył krytycznych błędów
+bezpieczeństwa — path traversal, zip-slip, symlinki, limity rozmiaru/ratio, blokada
+wykonywania EXE/DLL, lista dozwolonych nazw EXE do uruchomienia, SSRF (DNS + globalny IP),
+HTTPS-only, robots.txt i wykrywanie CAPTCHA już działają zgodnie ze specyfikacją. Jedno
+znalezisko o średnim znaczeniu i niskiej pewności (0,3): `mod_http.py` waliduje adres IP
+przy `validate_url`, ale faktyczne połączenie w `urllib` wykonuje własną, odrębną
+rezolucję DNS - teoretyczne okno na DNS rebinding, jeśli domena źródła ma bardzo krótkie
+TTL i jest kontrolowana przez atakującego; nie naprawiono (brak możliwości przetestowania
+żywego ruchu sieciowego w tym środowisku), zgłoszono do rozważenia.
+
+Dodano 27 nowych testów Python (`tests/test_mod_http.py`, `tests/test_mod_downloads.py`)
+obejmujących `mod_http.py` i `mod_downloads.py` - wcześniej całkowicie nieobjęte testami
+automatycznymi (walidacja URL/SSRF, robots.txt, wznawianie pobierania z Range/ETag,
+weryfikacja SHA-256, wykrywanie typu archiwum po magic bytes, maszyna stanów
+pause/resume/cancel). Użyto lokalnego serwera HTTPS z samopodpisanym certyfikatem (bez
+żadnego ruchu do internetu). Wynik: Python 97 PASS / 1 SKIP (było 70/1), Lua 70 PASS,
+składnia 145 plików PASS - bez regresji. Brak dostępu push do GitHub w tej sesji
+(organizacja nie ma zainstalowanej aplikacji Claude GitHub dla tego repo) - zmiany
+pozostają lokalnie w klonie roboczym, nie opublikowano niczego.
+
 ## 2026-11-13 — 0.16.0 menu LF2 i importer Androida (wydanie testowe)
 
 Główne menu gry korzysta teraz z oryginalnego tła, logo i bitmapowej czcionki

@@ -89,9 +89,19 @@ do
     local state=world(413);local boss=state.items[0];runtime.initialize(boss)
     assert(boss.hp==1500);boss.hp=700;runtime.advance(state,0,boss,objects)
     assert(boss.pf_phase2 and state.pf_events.boss_phase2==1)
-    runtime.advance(state,0,boss,objects);assert(boss.hp==700 and state.pf_events.boss_phase2==1)
+    assert(state.pf_events.boss_phase2_rain==1 and state.pf_events.spawn_424==9,"phase-2 entrance did not rain")
+    runtime.advance(state,0,boss,objects)
+    assert(boss.hp==700 and state.pf_events.boss_phase2==1 and state.pf_events.boss_phase2_rain==1,"phase-2 rain fired more than once")
     cast(state,340);assert(state.pf_events.boss_toilets==3)
-    local helper=state.items[50];state.frame_number=40;runtime.advance(state,50,helper,objects)
+    -- Found by id, not a fixed slot: the phase-2 entrance rain (inspired by
+    -- Henry's Arrow Rain, added alongside this turret summon) now also claims
+    -- early object slots, so the first turret is no longer necessarily slot 50.
+    local helper_slot,helper
+    for slot,value in pairs(state.items) do
+        if value.record.id==433 then helper_slot,helper=slot,value;break end
+    end
+    assert(helper,"no turret summoned")
+    state.frame_number=40;runtime.advance(state,helper_slot,helper,objects)
     assert(state.pf_events.boss_toilet_fire==1,"toilet does not fire")
     cast(state,310);assert(state.items[10].hp==440,"stomp has no damage")
     assert(state.items[10].frame==180 and state.items[10].vy<0,"stomp has no knockdown reaction")

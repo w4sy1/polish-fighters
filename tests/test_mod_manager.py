@@ -33,7 +33,20 @@ class ModTests(unittest.TestCase):
         self.assertEqual(len({e['id'] for e in rows}), 103)
         self.assertEqual(len(manager.catalog('D.R. LF2 & LF3')), 2)
         self.assertTrue(manager.catalog('NTSD Community Seasons 1–7'))
-        self.assertTrue(all(e['compatibility'] == 'not_tested' and e['download_url'] is None for e in rows))
+        self.assertTrue(all(e['compatibility'] == 'not_tested' for e in rows))
+        # Three entries have been verified against the real lf-empire.de pages
+        # (2026-11-19): their download_url is now known and real, the rest are
+        # still unverified placeholders.
+        verified_ids = {
+            'reinforced-little-fighter-2',
+            'naruto-lf2-v2-0',
+            'wrestle-little-fighter-v1-35-above-limit',
+        }
+        for entry in rows:
+            if entry['id'] in verified_ids:
+                self.assertIsNotNone(entry['download_url'], entry['id'])
+            else:
+                self.assertIsNone(entry['download_url'], entry['id'])
         self.assertEqual((ROOT / 'engine/scripts/polish-fighters/mod_catalog.lua').read_text(encoding='utf-8'), generate_mod_catalog.render())
 
     def test_paths(self):
