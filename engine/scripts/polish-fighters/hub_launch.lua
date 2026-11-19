@@ -106,7 +106,7 @@ return function(base)
   elseif id=="recording" then
    local values=require("base/ui/controls").current()
    state.page="recording";state.record={record=values.record,author=values.author,email=values.email,info=values.info}
-  elseif id=="extras" or id=="maps" or id=="fighters" then
+  elseif id=="extras" or id=="maps" or id=="fighters" or id=="guide" then
    state.hub_classic=true
    if id=="extras" then state.pf_panel="extras"
    elseif id=="maps" then state.pf_panel="maps"
@@ -115,6 +115,9 @@ return function(base)
  end
  function base.update(state,input,context)
   if not state.hub_enabled then return update(state,input,context) end
+  if state.page=="menu" and not state.hub_android then
+   state.hub_pointer_x,state.hub_pointer_y=input.pointer_x,input.pointer_y
+  end
   if state.hub_wait_release then
    local pad=input.gamepad or {}
    if input.button or input.keys[13] or pad.a or pad.s then return end
@@ -164,7 +167,7 @@ return function(base)
   -- The native frame protocol requires integral text and sprite coordinates.
   font.draw(context,value,math.floor(x+0.5),math.floor(y+0.5),variant or variants.white,nil,align)
  end
- function base.draw(state,context)
+ local function draw_menu(state,context)
   if state.hub_enabled and state.hub_mods then return mods.draw(state,context) end
   if not state.hub_enabled or state.page~="menu" or state.hub_classic then return draw(state,context) end
   if state.hub_online then return online.draw(state,context) end
@@ -198,7 +201,10 @@ return function(base)
   local rows=hub.rows(state,catalog.profile_id)
   for index,row in ipairs(rows) do
    local x,y,w,h=layout.box(index,#rows)
-   if row[3] and context.fill then context.fill(x-8,y,4,h,255,211,76,255) end
+   if context.fill then
+    if index==state.hub_hover then context.fill(x,y,w,h,20,42,82,220) end
+    if row[3] then context.fill(x-8,y,4,h,255,211,76,255) end
+   end
    local color=index==state.hub_hover and variants.white or (row[3] and variants.yellow or variants.blue)
    text(context,row[2],x+w/2,y+3,color,'center')
   end
@@ -215,8 +221,20 @@ return function(base)
   elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,variants.yellow,'center')
   elseif state.hub_mode=='players' then text(context,locale.text('local_players'),397,370,variants.white,'center') end
   local message=state.hub_note or state.message
-  text(context,tostring(message or locale.text('navigation')):sub(1,92),16,520,message and variants.yellow or variants.blue)
+  local label=tostring(message or locale.text('navigation'))
+  local limit=math.min(#label,92)
+  while limit<#label and label:byte(limit+1)>=128 and label:byte(limit+1)<192 do limit=limit-1 end
+  text(context,label:sub(1,limit),16,520,message and variants.yellow or variants.blue)
 
+ end
+ function base.draw(state,context)
+  draw_menu(state,context)
+  if state.hub_enabled and state.page=="menu" then
+   local x,y=state.hub_pointer_x,state.hub_pointer_y
+   if x and y and x>=0 and x<794 and y>=0 and y<550 then
+    context.image("pe/lf2_cursor",math.min(x,775),math.min(y+2,535),true)
+   end
+  end
  end
  function base.describe(state)
   return describe(state).." hub="..tostring(state.hub_enabled==true)..":"..tostring(state.hub_mode)..

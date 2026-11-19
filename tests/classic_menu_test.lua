@@ -23,7 +23,9 @@ local function back()
  shell.update(state,{keys={[27]=true},gamepad={},pointer_x=0,pointer_y=0},context)
  shell.update(state,{keys={},gamepad={},pointer_x=0,pointer_y=0},context)
 end
-assert(#hub.rows(state)==7)
+assert(#hub.rows(state)==8)
+click('guide');assert(state.hub_classic and state.pf_panel=='combo-guide')
+state.hub_classic=nil;state.pf_panel=nil
 click('battle');assert(#hub.rows(state)==10)
 for _,mode in ipairs({'versus','stage','championship','team_championship','battle_setup'}) do
  state.hub_preselected=false;state.hub_mode='battle';click('mode_'..mode);assert(state.hub_mode=='library' and state.hub_pending_mode==mode)
@@ -69,15 +71,23 @@ state.hub_mode='status';state.hub_enabled=true;state.page='menu';state.hub_edit=
 shell.draw(state,{viewport=function() end,image=function() commands=commands+1 end,
  fill=function() commands=commands+1 end,sprite=function() commands=commands+1 end,text=function() commands=commands+1 end})
 assert(commands<4096,'module list exceeded native renderer command limit')
-local artwork,words,fills=0,0,0
-state.hub_mode='root';state.hub_hover=1
-shell.draw(state,{viewport=function() end,image=function(path) if path:match('pe/menu_back') then artwork=artwork+1 end end,
+local artwork,words,fills,cursor=0,0,0,0
+state.hub_mode='root';state.hub_hover=1;state.hub_pointer_x=300;state.hub_pointer_y=210
+shell.draw(state,{viewport=function() end,image=function(path) if path:match('pe/menu_back') then artwork=artwork+1 elseif path=='pe/lf2_cursor' then cursor=cursor+1 end end,
  fill=function() fills=fills+1 end,text=function() end,sprite=function(sheet,rect)
  if sheet=='pe/menu_clip' and rect[2]==41 and (rect[1]==0 or rect[1]==434) then artwork=artwork+1 end
  if sheet=='pe/words1' or sheet=='pe/words0' then words=words+1 end
 end})
 assert(artwork==3,'classic scenic backdrop and LF2 logo should frame the game menu')
-assert(words>0 and fills==0,'game menu text should use the original bitmap font without replacement cards')
+assert(words>0 and fills==1 and cursor==1,'classic menu needs bitmap labels, selection highlight and cursor')
+state.hub_android=true;state.hub_pointer_x=nil;state.hub_pointer_y=nil
+assert(locale.select('pl'))
+local i18n=require('base/i18n/i18n')
+i18n.host(true);i18n.use('default',true)
+local labels={}
+shell.draw(state,{viewport=function() end,image=function(path) assert(path~='pe/lf2_cursor') end,
+ fill=function() end,sprite=function() end,text=function(label) labels[label]=true end})
+assert(labels['MODUŁY'] and labels['PORADNIK KOMBOSÓW'],'UTF-8 labels require TrueType even in default mode')
 local edit=controls.copy(controls.current());edit.sets[1].device=1;edit.sets[1].directions={'r','d','l','u'}
 assert(controls.save(edit));controls.load();assert(controls.current().sets[1].directions[1]=='r')
 local held=controls.read(controls.current(),'$1r');assert(held[0]:find('u') and not held[0]:find('r'))

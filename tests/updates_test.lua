@@ -5,8 +5,8 @@ local function release(v,asset)
 end
 assert(not updates.select({release('0.10.0'),release('0.11.0'),release('0.12.0')}))
 assert(not updates.select({release(updates.version)}),'installed version must not advertise itself as an update')
-local newer=release('0.18.5');assert(updates.select({newer})==newer)
-assert(not updates.select({release('0.18.5','Android.apk')}))
+local newer=release('0.18.7');assert(updates.select({newer})==newer)
+assert(not updates.select({release('0.18.7','Android.apk')}))
 newer.draft=true;assert(not updates.select({newer}));newer.draft=false
 newer.html_url='https://evil.invalid';assert(not updates.select({newer}))
 assert(not updates.select(false))
@@ -17,6 +17,10 @@ local flow=dofile(arg[1]..'/engine/scripts/polish-fighters/updates_flow.lua')({c
  draw=function() end,overlay_update=function() return false end})
 flow.create({headless=true});assert(#calls==0,'headless tests must not access network')
 local state=flow.create({});assert(calls[1]=='start')
+state.launch={hub_enabled=true,page='menu'}
+local label
+flow.draw(state,{text=function(value) label=value end})
+assert(label=='Polish Fighters '..updates.version,'launch menu must show the packaged version')
 flow.overlay_update(state,{},{});assert(calls[2]=='poll' and not state.update_pending)
 state.available_update=release('0.13.0');local action
 assert(flow.overlay_update(state,{},{action=function(a) action=a end}))
