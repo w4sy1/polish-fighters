@@ -47,6 +47,15 @@ class ModTests(unittest.TestCase):
                 self.assertIsNotNone(entry['download_url'], entry['id'])
             else:
                 self.assertIsNone(entry['download_url'], entry['id'])
+        by_id = {entry['id']: entry for entry in rows}
+        for mod_id in ('dragonball-super-edition-v1-0', 'dragonball-super-edition-v1-1'):
+            self.assertEqual(by_id[mod_id]['download_status'], 'download_access_blocked')
+            self.assertIn('/downloads/', by_id[mod_id]['download_page_url'])
+        bleach = by_id['bleach-bankai-revolution-2-0']
+        self.assertEqual(bleach['version'], '2.0')
+        self.assertTrue(bleach['download_page_url'].endswith('/versoes-anteriores/'))
+        self.assertNotEqual(by_id['ntsd-community-edition']['page_url'],
+                            by_id['naruto-the-setting-dawn-2-5']['page_url'])
         self.assertEqual((ROOT / 'engine/scripts/polish-fighters/mod_catalog.lua').read_text(encoding='utf-8'), generate_mod_catalog.render())
 
     def test_paths(self):
