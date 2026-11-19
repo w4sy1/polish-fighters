@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "relation": {
+      "type": "object",
+      "required": [
+        "id",
+        "version_range"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "version_range": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "not_applicable"
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "name": {
+      "$ref": "#/$defs/text"
+    },
+    "version": {
+      "$ref": "#/$defs/version"
+    },
+    "author": {
+      "$ref": "#/$defs/text"
+    },
+    "license": {
+      "$ref": "#/$defs/text"
+    },
+    "min_engine_version": {
+      "$ref": "#/$defs/version"
+    },
+    "platforms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "windows",
+          "android"
+        ]
+      }
+    },
+    "category": {
+      "$ref": "#/$defs/text"
+    },
+    "package_type": {
+      "const": "data-only"
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 268435456
+    },
+    "unpacked_size_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1073741824
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "type",
+        "url"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "github-release-asset"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://github\\.com/w4sy1/polish-fighters-mody/releases/download/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+\\.zip$"
+        }
+      }
+    },
+    "test_status": {
+      "type": "object",
+      "required": [
+        "windows",
+        "android"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "windows": {
+          "$ref": "#/$defs/status"
+        },
+        "android": {
+          "$ref": "#/$defs/status"
+        }
+      }
+    },
+    "required_assets": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/text"
+      }
+    },
+    "installation": {
+      "type": "object",
+      "required": [
+        "method",
+        "entrypoint"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "managed-data-zip"
+        },
+        "entrypoint": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_./-]+\\.json$",
+          "maxLength": 256
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "version",
+    "author",
+    "license",
+    "min_engine_version",
+    "platforms",
+    "category",
+    "package_type",
+    "dependencies",
+    "conflicts",
+    "size_bytes",
+    "unpacked_size_bytes",
+    "sha256",
+    "source",
+    "test_status",
+    "required_assets",
+    "installation"
+  ]
+}
