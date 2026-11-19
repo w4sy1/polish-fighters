@@ -321,7 +321,7 @@ function flow.draw(state, context)
     -- would sit under the PAUSE picture).
     if gamepad_mode(state) then
         state.touch_gamepad.fast_on = speed.fast
-        touch_gamepad.draw(state.touch_gamepad, context)
+        touch_gamepad.draw(state.touch_gamepad, context, state.active == "match" and state.match.attack_preview)
     end
     local status = recording.status_text()
     if status then font.gdi(context, i18n.clip(status, 128), 3, 0x213, recording.status_color())
@@ -456,8 +456,14 @@ function flow.update(state, raw, context)
     local available = {}
     for _, chord in ipairs({"da", "dj", "daj"}) do available[chord] = control.chord_available(fighter, chord) end
     touch_gamepad.set_available(state.touch_gamepad, available)
+    local classic_match = state.active == "match" and catalog.profile_id == "lf2-classic"
     local touched, pause_held, fast_held, team_command = touch_gamepad.update(state.touch_gamepad,
-        active_screen and gamepad_input or {touch_active = false, screen = input.screen}, mode)
+        active_screen and gamepad_input or {touch_active = false, screen = input.screen}, mode, classic_match)
+    if classic_match then
+        local local_slot = state.session and state.session.slot or 0
+        state.match.match.attack_preview_slot = state.touch_gamepad.preview_on and local_slot or nil
+        if not state.touch_gamepad.preview_on then state.match.attack_preview = nil end
+    end
     -- The pause button is F1; the match toggles on its press.
     if pause_held and state.active == "match" and not input.functions:find("1", 1, true) then
         input.functions = input.functions .. "1"

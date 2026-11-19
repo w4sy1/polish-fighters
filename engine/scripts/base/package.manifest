@@ -65,3 +65,4 @@ asset=mods/base/fonts/droid_sans_fallback.ttf|fonts/droid_sans_fallback.ttf
 module=i18n/polish|i18n/polish.lua
 
 module=ui/culling|ui/culling.lua
+asset=mods/base/attack-pl.wav|attack-pl.wav

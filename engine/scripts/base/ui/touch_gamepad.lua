@@ -9,6 +9,7 @@
 -- overlay so it can sit in the bars.
 local constants = require("base/game/constants")
 local font = require("base/ui/font")
+local object_data = require("base/game/object_data")
 local gamepad = {}
 
 -- Left floating joystick: a finger down in the zone recenters the base; direction comes from
@@ -136,8 +137,13 @@ local function target_at(state, touch, mode)
             best, best_gap = target, distance-hit_radius
         end
     end
+    if state.classic_match and mode == "match" then
+        local bubble = state.commands
+        local dx, dy = touch.x - bubble.x, touch.y - bubble.y
+        if dx * dx + dy * dy <= bubble.radius * bubble.radius then return bubble end
+    end
     if mode ~= "full" then consider(state.pause); consider(state.fast) end
-    if mode=='match' then consider(state.commands) end
+    if mode=='match' and not state.classic_match then consider(state.commands) end
     if mode ~= "pause" then
         for _, button in ipairs(state.buttons) do
             if not button.letters or state.available[button.action] then consider(button) end
@@ -150,8 +156,10 @@ end
 -- "pause" (only the pause button is live: the match is paused or replaying).
 -- Returns held letters ("udlrcbf" subset), or "" while hidden, and whether the pause and the fast-forward
 -- button are held; a run pulse briefly overrides l/r on its own.
-function gamepad.update(state, input, mode)
+function gamepad.update(state, input, mode, classic_match)
     mode = mode or "full"
+    state.classic_match, state.mode = classic_match, mode
+    if not classic_match then state.preview_on = nil end
     fit(state, input.screen or default_screen)
     local stick, buttons = state.stick, state.buttons
     local screen = state.screen
@@ -160,7 +168,7 @@ function gamepad.update(state, input, mode)
     state.visible = input.touch_active == true
     if not state.visible then
         state.command_open=nil
-        state.previous_touches={}
+        state.previous_touches, state.preview_fingers = {}, {}
         state.finger, state.held = nil, {}
         state.aim_finger,state.attack_pulse=nil,nil
         state.run_armed,state.run_pulse=nil,nil
@@ -170,11 +178,17 @@ function gamepad.update(state, input, mode)
     end
     local touches = input.touches or {}
     if mode=="full" then state.aim_finger,state.attack_pulse=nil,nil end
-    local pressed = {}
+    local pressed, preview_fingers = {}, {}
     for _, touch in ipairs(touches) do
-        local target = target_at(state, touch, mode)
+        local owned = state.preview_fingers and state.preview_fingers[touch.id]
+        local target = owned and state.commands or target_at(state, touch, mode)
+        if state.classic_match and target == state.commands
+            and (owned or not state.previous_touches[touch.id]) then
+            preview_fingers[touch.id] = true
+            if not owned then state.preview_on = not state.preview_on end
+        end
         if target and not state.previous_touches[touch.id] then
-            if target==state.commands then state.command_open=not state.command_open
+            if target==state.commands and not state.classic_match then state.command_open=not state.command_open
             elseif target.command then
                 state.command_signal=target.command;state.command_open=false
                 state.command_confirmation=target.label;state.confirmation_ticks=75
@@ -184,9 +198,10 @@ function gamepad.update(state, input, mode)
         -- attack must never wait for release or consume the movement finger.
         if target and touch.id~=state.finger then pressed[target] = true end
     end
+    state.preview_fingers = preview_fingers
     local pause_held = pressed[state.pause] == true
     local fast_held = pressed[state.fast] == true
-    state.pause_held, state.fast_held, state.mode = pause_held, fast_held, mode
+    state.pause_held, state.fast_held = pause_held, fast_held
     if mode == "pause" then
         state.finger, state.held = nil, {}
         state.aim_finger,state.attack_pulse=nil,nil
@@ -203,7 +218,7 @@ function gamepad.update(state, input, mode)
     if not owner then
         state.finger = nil
         for _, touch in ipairs(touches) do
-            if not target_at(state,touch,mode) and inside_zone(stick, touch.x, touch.y) then
+            if not preview_fingers[touch.id] and not target_at(state,touch,mode) and inside_zone(stick, touch.x, touch.y) then
                 state.finger, owner = touch.id, touch
                 break
             end
@@ -347,9 +362,38 @@ local function draw_digipad(state, context, base_color, held_color)
     end
 end
 
--- Call only while state.visible; the caller hides it while paused or off the match screen.
-function gamepad.draw(state, context)
-    if not state.visible then return end
+local function draw_preview(state, context, entry)
+    local bubble = state.commands
+    local x, y = bubble.x, bubble.y
+    local fill = state.preview_on and {42, 145, 105} or {65, 78, 95}
+    disc(context, x, y, bubble.radius, 18, 18, 22)
+    disc(context, x, y, bubble.radius - 3, fill[1], fill[2], fill[3])
+    context.fill(x - 15, y - 11, 30, 19, 235, 242, 250)
+    context.fill(x - 10, y + 8, 6, 5, 235, 242, 250)
+    for dot = -1, 1 do context.fill(x + dot * 8 - 2, y - 3, 4, 4, fill[1], fill[2], fill[3]) end
+    if not entry then return end
+    local resource, source = object_data.picture(entry.record.data, entry.frame, entry.pic_offset)
+    if not resource then return end
+    local width, height = source[3], source[4]
+    local w, h = math.max(108, width + 8), math.max(94, height + 8)
+    local left = math.floor(clamp(x - w / 2, state.screen.left, state.screen.right - w))
+    local top = y + bubble.radius + 5
+    context.fill(x - 4, top - 8, 8, 8, 42, 145, 105)
+    context.fill(left, top, w, h, 42, 145, 105)
+    context.fill(left + 2, top + 2, w - 4, h - 4, 18, 34, 46, 245)
+    local sx, sy = left + math.floor((w - width) / 2), top + h - 4 - height
+    context.sprite(resource, source, sx, sy, true, entry.facing ~= constants.facings.right)
+end
+
+function gamepad.draw(state, context, preview)
+    if not state.visible then
+        if state.classic_match and state.mode == "match" and state.preview_on then
+            context.overlay(true)
+            draw_preview(state, context, preview)
+            context.overlay(false)
+        end
+        return
+    end
     local stick, buttons = state.stick, state.buttons
     local appearance=state.layout.appearance
     local opacity=type(appearance)=="table" and appearance.opacity or 0.66
@@ -363,7 +407,9 @@ function gamepad.draw(state, context)
         draw_pause(state, button_context)
         draw_fast(state, button_context)
     end
-    if state.mode=='match' then
+    if state.mode == "match" and state.classic_match then
+        draw_preview(state, context, preview)
+    elseif state.mode=='match' then
         disc(button_context,state.commands.x,state.commands.y,state.commands.radius,40,90,110)
         font.draw(context,'KOMENDY',state.commands.x,state.commands.y-7,nil,nil,'center')
         if state.command_open then

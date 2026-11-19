@@ -685,7 +685,11 @@ function_keys = function(state)
 end
 
 local function control_item(state, index, value)
-    control.step(state, value)
+    local attack_started = control.step(state, value)
+    if attack_started and index == state.attack_preview_slot and value.human then
+        state.attack_started = {record = value.record, frame = value.frame,
+            pic_offset = value.pic_offset, facing = value.facing}
+    end
     frame_rules.after_control(state, index, value)
 end
 

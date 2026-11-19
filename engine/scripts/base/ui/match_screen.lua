@@ -95,7 +95,26 @@ end
 
 function screen.update(state, held, context)
     if (held.functions or ""):find("4",1,true) then state.back_to_characters=true end
-    local result = match.step(state.match, held)
+    local current = state.match
+    current.attack_started = nil
+    local result = match.step(current, held)
+    local attack = current.attack_started
+    if attack then
+        state.attack_preview = attack
+        local master = require("base/game/music").master
+        if master > 0 then context.sound("mods/base/attack-pl.wav", math.floor((master - 100) * 38), 0) end
+    elseif state.attack_preview and current.last_snapshot and result ~= "paused" then
+        local previous = state.attack_preview
+        state.attack_preview = nil
+        for _, entry in ipairs(current.last_snapshot.items) do
+            if entry.index == current.attack_preview_slot and entry.record == previous.record then
+                if entry.frame == previous.frame or entry.frame == math.abs(previous.record.frame(previous.frame).next) then
+                    state.attack_preview = entry
+                end
+                break
+            end
+        end
+    end
     if not state.match.replay and (result=="leave" or result=="finished")
        and state.back_to_characters then
         context.action("characters_back")
@@ -573,7 +592,9 @@ function screen.draw(state, context, window_bounds)
     mode_line(context, current, replaying)
     local save_error=require('base/game/campaign_save').last_error
     if current.stage_run and save_error then font.draw(context,'BLAD ZAPISU: '..tostring(save_error):sub(1,90),8,174) end
-    if current.training then
+    if current.training and require("base/game/catalog").profile_id == "lf2-classic" then
+        font.draw(context, "TRENING / TRAINING", math.floor(constants.screen.width / 2), 104, nil, nil, "center")
+    elseif current.training then
         context.fill(0,100,794,66,10,20,35,230)
         for index,line in ipairs(require('base/game/training').lines(current)) do
             font.draw(context,line,8,104+(index-1)*19)

@@ -47,7 +47,7 @@ function control.enter_frame(match, value, target)
     if not match.running then
         value.frame = target
         clear_presses(value)
-        return
+        return true
     end
     local cost = frame.mp
     local mp_cost = cmod(cost, move_cost_encoding.hp_radix)
@@ -60,6 +60,7 @@ function control.enter_frame(match, value, target)
         value.frame = target
         if turn then value.facing = 1 - value.facing end
         clear_presses(value)
+        return true
     end
 end
 
@@ -128,9 +129,9 @@ local function recognize(match, value, index)
                 return
             end
             if target ~= 0 and value.transform == -1 and value.weapon ~= record_kinds.heavy_item then
-                control.enter_frame(match, value, target)
+                local entered = control.enter_frame(match, value, target)
                 value.sequences[index] = sequence_idle
-                return
+                return entered
             end
             if value.twin == fusion_merged then
                 value.merge_timer = 0
@@ -138,10 +139,10 @@ local function recognize(match, value, index)
                 return
             end
         elseif target ~= 0 and value.weapon ~= record_kinds.heavy_item then
-            control.enter_frame(match, value, target)
+            local entered = control.enter_frame(match, value, target)
             if spec[6] then value.facing = spec[6] end
             value.sequences[index] = sequence_idle
-            return
+            return entered and spec[4] == "a"
         end
         if interrupted(value, spec[4], advanced) then state = sequence_idle end
     end
@@ -422,13 +423,16 @@ function control.step(match, value)
             history[input_history_length] = key_codes[key]
         end
     end
-    for index = combo_right_attack, combo_jump_attack do recognize(match, value, index) end
+    local attack_frame
+    for index = combo_right_attack, combo_jump_attack do
+        if recognize(match, value, index) then attack_frame = value.frame end
+    end
 
     -- A frame's hit_a/hit_d/hit_j continue to another frame on the freshest key.
     local frame = value.record.frame(value.frame)
     local hits = frame.hits
     if hits.a ~= 0 and value.attack_press > value.defend_press and value.attack_press > value.jump_press then
-        control.enter_frame(match, value, hits.a)
+        if control.enter_frame(match, value, hits.a) then attack_frame = value.frame end
         value.attack_press = 0
     elseif hits.d ~= 0 and value.defend_press > value.attack_press and value.defend_press > value.jump_press then
         control.enter_frame(match, value, hits.d)
@@ -441,6 +445,7 @@ function control.step(match, value)
         if value.keys.right then value.facing = facing_right end
         if value.keys.left then value.facing = facing_left end
     end
+    local before_movement = value.frame
     local movement = value.record.movement
     local state = value.record.frame(value.frame).state
     if state == constants.frame_states.deep_dash_sword or state == constants.frame_states.burning_run then
@@ -460,5 +465,12 @@ function control.step(match, value)
     if value.frame == 182 or value.frame == 188 then recovering(value) end
     if value.record.frame(value.frame).state == constants.frame_states.dashing then dashing(match, value) end
     frame_velocity(value)
+    if value.frame == attack_frame then return true end
+    -- Only input-driven transitions are considered here. Regular animation advances
+    -- separately, so holding attack never repeats the event for its later frames.
+    local frame_id = value.frame
+    return value.keys.attack and frame_id ~= before_movement
+        and ((frame_id >= character_frames.weapon_attack and frame_id < character_frames.drinking)
+            or (frame_id >= character_frames.punch and frame_id < character_frames.dash_defend))
 end
 return control
