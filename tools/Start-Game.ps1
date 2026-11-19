@@ -8,7 +8,7 @@ $latest=Join-Path $logs 'session-latest.log'
 $previous=Join-Path $logs 'session-previous.log'
 if (Test-Path -LiteralPath $latest) { Move-Item -LiteralPath $latest -Destination $previous -Force }
 $writer=[IO.StreamWriter]::new($latest,$false,[Text.UTF8Encoding]::new($false))
-$arguments=@('--installer',(Join-Path $gameRoot 'LF2_v2.0a.exe'),'--scripts',(Join-Path $gameRoot 'scripts'),'--config-dir',$configRoot)
+$arguments=@('--scripts',(Join-Path $gameRoot 'scripts'),'--config-dir',$configRoot)
 if ($Clean) { $arguments+='--legacy-menu' }
 if ($InputTrace) { $arguments+=@('--input-trace',$InputTrace) }
 Push-Location -LiteralPath $gameRoot

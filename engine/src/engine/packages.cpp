@@ -103,7 +103,8 @@ Result<Package> parse_package(const std::filesystem::path& root) {
     return package;
 }
 }
-Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots) {
+Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots,
+                                  const std::function<Result<void>(WindowSize)>& before_assets) {
     if (roots.size() > 64) return fail(ErrorCode::limit, "at most 64 script packages");
     std::map<std::string, Package, std::less<>> packages;
     for (const auto& root : roots) {
@@ -134,6 +135,10 @@ Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots)
                 return fail(ErrorCode::dependency, id + " needs " + dependency + "@" + version);
             }
         }
+    }
+    if (before_assets) {
+        auto ready = before_assets(bundle.window);
+        if (!ready) return std::unexpected(ready.error());
     }
     auto& modules = bundle.modules;
     std::set<std::string> loaded, declared, replaced, asset_paths;

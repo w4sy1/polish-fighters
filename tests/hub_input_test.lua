@@ -50,7 +50,7 @@ fail=true;screen.activate(state,'save');assert(state.hub_edit and state.hub_cont
 screen.activate(state,'cancel');assert(not state.hub_edit)
 local hub=require('polish-fighters/hub')
 assert(#hub.profiles==9 and #hub.rows({hub_mode='root'})==7)
-assert(hub.title('polish-originals')=='Polish Fighters' and hub.title('lf2-classic')=='LF2')
+assert(hub.title('polish-originals')=='Polish Originals' and hub.title('lf2-classic')=='LF2')
 local flow=dofile(arg[1]..'/engine/scripts/polish-fighters/hub_flow.lua')({create=function() return {launch={}} end})
 assert(flow.create({legacy_menu=true}).launch.hub_enabled==false)
 local live=flow.create({profile_start=true,profiles_available={lf_two=true}})

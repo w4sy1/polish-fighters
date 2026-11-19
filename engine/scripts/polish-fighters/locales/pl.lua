@@ -6,7 +6,7 @@ return {
  back='WSTECZ', controls='STEROWANIE', video='OBRAZ / DŹWIĘK', extras='HISTORIA / ODBLOKOWANIA', recording='USTAWIENIA NAGRAŃ',
  versus='VS Mode', stage='Stage Mode', championship='1 on 1 Championship', team_championship='2 on 2 Championship',
  battle_setup='Battle Mode', demo='Demo', replay='Playback Recording',
- packs='WŁĄCZ / WYŁĄCZ MODUŁY', mixed='WYBRANE MODUŁY RAZEM [TEST]', all='ZAZNACZ WSZYSTKIE', save='ZAPISZ', cancel='ANULUJ',
+ packs='DOBIERZ MODUŁY DO PULI', mixed='WYBRANE MODUŁY RAZEM [TEST]', all='ZAZNACZ WSZYSTKIE', save='ZAPISZ', cancel='ANULUJ',
  on='[WŁ.] ', off='[WYŁ.] ', missing=' [BRAK DANYCH]', duplicates_hidden='POWTÓRZENIA LF2: UKRYTE', duplicates_shown='POWTÓRZENIA LF2: WIDOCZNE',
  players='KONFIGURACJA GRACZY', start='DALEJ: WYBÓR POSTACI', active='AKTYWNY MODUŁ: ',
  quick='GRA PRZEZ INTERNET', host='UTWÓRZ POKÓJ LAN', join='DOŁĄCZ DO POKOJU LAN', rooms='LISTA POKOI / INNY SERWER', friends='GRA ZE ZNAJOMYMI [NIEDOSTĘPNA]',

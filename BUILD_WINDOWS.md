@@ -4,12 +4,9 @@ Wydanie testowe 0.6, 2026-10-25. Bez instalacji systemowej, commitów, pushów a
 
 ## Uruchomienie
 
-Folder `engine/out/PolishFighters-Windows-x64-portable`:
+W folderze `engine/out/PolishFighters-Windows-x64-portable` uruchom `LittleFighters.exe`. Dwuklik otwiera profil Polish Fighters, jeśli został dołączony do paczki. Pozostałe zainstalowane moduły wybierzesz w menu gry lub klawiszem F4.
 
-- `Graj-LF2.cmd` — profil klasyczny.
-- `Graj-LF4-Turbo.cmd` — osobny profil LF4 Turbo.
-
-Ustawienia są zapisywane osobno w `userdata/LF2` i `userdata/LF4-Turbo` wewnątrz paczki. Wygląd i nawigacja pozostają klasyczne. Dodatki: F10; pokój: Połączenia → Pokój LAN. Port domyślny TCP 12345. Fizycznego LAN/Wi-Fi jeszcze nie sprawdzono.
+Ustawienia i zapisy paczki znajdują się w `userdata/common`. Plik `game-data/LF2_v2.0a.exe` stanowi źródło danych gry. Jeśli używasz starszej paczki z launcherami CMD, zbuduj nową do osobnego katalogu za pomocą `-StageDirectory`.
 
 ## Odtworzenie budowy
 
@@ -32,9 +29,9 @@ Pierwszy link ujawnił konflikt CRT (LNK4098): statyczny LuaJIT używał innego 
 ```powershell
 .\tools\test_windows_native.ps1 -TigerData '..\games\LF4-Turbo\Little Fighter 4 Turbo\tiger\tiger.dat'
 python -m unittest discover -s tests -v
-python tools/check_classic.py --engine engine/out/PolishFighters-Windows-x64-portable/openlf2.exe --installer ../downloads/LF2_v2.0a.exe --output-dir validation/windows-native/classic
-python tools/smoke_lf4.py --engine engine/out/PolishFighters-Windows-x64-portable/openlf2.exe --installer ../downloads/LF2_v2.0a.exe --output-dir validation/windows-native/lf4
-python tools/check_room_game.py --engine engine/out/PolishFighters-Windows-x64-portable/openlf2.exe --installer ../downloads/LF2_v2.0a.exe --output-dir validation/windows-native/room-game
+python tools/check_classic.py --engine engine/out/PolishFighters-Windows-x64-portable/LittleFighters.exe --installer ../downloads/LF2_v2.0a.exe --output-dir validation/windows-native/classic
+python tools/smoke_lf4.py --engine engine/out/PolishFighters-Windows-x64-portable/LittleFighters.exe --installer ../downloads/LF2_v2.0a.exe --output-dir validation/windows-native/lf4
+python tools/check_room_game.py --engine engine/out/PolishFighters-Windows-x64-portable/LittleFighters.exe --installer ../downloads/LF2_v2.0a.exe --output-dir validation/windows-native/room-game
 ```
 
 Wykonano również warianty `--counts 2,8 --menu`, `--counts 2,8 --pack lf4-turbo` i `--counts 2 --probe`. Testy źródłowe zmieniają ustawienia rosteru/pokoju na czas testu i przywracają je w finally; nie uruchamiać ich równolegle z innymi testami zmieniającymi te pliki ani z grą korzystającą z katalogu źródłowego.

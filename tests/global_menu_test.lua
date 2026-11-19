@@ -56,6 +56,8 @@ assert(hub.open_android_tools(context) and actions[1]=='quit')
 actions={}
 local mobile=base.create({touch_device=true,profile_start=true})
 assert(mobile.launch.hub_mode=='profile','chosen Android module must not open the module list again')
+mobile.active='launch';mobile.launch.page='menu'
+assert(base.global_navigation_update(mobile,{keys={},click=true,pointer_x=600,pointer_y=20},context))
 assert(base.create({}).launch.hub_mode=='root','desktop root must remain available')
 assert(#actions==0,'menu return must not exit application')
 print('PASS global menu: all screen types, F4 edge, touch during fight, stalled network, no quit')

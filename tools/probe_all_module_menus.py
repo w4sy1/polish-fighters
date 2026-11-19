@@ -31,7 +31,7 @@ end''')
             run=subprocess.run(command,capture_output=True,text=True,timeout=90)
             log=run.stdout+run.stderr;(config/'run.log').write_text(log,encoding='utf-8')
             document=json.loads((config/'config.json').read_text())
-            passed=run.returncode==0 and 'screen=launch' in log and 'hub=true:root' in log and 'touch='+style in log
+            passed=run.returncode==0 and 'screen=launch' in log and 'hub=true:library' in log and 'touch='+style in log
             passed=passed and document['qa_keep']==saved['qa_keep'] and document['options']['touch_layout']==style
             results.append(dict(pack=pack or 'lf2',style=style,passed=passed,exit=run.returncode))
             print(name,'PASS' if passed else 'FAIL',flush=True)

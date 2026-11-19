@@ -370,9 +370,10 @@ function flow.return_to_modules(state)
     unlock.end_replay()
     state.match, state.battle, state.ending, state.quit_dialog = nil, nil, nil, nil
     state.pending_leave, state.return_modules_after_match = nil, nil
-    state.launch.page, state.launch.hub_mode = "menu", "root"
+    state.launch.page, state.launch.hub_mode = "menu", "library"
+    state.launch.hub_pending_mode, state.launch.hub_hover = nil, nil
     state.launch.hub_classic, state.launch.pf_panel, state.launch.hub_edit, state.launch.hub_online = nil, nil, nil, nil
-    state.launch.hub_pack_edit, state.launch.pf_typing = nil, nil
+    state.launch.hub_pack_edit, state.launch.pf_typing, state.launch.hub_mods = nil, nil, nil
     state.wait_release, state.swallow_pointer = true, true
 end
 -- Whether Escape (and Android's back button, which the platform reports as Escape) is free to ask about leaving

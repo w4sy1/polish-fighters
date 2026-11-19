@@ -20,12 +20,18 @@ class Page(HTMLParser):
     def __init__(self, text):
         super().__init__(convert_charrefs=True)
         self.links = []; self.meta = {}; self.headings = []; self.active = None; self.heading = None
+        self.list_items = []
+        self.post_links = []
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == 'li':
+            self.list_items.append([])
         if tag == 'a' and attrs.get('href'):
-            self.active = [attrs['href'], [], attrs.get('title', '')]
+            post_link = 'postlink' in attrs.get('class', '').split()
+            prefix = ''.join(self.list_items[-1]) if self.list_items else ''
+            self.active = [attrs['href'], [], attrs.get('title', ''), post_link, prefix]
         if tag in ('h1', 'h2'):
             self.heading = []
         if tag == 'meta':
@@ -33,12 +39,23 @@ class Page(HTMLParser):
 
     def handle_data(self, text):
         if self.active is not None: self.active[1].append(text)
+        elif self.list_items: self.list_items[-1].append(text)
         if self.heading is not None: self.heading.append(text)
 
     def handle_endtag(self, tag):
         if tag == 'a' and self.active is not None:
-            href, text, title = self.active
-            self.links.append((href, ' '.join(' '.join(text).split()) or title)); self.active = None
+            href, text, title, post_link, prefix = self.active
+            label = ' '.join(' '.join(text).split()) or title
+            self.links.append((href, label))
+            if post_link:
+                name = ' '.join(prefix.split()).rstrip(': ')
+                name = re.sub(r'\s*:\s*Spoiler$', '', name, flags=re.I)
+                self.post_links.append((href, name or label))
+                if self.list_items:
+                    self.list_items[-1].clear()
+            self.active = None
+        if tag == 'li' and self.list_items:
+            self.list_items.pop()
         if tag in ('h1', 'h2') and self.heading is not None:
             self.headings.append(' '.join(' '.join(self.heading).split())); self.heading = None
 
@@ -52,6 +69,7 @@ def discover(source_id, page_url=None):
     if source is None: raise ValueError('Unknown source')
     urls = [page_url] if page_url else source['indexes']
     result = {'source': source_id, 'checked_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'projects': [], 'pages': [], 'errors': []}
+    thread_links = set()
     for requested in urls[:2]:
         if urlsplit(requested).hostname not in source['hosts']:
             raise ValueError('Page is outside the selected source')
@@ -75,8 +93,12 @@ def discover(source_id, page_url=None):
                                     'description': (page.meta.get('description') or page.meta.get('og:description') or '')[:240] or None,
                                     'download_url': None, 'download_status': 'not_verified', 'compatibility': 'not_tested'})
             seen = set()
-            for href, label in page.links:
+            links = page.post_links if source['adapter'] == 'ultimate' else page.links
+            for href, label in links:
                 url = urljoin(actual, href); parsed = urlsplit(url)
+                if source['adapter'] == 'ultimate' and parsed.scheme == 'http' and parsed.netloc == 'bit.ly':
+                    parsed = parsed._replace(scheme='https')
+                    url = parsed.geturl()
                 if parsed.scheme != 'https' or not label or url in seen: continue
                 own_host = parsed.hostname in source['hosts']
                 path = parsed.path
@@ -88,6 +110,10 @@ def discover(source_id, page_url=None):
                 elif source['adapter'] == 'ultimate' and not own_host: kind = 'external_reference'
                 elif source['adapter'] == 'lfe' and ('download' in label.lower() or path.lower().endswith(('.zip', '.rar', '.7z'))): kind = 'download_candidate'
                 if kind:
+                    if source['adapter'] == 'ultimate':
+                        if url in thread_links:
+                            continue
+                        thread_links.add(url)
                     seen.add(url)
                     result['projects'].append({'name': label[:160], 'page_url': url, 'kind': kind, 'source_page': actual})
                 if len(result['projects']) >= 200: break
