@@ -32,6 +32,9 @@ return function(base)
   elseif id=='resume_campaign' then
    local saved,problem=require('base/game/campaign_save').options(catalog.profile_id)
    if saved then context.action(id) else state.hub_note=tostring(problem) end
+  elseif id=='android_tools' then
+   local opened,problem=hub.open_android_tools(context)
+   if not opened then state.hub_note=locale.text('save_error')..tostring(problem) end
   elseif id=='training' then context.action(id)
   elseif id=='diagnostics' then state.page='diagnostics';state.diagnostics=require('base/ui/diagnostics').create()
   elseif id=='unavailable' then state.hub_note=locale.text('offline')
@@ -157,7 +160,9 @@ return function(base)
  end
 
  local function text(context,value,x,y,variant,align)
-  font.draw(context,value,x,y,variant or variants.white,nil,align)
+  -- Lua menu positions can be half pixels (an odd-width language button).
+  -- The native frame protocol requires integral text and sprite coordinates.
+  font.draw(context,value,math.floor(x+0.5),math.floor(y+0.5),variant or variants.white,nil,align)
  end
  function base.draw(state,context)
   if state.hub_enabled and state.hub_mods then return mods.draw(state,context) end
@@ -167,6 +172,7 @@ return function(base)
   -- launch menu. Keep the artwork bright; the old blue wash and modern cards
   -- obscured the original interface.
   context.viewport(794,550,16,32,108)
+  context.pf_status_line=true -- the navigation hint at the bottom; the FPS counter stays off it
   context.image('pe/menu_back'..(state.background or 0),0,0,true)
   context.sprite('pe/menu_clip',{0,41,434,80},155,96,true)
   context.sprite('pe/menu_clip',{434,41,62,68},589,96,true)

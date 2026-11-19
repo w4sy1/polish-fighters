@@ -78,7 +78,7 @@ public final class GameBootstrapActivity extends Activity {
                 android.util.Log.i("OpenLF2", "Startup prepare: " + (android.os.SystemClock.elapsedRealtime() - started) + " ms");
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) return;
-                    startActivity(new Intent(this, BluetoothLobbyActivity.class));
+                    startActivity(new Intent(this, OpenLF2Activity.class));
                     finish();
                 });
             } catch (Exception error) {

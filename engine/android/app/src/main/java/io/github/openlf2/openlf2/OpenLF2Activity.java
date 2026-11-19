@@ -1,5 +1,6 @@
 package io.github.openlf2.openlf2;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.Manifest;
@@ -7,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,11 +18,30 @@ import org.libsdl.app.SDLActivity;
 /** Stages only the project's Lua modules before SDL starts the native entry point. */
 public final class OpenLF2Activity extends SDLActivity {
     private static final String TAG = "OpenLF2";
+    private static final String OPEN_ANDROID_TOOLS = "little_fighters_open_android_tools";
     private LanWifiMode lanWifi;
+    private File stagedScripts;
+    private volatile boolean openAndroidTools;
     @Override protected void main() {
         GameDiagnostics.write(this, "launch-last.txt", "Native engine launch\n" + android.os.Build.VERSION.RELEASE);
+        takeAndroidToolsRequest(); // Discard a request left behind by an interrupted game.
         int result = SDLActivity.nativeRunMain(getMainSharedObject(), getMainFunction(), getArguments());
+        openAndroidTools = result == 0 && takeAndroidToolsRequest();
         if (result != 0) GameDiagnostics.write(this, "native-return.txt", "Native engine exit code: " + result);
+    }
+
+    private boolean takeAndroidToolsRequest() {
+        try {
+            MobileCodeSettings settings = new MobileCodeSettings(getFilesDir());
+            org.json.JSONObject document = settings.read();
+            if (!document.optBoolean(OPEN_ANDROID_TOOLS)) return false;
+            document.remove(OPEN_ANDROID_TOOLS);
+            settings.write(document);
+            return true;
+        } catch (IOException | org.json.JSONException error) {
+            Log.w(TAG, "Could not read or clear the Android tools request", error);
+            return false;
+        }
     }
 
     /** Called on entering Bluetooth mode, never on application startup.
@@ -49,8 +70,9 @@ public final class OpenLF2Activity extends SDLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         GameDiagnostics.install(this);
         try {
-            if (!new File(getFilesDir(), "game/.ready").isFile()) {
-                copyAssetTree("scripts", new File(getFilesDir(), "scripts"));
+            if (!usesCurrentBundle()) {
+                stagedScripts = new File(getFilesDir(), "scripts");
+                copyAssetTree("scripts", stagedScripts);
             }
         } catch (IOException error) {
             Log.e(TAG, "Could not stage Lua modules", error);
@@ -58,6 +80,17 @@ public final class OpenLF2Activity extends SDLActivity {
         }
         super.onCreate(savedInstanceState);
         GitHubUpdates.attach(this);
+    }
+
+    private boolean usesCurrentBundle() throws IOException {
+        if (!new File(getFilesDir(), "game/.ready").isFile()) return false;
+        try (InputStream id = getAssets().open("game-bundle.id")) {
+            return true;
+        } catch (FileNotFoundException absent) {
+            // A small APK can update a previous full install. Use its own Lua
+            // files and keep the already unpacked game data and modules.
+            return false;
+        }
     }
 
     @Override
@@ -77,11 +110,11 @@ public final class OpenLF2Activity extends SDLActivity {
         try {
             if (getIntent().hasExtra("lan_host")) {
                 return GameLaunchArguments.lan(getFilesDir(), getIntent().getBooleanExtra("lan_host", false),
-                    getIntent().getStringExtra("lan_address"), getIntent().getIntExtra("lan_port", 12345));
+                    getIntent().getStringExtra("lan_address"), getIntent().getIntExtra("lan_port", 12345), stagedScripts);
             }
             return GameLaunchArguments.build(getFilesDir(),
                 getIntent().getStringExtra("bluetooth_role"),
-                getIntent().getIntExtra("bluetooth_port", 0));
+                getIntent().getIntExtra("bluetooth_port", 0), stagedScripts);
         } catch (IOException | org.json.JSONException error) {
             throw new IllegalStateException("Nie można odczytać wybranego modułu gry", error);
         }
@@ -91,6 +124,9 @@ public final class OpenLF2Activity extends SDLActivity {
         if (lanWifi != null) lanWifi.pause();
         BluetoothSession.closeCurrent();
         super.onDestroy();
+        if (isFinishing() && openAndroidTools) {
+            startActivity(new Intent(this, BluetoothLobbyActivity.class));
+        }
     }
     @Override protected void onResume() {
         super.onResume();

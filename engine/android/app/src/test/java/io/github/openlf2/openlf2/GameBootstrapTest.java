@@ -73,6 +73,9 @@ public class GameBootstrapTest {
   assertTrue(new File(root,"game/scripts/polish-fighters/hub.lua").isFile());
   assertTrue(new File(root,"game/content-packs/lf4-turbo/package.manifest").isFile());
   assertTrue(Arrays.asList(GameLaunchArguments.build(root,null,0)).contains("--scripts"));
+  File apkScripts = new File(root, "scripts");
+  java.util.List<String> updated = Arrays.asList(GameLaunchArguments.build(root,null,0,apkScripts));
+  assertEquals(apkScripts.getAbsolutePath(), updated.get(updated.indexOf("--scripts") + 1));
  }
  @Implements(Os.class) public static class FileSystemShadow {
   @Implementation protected static void link(String oldPath,String newPath) throws ErrnoException {

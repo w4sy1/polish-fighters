@@ -220,7 +220,11 @@ return function(base)
             else s.pf_message={pack[1],"Pakiet nie jest zaladowany w tej sesji."} end
         elseif id=="google" or id=="email" then
             s.pf_message={"LOGOWANIE NIEDOSTEPNE","Usluga kont nie jest jeszcze podlaczona.","Mozesz grac offline jako gosc."}
-        elseif id=="bluetooth" then s.pf_message={"BLUETOOTH: ANDROID","Wybierz host lub dolacz na ekranie startowym APK.","Najpierw sparuj telefony w ustawieniach Androida."}
+        elseif id=="bluetooth" then
+            if s.hub_android then
+                local opened,problem=require("polish-fighters/hub").open_android_tools(c)
+                if not opened then s.pf_message={"BLAD ZAPISU",tostring(problem)} end
+            else s.pf_message={"BLUETOOTH: ANDROID","Otwórz ustawienia Android / Bluetooth w grze na telefonie."} end
         elseif id=="lan" then s.pf_message={"GRA BEZ INTERNETU","Podlacz urzadzenia do wspolnego Wi-Fi lub hotspotu.","Otworz POKOJ LAN i wpisz adres IP gospodarza."}
         else s.pf_panel=id end
     end

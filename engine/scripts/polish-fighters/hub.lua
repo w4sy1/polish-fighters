@@ -19,11 +19,21 @@ function hub.title(profile)
 end
 local L=require('polish-fighters/menu_locale').text
 local L=require('polish-fighters/menu_locale').text
+function hub.open_android_tools(context)
+ local settings,problem=engine.read_settings()
+ if problem then return nil,problem end
+ settings=type(settings)=='table' and settings or {}
+ settings.little_fighters_open_android_tools=true
+ local saved,problem=engine.write_settings(settings)
+ if not saved then return nil,problem end
+ context.action('quit')
+ return true
+end
 function hub.rows(state)
  local mode=state.hub_mode
  local function row(id,key) return {id,L(key or id)} end
  if mode=='root' or mode==nil then
-  return {row('battle'),row('library','modules'),row('online'),row('settings'),row('language'),row('credits'),row('quit')}
+  return {row('library','modules'),row('battle','play_main'),row('online'),row('settings'),row('language'),row('credits'),row('quit')}
  elseif mode=='profile' or mode=='battle' then
   local rows={}
   for _,id in ipairs({'versus','stage','championship','team_championship','battle_setup','demo','replay'}) do rows[#rows+1]=row('mode_'..id,id) end
@@ -38,12 +48,15 @@ function hub.rows(state)
   end
   rows[#rows+1]={'unavailable',L('absent_turbo')};rows[#rows+1]=row('library','back');return rows
  elseif mode=='settings' then
-  return {row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'},row('root','back')}
+  local rows={row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'}}
+  if state.hub_android then rows[#rows+1]={'android_tools','ANDROID / BLUETOOTH'} end
+  rows[#rows+1]=row('root','back')
+  return rows
  elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
  elseif mode=='credits' then return {row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}
  elseif mode=='online' then
-  return {row('unavailable','quick'),row('network','host'),row('network','join'),row('account','rooms'),row('unavailable','friends'),row('root','back')}
+  return {row('account','quick'),row('network','host'),row('network','join'),row('account','rooms'),row('unavailable','friends'),row('root','back')}
  elseif mode=='packs' then
   local rows={}
   for _,entry in ipairs(hub.profiles) do

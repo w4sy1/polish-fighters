@@ -67,8 +67,8 @@ android {
         applicationId 'pl.prestigetech.polishfighters'
         minSdk 21
         targetSdk 35
-        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 19
-        versionName project.findProperty('openlf2VersionName') ?: '0.17.0-touch-input-test'
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 10002
+        versionName project.findProperty('openlf2VersionName') ?: '0.18.4'
     }
 
     // A fixed key, so each build is signed the same and installs over the previous one; the
@@ -88,6 +88,7 @@ android {
         main {
             java.srcDir '../../build/android/sdl-java'
             assets.srcDir '../../build/android/assets'
+            assets.srcDir '../../dist/loading'
             res.srcDir '../../build/android/res'
             jniLibs.srcDir '../../build/android/jniLibs'
         }

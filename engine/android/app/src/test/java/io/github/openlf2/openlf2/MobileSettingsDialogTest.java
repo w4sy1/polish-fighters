@@ -43,7 +43,7 @@ public class MobileSettingsDialogTest {
             open.performClick();
             Shadows.shadowOf(Looper.getMainLooper()).idle();
             AlertDialog menu = ShadowAlertDialog.getLatestAlertDialog();
-            android.widget.ListView list=menu.getListView();list.performItemClick(list.getAdapter().getView(2,null,list),2,2);
+            android.widget.ListView list=menu.getListView();list.performItemClick(list.getAdapter().getView(0,null,list),0,0);
             Shadows.shadowOf(Looper.getMainLooper()).idle();
             AlertDialog settings = ShadowAlertDialog.getLatestAlertDialog();
             CheckBox checkbox = (CheckBox)find(settings.getWindow().getDecorView(), CheckBox.class, null);
@@ -68,7 +68,7 @@ public class MobileSettingsDialogTest {
             find(activity.getWindow().getDecorView(), Button.class, "USTAWIENIA").performClick();
             Shadows.shadowOf(Looper.getMainLooper()).idle();
             AlertDialog menu = ShadowAlertDialog.getLatestAlertDialog();
-            android.widget.ListView list=menu.getListView();list.performItemClick(list.getAdapter().getView(2,null,list),2,2);
+            android.widget.ListView list=menu.getListView();list.performItemClick(list.getAdapter().getView(0,null,list),0,0);
             Shadows.shadowOf(Looper.getMainLooper()).idle();
             AlertDialog settings = ShadowAlertDialog.getLatestAlertDialog();
             ((CheckBox)find(settings.getWindow().getDecorView(), CheckBox.class, null)).performClick();

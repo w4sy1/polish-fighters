@@ -25,7 +25,20 @@ Error sdl_error() { return Error{ErrorCode::platform, std::string("setup screen:
 
 SdlSetupScreen::SdlSetupScreen(SDL_Renderer& renderer, const Viewport& viewport, Observer observe)
     : renderer_(renderer), viewport_(viewport), observe_(std::move(observe)), width_(static_cast<float>(viewport.width) / scale),
-      height_(static_cast<float>(viewport.height) / scale) {}
+      height_(static_cast<float>(viewport.height) / scale) {
+#if defined(_WIN32) || defined(__ANDROID__)
+    std::string path;
+#ifdef _WIN32
+    if (const char* directory = SDL_GetBasePath()) path = directory;
+#endif
+    path += "loading-roster.png";
+    std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface(SDL_LoadPNG(path.c_str()), SDL_DestroySurface);
+    if (surface) {
+        artwork_.reset(SDL_CreateTextureFromSurface(&renderer_, surface.get()));
+        if (artwork_) SDL_SetTextureScaleMode(artwork_.get(), SDL_SCALEMODE_LINEAR);
+    }
+#endif
+}
 
 Result<std::optional<std::size_t>> SdlSetupScreen::choose(std::string_view text, std::span<const std::string> answers) {
     if (answers.empty()) return fail(ErrorCode::platform, "setup screen: a question needs an answer");
@@ -54,7 +67,8 @@ Result<std::optional<std::size_t>> SdlSetupScreen::choose(std::string_view text,
 
 Result<bool> SdlSetupScreen::progress(std::string_view text, double fraction, std::string_view cancel) {
     const std::array labels{std::string(cancel)};
-    const auto buttons = layout(labels);
+    auto buttons = layout(labels);
+    if (artwork_) buttons.front().area.x = (width_ - buttons.front().area.w) / 2.0f;
     focus_ = 0;
     SDL_ShowCursor();
     SDL_Event event;
@@ -68,8 +82,8 @@ Result<bool> SdlSetupScreen::progress(std::string_view text, double fraction, st
 
 // Lines that fit the width, broken between words; '\n' starts a new line and longer words
 // (paths) are split.
-std::vector<std::string> SdlSetupScreen::wrap(std::string_view text) const {
-    const auto columns = static_cast<std::size_t>(std::max(1.0f, (width_ - 2 * margin) / glyph));
+std::vector<std::string> SdlSetupScreen::wrap(std::string_view text, float available_width) const {
+    const auto columns = static_cast<std::size_t>(std::max(1.0f, available_width / glyph));
     std::vector<std::string> lines;
     std::size_t start = 0;
     while (start <= text.size()) {
@@ -175,18 +189,41 @@ Result<void> SdlSetupScreen::draw(std::string_view text, const std::vector<Butto
         && SDL_SetRenderScale(renderer, 1.0f, 1.0f)
         && SDL_SetRenderDrawColor(renderer, 30, 32, 40, 255) && SDL_RenderClear(renderer)
         && SDL_SetRenderScale(renderer, scale, scale);
-    auto lines = wrap(text);
-    const auto capacity = static_cast<std::size_t>(std::max(1.0f, ((fraction ? bar_top : button_top) - 2 * margin) / line_height));
+    const bool illustrated = fraction.has_value() && artwork_ != nullptr;
+    const float card_width = illustrated ? width_ * 0.48f : width_;
+    const float card_left = (width_ - card_width) / 2.0f;
+    const float text_left = card_left + margin;
+    const float text_top = illustrated ? 4.0f * margin : margin;
+    if (illustrated && drawn) {
+        constexpr float aspect = 16.0f / 9.0f;
+        const float image_width = std::min(width_, height_ * aspect);
+        const float image_height = image_width / aspect;
+        const SDL_FRect image{(width_ - image_width) / 2.0f, (height_ - image_height) / 2.0f,
+                             image_width, image_height};
+        const SDL_FRect card{card_left, 3.0f * margin, card_width, height_ - 3.0f * margin - 4.0f};
+        constexpr std::string_view title = "POLISH LITTLE FIGHTERS";
+        const float title_x = (width_ - static_cast<float>(title.size()) * glyph) / 2.0f;
+        drawn = SDL_RenderTexture(renderer, artwork_.get(), nullptr, &image)
+            && SDL_SetRenderDrawColor(renderer, 12, 22, 54, 255) && SDL_RenderFillRect(renderer, &card)
+            && SDL_SetRenderDrawColor(renderer, 105, 137, 219, 255) && SDL_RenderRect(renderer, &card)
+            && SDL_SetRenderDrawColor(renderer, 12, 22, 54, 255)
+            && SDL_RenderDebugText(renderer, title_x + 1.0f, 2.0f * margin - 3.0f, title.data())
+            && SDL_SetRenderDrawColor(renderer, 255, 201, 130, 255)
+            && SDL_RenderDebugText(renderer, title_x, 2.0f * margin - 4.0f, title.data());
+    }
+    auto lines = wrap(text, card_width - 2 * margin);
+    const auto capacity = static_cast<std::size_t>(std::max(
+        1.0f, ((fraction ? bar_top : button_top) - margin - text_top) / line_height));
     if (lines.size() > capacity) {
         lines.resize(capacity);
         lines.back() = "...";
     }
     drawn = drawn && SDL_SetRenderDrawColor(renderer, 230, 230, 230, 255);
     for (std::size_t line = 0; line < lines.size(); ++line) {
-        drawn = drawn && SDL_RenderDebugText(renderer, margin, margin + static_cast<float>(line) * line_height, lines[line].c_str());
+        drawn = drawn && SDL_RenderDebugText(renderer, text_left, text_top + static_cast<float>(line) * line_height, lines[line].c_str());
     }
     if (fraction) {
-        const SDL_FRect outline{margin, bar_top, width_ - 2 * margin, bar_height};
+        const SDL_FRect outline{text_left, bar_top, card_width - 2 * margin, bar_height};
         const SDL_FRect filled{outline.x + 2, outline.y + 2, static_cast<float>((outline.w - 4) * *fraction), outline.h - 4};
         drawn = drawn && SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255) && SDL_RenderRect(renderer, &outline)
             && SDL_SetRenderDrawColor(renderer, 80, 140, 220, 255) && SDL_RenderFillRect(renderer, &filled);

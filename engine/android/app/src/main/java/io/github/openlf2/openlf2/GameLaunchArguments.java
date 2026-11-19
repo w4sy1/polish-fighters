@@ -9,6 +9,9 @@ import org.json.JSONException;
 /** Explicit paths let Android find every installed standalone package and the Lua hub. */
 final class GameLaunchArguments {
     static String[] lan(File files, boolean host, String address, int port) throws IOException, JSONException {
+        return lan(files, host, address, port, null);
+    }
+    static String[] lan(File files, boolean host, String address, int port, File scripts) throws IOException, JSONException {
         if (port < 1 || port > 65535) throw new IllegalArgumentException("Port: 1–65535.");
         if (!host) {
             String[] parts = address.split("\\.", -1);
@@ -20,18 +23,21 @@ final class GameLaunchArguments {
             if (address.startsWith("127.") || address.equals("0.0.0.0"))
                 throw new IllegalArgumentException("Podaj adres drugiego urządzenia, nie localhost.");
         }
-        List<String> args = new ArrayList<>(java.util.Arrays.asList(build(files, null, 0)));
+        List<String> args = new ArrayList<>(java.util.Arrays.asList(build(files, null, 0, scripts)));
         args.add("--room"); args.add(host ? "--host" : "--join"); args.add(host ? "0.0.0.0" : address);
         args.add("--port"); args.add(Integer.toString(port));
         return args.toArray(new String[0]);
     }
     static String[] build(File files, String role, int port) throws IOException, JSONException {
+        return build(files, role, port, null);
+    }
+    static String[] build(File files, String role, int port, File scripts) throws IOException, JSONException {
         File game = new File(files, "game");
         if (!new File(game, ".ready").isFile()) return new String[] {files.getAbsolutePath()};
         List<String> args = new ArrayList<>();
         args.add(game.getAbsolutePath());
         add(args, "--installer", new File(game, "LF2_v2.0a.exe"));
-        add(args, "--scripts", new File(game, "scripts"));
+        add(args, "--scripts", scripts == null ? new File(game, "scripts") : scripts);
         add(args, "--config-dir", new File(files, "settings"));
         GamePackSettings settings = new GamePackSettings(files);
         String mode = settings.mode();
