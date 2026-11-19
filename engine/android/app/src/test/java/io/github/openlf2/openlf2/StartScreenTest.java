@@ -31,7 +31,11 @@ public class StartScreenTest {
    BluetoothLobbyActivity activity=controller.get();View root=activity.findViewById(R.id.pf_screen);render(root,"home");
    Button play=activity.findViewById(R.id.pf_play);assertTrue(play.getWidth()>=200);assertTrue(play.getHeight()>=24);
    assertEquals(View.GONE,activity.findViewById(R.id.pf_cancel).getVisibility());
-   assertEquals("MODUŁY",((Button)activity.findViewById(R.id.pf_module)).getText().toString());
+   Button modules=activity.findViewById(R.id.pf_module);
+   assertEquals("MODUŁY",modules.getText().toString());
+   android.view.ViewGroup menu=(android.view.ViewGroup)modules.getParent();
+   assertEquals(0,menu.indexOfChild(modules));
+   assertEquals(1,menu.indexOfChild(play));
    assertTrue(((TextView)activity.findViewById(R.id.pf_status)).getText().toString().startsWith("AKTYWNY MODUŁ:"));
    play.performClick();assertEquals("battle",new MobileCodeSettings(activity.getFilesDir()).read().getString("little_fighters_start_menu"));Intent next=Shadows.shadowOf(activity).getNextStartedActivity();assertTrue(next.getComponent().getClassName().endsWith("OpenLF2Activity"));
   }
@@ -45,14 +49,14 @@ public class StartScreenTest {
  @Test public void languageChangesImmediatelyAndPersistsAcrossActivities() throws Exception {
   try(ActivityController<BluetoothLobbyActivity> c=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
    BluetoothLobbyActivity a=c.get();a.findViewById(R.id.pf_en).performClick();
-   assertEquals("BATTLE",((Button)a.findViewById(R.id.pf_play)).getText().toString());
+   assertEquals("PLAY",((Button)a.findViewById(R.id.pf_play)).getText().toString());
    assertEquals("english",new MobileCodeSettings(a.getFilesDir()).read().getJSONObject("options").getString("language"));
    assertEquals("Loading game data",ClassicMenuData.localized(a).getString(R.string.pf_loading_title));
    render(a.findViewById(R.id.pf_screen),"home-en");
   }
   try(ActivityController<BluetoothLobbyActivity> c=Robolectric.buildActivity(BluetoothLobbyActivity.class).setup()){
    BluetoothLobbyActivity a=c.get();assertEquals("MODULES",((Button)a.findViewById(R.id.pf_module)).getText().toString());
-   a.findViewById(R.id.pf_pl).performClick();assertEquals("BITWA",((Button)a.findViewById(R.id.pf_play)).getText().toString());
+   a.findViewById(R.id.pf_pl).performClick();assertEquals("GRAJ",((Button)a.findViewById(R.id.pf_play)).getText().toString());
   }
  }
  @Test public void allSevenActionsFitSmallLandscapeAndPortrait() throws Exception {
