@@ -8,6 +8,13 @@ local function ipv4(value)
  return true
 end
 client.ipv4=ipv4
+-- Players see and type the project page; its API lives in the page's /api folder.
+local project_page='https://www.projektocalenie.pl/projekty/polish-fighters'
+function client.api_endpoint(endpoint)
+ local trimmed=tostring(endpoint or ''):gsub('/+$','')
+ if trimmed==project_page or trimmed==project_page:gsub('://www%.','://') then return trimmed..'/api' end
+ return endpoint
+end
 function client.request(endpoint,operation,payload,purpose)
  if client.pending then return nil,'Poczekaj na poprzednie żądanie.' end
  if client.token and endpoint~=client.origin then return nil,'Wyloguj się przed zmianą serwera.' end
@@ -15,7 +22,7 @@ function client.request(endpoint,operation,payload,purpose)
  local body,problem
  if not payload or next(payload)==nil then body='{}' else body,problem=engine.json_encode(payload) end
  if not body then return nil,problem end
- local ok;ok,problem=engine.account('start',endpoint,operation,body,client.token or '')
+ local ok;ok,problem=engine.account('start',client.api_endpoint(endpoint),operation,body,client.token or '')
  if not ok then return nil,problem end
  client.pending={operation=operation,endpoint=endpoint,purpose=purpose}
  client.notice='Łączenie z serwerem…'

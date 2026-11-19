@@ -89,6 +89,40 @@ class RelayRoomsTest(unittest.TestCase):
             server.shutdown()
             server.server_close()
 
+    def test_passenger_status_page_for_browsers(self):
+        import io
+        import os
+        import tempfile
+        sys.path.insert(0, str(ROOT / 'tools'))
+        folder = tempfile.mkdtemp()
+        os.environ['POLISH_FIGHTERS_DATABASE'] = str(Path(folder) / 'accounts.sqlite')
+        try:
+            spec = importlib.util.spec_from_file_location('passenger_entry', ROOT / 'server/passenger_wsgi.py')
+            entry = importlib.util.module_from_spec(spec)
+            sys.modules['account_service'] = accounts
+            spec.loader.exec_module(entry)
+            app = entry.AccountApplication(':memory:', RELAY)
+            app.service.request('register', {'name': 'Visible', 'password': 'long password 123'})
+            seen = {}
+            def start(status, headers):
+                seen['status'], seen['headers'] = status, dict(headers)
+            for path in ('/projekty/polish-fighters/api/', '/projekty/polish-fighters/api', '/projekty/polish-fighters/api/status'):
+                body = b''.join(app({'PATH_INFO': path, 'REQUEST_METHOD': 'GET', 'wsgi.input': io.BytesIO()}, start)).decode()
+                self.assertTrue(seen['status'].startswith('200'), path)
+                self.assertIn('text/html', seen['headers']['Content-Type'])
+                self.assertIn('działa', body)
+                self.assertIn('podłączony', body)
+                self.assertNotIn('Visible', body)
+                self.assertNotIn(KEY, body)
+                self.assertNotIn('203.0.113.10', body)
+            body = b''.join(app({'PATH_INFO': '/projekty/polish-fighters/api/v1/list-rooms', 'REQUEST_METHOD': 'GET',
+                                 'wsgi.input': io.BytesIO()}, start))
+            self.assertTrue(seen['status'].startswith('405'))
+            app.service.db.close()
+            entry.application.service.db.close()
+        finally:
+            os.environ.pop('POLISH_FIGHTERS_DATABASE', None)
+
     def test_passenger_entry_reads_relay_config(self):
         source = (ROOT / 'server/passenger_wsgi.py').read_text(encoding='utf-8')
         self.assertIn('relay_settings()', source)
