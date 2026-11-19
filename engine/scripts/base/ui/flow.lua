@@ -327,9 +327,9 @@ function flow.draw(state, context)
     if status then font.gdi(context, i18n.clip(status, 128), 3, 0x213, recording.status_color())
     elseif state.volume_text then font.gdi(context, state.volume_text, 3, 0x213, 0x00ff00) end
     -- Show FPS (OpenLF2 extension): centered on the statusbar line so it never overlaps the
-    -- left-aligned text. Polish Fighters' character selection fills that line with the key hint,
-    -- so the counter stays off it there.
-    if shown_options.show_fps and state.fps and not context.pf_selection_hint then
+    -- left-aligned text. Polish Fighters fills that line with its key hint (menus, character
+    -- selection), so the counter stays off it there.
+    if shown_options.show_fps and state.fps and not context.pf_selection_hint and not context.pf_status_line then
         local fps_text = "FPS: " .. state.fps
         font.gdi(context, fps_text, math.floor((constants.screen.width - font.gdi_width(fps_text)) / 2), 0x213)
     end

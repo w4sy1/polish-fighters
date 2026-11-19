@@ -169,6 +169,7 @@ return function(base)
   -- launch menu. Keep the artwork bright; the old blue wash and modern cards
   -- obscured the original interface.
   context.viewport(794,550,16,32,108)
+  context.pf_status_line=true -- the navigation hint at the bottom; the FPS counter stays off it
   context.image('pe/menu_back'..(state.background or 0),0,0,true)
   context.sprite('pe/menu_clip',{0,41,434,80},155,96,true)
   context.sprite('pe/menu_clip',{434,41,62,68},589,96,true)
