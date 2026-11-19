@@ -52,10 +52,11 @@ Result<std::vector<RoomTick>> Room::submit(int slot,std::uint64_t frame,std::str
 Result<void> Room::checksum(int slot,std::uint64_t frame,std::string value) {
     if(phase_!=RoomPhase::playing || !peers_.contains(slot) || frame>=frame_ || !digest(value))
         return fail(ErrorCode::format,"invalid checksum report");
+    if(verified_ && frame<=*verified_ && !checksums_.contains(frame))return fail(ErrorCode::format,"duplicate checksum report");
     auto& reports=checksums_[frame];
     if(!reports.empty() && reports.begin()->second!=value){phase_=RoomPhase::aborted;return fail(ErrorCode::format,"simulation desynchronized");}
     if(!reports.emplace(slot,std::move(value)).second)return fail(ErrorCode::format,"duplicate checksum report");
-    if(reports.size()==peers_.size())checksums_.erase(frame);
+    if(reports.size()==peers_.size()){checksums_.erase(frame);if(!verified_ || frame>*verified_)verified_=frame;}
     else if(checksums_.size()>pending_checksum_limit){phase_=RoomPhase::aborted;return fail(ErrorCode::limit,"too many pending checksums");}
     return {};
 }

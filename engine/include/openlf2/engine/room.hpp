@@ -41,5 +41,6 @@ private:
     std::map<int,RoomPeer> peers_;
     std::map<std::uint64_t,std::map<int,std::string>> inputs_,checksums_;
     std::uint64_t frame_=0;
+    std::optional<std::uint64_t> verified_; // newest frame whose checksums all agreed
 };
 }
