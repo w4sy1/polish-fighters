@@ -39,13 +39,13 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
         char* text=nullptr;std::string result;
         if(curl_url_get(url.get(),component,&text,0)==CURLUE_OK){result=text;curl_free(text);}return result;
     };
-    const auto scheme=part(CURLUPART_SCHEME),host=part(CURLUPART_HOST),path=part(CURLUPART_PATH);
+    const auto scheme=part(CURLUPART_SCHEME),host=part(CURLUPART_HOST);
     const bool local=host=="127.0.0.1" || host=="localhost" || host=="[::1]";
     if((scheme!="https" && !(scheme=="http" && local)) ||
        !part(CURLUPART_USER).empty() || !part(CURLUPART_PASSWORD).empty() ||
-       !part(CURLUPART_QUERY).empty() || !part(CURLUPART_FRAGMENT).empty() || (path!="/" && !path.empty()))
-        return fail(ErrorCode::format,"Use HTTPS server origin; HTTP is allowed only on localhost");
-    std::string endpoint=address;
+       address.find_first_of("?#")!=std::string::npos)
+        return fail(ErrorCode::format,"Use an HTTPS server URL without credentials, query or fragment; HTTP is allowed only on localhost");
+    std::string endpoint=part(CURLUPART_URL);
     while(endpoint.ends_with('/'))endpoint.pop_back();
     endpoint+="/v1/";endpoint+=operation;
     std::unique_ptr<CURL,decltype(&curl_easy_cleanup)> handle(curl_easy_init(),curl_easy_cleanup);
