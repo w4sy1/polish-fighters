@@ -5,6 +5,9 @@ return function(base)
   client.tick()
   local result=update(state,...)
   local session=state.network and state.network.session
+  if session and session.host and (session.phase=='lobby' or session.phase=='greeting' or session.phase=='connecting') then
+   client.maintain_relay(session)
+  end
   if client.host_started and client.room and not client.pending and session and
     (session.phase=='idle' or session.phase=='failed') then
    client.host_started=false

@@ -40,6 +40,14 @@ try {
     & python (Join-Path $projectRoot 'tests/test_room_tcp.py') --runner (Join-Path $build 'room-host-runner.exe') --output (Join-Path $report 'tcp-results.json') 2>&1 |
         Tee-Object -FilePath (Join-Path $report 'tcp-test.log')
     if ($LASTEXITCODE -ne 0) { throw 'Loopback TCP tests failed.' }
+    $sources = @('tests/relay_link_runner.cpp', 'engine/src/engine/relay_link.cpp', 'engine/src/engine/room_host.cpp', 'engine/src/engine/room.cpp', 'engine/src/core/json.cpp', 'engine/src/adapters/network/transport.cpp') |
+        ForEach-Object { Join-Path $projectRoot $_ }
+    & cl @flags @sources /Fe:relay-link-runner.exe /link ws2_32.lib 2>&1 |
+        Tee-Object -FilePath (Join-Path $report 'relay-link-build.log')
+    if ($LASTEXITCODE -ne 0) { throw 'Relay link compilation failed.' }
+    & python (Join-Path $projectRoot 'tests/test_relay_link.py') --runner (Join-Path $build 'relay-link-runner.exe') 2>&1 |
+        Tee-Object -FilePath (Join-Path $report 'relay-link-test.log')
+    if ($LASTEXITCODE -ne 0) { throw 'Relay link test failed.' }
 } finally {
     Pop-Location
 }

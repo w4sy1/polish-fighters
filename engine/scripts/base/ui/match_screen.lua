@@ -102,14 +102,18 @@ function screen.update(state, held, context)
     if attack then
         state.attack_preview = attack
         local master = require("base/game/music").master
-        if master > 0 then context.sound("mods/base/attack-pl.wav", math.floor((master - 100) * 38), 0) end
+        local curve = constants.music_volume
+        if master > 0 then context.sound("mods/base/attack-pl.wav", master * curve.gain - curve.offset, 0) end
     elseif state.attack_preview and current.last_snapshot and result ~= "paused" then
         local previous = state.attack_preview
         state.attack_preview = nil
         for _, entry in ipairs(current.last_snapshot.items) do
             if entry.index == current.attack_preview_slot and entry.record == previous.record then
                 if entry.frame == previous.frame or entry.frame == math.abs(previous.record.frame(previous.frame).next) then
-                    state.attack_preview = entry
+                    -- Snapshot entries live in two reused buffers (also rewritten while
+                    -- paused), so keep only the fields the preview draws.
+                    state.attack_preview = {record = entry.record, frame = entry.frame,
+                        pic_offset = entry.pic_offset, facing = entry.facing}
                 end
                 break
             end

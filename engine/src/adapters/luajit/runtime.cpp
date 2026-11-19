@@ -4,6 +4,7 @@
 #include "openlf2/ports/scripts.hpp"
 #include "openlf2/core/json.hpp"
 #include "openlf2/engine/room_host.hpp"
+#include "openlf2/engine/relay_link.hpp"
 #include "openlf2/ports/digest.hpp"
 #include "openlf2/ports/download.hpp"
 #include "openlf2/core/files.hpp"
@@ -64,6 +65,18 @@ struct ResourceBridge {
     ScriptRecordings& recordings;
     NetworkTransport& network;
     std::unique_ptr<RoomHost> room_host;
+    // Internet rooms: the joining device talks through a relay channel; the host splices
+    // relay channels to its local RoomHost. LAN sessions keep using `network` directly.
+    std::unique_ptr<NetworkTransport> relay_client;
+    RelayHostBridge relay_bridge;
+    NetworkTransport& active_network() noexcept { return relay_client ? *relay_client : network; }
+    static bool split_relay(std::string_view value, std::string_view& address, std::string& ticket) {
+        const auto separator = value.find(':');
+        if (separator == std::string_view::npos || separator == 0) return false;
+        address = value.substr(0, separator);
+        ticket = std::string(value.substr(separator + 1));
+        return valid_relay_ticket(ticket);
+    }
     std::optional<Result<std::string>> pending_network;
     std::future<Result<std::string>> account_future;
     std::optional<Result<std::string>> account_result;
@@ -74,7 +87,37 @@ struct ResourceBridge {
             pending_network = std::string{};
             if (operation == "profile") {
                 pending_network = data.network_profile();
+            } else if (operation == "relay_join") {
+                // numeric relay IPv4:single-use ticket from the account server's relay-ticket.
+                std::string_view address; std::string ticket;
+                network.close(); relay_client.reset(); relay_bridge.close(); room_host.reset();
+                if (!split_relay(value, address, ticket)) pending_network = fail(ErrorCode::format, "invalid relay address or ticket");
+                else {
+                    auto socket = make_network_transport();
+                    if (!socket) pending_network = std::unexpected(socket.error());
+                    else {
+                        auto relay = make_relay_transport(std::move(*socket), std::move(ticket));
+                        if (!relay) pending_network = std::unexpected(relay.error());
+                        else {
+                            auto connected = (*relay)->connect(address, port);
+                            if (!connected) pending_network = std::unexpected(connected.error());
+                            else relay_client = std::move(*relay);
+                        }
+                    }
+                }
+            } else if (operation == "relay_offer") {
+                std::string_view address; std::string ticket;
+                if (!room_host) pending_network = fail(ErrorCode::format, "relay channels need a running room host");
+                else if (!split_relay(value, address, ticket)) pending_network = fail(ErrorCode::format, "invalid relay address or ticket");
+                else {
+                    auto offered = relay_bridge.offer(address, port, std::move(ticket));
+                    if (!offered) pending_network = std::unexpected(offered.error());
+                }
+            } else if (operation == "relay_status") {
+                pending_network = std::to_string(relay_bridge.waiting()) + ":" + std::to_string(relay_bridge.active()) +
+                    ":" + relay_bridge.last_error().substr(0, 160);
             } else if (operation == "room_host") {
+                relay_client.reset(); relay_bridge.close();
                 // capacity:64-byte profile:numeric IPv4; validated again by RoomHost.
                 const auto separator = value.find(':');
                 if (separator == std::string_view::npos || separator != 1 || value.size() < 69 || value[66] != ':') {
@@ -94,27 +137,33 @@ struct ResourceBridge {
                     }
                 }
             } else if (operation == "host" || operation == "join") {
+                relay_client.reset(); relay_bridge.close();
                 auto started = operation == "host" ? network.listen(value, port) : network.connect(value, port);
                 if (!started) pending_network = std::unexpected(started.error());
             } else if (operation == "send") {
-                auto sent = network.send(std::span<const char>(value.data(), value.size()));
+                auto sent = active_network().send(std::span<const char>(value.data(), value.size()));
                 if (!sent) pending_network = std::unexpected(sent.error());
             } else if (operation == "poll") {
                 if (room_host) {
                     auto progressed = room_host->poll();
                     if (!progressed) { pending_network = std::unexpected(progressed.error()); return true; }
+                    relay_bridge.poll(room_host->port());
                 }
-                auto received = network.poll();
+                auto received = active_network().poll();
                 if (received) pending_network = std::string(received->begin(), received->end());
                 else pending_network = std::unexpected(received.error());
             } else if (operation == "status") {
-                switch (network.status()) {
+                switch (active_network().status()) {
                 case NetworkStatus::idle: pending_network = "idle"; break;
                 case NetworkStatus::listening: pending_network = "listening"; break;
                 case NetworkStatus::connecting: pending_network = "connecting"; break;
                 case NetworkStatus::connected: pending_network = "connected"; break;
                 }
-            } else if (operation == "close") { network.close(); room_host.reset(); }
+            } else if (operation == "close") {
+                network.close(); relay_bridge.close(); room_host.reset();
+                if (relay_client) relay_client->close();
+                relay_client.reset();
+            }
             else pending_network = fail(ErrorCode::script, "Unknown network operation");
             return true;
         } catch (...) { pending_network.reset(); return false; }

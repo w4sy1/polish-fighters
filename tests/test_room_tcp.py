@@ -26,44 +26,42 @@ def run(runner,count):
  try:
   line=process.stdout.readline();assert line.startswith('LISTEN '),line+process.stderr.read()
   port=int(line.rsplit(':',1)[1])
-  bad=Client(port);extra.append(bad);bad.send(op='hello',protocol=1,profile='b'*64,name='wrong');assert 'mismatch' in bad.until('error')['reason']
+  bad=Client(port);extra.append(bad);bad.send(op='hello',protocol=2,profile='b'*64,name='wrong');assert 'mismatch' in bad.until('error')['reason']
   malformed=Client(port);extra.append(malformed);malformed.socket.sendall(b'not-json\n');assert 'JSON' in malformed.until('error')['reason']
   oversize=Client(port);extra.append(oversize);oversize.socket.sendall(b'x'*4100+b'\n');assert 'exceed' in oversize.until('error')['reason']
   # Fragment the first greeting across TCP writes; the host must not treat reads as messages.
-  first=Client(port);clients.append(first);hello=json.dumps({'op':'hello','protocol':1,'profile':PROFILE,'name':'player0'}).encode()+b'\n'
+  first=Client(port);clients.append(first);hello=json.dumps({'op':'hello','protocol':2,'profile':PROFILE,'name':'player0'}).encode()+b'\n'
   for start in range(0,len(hello),7):
    first.socket.sendall(hello[start:start+7]);time.sleep(0.002)
   assert first.until('welcome')['slot']==0
   first.send(op='start');assert 'two devices' in first.until('error')['reason']
   for index in range(1,count):
-   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=1,profile=PROFILE,name=('Player \"Two\" \\ name' if index==1 else 'player'+str(index)));assert peer.until('welcome')['slot']==index
-  ninth=Client(port);extra.append(ninth);ninth.send(op='hello',protocol=1,profile=PROFILE,name='extra');assert 'full' in ninth.until('error')['reason']
+   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=2,profile=PROFILE,name=('Player \"Two\" \\ name' if index==1 else 'player'+str(index)));assert peer.until('welcome')['slot']==index
+  ninth=Client(port);extra.append(ninth);ninth.send(op='hello',protocol=2,profile=PROFILE,name='extra');assert 'full' in ninth.until('error')['reason']
   for client in clients:client.send(op='ready',value=True)
   snapshot=first.until('lobby',lambda m:len(m['peers'])==count and all(p['ready'] for p in m['peers']))
   assert snapshot['peers'][1]['name']=='Player \"Two\" \\ name'
-  first.send(op='start')
-  for client in clients:assert client.until('start')['seed']==42
+  first.send(op='start',delay=4)
+  for client in clients:
+   start=client.until('start');assert start['seed']==42 and start['delay']==4 and start['checksum_interval']==30,start
   expected=['rc' if i%2 else 'l' for i in range(count)]+['']*(8-count)
-  first_queued=False
+  # Input delay: the host runs 4 frames ahead before anyone else sends anything.
+  for frame in range(4):first.send(op='input',frame=frame,keys=expected[0],functions='15' if frame%2 else '',unlock=3 if frame%2 else 0)
   for frame in range(30):
-   for index in reversed(range(count)):
-    if index!=0 or not first_queued:clients[index].send(op='input',frame=frame,keys=expected[index],slot=7-index,functions='15' if index==0 else '',unlock=3 if index==0 else 0)
-   first_queued=False
+   if frame+4<30:first.send(op='input',frame=frame+4,keys=expected[0],functions='15' if (frame+4)%2 else '',unlock=3 if (frame+4)%2 else 0)
+   for index in reversed(range(1,count)):clients[index].send(op='input',frame=frame,keys=expected[index],slot=7-index)
    for client in clients:
-    tick=client.until('frame');assert tick['frame']==frame and tick['inputs']==expected and tick['functions']=='15' and tick['unlock']==3,tick
-   for index,client in enumerate(clients):
-    client.send(op='checksum',frame=frame,state='c'*64)
-    if index==0 and frame<29:
-     client.send(op='input',frame=frame+1,keys=expected[0],functions='15',unlock=3)
-     first_queued=True;time.sleep(0.003)
-   for client in clients:assert client.until('checked')['frame']==frame
+    tick=client.until('frame');assert tick['frame']==frame and tick['inputs']==expected,tick
+    assert (tick['functions'],tick['unlock'])==(('15',3) if frame%2 else ('',0)),tick
+   if frame%30==0:
+    for client in clients:client.send(op='checksum',frame=frame,state='c'*64)
   # Divergent state must stop the room; it cannot be accepted silently.
   for index,client in enumerate(clients):client.send(op='input',frame=30,keys=expected[index],slot=7-index)
-  for client in clients:client.until('frame')
+  for client in clients:client.until('frame',lambda m:m['frame']==30)
   first.send(op='checksum',frame=30,state='c'*64)
   clients[1].send(op='checksum',frame=30,state='d'*64)
   assert first.until('abort')['reason']
-  return {'devices_as_tcp_clients':count,'frames':30,'fragmented_greeting':True,'full_room_rejected':True,'wrong_profile_rejected':True,'malformed_rejected':True,'oversize_rejected':True,'desync_aborted':True}
+  return {'devices_as_tcp_clients':count,'frames':30,'input_delay':4,'fragmented_greeting':True,'full_room_rejected':True,'wrong_profile_rejected':True,'malformed_rejected':True,'oversize_rejected':True,'desync_aborted':True}
  finally:
   for client in clients+extra:
    try:client.close()
@@ -71,23 +69,26 @@ def run(runner,count):
   process.terminate()
   try:process.wait(timeout=3)
   except subprocess.TimeoutExpired:process.kill();process.wait()
-def interruption_case(runner,timeout=False,unauthorized=False,queued=None):
+def interruption_case(runner,timeout=False,unauthorized=False,queued=None,old_protocol=False):
  process=subprocess.Popen([str(Path(runner).resolve()),'2','150' if timeout else '5000'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
  clients=[]
  try:
   line=process.stdout.readline();assert line.startswith('LISTEN ');port=int(line.rsplit(':',1)[1])
+  if old_protocol:
+   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=1,profile=PROFILE,name='old')
+   assert 'version mismatch' in peer.until('error')['reason']
+   return {'test':'old_protocol_rejected','passed':True}
   for slot in range(2):
-   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=1,profile=PROFILE,name='peer'+str(slot));peer.until('welcome');peer.send(op='ready',value=True)
+   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=2,profile=PROFILE,name='peer'+str(slot));peer.until('welcome');peer.send(op='ready',value=True)
   clients[0].until('lobby',lambda v:len(v['peers'])==2 and all(p['ready'] for p in v['peers']))
   clients[0].send(op='start')
   for peer in clients:peer.until('start')
   if queued:
    for peer in clients:peer.send(op='input',frame=0,keys='')
    for peer in clients:peer.until('frame')
-   clients[0].send(op='checksum',frame=0,state='c'*64)
-   clients[0].send(op='input',frame=2 if queued=='order' else 1,keys='r')
-   if queued=='duplicate':clients[0].send(op='input',frame=1,keys='r')
-   assert ('out-of-order' if queued=='order' else 'duplicate queued') in clients[0].until('error')['reason']
+   if queued=='order':clients[0].send(op='input',frame=1+32,keys='r')
+   else:clients[0].send(op='input',frame=1,keys='r');clients[0].send(op='input',frame=1,keys='r')
+   assert ('out-of-order' if queued=='order' else 'duplicate input') in clients[0].until('error')['reason']
   elif unauthorized:
    clients[1].send(op='input',frame=0,keys='',functions='1')
    assert 'only the host' in clients[1].until('error')['reason']
@@ -118,7 +119,7 @@ def main():
  p=argparse.ArgumentParser();p.add_argument('--runner',required=True);p.add_argument('--output',type=Path,default=ROOT/'validation/network/tcp-results.json');a=p.parse_args();results=[]
  for count in range(2,9):
   results.append(run(a.runner,count));print('PASS:',count,'separate TCP clients, 30 synchronized frames')
- interruptions=[interruption_case(a.runner),interruption_case(a.runner,timeout=True),interruption_case(a.runner,unauthorized=True),interruption_case(a.runner,queued='duplicate'),interruption_case(a.runner,queued='order')]
+ interruptions=[interruption_case(a.runner),interruption_case(a.runner,timeout=True),interruption_case(a.runner,unauthorized=True),interruption_case(a.runner,queued='duplicate'),interruption_case(a.runner,queued='order'),interruption_case(a.runner,old_protocol=True)]
  print('PASS: disconnect and stalled-peer timeout abort')
  a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps({'scope':'real OS loopback sockets on one '+platform.system()+' machine; not a physical-device/gameplay test','results':results,'interruptions':interruptions},indent=2)+'\n')
 if __name__=='__main__':main()

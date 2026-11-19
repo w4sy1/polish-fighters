@@ -29,7 +29,8 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
        bearer.find_first_of("\r\n")!=std::string_view::npos)
         return fail(ErrorCode::limit,"Account request exceeds limit");
     if(operation!="login" && operation!="register" && operation!="logout" &&
-       operation!="list-rooms" && operation!="publish-room" && operation!="delete-room" && operation!="heartbeat-room")
+       operation!="list-rooms" && operation!="publish-room" && operation!="delete-room" && operation!="heartbeat-room" &&
+       operation!="relay-ticket")
         return fail(ErrorCode::format,"Unknown account operation");
     const auto address=std::string(base);
     std::unique_ptr<CURLU,decltype(&curl_url_cleanup)> url(curl_url(),curl_url_cleanup);
@@ -51,6 +52,8 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
     std::unique_ptr<CURL,decltype(&curl_easy_cleanup)> handle(curl_easy_init(),curl_easy_cleanup);
     if(!handle)return fail(ErrorCode::dependency,"Account HTTP unavailable");
     curl_slist* raw_headers=curl_slist_append(nullptr,"Content-Type: application/json");
+    // Shared hosting may answer HTML clients with a browser verification page; ask for JSON.
+    if(raw_headers){auto* accepted=curl_slist_append(raw_headers,"Accept: application/json");if(accepted)raw_headers=accepted;}
     const auto authorization="Authorization: Bearer "+std::string(bearer);
     if(!bearer.empty()){
         auto* appended=curl_slist_append(raw_headers,authorization.c_str());

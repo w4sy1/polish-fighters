@@ -148,3 +148,69 @@ class RelayHandler(socketserver.BaseRequestHandler):
                 # Always release join thread even if handshake send failed.
                 if waiter.get('socket') is connection:
                     waiter['done'].set()
+
+
+class RemoteTickets:
+    """Ticket check for a relay running on another machine than the account API.
+
+    The API (e.g. on shared WordPress hosting) issues tickets; this relay consumes each one
+    exactly once through POST <api>/v1/consume-relay-ticket with the shared relay key.
+    """
+
+    def __init__(self, api, key, timeout=10):
+        import urllib.parse
+        parts = urllib.parse.urlsplit(api)
+        if parts.scheme != 'https' and parts.hostname not in ('127.0.0.1', 'localhost'):
+            raise ValueError('Account API must use HTTPS')
+        self.endpoint = api.rstrip('/') + '/v1/consume-relay-ticket'
+        self.key = key
+        self.timeout = timeout
+
+    def consume_relay_ticket(self, ticket):
+        import ssl
+        import urllib.error
+        import urllib.request
+        if not isinstance(ticket, str) or not 16 <= len(ticket) <= 128:
+            raise PermissionError('Invalid relay ticket')
+        body = json.dumps({'ticket': ticket, 'key': self.key}).encode()
+        request = urllib.request.Request(self.endpoint, data=body, method='POST',
+                                         headers={'Content-Type': 'application/json', 'Accept': 'application/json',
+                                                  'User-Agent': 'pf-room-relay'})
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout, context=ssl.create_default_context()) as response:
+                value = json.loads(response.read(4096))
+        except urllib.error.HTTPError as error:
+            raise PermissionError('Ticket rejected (HTTP %d)' % error.code) from None
+        except (OSError, ValueError):
+            raise PermissionError('Account API unavailable') from None
+        room, role, capacity = value.get('room'), value.get('role'), value.get('capacity')
+        if not isinstance(room, str) or role not in ('host', 'join') or type(capacity) is not int or not 2 <= capacity <= 8:
+            raise PermissionError('Invalid ticket response')
+        return room, role, capacity
+
+
+def main(argv=None):
+    import argparse
+    parser = argparse.ArgumentParser(description='Standalone Polish Fighters match relay.')
+    parser.add_argument('--api', required=True, help='Account API base URL, e.g. https://example.org/api')
+    parser.add_argument('--key-file', required=True, help='File holding the shared relay key (same as on the API)')
+    parser.add_argument('--bind', default='0.0.0.0')
+    parser.add_argument('--port', type=int, default=8766)
+    args = parser.parse_args(argv)
+    with open(args.key_file, encoding='utf-8') as handle:
+        key = handle.read().strip()
+    if len(key) < 32:
+        raise SystemExit('Relay key must have at least 32 characters')
+    server = RelayServer((args.bind, args.port), RemoteTickets(args.api, key))
+    print('Relay listening on %s:%d, tickets via %s' % (args.bind, args.port, args.api), flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

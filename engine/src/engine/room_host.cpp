@@ -5,10 +5,12 @@
 #include <algorithm>
 #include <chrono>
 #include <limits>
+#include <map>
 #include <utility>
 namespace openlf2 {
 namespace {
 using Clock=std::chrono::steady_clock;
+constexpr std::int32_t protocol_version=2,max_input_delay=15,checksum_interval=30;
 ScriptValue object(ScriptTable table){return ScriptValue{std::move(table)};}
 const ScriptValue* field(const ScriptValue& value,std::string_view key){
  const auto* fields=std::get_if<ScriptTable>(&value.value);if(!fields)return nullptr;
@@ -24,7 +26,6 @@ struct RoomHost::Impl {
   std::unique_ptr<NetworkTransport> socket;
   std::optional<int> slot;
   std::string input;
-  std::optional<ScriptValue> queued_input;
   Clock::time_point last=Clock::now(),close_at{};
   bool closing=false,dead=false;
  };
@@ -32,8 +33,8 @@ struct RoomHost::Impl {
  std::unique_ptr<NetworkTransport> listener;
  std::vector<Peer> peers;
  std::int32_t seed;
- std::string functions;
- std::int32_t unlock=0;
+ // Host-only global commands travel with the host's input for the same frame.
+ std::map<std::uint64_t,std::pair<std::string,std::int32_t>> globals;
  std::chrono::milliseconds timeout;
  Impl(Room value,std::int32_t random_seed,std::chrono::milliseconds idle):room(std::move(value)),seed(random_seed),timeout(idle){}
  bool send(Peer& peer,const ScriptValue& message){
@@ -71,7 +72,8 @@ struct RoomHost::Impl {
   const auto* op=text(value,"op");if(!op){reject(peer,"missing operation");return;}
   if(!peer.slot){
    const auto* version=number(value,"protocol");const auto* profile=text(value,"profile");const auto* name=text(value,"name");
-   if(*op!="hello" || !version || *version!=1 || !profile || !name){reject(peer,"invalid protocol greeting");return;}
+   if(*op!="hello" || !version || !profile || !name){reject(peer,"invalid protocol greeting");return;}
+   if(*version!=protocol_version){reject(peer,"network protocol version mismatch; update the game on every device");return;}
    auto joined=room.join(*profile,*name);if(!joined){reject(peer,joined.error().message);return;}
    peer.slot=*joined;
    send(peer,object({{"op",ScriptValue{std::string("welcome")}},{"slot",ScriptValue{static_cast<std::int32_t>(*joined)}},{"capacity",ScriptValue{static_cast<std::int32_t>(room.capacity())}}}));lobby();return;
@@ -82,8 +84,12 @@ struct RoomHost::Impl {
    const auto* ready=boolean(value,"value");if(!ready){reject(peer,"missing ready value");return;}
    auto changed=room.ready(*peer.slot,*ready);if(!changed){soft_error(peer,changed.error().message);return;}lobby();
   }else if(*op=="start"){
+   // The leader picks the input delay: every client must apply the same lead.
+   const auto* requested=number(value,"delay");const std::int32_t delay=requested?*requested:2;
+   if(delay<0 || delay>max_input_delay){soft_error(peer,"input delay must be 0..15 frames");return;}
    auto started=room.start(*peer.slot);if(!started){soft_error(peer,started.error().message);return;}
-   broadcast(object({{"op",ScriptValue{std::string("start")}},{"seed",ScriptValue{seed}},{"frame",ScriptValue{std::int32_t{0}}}}));
+   broadcast(object({{"op",ScriptValue{std::string("start")}},{"seed",ScriptValue{seed}},{"frame",ScriptValue{std::int32_t{0}}},
+    {"delay",ScriptValue{delay}},{"checksum_interval",ScriptValue{checksum_interval}}}));
   }else if(*op=="input"){
    const auto* frame=number(value,"frame");const auto* keys=text(value,"keys");
    if(!frame || *frame<0 || !keys){reject(peer,"invalid input frame");return;}
@@ -92,33 +98,20 @@ struct RoomHost::Impl {
       (marks && (*marks<0 || *marks>3)) || (*peer.slot!=0 && ((commands && !commands->empty()) || (marks && *marks!=0)))) {
     reject(peer,"only the host may submit global commands");return;
    }
-   // Accept at most the next input while the preceding checksums are in flight.
-   // Simulation still cannot advance until every checksum agrees.
-   if(room.waiting_for_checksums()){
-    if(static_cast<std::uint64_t>(*frame)!=room.frame()){reject(peer,"out-of-order queued input frame");return;}
-    if(peer.queued_input){reject(peer,"duplicate queued input frame");return;}
-    peer.queued_input=value;return;
-   }
-   if(*peer.slot==0){functions=commands?*commands:"";unlock=marks?*marks:0;}
-   auto tick=room.submit(*peer.slot,static_cast<std::uint64_t>(*frame),*keys);
-   if(!tick){reject(peer,tick.error().message);return;}
-   if(*tick){
-    ScriptTable inputs;for(int slot=0;slot<8;++slot)inputs.push_back({slot+1,ScriptValue{(**tick).inputs[static_cast<std::size_t>(slot)]}});
-    broadcast(object({{"op",ScriptValue{std::string("frame")}},{"frame",ScriptValue{*frame}},{"inputs",object(std::move(inputs))},{"functions",ScriptValue{functions}},{"unlock",ScriptValue{unlock}}}));
+   auto ticks=room.submit(*peer.slot,static_cast<std::uint64_t>(*frame),*keys);
+   if(!ticks){reject(peer,ticks.error().message);if(room.phase()==RoomPhase::aborted)abort();return;}
+   if(*peer.slot==0)globals[static_cast<std::uint64_t>(*frame)]={commands?*commands:"",marks?*marks:0};
+   for(const auto& tick:*ticks){
+    ScriptTable inputs;for(int slot=0;slot<8;++slot)inputs.push_back({slot+1,ScriptValue{tick.inputs[static_cast<std::size_t>(slot)]}});
+    auto global=globals.extract(tick.frame);
+    const std::string functions=global?global.mapped().first:"";const std::int32_t unlock=global?global.mapped().second:0;
+    broadcast(object({{"op",ScriptValue{std::string("frame")}},{"frame",ScriptValue{static_cast<std::int32_t>(tick.frame)}},{"inputs",object(std::move(inputs))},{"functions",ScriptValue{functions}},{"unlock",ScriptValue{unlock}}}));
    }
   }else if(*op=="checksum"){
    const auto* frame=number(value,"frame");const auto* state=text(value,"state");
    if(!frame || *frame<0 || !state){reject(peer,"invalid checksum frame");return;}
    auto checked=room.checksum(*peer.slot,static_cast<std::uint64_t>(*frame),*state);
    if(!checked){reject(peer,checked.error().message);if(room.phase()==RoomPhase::aborted)abort();return;}
-   if(!room.waiting_for_checksums()){
-    broadcast(object({{"op",ScriptValue{std::string("checked")}},{"frame",ScriptValue{*frame}}}));
-    for(auto& waiting:peers){
-     if(waiting.queued_input && !waiting.closing && !waiting.dead){
-      auto input=std::move(*waiting.queued_input);waiting.queued_input.reset();handle(waiting,input);
-     }
-    }
-   }
   }else reject(peer,"unknown operation");
  }
 };
