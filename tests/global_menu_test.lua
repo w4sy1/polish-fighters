@@ -37,7 +37,24 @@ assert(base.global_navigation_update(s,{functions='',keys={}},context))
 assert(not s.session and s.active=='launch','stalled network must allow local return from menus')
 dialog.update=update
 engine={read_settings=function() return {little_fighters_start_profile='lf_four_turbo'} end}
-local mobile=base.create({touch_device=true})
+local hub=require('polish-fighters/hub')
+local initial=base.create({touch_device=true})
+assert(initial.launch.hub_mode=='root' and initial.launch.hub_preselected,'Android starts at the game menu with its chosen module')
+initial.launch.hub_mode='settings'
+local found_tools=false
+for _,row in ipairs(hub.rows(initial.launch)) do
+ if row[1]=='android_tools' then found_tools=true end
+end
+assert(found_tools,'Android tools must be reachable from the settings menu')
+local settings={little_fighters_start_profile='lf_four_turbo'}
+engine.read_settings=function() return settings end
+engine.write_settings=function(document)
+ assert(document==settings and document.little_fighters_open_android_tools==true)
+ return true
+end
+assert(hub.open_android_tools(context) and actions[1]=='quit')
+actions={}
+local mobile=base.create({touch_device=true,profile_start=true})
 assert(mobile.launch.hub_mode=='profile','chosen Android module must not open the module list again')
 assert(base.create({}).launch.hub_mode=='root','desktop root must remain available')
 assert(#actions==0,'menu return must not exit application')

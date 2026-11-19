@@ -21,7 +21,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Offline play and paired-device Bluetooth entry, before native SDL starts. */
+/** Android-specific tools launched on demand from the game menu. */
 public final class BluetoothLobbyActivity extends Activity {
     @Override protected void attachBaseContext(android.content.Context base) { super.attachBaseContext(ClassicMenuData.localized(base)); }
     private TextView status;
@@ -38,22 +38,17 @@ public final class BluetoothLobbyActivity extends Activity {
         status = findViewById(R.id.pf_status);
         moduleButton = findViewById(R.id.pf_module);
         moduleButton.setOnClickListener(v -> showModules());
-        Button play = findViewById(R.id.pf_play);
         Button network = findViewById(R.id.pf_network);
         Button settings = findViewById(R.id.pf_settings);
-        java.util.Collections.addAll(actions, moduleButton, play, network, settings);
-        play.setOnClickListener(v -> launchMenu("battle"));
-        findViewById(R.id.pf_language).setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(t("language"))
-            .setItems(new String[]{"Polski", "English"}, (d,w) -> selectLanguage(w==0?"pl":"en")).setNegativeButton(t("back"),null).show());
-        findViewById(R.id.pf_pl).setOnClickListener(v -> selectLanguage("pl"));
-        findViewById(R.id.pf_en).setOnClickListener(v -> selectLanguage("en"));
-        findViewById(R.id.pf_credits).setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(t("credits"))
-            .setMessage(t("credit_text")+"\n\n"+t("credit_packs")).setPositiveButton(t("back"),null).show());
-        findViewById(R.id.pf_quit).setOnClickListener(v -> finish());
-        network.setOnClickListener(v -> showOnline());
-        settings.setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(t("settings"))
-            .setItems(new String[]{t("controls"),t("video"),"Android / Bluetooth","Diagnostyka / Diagnostics"},(d,w)->{if(w==3)GameDiagnostics.show(this);else if(w==2)showSettings();else launchMenu(w==0?"controls":"options");})
-            .setNegativeButton(t("back"),null).show());
+        Button back = findViewById(R.id.pf_quit);
+        java.util.Collections.addAll(actions, moduleButton, network, settings, back);
+        back.setOnClickListener(v -> launch(null, 0));
+        network.setOnClickListener(v -> showConnections());
+        settings.setOnClickListener(v -> new AlertDialog.Builder(this).setTitle("Android")
+            .setItems(new String[]{"Android / Bluetooth","Diagnostyka / Diagnostics"}, (dialog, which) -> {
+                if (which == 0) showSettings();
+                else GameDiagnostics.show(this);
+            }).setNegativeButton(t("back"), null).show());
         try { org.json.JSONObject opts=new MobileCodeSettings(getFilesDir()).read().optJSONObject("options");
             language=opts!=null && "english".equals(opts.optString("language"))?"en":"pl";
         } catch(java.io.IOException | org.json.JSONException error) { status.setText(error.getMessage()); }
@@ -139,10 +134,10 @@ public final class BluetoothLobbyActivity extends Activity {
         if(status!=null) refreshModuleLabel();
     }
     private void refreshMenu() {
-        int[] ids={R.id.pf_play,R.id.pf_module,R.id.pf_network,R.id.pf_settings,R.id.pf_language,R.id.pf_credits,R.id.pf_quit};
-        String[] keys={"play_main","modules","online","settings","language","credits","quit"};
-        for(int i=0;i<ids.length;i++) ((Button)findViewById(ids[i])).setText(t(keys[i]));
-        findViewById(R.id.pf_pl).setSelected(language.equals("pl"));findViewById(R.id.pf_en).setSelected(language.equals("en"));
+        moduleButton.setText(t("modules"));
+        ((Button)findViewById(R.id.pf_network)).setText("Wi-Fi / Bluetooth");
+        ((Button)findViewById(R.id.pf_settings)).setText(t("settings"));
+        ((Button)findViewById(R.id.pf_quit)).setText(t("back"));
         ((Button)findViewById(R.id.pf_cancel)).setText(ClassicMenuData.localized(this).getText(R.string.pf_cancel));
         refreshModuleLabel();
     }
@@ -150,28 +145,9 @@ public final class BluetoothLobbyActivity extends Activity {
         try { status.setText(t("active")+tr(new GamePackSettings(getFilesDir()).label())); }
         catch(java.io.IOException | org.json.JSONException error) { status.setText(error.getMessage()); }
     }
-    private void selectLanguage(String id) {
-        try {
-            MobileCodeSettings store=new MobileCodeSettings(getFilesDir());org.json.JSONObject doc=store.read();
-            org.json.JSONObject opts=doc.optJSONObject("options");if(opts==null)opts=new org.json.JSONObject();
-            opts.put("language",id.equals("en")?"english":"polish");opts.put("font_antialiasing",false);doc.put("options",opts);store.write(doc);
-            language=id;refreshMenu();
-        } catch(java.io.IOException | org.json.JSONException error) { status.setText(t("save_error")+error.getMessage()); }
+    @Override public void onBackPressed() {
+        launch(null, 0);
     }
-    private void launchMenu(String menu) {
-        try {
-            MobileCodeSettings store=new MobileCodeSettings(getFilesDir());org.json.JSONObject doc=store.read();
-            doc.put("little_fighters_start_menu",menu);store.write(doc);launch(null,0);
-        } catch(java.io.IOException | org.json.JSONException error) {status.setText(t("save_error")+error.getMessage());}
-    }
-    private void showOnline() {
-        new AlertDialog.Builder(this).setTitle(t("online"))
-            .setItems(new String[]{t("quick"),t("host"),t("join"),t("rooms"),t("friends"),"Wi-Fi / Bluetooth"},(d,w)->{
-                if(w==0||w==4)new AlertDialog.Builder(this).setMessage(t("offline")).setPositiveButton(t("back"),null).show();
-                else if(w==1)lanAddress(true);else if(w==2)lanAddress(false);else if(w==3)launchMenu("online");else showConnections();
-            }).setNegativeButton(t("back"),null).show();
-    }
-
     private void showModules() {
         GamePackSettings settings = new GamePackSettings(getFilesDir());
         java.util.List<String> rows=new java.util.ArrayList<>(java.util.Arrays.asList(GamePackSettings.TITLES));

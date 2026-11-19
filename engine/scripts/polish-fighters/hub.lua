@@ -19,6 +19,16 @@ function hub.title(profile)
 end
 local L=require('polish-fighters/menu_locale').text
 local L=require('polish-fighters/menu_locale').text
+function hub.open_android_tools(context)
+ local settings,problem=engine.read_settings()
+ if problem then return nil,problem end
+ settings=type(settings)=='table' and settings or {}
+ settings.little_fighters_open_android_tools=true
+ local saved,problem=engine.write_settings(settings)
+ if not saved then return nil,problem end
+ context.action('quit')
+ return true
+end
 function hub.rows(state)
  local mode=state.hub_mode
  local function row(id,key) return {id,L(key or id)} end
@@ -38,7 +48,10 @@ function hub.rows(state)
   end
   rows[#rows+1]={'unavailable',L('absent_turbo')};rows[#rows+1]=row('library','back');return rows
  elseif mode=='settings' then
-  return {row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'},row('root','back')}
+  local rows={row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'}}
+  if state.hub_android then rows[#rows+1]={'android_tools','ANDROID / BLUETOOTH'} end
+  rows[#rows+1]=row('root','back')
+  return rows
  elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
  elseif mode=='credits' then return {row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}

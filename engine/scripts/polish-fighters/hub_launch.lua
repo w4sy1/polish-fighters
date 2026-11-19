@@ -32,6 +32,9 @@ return function(base)
   elseif id=='resume_campaign' then
    local saved,problem=require('base/game/campaign_save').options(catalog.profile_id)
    if saved then context.action(id) else state.hub_note=tostring(problem) end
+  elseif id=='android_tools' then
+   local opened,problem=hub.open_android_tools(context)
+   if not opened then state.hub_note=locale.text('save_error')..tostring(problem) end
   elseif id=='training' then context.action(id)
   elseif id=='diagnostics' then state.page='diagnostics';state.diagnostics=require('base/ui/diagnostics').create()
   elseif id=='unavailable' then state.hub_note=locale.text('offline')

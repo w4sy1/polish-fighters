@@ -11,6 +11,7 @@ return function(base)
   local state=create(options)
   state.launch.hub_enabled=not options.legacy_menu
   state.launch.hub_available=options.profiles_available
+  state.launch.hub_android=options.touch_device
   local saved=engine and engine.read_settings and engine.read_settings() or {}
   if type(saved)~="table" then saved={} end
   local chosen=saved.little_fighters_start_profile
@@ -20,6 +21,7 @@ return function(base)
   state.launch.hub_custom_profile=managed_profile and active_profile or nil
   state.launch.hub_mode=(options.profile_start or single_mobile or managed_profile) and "profile" or "root"
   state.launch.hub_preselected=options.profile_start or single_mobile or managed_profile
+  if state.launch.hub_android and not options.profile_start then state.launch.hub_mode="root" end
   state.launch.hub_wait_release=options.profile_start==true
   local menu=saved.little_fighters_start_menu
   if menu=='battle' or menu=='settings' or menu=='online' or menu=='controls' or menu=='options' then
