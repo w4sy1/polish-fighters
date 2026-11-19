@@ -9,3 +9,5 @@ engine/android/gradlew text eol=lf
 # Preserve upstream patch context and license wording byte for byte.
 *.patch -text -whitespace
 engine/scripts/base/fonts/license-dejavu.txt -text -whitespace
+mody/*.zip filter=lfs diff=lfs merge=lfs -text
+mody/*.rar filter=lfs diff=lfs merge=lfs -text
