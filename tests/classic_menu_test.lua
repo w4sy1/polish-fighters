@@ -32,7 +32,7 @@ for _,mode in ipairs({'versus','stage','championship','team_championship','battl
  click('start_mode');assert(requested==(mode=='battle_setup' and 'battle' or mode));back();assert(state.hub_mode=='library');back();assert(state.hub_mode=='battle')
 end
 state.hub_mode='battle';click('mode_demo');assert(requested=='demo');click('mode_replay');assert(requested=='replay')
-state.hub_mode='root';click('language');click('lang_en');assert(locale.id()=='en' and hub.rows({hub_mode='root'})[1][2]=='BATTLE')
+state.hub_mode='root';click('language');click('lang_en');assert(locale.id()=='en' and hub.rows({hub_mode='root'})[1][2]=='MODULES' and hub.rows({hub_mode='root'})[2][2]=='PLAY')
 assert(document.options.language=='english' and document.unrelated.keep)
 assert(locale.translate('GRACZ 2: ATAK Num 7')=='PLAYER 2: ATTACK Num 7')
 options.load();assert(locale.id()=='en');click('lang_pl');assert(locale.id()=='pl')

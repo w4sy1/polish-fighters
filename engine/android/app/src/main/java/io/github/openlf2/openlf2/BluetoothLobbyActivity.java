@@ -140,7 +140,7 @@ public final class BluetoothLobbyActivity extends Activity {
     }
     private void refreshMenu() {
         int[] ids={R.id.pf_play,R.id.pf_module,R.id.pf_network,R.id.pf_settings,R.id.pf_language,R.id.pf_credits,R.id.pf_quit};
-        String[] keys={"battle","modules","online","settings","language","credits","quit"};
+        String[] keys={"play_main","modules","online","settings","language","credits","quit"};
         for(int i=0;i<ids.length;i++) ((Button)findViewById(ids[i])).setText(t(keys[i]));
         findViewById(R.id.pf_pl).setSelected(language.equals("pl"));findViewById(R.id.pf_en).setSelected(language.equals("en"));
         ((Button)findViewById(R.id.pf_cancel)).setText(ClassicMenuData.localized(this).getText(R.string.pf_cancel));

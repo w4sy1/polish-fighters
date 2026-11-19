@@ -35,6 +35,10 @@ return function(base)
   end
   return state
  end
+ local function return_to_main(state)
+  base.return_to_modules(state)
+  state.launch.hub_mode='root'
+ end
  function base.global_navigation_update(state,input,context)
   local f4=(input.functions or ''):find('4',1,true)~=nil
   local pressed=f4 and not state.hub_f4_held
@@ -42,11 +46,21 @@ return function(base)
   -- A local disconnect must remain possible while a peer is stalled.
   if state.quit_dialog and state.quit_dialog.kind=='modules' and state.session then
    local answer=require('base/ui/quit_dialog').update(state.quit_dialog,input,context)
-   if answer=='exit' then base.return_to_modules(state)
+   if answer=='exit' then return_to_main(state)
    elseif answer=='close' then state.quit_dialog=nil;state.swallow_pointer=true end
    return true
   end
   if not visible(state) then return false end
+  if pressed and state.active=='launch' and not state.session then
+   local launch=state.launch
+   if launch.hub_mode=='root' and (launch.page==nil or launch.page=='menu') and
+    not launch.hub_edit and not launch.hub_online and not launch.hub_mods and not launch.pf_panel then
+    return true
+   end
+   input.keys=input.keys or {}
+   input.keys[27]=true
+   return false
+  end
   local escape=input.keys and input.keys[27]
   local back=escape and not state.hub_escape_held
   state.hub_escape_held=escape
@@ -66,7 +80,7 @@ return function(base)
    local match=state.active=='match' and state.match.match
    if state.session or (match and not match.finished) then
     state.quit_dialog=require('base/ui/quit_dialog').create('modules')
-   else base.return_to_modules(state) end
+   else return_to_main(state) end
    return true
   end
   return false
@@ -90,9 +104,9 @@ return function(base)
    context.text('WSPÓLNY EKRAN | TY: GRACZ '..(state.session.slot+1),8,9,'left',13,0xffffff,nil,nil,true)
   end
   context.fill(x,y,w,h,25,48,80,240)
-  local label=state.active=='match' and 'POSTACIE (F4)' or 'MENU / MODUŁY (F4)'
+  local label=state.active=='match' and 'POSTACIE (F4)' or 'POWRÓT (F4)'
   if context.text then context.text(label,x+w/2,y+7,'center',15,0xffffff,nil,nil,true)
-  else require('base/ui/font').draw(context,state.active=='match' and 'POSTACIE (F4)' or 'MENU / MODULY (F4)',x+w/2,y+9,1,nil,'center') end
+  else require('base/ui/font').draw(context,state.active=='match' and 'POSTACIE (F4)' or 'POWROT (F4)',x+w/2,y+9,1,nil,'center') end
  end
  return base
 end
