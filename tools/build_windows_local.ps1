@@ -20,6 +20,11 @@ if ((Get-FileHash -LiteralPath $Installer -Algorithm SHA256).Hash.ToLowerInvaria
 $build = Join-Path $engine 'build/windows/x64'
 $native = Join-Path $build 'native'
 $stage = if ($StageDirectory) { [IO.Path]::GetFullPath($StageDirectory, $projectRoot) } else { Join-Path $engine 'out/PolishFighters-Windows-x64-portable' }
+$legacyLaunchers = @(Get-ChildItem -LiteralPath $stage -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Extension -in '.cmd', '.bat' -or ($_.Extension -eq '.exe' -and $_.Name -ne 'LittleFighters.exe') })
+if ($legacyLaunchers.Count) {
+    throw 'The output folder contains legacy launchers. Pass -StageDirectory with a new folder to preserve the old build.'
+}
 $report = Join-Path $projectRoot 'validation/windows-native'
 New-Item -ItemType Directory -Force -Path $build, $stage, $report | Out-Null
 $previousPath = $env:PATH
@@ -52,7 +57,6 @@ try {
         "-DCMAKE_TOOLCHAIN_FILE=$toolchain", '-DOPENLF2_DEPENDENCY_PROVIDER=conan',
         "-DPython3_EXECUTABLE=$(Join-Path $venv 'python.exe')") 'cmake-configure.log'
     Invoke-Logged cmake @('--build', $native, '--config', 'Release', '--parallel', '4') 'cmake-build.log'
-    Copy-Item -LiteralPath (Join-Path $native 'Release/openlf2.exe') -Destination $stage -Force
     Copy-Item -LiteralPath (Join-Path $native 'Release/openlf2.exe') -Destination (Join-Path $stage 'LittleFighters.exe') -Force
     $dlls = @(Get-ChildItem -LiteralPath (Join-Path $build 'runtime') -Recurse -File -Filter '*.dll')
     if ($dlls.Count -eq 0) { throw 'No runtime DLLs were deployed.' }
@@ -67,7 +71,9 @@ try {
         New-Item -ItemType Directory -Force -Path $packTarget | Out-Null
         Copy-Item -Path (Join-Path $packSource '*') -Destination $packTarget -Recurse -Force
     }
-    Copy-Item -LiteralPath $Installer -Destination (Join-Path $stage 'LF2_v2.0a.exe') -Force
+    $gameData = Join-Path $stage 'game-data'
+    New-Item -ItemType Directory -Force -Path $gameData | Out-Null
+    Copy-Item -LiteralPath $Installer -Destination (Join-Path $gameData 'LF2_v2.0a.exe') -Force
     Copy-Item -LiteralPath (Join-Path $engine 'LICENSE'), (Join-Path $engine 'THIRD-PARTY-NOTICES.md'),
         (Join-Path $projectRoot 'README_PL.md'), (Join-Path $projectRoot 'BUILD_WINDOWS.md'),
         (Join-Path $projectRoot 'PROJECT-STATUS.md') -Destination $stage -Force
@@ -75,13 +81,6 @@ try {
         '--key', 'ffmpeg', '--key', 'ffmpeg-notes', '--key', 'sdl3', '--key', 'sdl3-ttf',
         '--key', 'freetype', '--key', 'luajit', '--key', 'zlib', '--key', 'bzip2',
         '--key', 'openssl', '--key', 'libcurl') 'licenses.log'
-    foreach ($pack in (@('LF2') + $PackIds)) {
-        $modArgument = if ($pack -ne 'LF2') { ' --mod "%~dp0content-packs\' + $pack + '"' } else { '' }
-        $launcher = "@echo off`r`ncd /d `"%~dp0`"`r`n`"%~dp0LittleFighters.exe`" --installer `"%~dp0LF2_v2.0a.exe`" --scripts `"%~dp0scripts`" --mod `"%~dp0scripts\polish-fighters`" --config-dir `"%~dp0userdata\common`"$modArgument`r`nif errorlevel 1 pause`r`n"
-        Set-Content -LiteralPath (Join-Path $stage "Graj-$pack.cmd") -Value $launcher -Encoding ascii
-    }
-    $mainLauncher = @('@echo off', 'cd /d "%~dp0"', '"%~dp0LittleFighters.exe" --config-dir "%~dp0userdata/common"', 'if errorlevel 1 pause') -join "`r`n"
-    Set-Content -LiteralPath (Join-Path $stage 'Graj-Little-Fighters.cmd') -Value $mainLauncher -Encoding ascii
     $files = Get-ChildItem -LiteralPath $stage -Recurse -File | ForEach-Object {
         [pscustomobject]@{ path = [IO.Path]::GetRelativePath($stage, $_.FullName); bytes = $_.Length;
             sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }

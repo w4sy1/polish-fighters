@@ -2,6 +2,7 @@
 import argparse
 import json
 import re
+import sys
 import tempfile
 import zipfile
 from pathlib import Path
@@ -118,7 +119,7 @@ def main():
                     if not args.id: raise ValueError('Download action requires --id')
                     result = queue.control(args.id, args.action)
             finally: queue.close()
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        print(json.dumps(result, ensure_ascii=not sys.stdout.isatty(), indent=2))
     except (ValueError, OSError, KeyError, AttributeError, EOFError, zipfile.BadZipFile, RuntimeError) as problem:
         parser.exit(1, str(problem) + '\n')
 

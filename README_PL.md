@@ -24,7 +24,7 @@ Wspólna baza OpenLF2 dla Androida i Windows. Zbudowano pełny silnik Linux x86_
 
 ## Lokalne wydanie testowe Windows — 2026-10-25
 
-W folderze `engine/out/PolishFighters-Windows-x64-portable` uruchom `Graj-LF2.cmd` albo `Graj-LF4-Turbo.cmd`. Paczka zawiera własny silnik, biblioteki DLL, skrypty, dane LF2 i izolowany pakiet LF4. Nie wymaga Pythona do grania. Są to lokalne pliki testowe, bez publikacji i bez instalatora systemowego.
+W folderze `engine/out/PolishFighters-Windows-x64-portable` uruchom `LittleFighters.exe`. Gra otworzy profil Polish Fighters, jeśli znajduje się on w paczce. Inny zainstalowany moduł wybierzesz w menu gry. Paczka zawiera silnik, biblioteki DLL, skrypty i dane LF2. Do grania wystarczy rozpakowany folder.
 
 Przeszło 11 scenariuszy menu/walki, 32/32 postacie LF4 po 300 klatek oraz mecze 2–8 osobnych procesów Windows. Sprawdzono też lobby i wybór postaci dla 2/8 procesów, LF4 dla 2/8 i przerwanie po desynchronizacji. Oba profile uruchomiono z danych gotowej paczki, z innego katalogu roboczego. Są to testy automatyczne bez okna: wygląd, dźwięk z głośników, sterowanie i fizyczne urządzenia wymagają sprawdzenia.
 

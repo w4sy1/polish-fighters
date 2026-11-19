@@ -189,16 +189,18 @@ return function(base)
    if message then text(context,message,397,480,variants.yellow,"center") end
    return
   end
-  local rows=hub.rows(state)
+  local rows=hub.rows(state,catalog.profile_id)
   for index,row in ipairs(rows) do
    local x,y,w,h=layout.box(index,#rows)
-   text(context,row[2],x+w/2,y+3,index==state.hub_hover and variants.white or variants.blue,'center')
+   if row[3] and context.fill then context.fill(x-8,y,4,h,255,211,76,255) end
+   local color=index==state.hub_hover and variants.white or (row[3] and variants.yellow or variants.blue)
+   text(context,row[2],x+w/2,y+3,color,'center')
   end
   for index,id in ipairs({'pl','en'}) do
    local x,y,w,h=layout.language(index)
-   text(context,id:upper(),x+w/2,y+4,locale.id()==id and variants.white or variants.blue,'center')
+   text(context,id:upper(),x+math.floor(w/2),y+4,locale.id()==id and variants.white or variants.blue,'center')
   end
-  text(context,locale.text('active')..hub.title(catalog.profile_id),16,492,variants.blue)
+  text(context,locale.text('active')..hub.title(catalog.profile_id),16,492,variants.yellow)
   if state.hub_mode=='credits' then
    text(context,locale.text('credit_text'),397,235,variants.white,'center')
    text(context,locale.text('credit_packs'),397,280,variants.white,'center')

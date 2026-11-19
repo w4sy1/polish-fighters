@@ -19,6 +19,7 @@ public:
     SdlSetupScreen(SDL_Renderer& renderer, const Viewport& viewport, Observer observe);
     Result<std::optional<std::size_t>> choose(std::string_view text, std::span<const std::string> answers) override;
     Result<bool> progress(std::string_view text, double fraction, std::string_view cancel) override;
+    Result<void> loading() override;
 
 private:
     struct Button {

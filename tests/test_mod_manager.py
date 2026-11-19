@@ -62,6 +62,24 @@ class ModTests(unittest.TestCase):
         for name in ('../x.dat', '/x.dat', 'C:/x.dat', 'x\\y.dat', 'con.txt', 'x/COM1.dat', 'x./a.dat', 'x /a.dat', 'a//b.dat', 'a/./b.dat', 'x\x00.dat'):
             with self.subTest(name=name), self.assertRaises(ValueError): archive.safe_name(name)
 
+    def test_ultimate_reads_named_links_from_posts(self):
+        thread = 'https://theultimatefighters.forumotion.com/t26-lf2-mods-all'
+        markup = '''
+            <a href="https://forumotion.com/">Forumotion</a>
+            <ul><li>Naruto: Battle For Dream :
+            <a class="postlink" href="http://bit.ly/example">Mediafire</a></li></ul>
+            <ul><li>Bleach Bankai Revolution 2.0 : Spoiler:
+            <a class="postlink" href="https://example.com/bleach.zip">Archive</a></li></ul>
+        '''
+        with patch('mod_sources.html_page', side_effect=lambda url: (url, markup)):
+            result = manager.discover('ultimate')
+        self.assertEqual(len(result['pages']), 2)
+        self.assertEqual([(item['name'], item['page_url'], item['kind'], item['source_page'])
+                          for item in result['projects']], [
+            ('Naruto: Battle For Dream', 'https://bit.ly/example', 'external_reference', thread),
+            ('Bleach Bankai Revolution 2.0', 'https://example.com/bleach.zip', 'external_reference', thread),
+        ])
+
     def test_duplicate_and_prefix_collision(self):
         for files in ({'A.dat': b'a', 'a.dat': b'b'}, {'a.dat': b'a', 'a.dat/b.dat': b'b'}):
             self.make_zip(files)

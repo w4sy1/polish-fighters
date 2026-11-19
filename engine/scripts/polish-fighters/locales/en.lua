@@ -6,7 +6,7 @@ return {
  back='BACK', controls='CONTROLS', video='VIDEO / SOUND', extras='HISTORY / UNLOCKS', recording='RECORDING SETTINGS',
  versus='VS Mode', stage='Stage Mode', championship='1 on 1 Championship', team_championship='2 on 2 Championship',
  battle_setup='Battle Mode', demo='Demo', replay='Playback Recording',
- packs='ENABLE / DISABLE MODULES', mixed='SELECTED MODULES TOGETHER [TEST]', all='SELECT ALL', save='SAVE', cancel='CANCEL',
+ packs='CHOOSE MODULES FOR POOL', mixed='SELECTED MODULES TOGETHER [TEST]', all='SELECT ALL', save='SAVE', cancel='CANCEL',
  on='[ON] ', off='[OFF] ', missing=' [MISSING DATA]', duplicates_hidden='LF2 DUPLICATES: HIDDEN', duplicates_shown='LF2 DUPLICATES: SHOWN',
  players='PLAYER SETUP', start='NEXT: SELECT CHARACTERS', active='ACTIVE MODULE: ',
  quick='QUICK GAME [UNAVAILABLE]', host='CREATE LAN ROOM', join='JOIN LAN ROOM', rooms='ROOM LIST / CUSTOM SERVER', friends='FRIENDS [UNAVAILABLE]',

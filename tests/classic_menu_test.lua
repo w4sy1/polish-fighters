@@ -40,7 +40,16 @@ state.hub_mode='root';click('library');click('packs')
 for _,entry in ipairs(hub.profiles) do state.hub_pack_edit[entry.id]=false end
 click('packs_save');assert(state.hub_mode=='packs' and state.hub_note)
 state.hub_pack_edit.lf_two=true;click('packs_save');assert(state.hub_mode=='library' and document.little_fighters_packs.lf_two)
-assert(#hub.rows(state)==6,'one module plus catalogue, pack settings, mixed mode, status and back expected')
+assert(#hub.rows(state)==14,'mixed pool settings must not hide standalone modules')
+local rows=hub.rows(state,'polish-originals')
+assert(rows[1][1]=='profile_polish_fighters' and rows[1][2]=='Polish Originals' and rows[1][3])
+assert(not rows[2][3] and hub.rows(state,'lf2-classic')[2][3])
+local seen={}
+for _,row in ipairs(rows) do assert(not seen[row[1]],row[1]);seen[row[1]]=true end
+state.hub_available={polish_fighters=false};requested=nil
+click('profile_polish_fighters');assert(not requested and state.hub_note:find('Brak lokalnego pakietu',1,true))
+state.hub_available.polish_fighters=true
+click('profile_polish_fighters');assert(requested=='profile_polish_fighters')
 click('mods');assert(state.hub_mods,'catalogue did not open from library')
 require('polish-fighters/mod_browser').activate(state,'back',context);assert(not state.hub_mods)
 click('packs');click('toggle_lf_two');back();assert(state.hub_selected.lf_two,'cancel modified saved modules')

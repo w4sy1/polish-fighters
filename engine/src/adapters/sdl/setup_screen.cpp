@@ -66,6 +66,33 @@ Result<bool> SdlSetupScreen::progress(std::string_view text, double fraction, st
     return true;
 }
 
+Result<void> SdlSetupScreen::loading() {
+    SDL_PumpEvents();
+    auto* renderer = &renderer_;
+    constexpr std::string_view title = "POLISH FIGHTERS";
+    constexpr std::string_view label = "Ladowanie modulu...";
+    const float center = width_ / 2;
+    const float top = height_ / 2;
+    const SDL_FRect panel{0, top - 32, width_, 64};
+    const SDL_FRect bar{center - width_ / 6, top + 16.5f, width_ / 3, 4};
+    const SDL_FRect filled{bar.x, bar.y, bar.w / 3, bar.h};
+    const bool drawn = SDL_SetRenderLogicalPresentation(renderer, viewport_.width, viewport_.height,
+                                                        SDL_LOGICAL_PRESENTATION_LETTERBOX)
+        && SDL_SetRenderScale(renderer, 1.0f, 1.0f)
+        && SDL_SetRenderDrawColor(renderer, 16, 32, 108, 255) && SDL_RenderClear(renderer)
+        && SDL_SetRenderScale(renderer, scale, scale)
+        && SDL_SetRenderDrawColor(renderer, 12, 26, 71, 255) && SDL_RenderFillRect(renderer, &panel)
+        && SDL_SetRenderDrawColor(renderer, 255, 223, 136, 255)
+        && SDL_RenderDebugText(renderer, center - glyph * static_cast<float>(title.size()) / 2, top - 22, title.data())
+        && SDL_SetRenderDrawColor(renderer, 232, 239, 255, 255)
+        && SDL_RenderDebugText(renderer, center - glyph * static_cast<float>(label.size()) / 2, top, label.data())
+        && SDL_SetRenderDrawColor(renderer, 45, 76, 151, 255) && SDL_RenderFillRect(renderer, &bar)
+        && SDL_SetRenderDrawColor(renderer, 255, 209, 96, 255) && SDL_RenderFillRect(renderer, &filled);
+    const bool restored = SDL_SetRenderScale(renderer, 1.0f, 1.0f);
+    if (!drawn || !restored || !SDL_RenderPresent(renderer)) return std::unexpected(sdl_error());
+    return {};
+}
+
 // Lines that fit the width, broken between words; '\n' starts a new line and longer words
 // (paths) are split.
 std::vector<std::string> SdlSetupScreen::wrap(std::string_view text) const {

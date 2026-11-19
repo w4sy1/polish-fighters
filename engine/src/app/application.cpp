@@ -486,6 +486,21 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
     if (config.installer.empty()) {
         auto local_installer = find_installer(directory);
         if (!local_installer) return std::unexpected(local_installer.error());
+#ifdef _WIN32
+        auto game_data_installer = find_installer(directory / "game-data");
+        if (!game_data_installer) return std::unexpected(game_data_installer.error());
+        if (*game_data_installer) {
+            local_installer = std::move(game_data_installer);
+            if (arguments.empty()) {
+                const auto polish = directory / "content-packs" / "polish-originals";
+                std::error_code error;
+                if (std::filesystem::is_regular_file(polish / "package.manifest", error)) {
+                    config.mods.push_back(polish);
+                    config.profile_start = true;
+                }
+            }
+        }
+#endif
         if (*local_installer) {
             config.installer = **local_installer;
             if (!config.headless && !config.config_directory) config.config_directory = directory / "userdata" / "common";
@@ -884,9 +899,6 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         const bool same = std::filesystem::equivalent(mod, bundled, same_error);
         if (!same || same_error) packages.push_back(mod);
     }
-    auto scripts = load_packages(packages);
-    if (!scripts) return std::unexpected(scripts.error());
-    startup_stage("packages");
     const auto music_decoder = make_music_decoder();
     // Declared in lifetime order: the window reads resources, which read the archive, which
     // uses the decompressor.
@@ -914,8 +926,9 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
 #endif
     // Open the window before installer setup, restoring saved desktop placement if present.
     std::unique_ptr<Platform> platform;
-    if (!config.headless || config.capture_frame) {
-        const Viewport window{scripts->window.width, scripts->window.height, 0, 0, 0};
+    const auto open_window = [&](WindowSize size) -> Result<void> {
+        if (config.headless && !config.capture_frame) return {};
+        const Viewport window{size.width, size.height, 0, 0, 0};
         auto placement = load_window_placement(*settings);
         if (!placement) std::cerr << "Window settings: " << placement.error().message << '\n';
         auto made = make_platform(game_data, window, *music_decoder, config.renderer,
@@ -925,6 +938,46 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         std::cout << "Renderer: " << platform->renderer_name()
                   << (platform->supports(RenderFilter::xbrz) ? " (xBRZ upscaling available)\n" : "\n");
         if (!platform->supports_text()) std::cout << "Translated languages unavailable: this build has no SDL3_ttf\n";
+        return {};
+    };
+    const auto show_startup = [&](WindowSize size) {
+        const int center = size.width / 2;
+        const int top = size.height / 2;
+        const int bar_width = size.width / 3;
+        const std::array<DrawCommand, 6> commands{
+            SpriteCommand{"pe/menu_back1", {}, 0, 0, true},
+            FillCommand{{0, top - 64, size.width, 128}, 12, 26, 71, false, std::nullopt, 230},
+            TextCommand{"POLISH FIGHTERS", center, top - 48, TextAlign::center, 32, 0xffdf88, 0x0c1a47},
+            TextCommand{"Ładowanie modułu…", center, top, TextAlign::center, 17, 0xe8efff},
+            FillCommand{{center - bar_width / 2, top + 33, bar_width, 8}, 45, 76, 151},
+            FillCommand{{center - bar_width / 2, top + 33, bar_width * 2 / 3, 8}, 255, 209, 96}
+        };
+        // A cosmetic frame must not prevent game startup if optional art or fonts fail.
+        auto shown = platform->present(commands, {size.width, size.height, 16, 32, 108});
+        if (!shown) std::cerr << "Loading screen: " << shown.error().message << '\n';
+    };
+#ifdef _WIN32
+    const bool show_loading = !config.headless && !bundled_error && packages.size() >= 2 &&
+                              packages[1] == bundled;
+#else
+    constexpr bool show_loading = false;
+#endif
+    std::function<Result<void>(WindowSize)> before_assets;
+    if (show_loading) {
+        before_assets = [&](WindowSize size) -> Result<void> {
+            auto opened = open_window(size);
+            if (!opened) return opened;
+            auto shown = platform->setup_dialog().loading();
+            if (!shown) std::cerr << "Loading screen: " << shown.error().message << '\n';
+            return {};
+        };
+    }
+    auto scripts = load_packages(packages, before_assets);
+    if (!scripts) return std::unexpected(scripts.error());
+    startup_stage("packages");
+    if (!platform) {
+        auto opened = open_window(scripts->window);
+        if (!opened) return opened;
     }
     auto installer = locate_installer(config, platform ? std::optional{std::ref(platform->setup_dialog())} : std::nullopt);
     if (!installer) return std::unexpected(installer.error());
@@ -941,6 +994,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     if (!constants) return std::unexpected(constants.error());
     startup_stage("platform-installer");
     const auto& resources = game_data.attach(std::make_unique<GameResources>(*archive, std::move(*executable), scripts->assets));
+    if (show_loading) show_startup(scripts->window);
     auto bootstrap = read_file(config.scripts / "runtime/bootstrap.lua", 1024 * 1024);
     if (!bootstrap) return std::unexpected(bootstrap.error());
     const auto menu_seed = config.seed.value_or(static_cast<std::uint32_t>(
