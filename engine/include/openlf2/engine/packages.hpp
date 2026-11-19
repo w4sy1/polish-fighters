@@ -4,6 +4,7 @@
 #pragma once
 #include "openlf2/core/result.hpp"
 #include <filesystem>
+#include <functional>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -25,7 +26,8 @@ struct ScriptBundle {
 };
 // Base must declare the window size; another package may change it, but two packages other
 // than base must not declare different sizes.
-Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots);
+Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots,
+                                  const std::function<Result<void>(WindowSize)>& before_assets = {});
 std::string lua_quote(std::string_view text);
 std::string bundle_source(std::span<const ScriptModule> modules);
 }

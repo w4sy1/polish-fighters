@@ -6,6 +6,9 @@
 set(OPENLF2_ICON_DIR "" CACHE PATH "Directory of icons rendered by tools/icons/make_icons.py (empty: render into the build tree)")
 set(openlf2_icons "")
 set(openlf2_icon_svg "${PROJECT_SOURCE_DIR}/dist/io.github.openlf2.OpenLF2.svg")
+if(WIN32)
+    set(openlf2_icon_svg "${PROJECT_SOURCE_DIR}/dist/windows/polish-fighters.svg")
+endif()
 set(openlf2_icon_tool "${PROJECT_SOURCE_DIR}/tools/icons/make_icons.py")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${openlf2_icon_svg}" "${openlf2_icon_tool}")
 if(OPENLF2_ICON_DIR)
@@ -13,7 +16,7 @@ if(OPENLF2_ICON_DIR)
 else()
     find_package(Python3 COMPONENTS Interpreter QUIET)
     if(Python3_Interpreter_FOUND)
-        execute_process(COMMAND "${Python3_EXECUTABLE}" "${openlf2_icon_tool}" "${CMAKE_BINARY_DIR}/icons"
+        execute_process(COMMAND "${Python3_EXECUTABLE}" "${openlf2_icon_tool}" --svg "${openlf2_icon_svg}" "${CMAKE_BINARY_DIR}/icons"
             RESULT_VARIABLE openlf2_icon_result ERROR_VARIABLE openlf2_icon_error)
         if(openlf2_icon_result EQUAL 0)
             set(openlf2_icons "${CMAKE_BINARY_DIR}/icons")

@@ -5,10 +5,7 @@ import subprocess
 from pathlib import Path
 
 FLOW = '''return function(base)
- local create,describe=base.create,base.describe
- function base.create(options)
-  local s=create(options);s.launch.hub_enabled=true;s.launch.hub_mode='profile';return s
- end
+ local describe=base.describe
  function base.describe(s)
   return describe(s)..' qa_guide='..tostring(s.launch.pf_guide_message==true)..
    ' guide_lines='..tostring(s.launch.pf_message and #s.launch.pf_message or 0)
@@ -31,11 +28,11 @@ if __name__ == '__main__':
         'requires=polish-fighters@1\nextend=base/ui/flow|flow.lua\n')
     (fixture / 'flow.lua').write_text(FLOW)
     for row, name in enumerate(['basics', 'wasyl', 'sz', 'jas', 'tata', 'remonoko', 'mech'], 1):
-        trace = '@60_360,!,@420_' + str(219 + (row - 1) * 25) + ',!,*3'
+        trace = '@400_430,!,@420_425,!,@420_' + str(225 + (row - 1) * 25) + ',!,*3'
         command = [str(stage / 'LittleFighters.exe'), '--installer', str(stage / 'LF2_v2.0a.exe'),
                    '--scripts', str(stage / 'scripts'), '--mod', str(stage / 'content-packs/polish-originals'),
                    '--mod', str(fixture), '--config-dir', str(output / ('config-' + name)),
-                   '--hub-menu', '--input-trace', trace]
+                   '--input-trace', trace]
         if args.capture: command += ['--renderer', 'software', '--capture-frame', str(output / (name + '.bmp'))]
         result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace',
                                 env=dict(os.environ, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy'), timeout=90)

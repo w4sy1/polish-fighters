@@ -56,6 +56,21 @@ Sprawdzono 41 istniejących wpisów. Nowe dane obejmują potwierdzone strony i w
 | `one-piece-lf2` | [Ultimate Fighters](https://theultimatefighters.forumotion.com/t26-lf2-mods-all) · [strona pobrania](https://www.mediafire.com/file/1wot3xce1yybpxr/lf2-Onepiece.rar) | Strona MediaFire wskazuje właściwy plik. Robots.txt blokuje transfer z CDN. |
 | `one-piece-battle-of-seas-1-5e` | [Ultimate Fighters](https://theultimatefighters.forumotion.com/t26-lf2-mods-all) | Sendspace zwraca HTTP 404. |
 
+## 2026-11-19 — Polish Originals na wspólnej liście F4
+
+- F4 otwiera wspólną listę modułów. Polish Originals występuje raz pod własną nazwą i uruchamia istniejący pakiet `polish-originals`. Złoty znacznik oraz opis pod listą wskazują załadowany profil. Biały tekst wskazuje fokus nawigacji. Ustawienia wspólnej puli nadal są zapisywane i nie ukrywają profili samodzielnych. Brakujące pakiety używają dotychczasowego komunikatu.
+- Windows x64: 50 testów Lua, 20 natywnych prób profili w obu zapisanych układach dotyku i 5 prób powrotu do listy zaliczone. Natywny silnik 0.18.0 z bieżącymi skryptami wykonał przełączenie LF2 → Polish Originals → LF2 za pomocą klawiatury i symulowanego pada. Zrzuty potwierdziły zmianę znacznika i wybór Remonoko w treningu. Fizycznego pada nie sprawdzano.
+- Android: `assembleDebug` ARM64 i 63 testy jednostkowe zaliczone. Lint zgłosił 0 błędów i 60 ostrzeżeń. Podpis APK przeszedł weryfikację, a sumy 107 skryptów w paczce są zgodne z repozytorium.
+- Na fizycznym telefonie instrumentacja ADB przekazała zdarzenia dotyku bezpośrednio do aktywności gry. Potwierdzono przełączenie LF2 → Polish Originals → LF2, właściwy znacznik po każdym otwarciu listy, wejście do wyboru postaci i zachowanie zapisanego profilu startowego. Test użył dotychczasowej instalacji debug z tymczasowo podmienionymi skryptami, ponieważ miała wyższy numer wersji niż lokalny APK. Przywrócono skrypty i konfigurację bajt w bajt. Instalacji nowego APK na telefonie nie sprawdzano.
+
+## 2026-11-19 — lokalna weryfikacja poradnika i import NTSD
+
+- Lokalny instalator `../downloads/LF2_v2.0a.exe` odpowiada przypiętemu SHA-256. Weryfikator potwierdził 42 kombinacje w rzeczywistych DAT. Próba na buildzie Windows 0.18.0 otworzyła podstawy i sześć kart poradnika z menu klasycznego. W natywnym treningu uruchomionym z bieżącymi skryptami i wejściem testowym 40 sekwencji weszło w spodziewane klatki, a dwie pozostałe wywołały przemianę Remonoko w mecha i powrót.
+- Na fizycznym telefonie zainstalowano lokalny APK combo-chord-fix i uruchomiono trening Polish Originals. Użytkownik potwierdził wystrzał po sekwencji, ale zgłosił niejednoznaczny wybór postaci. Pełna zgodność sterowania dotykowego z poradnikiem pozostaje do sprawdzenia.
+- Adapter Ultimate Fighters czyta obie strony wątku i zwraca 70 nazwanych odnośników z postów. 36 wpisów Naruto, Bleach i One Piece dostało adres strony źródłowej. Status pobrania tych plików pozostaje niezweryfikowany. Wątek wymienia Bleach The Conquest wśród zaginionych wydań.
+- Mod Manager zaimportował 42 postacie NTSD 2.4_2.0a z lokalnych, wcześniej rozpakowanych danych spakowanych do testowego ZIP. Windows uruchomił menu z zaimportowanym pakietem. Próba rozpoczęcia walki wykryła wartości spoza zakresu 32-bitowego w DAT. Po zastosowaniu istniejącej normalizacji VC80 do 364 wartości w 37 plikach tymczasowa próba treningu Naruto przeszła. Importer nadal zapisuje pakiet w postaci surowej.
+- Próba pobrania Naruto LF2 z LF Empire zatrzymała się na zasadach kolejki. Chrome zablokował ten sam plik po kliknięciu na stronie. 37 testów Mod Managera przeszło. Stare kopie modów są nadal na dysku.
+
 ## 2026-11-19 — realny dostęp do lf-empire.de/Ultimate Fighters, 2 nowe prawdziwe adresy pobierania, potwierdzony limit robots.txt
 
 Po zmianie przez użytkownika dozwolonych domen konta, lf-empire.de i

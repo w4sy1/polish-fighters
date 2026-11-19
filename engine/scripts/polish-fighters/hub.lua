@@ -1,7 +1,7 @@
 -- First menu shared by all profiles. Only installed packages can be activated.
 local hub={}
 hub.profiles={
- {id="polish_fighters",profile="polish-originals",title="Polish Fighters"},
+ {id="polish_fighters",profile="polish-originals",title="Polish Originals"},
  {id="lf_two",profile="lf2-classic",title="LF2"},
  {id="lf_four_turbo",profile="lf4-turbo",title="LF4 Turbo"},
  {id="dbz",profile="dbz",title="Dragon Ball"},
@@ -18,7 +18,6 @@ function hub.title(profile)
  return "Little Fighters"
 end
 local L=require('polish-fighters/menu_locale').text
-local L=require('polish-fighters/menu_locale').text
 function hub.open_android_tools(context)
  local settings,problem=engine.read_settings()
  if problem then return nil,problem end
@@ -29,9 +28,9 @@ function hub.open_android_tools(context)
  context.action('quit')
  return true
 end
-function hub.rows(state)
+function hub.rows(state,active_profile)
  local mode=state.hub_mode
- local function row(id,key) return {id,L(key or id)} end
+ local function row(id,key) return {id,(L(key or id))} end
  if mode=='root' or mode==nil then
   return {row('library','modules'),row('battle','play_main'),row('online'),row('settings'),row('language'),row('credits'),row('quit')}
  elseif mode=='profile' or mode=='battle' then
@@ -68,13 +67,15 @@ function hub.rows(state)
   rows[#rows+1]=row('status');rows[#rows+1]=row('packs_save','save');rows[#rows+1]=row('packs_cancel','cancel');return rows
  end
  local rows={}
- if state.hub_custom_profile then rows[#rows+1]={'profile_current',L('current_mod')..state.hub_custom_profile:sub(5,16)} end
- for _,entry in ipairs(hub.profiles) do
-  if not state.hub_selected or state.hub_selected[entry.id]~=false then
-   rows[#rows+1]={'profile_'..entry.id,entry.title..(state.hub_available and state.hub_available[entry.id]==false and L('missing') or '')}
-  end
+ local function profile_row(id,title,profile)
+  local missing=state.hub_available and state.hub_available[id]==false
+  rows[#rows+1]={'profile_'..id,title..(missing and L('missing') or ''),profile==active_profile}
  end
- rows[#rows+1]=row('mods');rows[#rows+1]=row('packs');rows[#rows+1]=row('profile_mixed','mixed');rows[#rows+1]=row('status');rows[#rows+1]=row(state.hub_pending_mode and 'battle' or 'root','back')
+ if state.hub_custom_profile then profile_row('current',hub.title(state.hub_custom_profile),state.hub_custom_profile) end
+ for _,entry in ipairs(hub.profiles) do
+  profile_row(entry.id,entry.title,entry.profile)
+ end
+ rows[#rows+1]=row('mods');rows[#rows+1]=row('packs');profile_row('mixed',L('mixed'),'mixed-all');rows[#rows+1]=row('status');rows[#rows+1]=row(state.hub_pending_mode and 'battle' or 'root','back')
  return rows
 end
 return hub

@@ -1,0 +1,17 @@
+<!-- SPDX-License-Identifier: MIT -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Polish Fighters</title>
+  <defs>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#284ba6"/>
+      <stop offset="1" stop-color="#0c1a47"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="45" fill="url(#field)"/>
+  <path d="M25 192h206" stroke="#ffcf61" stroke-width="8" stroke-linecap="round"/>
+  <path d="M45 212h83" stroke="#fff6ee" stroke-width="13" stroke-linecap="round"/>
+  <path d="M128 212h83" stroke="#e83a51" stroke-width="13" stroke-linecap="round"/>
+  <!-- Block lettering remains legible at 16 pixels. -->
+  <path d="M42 57h75l16 16v47l-16 16H68v38H42zM68 81v31h39V81z" fill="#fff6ee" fill-rule="evenodd"/>
+  <path d="M150 57h64v25h-38v24h30v24h-30v44h-26z" fill="#ffcf61"/>
+</svg>

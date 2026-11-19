@@ -7,6 +7,12 @@ return function(base)
  local function button_area(state)
   return 574,6,214,32
  end
+ local function show_button(state)
+  if not visible(state) then return false end
+  if state.active~='launch' then return true end
+  local launch=state.launch
+  return launch.page=='menu' and (launch.hub_mode=='profile' or launch.hub_mode=='battle')
+ end
  function base.create(options)
   local state=create(options)
   state.launch.hub_enabled=not options.legacy_menu
@@ -71,7 +77,7 @@ return function(base)
    return true
   end
   local x,y,w,h=button_area(state)
-  if pressed or (input.click and input.pointer_x>=x and input.pointer_x<=x+w and input.pointer_y>=y and input.pointer_y<=y+h) then
+  if pressed or (show_button(state) and input.click and input.pointer_x>=x and input.pointer_x<=x+w and input.pointer_y>=y and input.pointer_y<=y+h) then
    if state.active=='match' then
     -- Send the back action through the same deterministic input as the fight.
     -- A local menu intercept would strand the other network participant.
@@ -94,7 +100,7 @@ return function(base)
   end
   context.pf_selection_hint=state.launch and state.launch.hub_enabled and state.active=='characters'
   draw(state,context)
-  if not visible(state) or state.active=='launch' then return end
+  if not show_button(state) then return end
   local x,y,w,h=button_area(state)
   if state.active=='characters' and context.text then
    local lines=require('polish-fighters/input_settings').selection_hint(

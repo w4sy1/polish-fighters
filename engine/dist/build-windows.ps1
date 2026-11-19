@@ -74,7 +74,8 @@ if (-not $version) { throw 'The project version was not found in CMakeLists.txt.
 
 # Wizard pictures and the icon, drawn from the project's SVG.
 $iconDir = Join-Path $build 'icons'
-Invoke-Checked 'python' @((Join-Path $root 'tools/icons/make_icons.py'), $iconDir)
+Invoke-Checked 'python' @((Join-Path $root 'tools/icons/make_icons.py'), '--svg',
+    (Join-Path $root 'dist/windows/polish-fighters.svg'), $iconDir)
 
 # Inno Setup has no Chinese message files; the unofficial ones are pinned to the Inno Setup release.
 $innoTag = 'is-6_7_1'

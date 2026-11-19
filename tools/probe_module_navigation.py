@@ -42,7 +42,10 @@ if __name__ == '__main__':
             'requires=base@1\nrequires=polish-fighters@1\nextend=base/ui/flow|flow.lua\n')
         (folder / 'flow.lua').write_text(FLOW.replace('CASE', case))
         point = '@680_20'
-        trace = point + ',!,*4' if case != 'paused' else point + ',!,@0_0,@300_300,!,*8'
+        trace = point + ',!,*4'
+        if case in ('paused', 'finished'):
+            # From a fight the first press returns to character selection.
+            trace += ',' + point + ',!,*4'
         command = [str(stage / 'LittleFighters.exe'), '--installer', str(stage / 'LF2_v2.0a.exe'),
                    '--scripts', str(stage / 'scripts'), '--mod', str(stage / 'content-packs/polish-originals'),
                    '--mod', str(folder), '--config-dir', str(folder / 'config'), '--hub-menu', '--input-trace', trace]
@@ -50,7 +53,7 @@ if __name__ == '__main__':
         log = process.stdout + process.stderr
         (folder / 'run.log').write_text(log, encoding='utf-8')
         result = dict(case=case, exit=process.returncode,
-                      returned_to_modules=process.returncode == 0 and 'hub=true:root' in log and 'screen=launch' in log)
+                      returned_to_modules=process.returncode == 0 and 'hub=true:library' in log and 'screen=launch' in log)
         results.append(result)
         print(json.dumps(result), flush=True)
     (output / 'summary.json').write_text(json.dumps(results, indent=2))
