@@ -35,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/w4sy1/polish-fighters/main/server/r
 Skrypt instaluje przekaźnik jako usługę systemową, otwiera port w zaporze
 serwera i wypisuje gotową zawartość pliku `relay_config.py`.
 
-**Z Windows (cmd), bez logowania na serwer:** uruchom `server
+**Z Windows (cmd), bez logowania na serwer:** uruchom `server\relay\install-relay.cmd`
 elay\install-relay.cmd`
 dwuklikiem albo w cmd:
 
