@@ -157,7 +157,9 @@ return function(base)
  end
 
  local function text(context,value,x,y,variant,align)
-  font.draw(context,value,x,y,variant or variants.white,nil,align)
+  -- Lua menu positions can be half pixels (an odd-width language button).
+  -- The native frame protocol requires integral text and sprite coordinates.
+  font.draw(context,value,math.floor(x+0.5),math.floor(y+0.5),variant or variants.white,nil,align)
  end
  function base.draw(state,context)
   if state.hub_enabled and state.hub_mods then return mods.draw(state,context) end
