@@ -26,8 +26,7 @@ rm -rf /opt/polish-fighters-relay/__pycache__
 install -d -m 750 -o root -g pfrelay /etc/polish-fighters
 # A key may be provided up front, e.g. by an Oracle "initialization script".
 if [ -n "${PF_RELAY_KEY:-}" ]; then
-  printf '%s
-' "$PF_RELAY_KEY" > /etc/polish-fighters/relay.key
+  echo "$PF_RELAY_KEY" > /etc/polish-fighters/relay.key
 fi
 if [ ! -s /etc/polish-fighters/relay.key ]; then
   python3 -c 'import secrets; print(secrets.token_urlsafe(36))' > /etc/polish-fighters/relay.key
