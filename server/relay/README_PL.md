@@ -35,6 +35,16 @@ curl -fsSL https://raw.githubusercontent.com/w4sy1/polish-fighters/main/server/r
 Skrypt instaluje przekaźnik jako usługę systemową, otwiera port w zaporze
 serwera i wypisuje gotową zawartość pliku `relay_config.py`.
 
+**Z Windows (cmd), bez logowania na serwer:** uruchom `serverelay\install-relay.cmd`
+dwuklikiem albo w cmd:
+
+```bat
+install-relay.cmd ADRES_IP_ORACLE C:\sciezka\do\klucza.key
+```
+
+Plik sam łączy się przez SSH (użytkownik `ubuntu`), uruchamia instalację
+i zapisuje gotowy `relay_config.py` obok siebie.
+
 ## 2. Hosting Domenomania (raz)
 
 W menedżerze plików, w folderze aplikacji API (tam, gdzie `passenger_wsgi.py`):
