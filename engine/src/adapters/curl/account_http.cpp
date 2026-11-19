@@ -29,7 +29,8 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
        bearer.find_first_of("\r\n")!=std::string_view::npos)
         return fail(ErrorCode::limit,"Account request exceeds limit");
     if(operation!="login" && operation!="register" && operation!="logout" &&
-       operation!="list-rooms" && operation!="publish-room" && operation!="delete-room" && operation!="heartbeat-room")
+       operation!="list-rooms" && operation!="publish-room" && operation!="delete-room" && operation!="heartbeat-room" &&
+       operation!="relay-ticket")
         return fail(ErrorCode::format,"Unknown account operation");
     const auto address=std::string(base);
     std::unique_ptr<CURLU,decltype(&curl_url_cleanup)> url(curl_url(),curl_url_cleanup);

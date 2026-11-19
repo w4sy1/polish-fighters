@@ -206,7 +206,7 @@ add_library(openlf2_resources STATIC src/resources/installer.cpp src/resources/p
 openlf2_target(openlf2_resources)
 target_link_libraries(openlf2_resources PRIVATE openlf2_core)
 
-add_library(openlf2_engine STATIC src/engine/packages.cpp src/engine/room.cpp src/engine/room_host.cpp)
+add_library(openlf2_engine STATIC src/engine/packages.cpp src/engine/room.cpp src/engine/room_host.cpp src/engine/relay_link.cpp)
 openlf2_target(openlf2_engine)
 target_link_libraries(openlf2_engine PRIVATE openlf2_core)
 

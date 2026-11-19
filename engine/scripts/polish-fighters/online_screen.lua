@@ -3,9 +3,11 @@ local controls=require('base/ui/controls')
 local catalog=require('base/game/catalog')
 local navigation=require('base/ui/navigation')
 local screen={}
+-- The project's own account and relay server; any other server can still be typed in.
+screen.default_server='https://www.projektocalenie.pl/projekty/polish-fighters/api'
 function screen.open(state)
  local doc=engine.read_settings() or {}
- state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server or 'http://127.0.0.1:8765'),
+ state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server or screen.default_server),
   name='',password='',room='Pokój Polish Fighters',host='127.0.0.1',port='12345',
   page=1,nav=navigation.create(),previous={}}
 end
@@ -18,8 +20,12 @@ function screen.rows(s)
   rows[#rows+1]={'register','UTWÓRZ KONTO',280,260,220,34}
  else
   rows[#rows+1]={'field:room','NAZWA POKOJU: '..s.room,40,145,714,30}
-  rows[#rows+1]={'field:host','ADRES GOSPODARZA (IPv4): '..s.host,40,182,500,30}
-  rows[#rows+1]={'field:port','PORT: '..s.port,550,182,204,30}
+  if client.relay_available then
+   rows[#rows+1]={'info','GRA PRZEZ SERWER: bez adresu IP i przekierowania portów',40,182,714,30}
+  else
+   rows[#rows+1]={'field:host','ADRES GOSPODARZA (IPv4): '..s.host,40,182,500,30}
+   rows[#rows+1]={'field:port','PORT: '..s.port,550,182,204,30}
+  end
   rows[#rows+1]={'publish','OPUBLIKUJ I HOSTUJ',40,230,220,34}
   rows[#rows+1]={'refresh','ODŚWIEŻ POKOJE',280,230,220,34}
   rows[#rows+1]={'logout','WYLOGUJ',520,230,234,34}
@@ -57,12 +63,21 @@ function screen.activate(state,id,context)
   local port=tonumber(s.port)
   if not port or port%1~=0 or port<1024 or port>65535 then client.notice='Port: 1024–65535.';return end
   client.publish_port=port
-  ok,problem=client.request(s.endpoint,'publish-room',{host=s.host,port=port,name=s.room,
-    profile=catalog.profile_id,capacity=require('polish-fighters/dashboard_model').current().room_capacity})
+  client.publish_relay=client.relay_available==true
+  local payload={port=port,name=s.room,profile=catalog.profile_id,
+    capacity=require('polish-fighters/dashboard_model').current().room_capacity}
+  if client.publish_relay then payload.relay=true else payload.host=s.host end
+  ok,problem=client.request(s.endpoint,'publish-room',payload)
  elseif id:sub(1,5)=='join:' then
   local room=client.rooms[tonumber(id:sub(6))]
   if room.profile~=catalog.profile_id then client.notice='Najpierw uruchom zestaw '..room.profile;return end
-  if not room.host:match('^%d+%.%d+%.%d+%.%d+$') then client.notice='Ten klient wymaga adresu IPv4.';return end
+  if room.relay then
+   -- The ticket answer arrives asynchronously; online_client then opens the match screen.
+   ok,problem=client.request(s.endpoint,'relay-ticket',{room=room.id,role='join'},'join')
+   if not ok and problem then client.notice=tostring(problem) end
+   return
+  end
+  if not client.ipv4(room.host) then client.notice='Ten klient wymaga adresu IPv4.';return end
   client.pending_join={host=false,address=room.host,port=room.port}
   state.hub_online=nil;context.action('network');return
  end

@@ -17,8 +17,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 
 class Service:
-    def __init__(self, database, clock=time.time):
+    def __init__(self, database, clock=time.time, relay=None):
+        """relay: optional {'host': numeric IPv4, 'port': int, 'key': shared secret} of a
+        standalone room_relay.py that validates tickets through consume-relay-ticket."""
         self.clock = clock
+        self.relay = relay if relay and relay.get('host') and relay.get('port') else None
         self.lock = threading.RLock()
         self.db = sqlite3.connect(database, check_same_thread=False)
         self.db.execute('PRAGMA foreign_keys=ON')
@@ -51,6 +54,14 @@ class Service:
             self.db.execute('DELETE FROM sessions WHERE expires <= ?', (now,))
             self.db.execute('DELETE FROM rooms WHERE expires <= ?', (now,))
             self.db.execute('DELETE FROM invites WHERE expires <= ?', (now,))
+            if operation == 'consume-relay-ticket':
+                # Called by a standalone relay, never by players: authenticated by its key.
+                key = (self.relay or {}).get('key')
+                supplied = data.get('key')
+                if not key or not isinstance(supplied, str) or not hmac.compare_digest(supplied.encode(), key.encode()):
+                    raise PermissionError('Relay key required')
+                room, role, capacity = self.consume_relay_ticket(data.get('ticket'))
+                return {'room': room, 'role': role, 'capacity': capacity}
             if operation == 'recover':
                 name, code, password = data.get('name'), data.get('recovery_code'), data.get('password')
                 if not isinstance(name, str) or not isinstance(code, str) or len(code) > 128:
@@ -155,7 +166,10 @@ class Service:
                 ticket = secrets.token_urlsafe(32)
                 self.db.execute('INSERT INTO relay_tickets VALUES(?,?,?,?)',
                                 (hashlib.sha256(ticket.encode()).hexdigest(), room_id, role, now + 30))
-                return {'ticket': ticket, 'expires_in': 30}
+                result = {'ticket': ticket, 'expires_in': 30}
+                if self.relay:
+                    result['relay'] = {'host': self.relay['host'], 'port': self.relay['port']}
+                return result
             if operation == 'logout':
                 self.db.execute('DELETE FROM sessions WHERE token=?', (digest,))
                 return {'ok': True}
@@ -164,12 +178,21 @@ class Service:
                 return {'ok': True}
             if operation == 'publish-room':
                 host, port = data.get('host'), data.get('port')
-                try:
-                    address = ipaddress.ip_address(host)
-                except (ValueError, TypeError):
-                    raise ValueError('host must be an IP address') from None
-                if address.is_unspecified or address.is_multicast:
-                    raise ValueError('Unusable host address')
+                relayed = data.get('relay', False)
+                if type(relayed) is not bool:
+                    raise ValueError('relay must be boolean')
+                if relayed:
+                    # Played through the relay: no host address is published at all.
+                    if not self.relay:
+                        raise ValueError('This server has no relay')
+                    address = ''
+                else:
+                    try:
+                        address = ipaddress.ip_address(host)
+                    except (ValueError, TypeError):
+                        raise ValueError('host must be an IP address') from None
+                    if address.is_unspecified or address.is_multicast:
+                        raise ValueError('Unusable host address')
                 capacity, profile, name = data.get('capacity'), data.get('profile'), data.get('name')
                 if type(port) is not int or not 1024 <= port <= 65535:
                     raise ValueError('port: 1024-65535')
@@ -192,7 +215,10 @@ class Service:
             if operation == 'list-rooms':
                 rows = self.db.execute('SELECT id,name,host,port,profile,capacity FROM rooms WHERE private=0 OR owner=? ORDER BY name LIMIT 200', (user_id,)).fetchall()
                 keys = ('id', 'name', 'host', 'port', 'profile', 'capacity')
-                return {'rooms': [dict(zip(keys, row)) for row in rows],
+                rooms = [dict(zip(keys, row)) for row in rows]
+                for room in rooms:
+                    room['relay'] = room['host'] == ''
+                return {'rooms': rooms, 'relay': bool(self.relay),
                         'scope': 'Advertisements only; availability, player count and connection are not verified'}
             raise ValueError('Unknown operation')
 

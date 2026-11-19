@@ -35,13 +35,19 @@ return function(legacy)
   return {room=true,phase="idle",profile=options.network_profile,port=options.network_port or 12345,
    capacity=require("polish-fighters/dashboard_model").current().room_capacity,
    received="",frames=0,sequence=0,version=options.recording_version,
-   input_delay=options.network_delay or (options.network_internet and internet_delay or lan_delay)}
+   input_delay=options.network_delay or (options.network_internet and internet_delay or lan_delay),
+   relay=options.network_relay}
  end
  function room.start(s,host,address)
   room.close(s);s.host=host;s.error=nil;s.names=nil;s.peers={};s.slot=nil;s.frames=0;s.sequence=0;s.sent_checksum=nil
   s.sent_frame=0;s.ticks={};s.delay=0
   local value=host and (s.capacity..":"..s.profile..":"..address) or address
-  local ok,problem=engine.network(host and "room_host" or "join",value,s.port)
+  local operation=host and "room_host" or "join"
+  if not host and s.relay then
+   -- Single-use ticket: reconnecting needs a fresh one from the room list.
+   operation,value="relay_join",s.relay.address..":"..s.relay.ticket;s.relay=nil
+  end
+  local ok,problem=engine.network(operation,value,s.port)
   if not ok then return fail(s,problem) end
   s.phase="connecting";s.deadline=engine.network_time()+timeout;return true
  end

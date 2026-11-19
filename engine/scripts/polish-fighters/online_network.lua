@@ -12,7 +12,7 @@ return function(base)
   end
   if join then
    client.pending_join=nil;transport.next_room=true
-   options.network_port=join.port
+   options.network_port=join.port;options.network_relay=join.relay
   end
   local state=create(options)
   if join then base.begin(state,join.host,join.address);client.host_started=join.host end
