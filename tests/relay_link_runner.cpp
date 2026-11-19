@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
         if (joiner.socket->send(std::span<const char>("x", 1))) return fail("unpaired relay accepted data");
     }
     bool ready_sent = false, started = false;
-    int leader_frames = 0, joiner_frames = 0, joiner_sent = 0;
+    int leader_frames = 0, joiner_frames = 0, joiner_sent = 0, leader_sent = 0;
     const int delay = 3, frames = 40;
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(20);
     while (std::chrono::steady_clock::now() < deadline) {
@@ -86,9 +86,15 @@ int main(int argc, char** argv) {
                 leader.send(R"({"op":"start","delay":3})");
             } else if (line.find(R"("op":"start")") != std::string::npos) {
                 // The leader runs `delay` frames ahead, as the game client does.
-                for (int frame = 0; frame < frames; ++frame)
-                    leader.send(R"({"op":"input","frame":)" + std::to_string(frame) + R"(,"keys":"r"})");
-            } else if (line.find(R"("op":"frame")") != std::string::npos) ++leader_frames;
+                for (; leader_sent < delay; ++leader_sent)
+                    leader.send(R"({"op":"input","frame":)" + std::to_string(leader_sent) + R"(,"keys":"r"})");
+            } else if (line.find(R"("op":"frame")") != std::string::npos) {
+                ++leader_frames;
+                if (leader_sent < frames) {
+                    leader.send(R"({"op":"input","frame":)" + std::to_string(leader_sent) + R"(,"keys":"r"})");
+                    ++leader_sent;
+                }
+            }
             else if (line.find(R"("op":"error")") != std::string::npos || line.find(R"("op":"abort")") != std::string::npos)
                 return fail("leader got " + line);
         }
