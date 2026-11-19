@@ -33,6 +33,34 @@ class AccountsTest(unittest.TestCase):
         self.assertNotIn('long password 123', values)
         self.assertNotIn(self.token, str(self.service.db.execute('SELECT token FROM sessions').fetchall()))
 
+    def test_nick_play_without_password(self):
+        first = self.service.request('login', {'nick': True, 'name': 'Kuba_7'})
+        self.assertEqual(first['name'], 'kuba_7')
+        self.assertTrue(first['token'] and first['nick_key'])
+        self.assertEqual(self.service.request('list-rooms', {}, first['token'])['rooms'], [])
+        # Another device cannot take a nick while it is signed in; the owning device always can.
+        with self.assertRaises(PermissionError):
+            self.service.request('login', {'nick': True, 'name': 'kuba_7'})
+        again = self.service.request('login', {'nick': True, 'name': 'KUBA_7', 'nick_key': first['nick_key']})
+        self.assertEqual(again['nick_key'], first['nick_key'])
+        # Password accounts are never reachable through a nick, and a nick has no password.
+        with self.assertRaises(PermissionError):
+            self.service.request('login', {'nick': True, 'name': 'player'})
+        with self.assertRaises(PermissionError):
+            self.service.request('login', {'name': 'kuba_7', 'password': 'long password 123'})
+        with self.assertRaises(ValueError):
+            self.service.request('register', {'name': 'kuba_7', 'password': 'long password 123'})
+        with self.assertRaises(ValueError):
+            self.service.request('login', {'nick': True, 'name': 'a b'})
+        # Once every session ended, the nick is free for someone else.
+        self.service.request('logout', {}, first['token'])
+        self.service.request('logout', {}, again['token'])
+        taken = self.service.request('login', {'nick': True, 'name': 'kuba_7'})
+        self.assertNotEqual(taken['nick_key'], first['nick_key'])
+        self.now += 12 * 3600 + 1
+        with self.assertRaises(PermissionError):
+            self.service.request('list-rooms', {}, taken['token'])
+
     def test_session_logout_and_expiry(self):
         self.service.request('logout', {}, self.token)
         with self.assertRaises(PermissionError):

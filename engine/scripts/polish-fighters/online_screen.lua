@@ -8,16 +8,22 @@ screen.default_server='https://www.projektocalenie.pl/projekty/polish-fighters/a
 function screen.open(state)
  local doc=engine.read_settings() or {}
  state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server:match('%S') and doc.account_server or screen.default_server),
-  name='',password='',room='Pokój Polish Fighters',host='127.0.0.1',port='12345',
+  name='',password='',room='Pokój Polish Fighters',nick=type(doc.online_nick)=='string' and doc.online_nick:sub(1,24) or '',host='127.0.0.1',port='12345',
   page=1,nav=navigation.create(),previous={}}
 end
 function screen.rows(s)
  local rows={{'field:endpoint','SERWER KONT: '..s.endpoint,40,100,714,32}}
- if not client.token then
+ if not client.token and not s.accounts then
+  -- Default: just a nickname, no password.
+  rows[#rows+1]={'field:nick','TWÓJ NICK: '..s.nick,40,160,714,36}
+  rows[#rows+1]={'play','GRAJ',40,215,340,40}
+  rows[#rows+1]={'accounts','KONTO Z HASŁEM',414,215,340,40}
+ elseif not client.token then
   rows[#rows+1]={'field:name','LOGIN: '..s.name,40,160,714,32}
   rows[#rows+1]={'field:password','HASŁO: '..string.rep('*',#s.password),40,205,714,32}
   rows[#rows+1]={'login','ZALOGUJ',40,260,220,34}
   rows[#rows+1]={'register','UTWÓRZ KONTO',280,260,220,34}
+  rows[#rows+1]={'nickmode','GRAJ NICKIEM',520,260,234,34}
  else
   rows[#rows+1]={'field:room','NAZWA POKOJU: '..s.room,40,145,714,30}
   if client.relay_available then
@@ -44,15 +50,22 @@ function screen.activate(state,id,context)
  local s=state.hub_online
  if id:sub(1,6)=='field:' then s.focus=id:sub(7);return end
  s.focus=nil
+ if id=='accounts' then s.accounts=true;return elseif id=='nickmode' then s.accounts=nil;s.password='';return end
  if id=='back' then
+  if context.text_input then context.text_input(false) end
   if client.pending and client.pending.operation=='publish-room' then client.cancel_publish=true end
   s.password='';state.hub_online=nil;return
- elseif id=='lan' then state.hub_online=nil;context.action('network');return
+ elseif id=='lan' then if context.text_input then context.text_input(false) end;state.hub_online=nil;context.action('network');return
  elseif id=='prev' then s.page=math.max(1,s.page-1);return
  elseif id=='next' then s.page=math.min(math.max(1,math.ceil(#client.rooms/4)),s.page+1);return end
  if client.pending then return end
  local ok,problem
- if id=='login' or id=='register' then
+ if id=='play' then
+  if not s.nick:match('^[A-Za-z0-9_]+$') or #s.nick<3 or #s.nick>24 then
+   client.notice='Nick: 3–24 znaki: litery bez polskich znaków, cyfry lub _.';return
+  end
+  ok,problem=client.request(s.endpoint,'login',{nick=true,name=s.nick,nick_key=client.nick_key(s.endpoint)})
+ elseif id=='login' or id=='register' then
   if not s.name:match('^[A-Za-z0-9_]+$') or #s.name<3 or #s.name>24 or #s.password<12 then
    client.notice='Login: 3–24 litery/cyfry/_; hasło: 12–128 znaków.';return
   end
@@ -86,6 +99,8 @@ end
 function screen.update(state,input,context)
  local s=state.hub_online
  if client.navigate then client.navigate=nil;state.hub_online=nil;context.action('network');return end
+ -- Shows the phone's on-screen keyboard while a field is selected.
+ if context.text_input then context.text_input(s.focus~=nil and not client.pending) end
  if s.focus and not client.pending then
   local addition=input.text or ''
   if addition=='' then
@@ -93,7 +108,15 @@ function screen.update(state,input,context)
     if input.keys[code] and not s.previous[code] then addition=addition..(controls.key_character(code,input.keys[16]) or '') end
    end
   end
-  local limit=s.focus=='endpoint' and 512 or (s.focus=='password' and 128 or 48)
+  local limit=s.focus=='endpoint' and 512 or (s.focus=='password' and 128 or (s.focus=='nick' and 24 or 48))
+  if s.focus=='nick' then
+   -- Enter (also the soft keyboard's) plays straight away.
+   if (input.keys[13] and not s.previous[13]) or addition:find('[\r\n]') then
+    s.previous={};for code,value in pairs(input.keys) do s.previous[code]=value end
+    screen.activate(state,'play',context);return
+   end
+   addition=addition:gsub('[^A-Za-z0-9_]','')
+  end
   if input.keys[8] and not s.previous[8] then s[s.focus]=s[s.focus]:sub(1,-2) end
   s[s.focus]=(s[s.focus]..addition:gsub('[^ -~]','')):sub(1,limit)
  end
@@ -112,7 +135,8 @@ function screen.draw(state,context)
  context.viewport(794,550,8,13,27);context.image('pe/menu_back1',0,0,true)
  context.fill(0,0,794,550,8,13,27,185)
  context.text('POLISH FIGHTERS / KONTO I POKOJE',397,25,'center',25,0xf0f5ff,nil,nil,true)
- context.text('HTTPS dla serwera zdalnego. Hasło i sesja nie są zapisywane na dysku.',397,68,'center',13,0xadc3df,nil,nil,true)
+ context.text((client.token or state.hub_online.accounts) and 'HTTPS dla serwera zdalnego. Hasło i sesja nie są zapisywane na dysku.'
+  or 'Wpisz nick i kliknij GRAJ. Bez hasła i bez zakładania konta.',397,68,'center',13,0xadc3df,nil,nil,true)
  for _,row in ipairs(screen.rows(state.hub_online)) do
   local active=row[1]=='field:'..tostring(state.hub_online.focus)
   context.fill(row[3],row[4],row[5],row[6],active and 42 or 22,active and 80 or 42,active and 120 or 68,230)

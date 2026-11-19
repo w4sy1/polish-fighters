@@ -10,7 +10,7 @@ return {
  on='[WŁ.] ', off='[WYŁ.] ', missing=' [BRAK DANYCH]', duplicates_hidden='POWTÓRZENIA LF2: UKRYTE', duplicates_shown='POWTÓRZENIA LF2: WIDOCZNE',
  players='KONFIGURACJA GRACZY', start='DALEJ: WYBÓR POSTACI', active='AKTYWNY MODUŁ: ',
  quick='GRA PRZEZ INTERNET', host='UTWÓRZ POKÓJ LAN', join='DOŁĄCZ DO POKOJU LAN', rooms='LISTA POKOI / INNY SERWER', friends='GRA ZE ZNAJOMYMI [NIEDOSTĘPNA]',
- offline='Serwer gry: projektocalenie.pl (ustawiony automatycznie). Załóż konto i graj.',
+ offline='Serwer gry: projektocalenie.pl (ustawiony automatycznie). Wpisz nick i graj.',
  compatibility='Sieć wymaga tego samego modułu i zasobów. Wspólna pula: testy lokalne.',
  absent_turbo='LF2 Turbo: brak osobnego pakietu', navigation='STRZAŁKI / D-PAD: WYBÓR   ENTER / A: OK   ESC / B: WSTECZ',
  credit_text='Silnik: OpenLF2. Oryginalna gra: Marti Wong i Starsky Wong.',

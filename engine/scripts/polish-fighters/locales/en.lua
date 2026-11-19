@@ -10,7 +10,7 @@ return {
  on='[ON] ', off='[OFF] ', missing=' [MISSING DATA]', duplicates_hidden='LF2 DUPLICATES: HIDDEN', duplicates_shown='LF2 DUPLICATES: SHOWN',
  players='PLAYER SETUP', start='NEXT: SELECT CHARACTERS', active='ACTIVE MODULE: ',
  quick='PLAY OVER THE INTERNET', host='CREATE LAN ROOM', join='JOIN LAN ROOM', rooms='ROOM LIST / OTHER SERVER', friends='FRIENDS [UNAVAILABLE]',
- offline='Game server: projektocalenie.pl (set automatically). Create an account and play.',
+ offline='Game server: projektocalenie.pl (set automatically). Enter a nickname and play.',
  compatibility='Network peers need the same module and assets. Mixed pool: local testing.',
  absent_turbo='LF2 Turbo: no separate package installed', navigation='ARROWS / D-PAD: SELECT   ENTER / A: OK   ESC / B: BACK',
  credit_text='Engine: OpenLF2. Original game: Marti Wong and Starsky Wong.',

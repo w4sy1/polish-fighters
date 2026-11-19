@@ -1,5 +1,22 @@
 -- Account credentials and tokens live only in this Lua runtime, never in settings or replays.
-local client={rooms={},notice='Serwer gry jest ustawiony. Zaloguj się albo utwórz konto.'}
+-- The one exception is the nick key: it only lets this device take its own nickname back.
+local client={rooms={},notice='Serwer gry jest ustawiony. Wpisz nick i kliknij GRAJ.'}
+function client.nick_key(endpoint)
+ local document=engine.read_settings()
+ local keys=type(document)=='table' and type(document.online_nick_keys)=='table' and document.online_nick_keys or {}
+ local key=keys[client.api_endpoint(endpoint)]
+ if type(key)=='string' and #key>=16 and #key<=128 then return key end
+ return nil
+end
+local function save_nick(endpoint,name,key)
+ local document,problem=engine.read_settings()
+ if problem then return end
+ if type(document)~='table' then document={} end
+ if type(document.online_nick_keys)~='table' then document.online_nick_keys={} end
+ document.online_nick=name
+ if type(key)=='string' and #key>=16 and #key<=128 then document.online_nick_keys[client.api_endpoint(endpoint)]=key end
+ engine.write_settings(document)
+end
 local function ipv4(value)
  if type(value)~='string' then return false end
  local a,b,c,d=value:match('^(%d+)%.(%d+)%.(%d+)%.(%d+)$')
@@ -50,7 +67,9 @@ function client.tick()
  if type(result)~='table' then client.notice='Nieprawidłowa odpowiedź serwera.';return end
  if result.error then
   if pending.operation=='publish-room' then client.cancel_publish=nil end
-  client.notice='Błąd serwera: '..tostring(result.error):sub(1,140)
+  local friendly={['Nick in use']='Ten nick jest teraz zajęty. Wybierz inny.',
+   ['Nick taken by an account']='Ten nick należy do konta z hasłem. Wybierz inny.'}
+  client.notice=friendly[result.error] or ('Błąd serwera: '..tostring(result.error):sub(1,140))
   if result.error=='Session required' then client.token=nil;client.room=nil;client.rooms={} end
   return
  end
@@ -65,7 +84,8 @@ function client.tick()
    engine.write_settings(document)
   end
   client.recovery=result.recovery_code
-  client.notice='Zalogowano jako '..tostring(result.name)
+  if result.nick_key~=nil then save_nick(pending.endpoint,tostring(result.name),result.nick_key) end
+  client.notice=(result.nick_key~=nil and 'Grasz jako ' or 'Zalogowano jako ')..tostring(result.name)
   client.auto_refresh=true
  elseif operation=='list-rooms' then
   client.rooms={}

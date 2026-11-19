@@ -48,6 +48,43 @@ class Service:
             self.db.execute('ALTER TABLE rooms ADD COLUMN private INTEGER NOT NULL DEFAULT 0')
         self.db.commit()
 
+    NICK_SALT = b'nick'
+    NICK_SESSION = 12 * 3600
+
+    def nick_login(self, data, now):
+        """Play under a nickname without a password. The server hands the device a nick key; that
+        device can always take the nick back. Another device may take it only while nobody is
+        signed in with it. Nicks never collide with password accounts."""
+        name, key = data.get('name'), data.get('nick_key')
+        if not isinstance(name, str) or not re.fullmatch(r'[A-Za-z0-9_]{3,24}', name):
+            raise ValueError('name: 3-24 ASCII letters, digits or underscore')
+        if key is not None and (not isinstance(key, str) or not 16 <= len(key) <= 128):
+            raise ValueError('Invalid nick key')
+        name = name.lower()
+        row = self.db.execute('SELECT id,salt,password FROM users WHERE name=?', (name,)).fetchone()
+        new_key = secrets.token_urlsafe(32)
+        new_hash = hashlib.sha256(new_key.encode()).digest()
+        if row is None:
+            user_id = self.db.execute('INSERT INTO users(name,salt,password) VALUES(?,?,?)',
+                                      (name, self.NICK_SALT, new_hash)).lastrowid
+        elif row[1] != self.NICK_SALT:
+            raise PermissionError('Nick taken by an account')
+        else:
+            user_id = row[0]
+            owned = key is not None and hmac.compare_digest(hashlib.sha256(key.encode()).digest(), row[2])
+            if owned:
+                new_key = key  # Keep the device's key, so a lost answer never locks it out.
+            else:
+                if self.db.execute('SELECT 1 FROM sessions WHERE user_id=?', (user_id,)).fetchone():
+                    raise PermissionError('Nick in use')
+                # A free nick changes hands: the previous holder's rooms go with it.
+                self.db.execute('DELETE FROM rooms WHERE owner=?', (user_id,))
+                self.db.execute('UPDATE users SET password=? WHERE id=?', (new_hash, user_id))
+        value = secrets.token_urlsafe(32)
+        self.db.execute('INSERT INTO sessions VALUES(?,?,?)',
+                        (hashlib.sha256(value.encode()).hexdigest(), user_id, now + self.NICK_SESSION))
+        return {'token': value, 'expires_in': self.NICK_SESSION, 'name': name, 'nick_key': new_key}
+
     def request(self, operation, data, token=''):
         with self.lock, self.db:
             now = self.clock()
@@ -81,6 +118,8 @@ class Service:
                 self.db.execute('DELETE FROM sessions WHERE user_id=?', (row[0],))
                 self.db.execute('DELETE FROM rooms WHERE owner=?', (row[0],))
                 return {'ok': True, 'recovery_code': replacement}
+            if operation == 'login' and data.get('nick') is True:
+                return self.nick_login(data, now)
             if operation in ('register', 'login'):
                 name, password = data.get('name'), data.get('password')
                 if not isinstance(name, str) or not re.fullmatch(r'[A-Za-z0-9_]{3,24}', name):
