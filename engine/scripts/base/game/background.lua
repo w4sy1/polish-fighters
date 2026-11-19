@@ -3,6 +3,7 @@
 
 local constants = require("base/game/constants")
 
+local managed_resource = require("base/game/managed_resource")
 local background = {}
 local cache = {}
 local screen_width = constants.screen.width
@@ -18,7 +19,10 @@ function background.load(path)
     local data = cache[path]
     if not data then
         data = engine.read_background_data(path)
-        for _, layer in ipairs(data.layers) do layer.resource = canonical(layer.path) end
+        data.shadow = managed_resource.resolve(path, data.shadow)
+        for _, layer in ipairs(data.layers) do
+            layer.resource = canonical(managed_resource.resolve(path, layer.path))
+        end
         cache[path] = data
     end
     return data

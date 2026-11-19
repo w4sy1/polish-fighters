@@ -17,7 +17,7 @@ def canonical(value):
  if p.is_absolute() or '..' in p.parts or ':' in value or not re.fullmatch(r'[a-z0-9_./-]+',value):raise ValueError('Unsafe resource path: '+value)
  return p.as_posix()
 
-def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allow_missing=False):
+def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allow_missing=False,managed_import=False):
  source=Path(source).resolve(strict=True);destination=Path(destination).resolve()
  if destination.exists():raise ValueError('Destination already exists; choose a new directory')
  if source==destination or source in destination.parents:raise ValueError('Destination must be outside source')
@@ -31,6 +31,12 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
     if relative in files:raise ValueError('Case-colliding resource: '+relative)
     files[relative]=path
  catalog=files['data/data.txt'].read_text(encoding='latin1')
+ catalog_sha256=hashlib.sha256(catalog.encode('latin1')).hexdigest()
+ normalization=None
+ normalized_files=[]
+ if managed_import:
+  from normalize_ntsd_vc80 import import_profile, normalize
+  normalization=import_profile(hashlib.sha256(files['data/data.txt'].read_bytes()).hexdigest(),files)
  objects=re.search(r'<object>(.*?)<object_end>',catalog,re.S).group(1)
  backgrounds=re.search(r'<background>(.*?)<background_end>',catalog,re.S).group(1)
  records=[];bgs=[];seen=set();markers=[];aliases={};custom_labels=[]
@@ -74,6 +80,11 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   raw=files[path].read_bytes()
   if path.endswith('.dat'):
    text=decode(raw)
+   if normalization and path in normalization[1]:
+    if hashlib.sha256(raw).hexdigest()!=normalization[1][path]:
+     raise ValueError('NTSD source DAT changed during import: '+path)
+    text,fields=normalize(text,normalization[2])
+    normalized_files.append({'path':path,'fields_changed':len(fields)})
    def replace(match):
     # The native frame reader recognizes the exact token sound:, not #sound:.
     # Keep disabled author annotations without inventing an asset dependency.
@@ -81,7 +92,13 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
     if re.fullmatch(r'\s*#sound:\s*',line_prefix):
      disabled_sounds.append({'source':path,'resource':canonical(match[1])})
      return match[0]
-    resource=canonical(match[1]);queue.append(resource);return register(resource)
+    resource=canonical(match[1]);queue.append(resource)
+    virtual=register(resource)
+    # Legacy image fields accept as few as 29 characters. Keep the full
+    # namespace in the manifest and resolve these local references on read.
+    if managed_import and resource.endswith(('.bmp','.png')):
+     return './'+virtual[len(prefix):]
+    return virtual
    # Frame labels are cosmetic, but the native reader retains the original 19-byte bound.
    text=re.sub(r'(?m)(<frame>\s+\d+\s+)(\S+)',lambda m:m[1]+m[2][:19],text)
    text=RESOURCE.sub(replace,text)
@@ -128,7 +145,13 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   (destination/'catalog.lua').write_text('return function(base)\n base.source_path="'+register('data/data.txt')+'"\n base.stage_path="'+register('data/stage.dat')+'"\n base.profile_id="'+pack_id+'"'+campaign_lua+'\n return base\nend\n')
   sound_paths={p:register(p) for p in converted if p.endswith('.wav')}
   (destination/'sounds.lua').write_text('return function(base)\n local paths={\n'+''.join(' ["'+k+'"]="'+v+'",\n' for k,v in sorted(sound_paths.items()))+' }\n for k,v in pairs(base.fixed_files) do base.fixed_files[k]=paths[v] or v end\n for k,v in pairs(base.menu) do base.menu[k]=paths[v] or v end\n return base\nend\n')
-  report={'pack_id':pack_id,'fighters':fighters,'objects':len(records),'backgrounds':len(bgs),'assets':len(converted),'source_catalog_sha256':hashlib.sha256(catalog.encode('latin1')).hexdigest(),'mode':'isolated, original IDs retained','executable_patches_emulated':False,'gameplay_verified':False,'png_aliases':aliases,'catalog_markers_not_emulated':markers,'custom_catalog_labels':custom_labels,'missing_resources':sorted(missing),'experimental':True}
+  report={'pack_id':pack_id,'fighters':fighters,'objects':len(records),'backgrounds':len(bgs),'assets':len(converted),'source_catalog_sha256':catalog_sha256,'mode':'isolated, original IDs retained','executable_patches_emulated':False,'gameplay_verified':False,'png_aliases':aliases,'catalog_markers_not_emulated':markers,'custom_catalog_labels':custom_labels,'missing_resources':sorted(missing),'experimental':True}
+  if normalized_files:
+   report['dat_normalization']={
+    'edition':normalization[0], 'method':'VC80 x86 sscanf %d',
+    'fields_changed':sum(item['fields_changed'] for item in normalized_files),
+    'files':sorted(normalized_files,key=lambda item:item['path']),
+   }
   report['campaigns']=campaigns
   report['disabled_sound_annotations']=disabled_sounds
   repairs=repair_sprite_edges(destination)
@@ -147,10 +170,12 @@ def repair_sprite_edges(package):
    virtual,local=line[6:].split('|');assets[virtual]=package/local
  required={}
  pattern=re.compile(r'file\([^)]*\):\s*(\S+)\s+w:\s*(\d+)\s+h:\s*(\d+)\s+row:\s*(\d+)\s+col:\s*(\d+)')
- for path in assets.values():
+ for virtual,path in assets.items():
   if path.suffix=='.dat':
    for match in pattern.finditer(decode(path.read_bytes())):
     name,w,h,columns,rows=match.groups()
+    if name.startswith('./a/'):
+     name=virtual.rsplit('/a/',1)[0]+'/'+name[2:]
     size=((int(w)+1)*int(columns)-1,(int(h)+1)*int(rows)-1)
     previous=required.get(name,(0,0));required[name]=(max(previous[0],size[0]),max(previous[1],size[1]))
  padded=[];unresolved=[]

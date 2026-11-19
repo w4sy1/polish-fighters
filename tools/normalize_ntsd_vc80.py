@@ -7,7 +7,6 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
-from import_legacy import decode,encode
 ROOT=Path(__file__).resolve().parents[1]
 FIELD=re.compile(r'\b([A-Za-z_]+):\s*(-?\d+)(?![\w.])')
 
@@ -23,7 +22,20 @@ def normalize(text,values):
     result=FIELD.sub(change,text)
     return result,evidence
 
+def import_profile(catalog_sha256, files):
+    fingerprint = json.loads((ROOT / 'data/mods/ntsd-2.4-2.0a.json').read_text(encoding='utf-8'))
+    if catalog_sha256 != fingerprint['source_catalog_sha256']:
+        return None
+    dat_hashes = fingerprint['source_dat_sha256']
+    for name, expected in dat_hashes.items():
+        if name not in files or hashlib.sha256(files[name].read_bytes()).hexdigest() != expected:
+            return None
+    proof = json.loads((ROOT / 'content-packs/ntsd/vc80-integer-normalization.json').read_text(encoding='utf-8'))
+    return fingerprint['edition'], dat_hashes, proof['unique_tokens']
+
+
 if __name__=='__main__':
+    from import_legacy import decode,encode
     pack=ROOT/'content-packs/ntsd';sources={p:decode(p.read_bytes()) for p in (pack/'assets').rglob('*.dat')}
     tokens=sorted({m[2] for text in sources.values() for m in FIELD.finditer(text) if not -2147483648<=int(m[2])<=2147483647})
     if not tokens:raise ValueError('No overflows; preserve existing normalization evidence')

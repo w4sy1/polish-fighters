@@ -35,7 +35,7 @@ def import_zip(archive, destination, pack_id, data_only=False):
         temporary = Path(temporary)
         report = extract_zip(archive, temporary / 'source', data_only=data_only)
         source = temporary / 'source' / preview['legacy_roots'][0]
-        result = convert(source, temporary / 'package', pack_id)
+        result = convert(source, temporary / 'package', pack_id, managed_import=True)
         result.update(archive_sha256=report['sha256'], compatibility='not_tested', active=False)
         if report.get('excluded'): result['excluded_archive_files'] = report['excluded']
         (temporary / 'package' / 'import-report.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

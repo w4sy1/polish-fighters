@@ -1,6 +1,7 @@
 -- SPDX-License-Identifier: MIT
 -- Copyright (c) 2026 OpenLF2 contributors
 
+local managed_resource = require("base/game/managed_resource")
 local object_data = {}
 local cache = {}
 local function canonical(path)
@@ -13,7 +14,11 @@ function object_data.load(path)
     local data = cache[path]
     if not data then
         data = engine.read_object_data(path)
-        for _, sheet in ipairs(data.sheets) do sheet.resource = canonical(sheet.path) end
+        data.head = managed_resource.resolve(path, data.head)
+        data.small = managed_resource.resolve(path, data.small)
+        for _, sheet in ipairs(data.sheets) do
+            sheet.resource = canonical(managed_resource.resolve(path, sheet.path))
+        end
         cache[path] = data
     end
     return data

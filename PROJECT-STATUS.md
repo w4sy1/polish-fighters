@@ -1,3 +1,12 @@
+## 2026-11-19 — NTSD 2.4_2.0a w Mod Managerze
+
+- Import dla rozpoznanego wydania sprawdza SHA-256 surowego katalogu i 37 plików źródłowych DAT. Wykorzystuje zmierzone wyniki x86 VC80 `sscanf %d` dla 364 wartości. `import-report.json` podaje wydanie, metodę, pliki i liczbę zmian. Inne wydania nadal podlegają standardowej walidacji liczb.
+- Obrazy w plikach DAT importowanych przez Mod Manager mają krótkie odwołania rozwiązywane we własnej przestrzeni zasobów pakietu. Zachowano limity parsera, format manifestów, identyfikatory pakietów i weryfikację plików biblioteki.
+- Kolejka nie pobrała `https://www.lf-empire.de/downloads/versions/NTSD_2.4_2.0a.zip` ani `https://www.lf-empire.de/downloads/versions/LF2_Reinforced.zip`. Zatrzymał ją wymagany odstęp żądań źródła. Nie powstał nowy plik do obliczenia SHA-256.
+- Oryginalny lokalny ZIP NTSD (SHA-256 `9ca26ee8f00adf043ce466c8e160399d9c6777a941d34c63c263564ea9d9c661`) odrzucono ze względu na limit rozpakowania. Osobny ZIP danych z wcześniej rozpakowanej kopii (SHA-256 `d084771491a7176ee60a4974690e1a4c8865202c646eedb5ba2dd58843ee1077`) przeszedł zwykły import. Po instalacji osobno wybrano pakiet w profilu testowym.
+- Próba Windows z natywnym silnikiem 0.18.0 i powtarzalnym wejściem z menu rozpoczęła walkę Yamato (ID 13) z Sasuke (ID 11). Po ruchu Yamato miał pozycję X 546,100 wobec 487,100 na starcie. Na klatce 21 symulacji atak dał klatkę aktora 61, a próba bez ataku 0. Wersja kontrolna z krótkimi ścieżkami i surowymi liczbami zatrzymała się na błędzie int32. Zaliczone testy Python Mod Managera i normalizacji: 39 dla zawartości commita, 40 z równoległymi zmianami lokalnymi. Bazowa walka LF2 osiągnęła klatkę 300. Próba obejmuje jedną walkę, bez weryfikacji całego rosteru i kampanii.
+- Android API 35 x86_64: zbudowano i uruchomiono izolowany APK debug z danymi bazowymi i lokalnym silnikiem ARM64 przez translację emulatora. `assembleDebug` i 63 testy jednostkowe zaliczone. Lint: 0 błędów i 60 ostrzeżeń. Podpis APK zweryfikowany. Na emulatorze sprawdzono uruchomienie menu. Próba grywalności NTSD dotyczy Windows.
+
 ## 2026-11-19 — realny dostęp do lf-empire.de/Ultimate Fighters, 2 nowe prawdziwe adresy pobierania, potwierdzony limit robots.txt
 
 Po zmianie przez użytkownika dozwolonych domen konta, lf-empire.de i

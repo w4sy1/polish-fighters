@@ -2,6 +2,7 @@
 -- Copyright (c) 2026 OpenLF2 contributors
 
 local catalog = {source_path="data/data.txt",stage_path="data/stage.dat",profile_id="lf2-classic"}
+local managed_resource = require("base/game/managed_resource")
 local cached
 local cached_backgrounds
 local cached_objects
@@ -48,7 +49,7 @@ function catalog.load()
                 assert(portrait, "missing portrait: " .. path)
                 local family = math.floor(id / 10)
                 fighters[#fighters + 1] = {id = id, record = record, name = name,
-                    portrait = canonical(portrait), path = path, hidden = family == 3 or family == 5}
+                    portrait = canonical(managed_resource.resolve(path, portrait)), path = path, hidden = family == 3 or family == 5}
                 assert(#fighters <= (catalog.fighter_limit or 400), "too many character records")
                 end
             end
