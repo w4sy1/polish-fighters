@@ -1,6 +1,8 @@
 # Polish Fighters
 
 Własny silnik OpenLF2 z rozszerzeniami Polish Fighters: Windows, źródła Androida, klasyczne i dotykowe sterowanie, izolowane dodatki, lokalna historia i postęp oraz pokoje TCP.
+HELP US https://discord.gg/ypuFkbuyj 
+
 
 ## Pobranie
 
