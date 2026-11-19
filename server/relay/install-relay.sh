@@ -12,8 +12,9 @@ SOURCE="${PF_RELAY_SOURCE:-https://raw.githubusercontent.com/w4sy1/polish-fighte
 case "$API" in https://*) ;; *) echo "The account API must use https://" >&2; exit 1 ;; esac
 case "$PORT" in ''|*[!0-9]*) echo "Port must be a number" >&2; exit 1 ;; esac
 
-apt-get update -qq
-DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 curl ca-certificates iptables-persistent >/dev/null
+# On a first boot (cloud-init) unattended upgrades may still hold the package lock.
+apt-get -o DPkg::Lock::Timeout=900 update -qq
+DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=900 install -y -qq python3 curl ca-certificates iptables-persistent >/dev/null
 
 id pfrelay >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin pfrelay
 install -d -m 755 /opt/polish-fighters-relay
@@ -23,6 +24,11 @@ mv /opt/polish-fighters-relay/room_relay.py.new /opt/polish-fighters-relay/room_
 rm -rf /opt/polish-fighters-relay/__pycache__
 
 install -d -m 750 -o root -g pfrelay /etc/polish-fighters
+# A key may be provided up front, e.g. by an Oracle "initialization script".
+if [ -n "${PF_RELAY_KEY:-}" ]; then
+  printf '%s
+' "$PF_RELAY_KEY" > /etc/polish-fighters/relay.key
+fi
 if [ ! -s /etc/polish-fighters/relay.key ]; then
   python3 -c 'import secrets; print(secrets.token_urlsafe(36))' > /etc/polish-fighters/relay.key
 fi
