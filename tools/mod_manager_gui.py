@@ -199,6 +199,9 @@ class Manager:
                  'Pliki pomijane (nie będą wypakowane): ' + str(len(report['excluded'])),
                  'Zgodność: NIEPRZETESTOWANA. Nie uruchamiamy kodu z archiwum.',
                  'Wpis katalogu (wybór użytkownika, nie dowód pochodzenia): ' + (result['name'] or 'bez przypisania'), '', 'Dane (pierwsze 100):']
+        if report.get('signed'):
+            manifest = report['manifest']
+            lines.insert(1, f"Podpis STABLE zweryfikowany: {manifest['id']} {manifest['version']}")
         lines += [item['name'] + ' (' + str(item['bytes']) + ' B)' for item in report['files'][:100]]
         lines += ['', 'Pomijane (pierwsze 30):'] + [item['name'] for item in report['excluded'][:30]]
         view.insert('1.0', '\n'.join(lines)); view.configure(state='disabled')
@@ -210,7 +213,7 @@ class Manager:
             self.background('import', lambda: self.library.install(result['path'], result['name'], result['catalog_id'], result['update_id']))
         controls = ttk.Frame(window); controls.pack(fill='x', pady=5)
         ttk.Button(controls, text='Anuluj', command=window.destroy).pack(side='right', padx=6)
-        if len(report['legacy_roots']) == 1:
+        if report.get('signed') or len(report['legacy_roots']) == 1:
             ttk.Button(controls, text='Aktualizuj dane z kopią' if result['update_id'] else 'Importuj tylko dane', command=install).pack(side='right', padx=6)
 
     def select_profile(self):

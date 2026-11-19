@@ -1,4 +1,5 @@
 import hashlib
+import io
 import json
 import subprocess
 import sys
@@ -11,12 +12,43 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
+from mod_library import Library
 from verify_mod_package import verify_catalog, verify_package
 
 
 def canonical(document):
     return json.dumps(document, sort_keys=True, ensure_ascii=False,
                       separators=(',', ':')).encode('utf-8')
+
+
+def signed_envelope(test, extra=None, wrong_hash=False, wrong_signature=False):
+    manifest = test.fixture()
+    payload = io.BytesIO()
+    entries = {
+        'module.json': canonical({'source': 'assets/a/data.txt', 'stage': 'assets/a/stage.dat'}),
+        'assets/a/data.txt': b'<object>\n<object_end>\n',
+        'assets/a/stage.dat': b'game data',
+        **(extra or {}),
+    }
+    with zipfile.ZipFile(payload, 'w') as archive:
+        for name, contents in entries.items():
+            archive.writestr(name, contents)
+    data = payload.getvalue()
+    manifest.update(size_bytes=len(data), unpacked_size_bytes=sum(map(len, entries.values())),
+                    min_engine_version='1.1.0',
+                    sha256='0' * 64 if wrong_hash else hashlib.sha256(data).hexdigest(),
+                    installation={'method': 'managed-data-zip', 'entrypoint': 'module.json'})
+    raw = canonical(manifest)
+    index = canonical({'channel': 'stable', 'revision': 1,
+                       'manifests': {'arena@1.0.0': hashlib.sha256(raw).hexdigest()}})
+    with zipfile.ZipFile(test.archive, 'w') as archive:
+        for name, contents in (
+            ('catalog.json', index), ('catalog.sig', test.signer.sign(index)),
+            ('manifest.json', raw), ('manifest.sig', b'\x00' * 64 if wrong_signature else test.signer.sign(raw)),
+            ('package.zip', data),
+        ):
+            archive.writestr(name, contents)
+    return test.archive
 
 
 class ModContractTests(unittest.TestCase):
@@ -102,3 +134,30 @@ class ModContractTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0 if pinned else 1, result.stderr)
             if not pinned:
                 self.assertIn('not pinned', result.stderr)
+    def test_windows_signed_install_uses_existing_library_and_adapter(self):
+        key = self.root / 'trusted.pub'
+        key.write_bytes(self.key)
+        library = Library(self.root / 'library', trusted_key=key)
+        path = signed_envelope(self)
+        self.assertTrue(library.preview(path)['signed'])
+        result = library.install(path)
+        record = result['package']
+        self.assertTrue(record['signed'])
+        self.assertEqual(record['version'], '1.0.0')
+        self.assertEqual(record['id'], 'mod-' + hashlib.sha256(b'signed:arena').hexdigest()[:24])
+        target = library.package_path(record['id'])
+        self.assertIn(f'mods/{record["id"]}/a/stage.dat', (target / 'catalog.lua').read_text())
+        self.assertTrue(library.install(path)['duplicate'])
+        library.verify(record['id'])
+        with self.assertRaisesRegex(ValueError, 'newer signed version'):
+            library.install(path, update_id=record['id'])
+
+    def test_windows_rejects_bad_signed_install_without_publishing(self):
+        key = self.root / 'trusted.pub'
+        key.write_bytes(self.key)
+        library = Library(self.root / 'library', trusted_key=key)
+        for arguments in ({'wrong_hash': True}, {'wrong_signature': True},
+                          {'extra': {'assets/a/script.lua': b'return 1'}}):
+            with self.subTest(arguments=arguments), self.assertRaises(ValueError):
+                library.install(signed_envelope(self, **arguments))
+            self.assertEqual(library.read()['installed'], {})

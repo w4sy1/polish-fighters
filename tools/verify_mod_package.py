@@ -85,9 +85,22 @@ def verify_package(raw, signature, public_key, archive, *, google_play=False):
     names = {entry['name'] for entry in report['files']}
     if manifest['installation']['entrypoint'] not in names:
         raise ValueError('Package entrypoint is missing')
-    if google_play and any(Path(name).suffix.lower() not in PLAY_SUFFIXES for name in names):
+
+    def play_data(name):
+        if Path(name).suffix.lower() in PLAY_SUFFIXES:
+            return True
+        return (manifest['installation']['entrypoint'] == 'module.json'
+                and re.fullmatch(r'assets/a/[a-z0-9]{1,40}\.dat', name))
+
+    if google_play and any(not play_data(name) for name in names):
         raise ValueError('File type is forbidden for Google Play')
     return manifest
+
+
+def verify_pinned_manifest(catalog, raw, manifest):
+    identity = f"{manifest['id']}@{manifest['version']}"
+    if catalog['manifests'].get(identity) != hashlib.sha256(raw).hexdigest():
+        raise ValueError('Manifest is not pinned in this catalogue')
 
 
 def main():
@@ -109,9 +122,7 @@ def main():
                                  key, args.channel, min_revision=args.min_revision)
         manifest = verify_package(raw, args.signature.read_bytes(), key, args.archive,
                                   google_play=args.google_play)
-        identity = f"{manifest['id']}@{manifest['version']}"
-        if catalog['manifests'].get(identity) != hashlib.sha256(raw).hexdigest():
-            raise ValueError('Manifest is not pinned in this catalogue')
+        verify_pinned_manifest(catalog, raw, manifest)
     except (OSError, ValueError, zipfile.BadZipFile) as error:
         parser.exit(1, f'{error}\n')
 

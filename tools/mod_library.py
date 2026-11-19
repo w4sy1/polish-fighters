@@ -17,6 +17,7 @@ import zipfile
 from pathlib import Path
 from mod_downloads import worker_lock
 from mod_archive import inspect_zip, has_link_component
+import signed_mod
 
 MAX_STATE = 2 * 1024 * 1024
 
@@ -55,7 +56,8 @@ def atomic_json(path, value):
 
 
 class Library:
-    def __init__(self, home):
+    def __init__(self, home, *, trusted_key=signed_mod.TRUSTED_KEY):
+        self.trusted_key = Path(trusted_key)
         self.home = Path(home).absolute()
         self.home.mkdir(parents=True, exist_ok=True)
         if has_link_component(self.home): raise ValueError('Library root cannot use links or junctions')
@@ -147,6 +149,14 @@ class Library:
         return result
 
     def preview(self, archive):
+        if signed_mod.is_signed(archive):
+            with tempfile.TemporaryDirectory(prefix='.preview-', dir=self.home) as work:
+                staging = Path(work) / 'package'
+                manifest, _ = signed_mod.prepare(archive, staging, key_path=self.trusted_key)
+                files = [{'name': path.relative_to(staging).as_posix(), 'bytes': path.stat().st_size}
+                         for path in sorted((staging / 'assets').rglob('*')) if path.is_file()]
+                return {'files': files, 'total_bytes': sum(item['bytes'] for item in files),
+                        'legacy_roots': [], 'excluded': [], 'signed': True, 'manifest': manifest}
         result = inspect_zip(archive, data_only=True)
         result['mode'] = 'supported_data_only; executable/unsupported files will not be extracted'
         result['gameplay_verified'] = False
@@ -198,42 +208,67 @@ class Library:
             # Stable IDs give independent installs of identical archives the same
             # virtual asset paths for the engine's network identity calculation.
             archive_sha256 = digest(archive)
-            pack_id = identifier(update_id) if update_id else 'mod-' + archive_sha256[:24]
-            previous = data['installed'].get(pack_id)
-            if update_id and previous is None: raise ValueError('Cannot update an uninstalled package')
-            if not update_id:
-                duplicate = next((row for row in data['installed'].values() if row.get('archive_sha256') == archive_sha256), None)
-                if duplicate:
-                    self.verify(duplicate['id'], data)
-                    return {'package': duplicate, 'duplicate': True}
-                if previous: raise ValueError('Package ID collision; choose an explicit update instead')
-            target = self.package_path(pack_id)
-            if target.exists() and not previous: raise ValueError('Unregistered directory blocks installation')
+            signed = signed_mod.is_signed(archive)
             with tempfile.TemporaryDirectory(prefix='.install-', dir=self.home) as work:
                 staging = Path(work) / 'package'
-                report = import_zip(archive, staging, pack_id, data_only=True)
-                if report['archive_sha256'] != archive_sha256: raise ValueError('Archive changed during installation; select it again')
-                record = self.describe(staging, report, name or (previous or {}).get('name') or Path(archive).stem,
-                                       catalog_id or (previous or {}).get('catalog_id'))
-                backup = None
-                if previous:
-                    backup = self._version(data, pack_id, previous, 'update')
-                    target.rename(backup)
-                published = False
-                try:
-                    if target.exists(): raise ValueError('Installation target already exists')
-                    staging.rename(target)
-                    published = True
-                    data['installed'][pack_id] = record
-                    self.save(data, 'update' if previous else 'install')
-                except BaseException:
-                    # The only recursive deletion here targets our newly created,
-                    # unpublished package, whose path is checked by package_path().
-                    if published and target.exists():
-                        shutil.rmtree(self.package_path(pack_id))
-                    if backup and backup.exists(): backup.rename(target)
-                    raise
-                return {'package': record, 'duplicate': False}
+                manifest = None
+                if signed:
+                    manifest, pack_id = signed_mod.prepare(archive, staging, key_path=self.trusted_key)
+                    if digest(archive) != archive_sha256:
+                        raise ValueError('Archive changed during installation; select it again')
+                    if update_id and identifier(update_id) != pack_id:
+                        raise ValueError('Signed package cannot update a different module')
+                else:
+                    pack_id = identifier(update_id) if update_id else 'mod-' + archive_sha256[:24]
+                return self._install_staged(data, archive, archive_sha256, pack_id, staging,
+                                            manifest, name, catalog_id, update_id, import_zip)
+
+    def _install_staged(self, data, archive, archive_sha256, pack_id, staging, manifest,
+                        name, catalog_id, update_id, import_zip):
+        previous = data['installed'].get(pack_id)
+        if previous and previous.get('signed') and not manifest:
+            raise ValueError('A signed module requires a signed update')
+        if update_id and previous and previous.get('signed') and manifest:
+            if tuple(map(int, manifest['version'].split('.'))) <= tuple(map(int, previous['version'].split('.'))):
+                raise ValueError('A STABLE update requires a newer signed version')
+        if update_id and previous is None: raise ValueError('Cannot update an uninstalled package')
+        if not update_id:
+            duplicate = next((row for row in data['installed'].values() if row.get('archive_sha256') == archive_sha256), None)
+            if duplicate:
+                self.verify(duplicate['id'], data)
+                return {'package': duplicate, 'duplicate': True}
+            if previous: raise ValueError('Package ID collision; choose an explicit update instead')
+        target = self.package_path(pack_id)
+        if target.exists() and not previous: raise ValueError('Unregistered directory blocks installation')
+        if manifest:
+            report = {'pack_id': pack_id, 'archive_sha256': archive_sha256}
+            record = self.describe(staging, report, manifest['name'], manifest['id'])
+            record.update(signed=True, version=manifest['version'])
+        else:
+            report = import_zip(archive, staging, pack_id, data_only=True)
+            if report['archive_sha256'] != archive_sha256:
+                raise ValueError('Archive changed during installation; select it again')
+            record = self.describe(staging, report, name or (previous or {}).get('name') or Path(archive).stem,
+                                   catalog_id or (previous or {}).get('catalog_id'))
+        backup = None
+        if previous:
+            backup = self._version(data, pack_id, previous, 'update')
+            target.rename(backup)
+        published = False
+        try:
+            if target.exists(): raise ValueError('Installation target already exists')
+            staging.rename(target)
+            published = True
+            data['installed'][pack_id] = record
+            self.save(data, 'update' if previous else 'install')
+        except BaseException:
+            # The only recursive deletion here targets our newly created,
+            # unpublished package, whose path is checked by package_path().
+            if published and target.exists():
+                shutil.rmtree(self.package_path(pack_id))
+            if backup and backup.exists(): backup.rename(target)
+            raise
+        return {'package': record, 'duplicate': False}
 
     def _version(self, data, pack_id, record, reason):
         token = 'backup-' + uuid.uuid4().hex

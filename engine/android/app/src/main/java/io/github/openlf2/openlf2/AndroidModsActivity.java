@@ -100,7 +100,7 @@ public final class AndroidModsActivity extends Activity {
         Uri selected=data.getData();setBusy(true,"Sprawdzam i importuję paczkę…");
         worker.submit(()->{
             try {
-                String id=AndroidModPackageImporter.importPackage(getContentResolver(),selected,getFilesDir(),entries->runOnUiThread(()->status.setText("Sprawdzono plików: "+entries)));
+                String id=AndroidModPackageImporter.importPackage(getContentResolver(),selected,getFilesDir(),getAssets(),entries->runOnUiThread(()->status.setText("Sprawdzono plików: "+entries)));
                 try { GamePackSettings settings=new GamePackSettings(getFilesDir());settings.save(id,settings.selection(),settings.hideDuplicates());runOnUiThread(()->setBusy(false,"Zaimportowano "+id+". Moduł został wybrany; zgodność gry nie jest potwierdzona.")); }
                 catch(Exception saveError) { runOnUiThread(()->setBusy(false,"Paczka "+id+" jest zainstalowana, ale nie zapisano jej wyboru: "+safe(saveError.getMessage()))); }
             } catch(Exception error) { runOnUiThread(()->setBusy(false,"Import przerwany: "+safe(error.getMessage()))); }

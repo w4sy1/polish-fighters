@@ -1,6 +1,7 @@
 package io.github.openlf2.openlf2;
 
 import android.content.ContentResolver;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,13 +24,31 @@ final class AndroidModPackageImporter {
     private AndroidModPackageImporter() {}
 
     static String importPackage(ContentResolver resolver, Uri uri, File filesDirectory,
-            Progress progress) throws IOException {
+            AssetManager assets, Progress progress) throws IOException {
         InputStream raw=resolver.openInputStream(uri);
         if(raw==null) throw new IOException("Nie można odczytać wybranego pliku.");
-        return importPackage(raw,filesDirectory,progress);
+        return importPackage(raw, filesDirectory, () -> {
+            try (InputStream key = assets.open(SignedModPackage.KEY_ASSET)) {
+                return SignedModPackage.read(key, 32);
+            } catch (IOException error) {
+                throw new IOException("Brak zaufanego klucza katalogu modów.", error);
+            }
+        }, BuildConfig.MOD_ENGINE_VERSION, BuildConfig.MOD_GOOGLE_PLAY, progress);
     }
 
-    static String importPackage(InputStream raw,File filesDirectory,Progress progress) throws IOException {
+    static String importPackage(InputStream raw, File filesDirectory, Progress progress) throws IOException {
+        return importPackage(raw, filesDirectory, () -> null, BuildConfig.MOD_ENGINE_VERSION, false, progress);
+    }
+
+    static String importPackage(InputStream raw, File filesDirectory, KeySource key,
+            String engineVersion, boolean googlePlay, Progress progress) throws IOException {
+        try (ZipInputStream zip = new ZipInputStream(raw)) {
+            return install(zip, filesDirectory, key, engineVersion, googlePlay, progress);
+        }
+    }
+
+    private static String install(ZipInputStream zip, File filesDirectory, KeySource key,
+            String engineVersion, boolean googlePlay, Progress progress) throws IOException {
         File game = new File(filesDirectory, "game").getCanonicalFile();
         if (!new File(game, ".ready").isFile()) throw new IOException("Najpierw przygotuj pliki gry.");
         File packs = new File(game, "content-packs");
@@ -42,10 +61,16 @@ final class AndroidModPackageImporter {
         Set<String> names = new HashSet<>();
         long total = 0;
         int count = 0;
-        try (InputStream source=raw; ZipInputStream zip = new ZipInputStream(source)) {
-                ZipEntry entry;
+        try {
+            ZipEntry first = zip.getNextEntry();
+            if (first != null && SignedModPackage.FIRST_ENTRY.equals(first.getName())) {
+                String id = SignedModPackage.prepare(zip, staging, key.load(), engineVersion);
+                if (!id.equals(validateManifest(staging))) throw new IOException("Nieprawidłowy identyfikator modułu.");
+                return publish(staging, packs, id);
+            }
+            if (googlePlay) throw new IOException("Ta wersja obsługuje tylko podpisane paczki danych.");
                 byte[] buffer = new byte[65536];
-                while ((entry = zip.getNextEntry()) != null) {
+                for (ZipEntry entry = first; entry != null; entry = zip.getNextEntry()) {
                     if (++count > MAX_ENTRIES) throw new IOException("Paczka ma zbyt wiele plików.");
                     String name = entry.getName();
                     if(entry.isDirectory() && name.endsWith("/")) name=name.substring(0,name.length()-1);
@@ -87,14 +112,19 @@ final class AndroidModPackageImporter {
         try {
             if (prefix == null) throw new IOException("Wybrany plik nie jest paczką ZIP.");
             String id = validateManifest(staging);
-            File destination = new File(packs, id).getCanonicalFile();
-            if (destination.exists()) throw new IOException("Ten moduł jest już zaimportowany.");
-            if (!staging.renameTo(destination)) throw new IOException("Nie można bezpiecznie zatwierdzić importu.");
-            return id;
+            return publish(staging, packs, id);
         } catch (IOException error) {
             deleteTree(staging);
             throw error;
         }
+    }
+
+    private static synchronized String publish(File staging, File packs, String id) throws IOException {
+        File destination = new File(packs, id);
+        if (destination.exists() || !destination.getCanonicalFile().equals(destination))
+            throw new IOException("Ten moduł jest już zaimportowany lub ścieżka jest zajęta.");
+        if (!staging.renameTo(destination)) throw new IOException("Nie można bezpiecznie zatwierdzić importu.");
+        return id;
     }
 
     private static void validateName(String name) throws IOException {
@@ -197,6 +227,8 @@ final class AndroidModPackageImporter {
         if (children != null) for (File child : children) deleteTree(child);
         file.delete();
     }
+
+    interface KeySource { byte[] load() throws IOException; }
 
     interface Progress { void update(int entries); }
 }
