@@ -5,6 +5,7 @@
 // Private to the SDL adapter: the setup screens drawn in the game window.
 #include "openlf2/ports/platform.hpp"
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 #include <SDL3/SDL.h>
@@ -30,12 +31,15 @@ private:
         enum class Kind { none, closed, picked } kind = Kind::none;
         std::size_t index = 0;
     };
-    [[nodiscard]] std::vector<std::string> wrap(std::string_view text) const;
+    [[nodiscard]] std::vector<std::string> wrap(std::string_view text, float available_width) const;
     [[nodiscard]] std::vector<Button> layout(std::span<const std::string> labels) const;
     Reaction react(const SDL_Event& original, const std::vector<Button>& buttons);
     Result<void> draw(std::string_view text, const std::vector<Button>& buttons, std::optional<double> fraction);
 
+    using Artwork = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
+
     SDL_Renderer& renderer_;
+    Artwork artwork_{nullptr, SDL_DestroyTexture};
     Viewport viewport_;
     Observer observe_;
     float width_;  // in scaled pixels

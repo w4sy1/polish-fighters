@@ -110,6 +110,7 @@ Name: "associate"; Description: "{cm:AssociateRecordings}"; GroupDescription: "{
 Name: "downloadlf2"; Description: "{cm:DownloadLF2}"; GroupDescription: "{cm:GameData}"; Check: NeedGameData
 
 [Files]
+Source: "{#StageDir}\loading-roster.png"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\scripts\*"; DestDir: "{app}\scripts"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -167,8 +168,33 @@ begin
 end;
 
 procedure InitializeWizard;
+var
+  Artwork: TBitmapImage;
+  AvailableHeight, ArtworkWidth, ArtworkHeight: Integer;
 begin
   DownloadPage := CreateDownloadPage(CustomMessage('Downloading'), CustomMessage('DownloadingDesc'), @OnDownloadProgress);
+  DownloadPage.ShowBaseNameInsteadOfUrl := True;
+  AvailableHeight := DownloadPage.SurfaceHeight - DownloadPage.AbortButton.Top -
+    DownloadPage.AbortButton.Height - ScaleY(8);
+  if AvailableHeight < ScaleY(40) then Exit;
+  ArtworkWidth := DownloadPage.SurfaceWidth;
+  ArtworkHeight := ArtworkWidth * 9 div 16;
+  if ArtworkHeight > AvailableHeight then
+  begin
+    ArtworkHeight := AvailableHeight;
+    ArtworkWidth := ArtworkHeight * 16 div 9;
+  end;
+  try
+    ExtractTemporaryFile('loading-roster.png');
+    Artwork := TBitmapImage.Create(DownloadPage);
+    Artwork.Parent := DownloadPage.Surface;
+    Artwork.SetBounds((DownloadPage.SurfaceWidth - ArtworkWidth) div 2,
+      DownloadPage.SurfaceHeight - ArtworkHeight, ArtworkWidth, ArtworkHeight);
+    Artwork.Stretch := True;
+    Artwork.PngImage.LoadFromFile(ExpandConstant('{tmp}\loading-roster.png'));
+  except
+    Log('Could not load download page artwork: ' + GetExceptionMessage);
+  end;
 end;
 
 // Tries the sources in turn; true when one delivered the file with the right checksum.

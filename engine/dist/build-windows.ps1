@@ -60,6 +60,7 @@ foreach ($dll in $dlls) {
 Copy-Item -Force (Join-Path $binaryDir 'openlf2.exe') $packageDir
 foreach ($dll in $dlls) { Copy-Item -Force $dll.FullName $packageDir }
 Copy-Item -Recurse -Force (Join-Path $root 'scripts') $packageDir
+Copy-Item -Force (Join-Path $root 'dist/loading/loading-roster.png') $packageDir
 Copy-Item -Force (Join-Path $root 'README.md') $packageDir
 Copy-Item -Force (Join-Path $root 'LICENSE') $packageDir
 Invoke-Checked 'python' @((Join-Path $root 'dist/collect-licenses.py'),
@@ -68,7 +69,7 @@ Invoke-Checked 'python' @((Join-Path $root 'dist/collect-licenses.py'),
     '--key', 'libcurl')
 
 # The installer (Inno Setup, dist/windows/openlf2.iss) is the artifact; the staged package above is its content.
-$version = '0.18.2' # Polish Fighters version; upstream engine version is preserved in CMake.
+$version = '0.18.3' # Polish Fighters version; upstream engine version is preserved in CMake.
 if (-not $version) { throw 'The project version was not found in CMakeLists.txt.' }
 
 # Wizard pictures and the icon, drawn from the project's SVG.

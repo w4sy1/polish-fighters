@@ -5,8 +5,8 @@ local function release(v,asset)
 end
 assert(not updates.select({release('0.10.0'),release('0.11.0'),release('0.12.0')}))
 assert(not updates.select({release(updates.version)}),'installed version must not advertise itself as an update')
-local newer=release('0.18.3');assert(updates.select({newer})==newer)
-assert(not updates.select({release('0.18.3','Android.apk')}))
+local newer=release('0.18.4');assert(updates.select({newer})==newer)
+assert(not updates.select({release('0.18.4','Android.apk')}))
 newer.draft=true;assert(not updates.select({newer}));newer.draft=false
 newer.html_url='https://evil.invalid';assert(not updates.select({newer}))
 assert(not updates.select(false))
