@@ -4,10 +4,15 @@ return function(base)
  local transport=require('base/game/network')
  function base.create(options)
   local join=client.pending_join
+  -- Rooms found or published through the account server are internet matches: the
+  -- room leader then picks the larger input delay that hides a long round trip.
+  if join or client.room then
+   local copy={};for key,value in pairs(options) do copy[key]=value end
+   copy.network_internet=true;options=copy
+  end
   if join then
    client.pending_join=nil;transport.next_room=true
-   local copy={};for key,value in pairs(options) do copy[key]=value end
-   copy.network_port=join.port;options=copy
+   options.network_port=join.port
   end
   local state=create(options)
   if join then base.begin(state,join.host,join.address);client.host_started=join.host end

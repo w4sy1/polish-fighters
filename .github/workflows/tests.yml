@@ -25,3 +25,14 @@ jobs:
         run: python ../tools/test_lua_scripts.py
       - name: Python developer tool tests
         run: python -m unittest discover -s ../tests -v
+  native:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Native room, network and data tests (MSVC)
+        shell: pwsh
+        run: ./tools/test_windows_native.ps1

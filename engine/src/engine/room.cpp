@@ -31,25 +31,32 @@ Result<void> Room::start(int requester) {
     for(const auto& [slot,peer]:peers_)if(!peer.ready)return fail(ErrorCode::format,"every player must be ready");
     phase_=RoomPhase::playing;return {};
 }
-Result<std::optional<RoomTick>> Room::submit(int slot,std::uint64_t frame,std::string buttons) {
+Result<std::vector<RoomTick>> Room::submit(int slot,std::uint64_t frame,std::string buttons) {
     if(phase_!=RoomPhase::playing || !peers_.contains(slot))return fail(ErrorCode::format,"invalid match peer");
-    if(checksum_frame_)return fail(ErrorCode::format,"waiting for state checksums");
-    if(frame!=frame_)return fail(ErrorCode::format,"out-of-order input frame");
+    if(frame<frame_ || frame>=frame_+input_window)return fail(ErrorCode::format,"out-of-order input frame");
     if(buttons.size()>7 || buttons.find_first_not_of("udlrcbf")!=std::string::npos)
         return fail(ErrorCode::format,"invalid input buttons");
     for(char key:buttons)if(std::count(buttons.begin(),buttons.end(),key)>1)return fail(ErrorCode::format,"duplicate input button");
-    if(!inputs_.emplace(slot,std::move(buttons)).second)return fail(ErrorCode::format,"duplicate input frame");
-    if(inputs_.size()!=peers_.size())return std::optional<RoomTick>{};
-    RoomTick tick{frame_,{}};
-    for(const auto& [id,value]:inputs_)tick.inputs[static_cast<std::size_t>(id)]=value;
-    inputs_.clear();checksum_frame_=frame_++;return std::optional<RoomTick>{std::move(tick)};
+    if(!checksums_.empty() && checksums_.begin()->first+checksum_deadline<frame_){
+        phase_=RoomPhase::aborted;return fail(ErrorCode::format,"state checksum timed out");
+    }
+    if(!inputs_[frame].emplace(slot,std::move(buttons)).second)return fail(ErrorCode::format,"duplicate input frame");
+    std::vector<RoomTick> ticks;
+    for(auto ready=inputs_.find(frame_);ready!=inputs_.end() && ready->second.size()==peers_.size();ready=inputs_.find(frame_)){
+        RoomTick tick{frame_,{}};
+        for(const auto& [id,value]:ready->second)tick.inputs[static_cast<std::size_t>(id)]=value;
+        inputs_.erase(ready);++frame_;ticks.push_back(std::move(tick));
+    }
+    return ticks;
 }
 Result<void> Room::checksum(int slot,std::uint64_t frame,std::string value) {
-    if(phase_!=RoomPhase::playing || !peers_.contains(slot) || !checksum_frame_ || *checksum_frame_!=frame || !digest(value))
+    if(phase_!=RoomPhase::playing || !peers_.contains(slot) || frame>=frame_ || !digest(value))
         return fail(ErrorCode::format,"invalid checksum report");
-    if(!checksums_.empty() && checksums_.begin()->second!=value){phase_=RoomPhase::aborted;return fail(ErrorCode::format,"simulation desynchronized");}
-    if(!checksums_.emplace(slot,std::move(value)).second)return fail(ErrorCode::format,"duplicate checksum report");
-    if(checksums_.size()==peers_.size()){checksums_.clear();checksum_frame_.reset();}
+    auto& reports=checksums_[frame];
+    if(!reports.empty() && reports.begin()->second!=value){phase_=RoomPhase::aborted;return fail(ErrorCode::format,"simulation desynchronized");}
+    if(!reports.emplace(slot,std::move(value)).second)return fail(ErrorCode::format,"duplicate checksum report");
+    if(reports.size()==peers_.size())checksums_.erase(frame);
+    else if(checksums_.size()>pending_checksum_limit){phase_=RoomPhase::aborted;return fail(ErrorCode::limit,"too many pending checksums");}
     return {};
 }
 void Room::leave(int slot) {
