@@ -7,7 +7,7 @@ local screen={}
 screen.default_server='https://www.projektocalenie.pl/projekty/polish-fighters/api'
 function screen.open(state)
  local doc=engine.read_settings() or {}
- state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server or screen.default_server),
+ state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server:match('%S') and doc.account_server or screen.default_server),
   name='',password='',room='Pokój Polish Fighters',host='127.0.0.1',port='12345',
   page=1,nav=navigation.create(),previous={}}
 end

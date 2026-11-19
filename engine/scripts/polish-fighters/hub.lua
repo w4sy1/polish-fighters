@@ -56,7 +56,7 @@ function hub.rows(state)
  elseif mode=='credits' then return {row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}
  elseif mode=='online' then
-  return {row('unavailable','quick'),row('network','host'),row('network','join'),row('account','rooms'),row('unavailable','friends'),row('root','back')}
+  return {row('account','quick'),row('network','host'),row('network','join'),row('account','rooms'),row('unavailable','friends'),row('root','back')}
  elseif mode=='packs' then
   local rows={}
   for _,entry in ipairs(hub.profiles) do

@@ -1,5 +1,5 @@
 -- Account credentials and tokens live only in this Lua runtime, never in settings or replays.
-local client={rooms={},notice='Podaj adres własnego serwera kont. Lokalny serwer: port 8765.'}
+local client={rooms={},notice='Serwer gry jest ustawiony. Zaloguj się albo utwórz konto.'}
 local function ipv4(value)
  if type(value)~='string' then return false end
  local a,b,c,d=value:match('^(%d+)%.(%d+)%.(%d+)%.(%d+)$')
