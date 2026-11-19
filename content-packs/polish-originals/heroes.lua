@@ -174,6 +174,11 @@ function heroes.advance(s,i,v,objects)
    -- "Drugi oddech" (inspired by desperation/power-up mechanics such as John's or
    -- Rudolf's): once per life, Wasyl gets a single bonus heal when critically low.
    -- Additive only; does not touch any existing combo or its MP cost.
+   -- A respawn keeps the same item table and only lowers v.lives, so a change of
+   -- the life counter starts a new life and re-arms the bonus.
+   if id==410 and v.pf_second_wind_lives~=v.lives then
+    v.pf_second_wind,v.pf_second_wind_lives=nil,v.lives
+   end
    if id==410 and not v.pf_second_wind and v.hp<=math.floor(v.max_hp*0.20) then
     v.pf_second_wind=true
     heroes.heal(s,i,v,objects,math.floor(v.max_hp*0.15))

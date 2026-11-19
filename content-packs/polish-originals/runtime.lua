@@ -212,7 +212,8 @@ function runtime.advance(state,index,value,objects)
             value.pf_phase2=true;event(state,"boss_phase2")
             -- "Deszcz strzal" (inspired by Henry's Arrow Rain): one-time entrance
             -- into phase 2, reusing the already-defined rain() helper and the
-            -- boss's own existing projectile id (424). Fires once per life; does
+            -- boss's own existing projectile id (424). Tied to pf_phase2, which
+            -- persists across respawns, so it fires once per fight; does
             -- not change any existing combo frame or its MP cost.
             rain(state,index,value,objects);event(state,"boss_phase2_rain")
         end

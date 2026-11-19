@@ -1,0 +1,27 @@
+name: Polish Fighters tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: engine
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install Pillow==12.3.0 lupa==2.8
+      - name: Lua script tests
+        run: python ../tools/test_lua_scripts.py
+      - name: Python developer tool tests
+        run: python -m unittest discover -s ../tests -v

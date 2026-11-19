@@ -51,6 +51,10 @@ do
  v.hp=50;s.frame_number=3;heroes.advance(s,0,v,objects)
  assert(v.hp==90 and s.pf_events.wasyl_second_wind==1,'Wasyl second wind fired a second time in the same life')
  v.hp=0;heroes.advance(s,0,v,objects);assert(v.hp==0,'dead Wasyl must not be healed')
+ -- A respawn reuses the item and only lowers v.lives: the next life gets the bonus again.
+ v.lives=(v.lives or 0)-1;v.hp=500;s.frame_number=4;heroes.advance(s,0,v,objects)
+ v.hp=50;s.frame_number=5;heroes.advance(s,0,v,objects)
+ assert(v.hp==165 and s.pf_events.wasyl_second_wind==2,'Wasyl second wind was not re-armed after a respawn')
 end
 do
  local s=world(412);local v=s.items[0];heroes.advance(s,0,v,objects)
