@@ -2,7 +2,7 @@
 
 Raport etapu lokalnego. Następnie użytkownik zatwierdził publikację 0.11 (2026-11-11), tag `guide-updates-test-2026-11-11`. Poniższy opis zachowuje stan i wyniki sprzed publikacji.
 
-Stan: zmiany lokalne na `codex/local-leumas-combo-guide-2026-11-11`, bez nowego commita, push i publikacji. Publiczna wersja 0.10 pozostaje dostępna. Przed następną publikacją użytkownik chciał poznać pomysły na dalsze funkcje.
+Stan: zmiany lokalne na gałęzi roboczej, bez nowego commita, push i publikacji. Publiczna wersja 0.10 pozostaje dostępna. Przed następną publikacją użytkownik chciał poznać pomysły na dalsze funkcje.
 
 ## Co zmieniono
 
@@ -49,7 +49,7 @@ Stan: zmiany lokalne na `codex/local-leumas-combo-guide-2026-11-11`, bez nowego 
 - `engine/out/PolishFighters-Windows-LOCAL-0.11.zip` — komplet gry, 1048460018 bajtów. SHA256 `9aa89d758b03c5774fb4a3a76a15c2dbacbb7022fda444c0c07e60ab21aece56`.
 - Rozpakowana gra: `engine/out/PolishFighters-Guide-LOCAL-2026-11-11/LittleFighters.exe`.
 - Skrót pulpitu **Polish Fighters** wskazuje nowy EXE. Zachowano ikonę i dotychczasowy katalog ustawień `engine/out/LittleFighters-Heroes-2026-11-06/userdata/common`. Kopia poprzedniego skrótu w katalogu dowodów.
-- Paczki, ten raport, poradnik i `SHA256SUMS-LOCAL-0.11.txt` skopiowano do `C:/Users/01dwa/Documents/Codex/2026-11-10/referenced-chatgpt-conversation-this-is-an/outputs`.
+- Paczki, ten raport, poradnik i `SHA256SUMS-LOCAL-0.11.txt` skopiowano do lokalnego katalogu wynikowego.
 
 ## Granice weryfikacji i ryzyka
 

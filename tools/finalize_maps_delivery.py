@@ -63,7 +63,7 @@ Kod: engine/include/openlf2/engine/packages.hpp, src/app/application.cpp, includ
 
 Lokalna pełna paczka Windows zawiera posiadane dane i7 dodatków, także jawnie eksperymentalne. GitHub zawiera kod, ZIP własnego silnika Windows z bibliotekami oraz ZIP projektu Android Studio. Cudze instalatory, grafiki i dźwięki dodatków, userdata, bazy, prywatne klucze, local.properties i cache buildów są wyłączone. Zachowano publiczny debug.keystore upstream; nie jest kluczem produkcyjnym.
 
-Kopia przed zmianami: ../baseline-maps-build-2026-10-30/. Utworzono repo Git na branchu codex/maps-build-2026-10-30, ponieważ projekt wcześniej nie miał.git. Bez zmiany istniejącej historii, force-push i wydania produkcyjnego. Git diff względem kopii i staged stat oraz skan sekretów są częścią lokalnego sprawdzenia przed wysłaniem.
+Kopia przed zmianami: ../baseline-maps-build-2026-10-30/. Utworzono repo Git na gałęzi roboczej map z 30.10.2026, ponieważ projekt wcześniej nie miał katalogu .git. Bez zmiany istniejącej historii, force-push i wydania produkcyjnego. Git diff względem kopii i staged stat oraz skan sekretów są częścią lokalnego sprawdzenia przed wysłaniem.
 
 Zakres jest częściowo wykonany: EXE i źródła dostarczone, wszystkie zadeklarowane mapy/starty sprawdzone, Kate99 odzyskany. Bleach2 cele, nieobsługiwane mechaniki kampanii i Android runtime pozostają otwarte. Bez deklaracji pełnej grywalności.
 
