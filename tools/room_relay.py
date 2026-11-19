@@ -174,7 +174,8 @@ class RemoteTickets:
             raise PermissionError('Invalid relay ticket')
         body = json.dumps({'ticket': ticket, 'key': self.key}).encode()
         request = urllib.request.Request(self.endpoint, data=body, method='POST',
-                                         headers={'Content-Type': 'application/json', 'User-Agent': 'pf-room-relay'})
+                                         headers={'Content-Type': 'application/json', 'Accept': 'application/json',
+                                                  'User-Agent': 'pf-room-relay'})
         try:
             with urllib.request.urlopen(request, timeout=self.timeout, context=ssl.create_default_context()) as response:
                 value = json.loads(response.read(4096))
