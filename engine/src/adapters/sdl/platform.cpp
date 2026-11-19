@@ -390,6 +390,15 @@ public:
 #endif
                 rebuild_pending_ = true;
                 break;
+#ifdef __ANDROID__
+            // A cold start first gets a surface without the cutout and navigation bar (2196x1008 on a 2436x1080
+            // phone), then the fullscreen one. Until the renderer is opened anew it keeps the first size, so the
+            // picture and finger coordinates disagree (a tap on BLOCK lands on ATTACK). Coming back from the
+            // background already rebuilt it; a resized surface now does the same.
+            case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+                if (event.window.windowID == SDL_GetWindowID(window_.get())) rebuild_pending_ = true;
+                break;
+#endif
             case SDL_EVENT_WINDOW_MAXIMIZED:
                 if (event.window.windowID == SDL_GetWindowID(window_.get())) was_maximized_ = true;
                 break;
