@@ -454,12 +454,15 @@ public:
                 if (event.motion.which != SDL_TOUCH_MOUSEID) pointer_from_touch_ = false;
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                reshow_keyboard_ = true;
                 // Fingers are read from their own events; SDL's copies as a mouse are ignored.
                 if (event.button.which == SDL_TOUCH_MOUSEID) break;
                 pointer_from_touch_ = false;
                 if (event.button.button == SDL_BUTTON_LEFT) input.pressed = true;
                 break;
             case SDL_EVENT_FINGER_DOWN:
+                reshow_keyboard_ = true;
+                [[fallthrough]];
             case SDL_EVENT_FINGER_MOTION:
             case SDL_EVENT_FINGER_UP:
             case SDL_EVENT_FINGER_CANCELED:
@@ -660,7 +663,16 @@ public:
                 static_cast<int>(std::ceil(right)), static_cast<int>(std::ceil(bottom))};
     }
     void set_text_input(bool active) override {
-        if (active == text_input_ || !window_) return;
+        if (!window_) return;
+        // Android stops text input when the player hides the screen keyboard (Back). The field
+        // stays focused, so the next tap shows the keyboard again instead of ignoring it.
+        if (active && text_input_ && !SDL_TextInputActive(window_.get()) && reshow_keyboard_) {
+            reshow_keyboard_ = false;
+            SDL_StartTextInput(window_.get());
+            return;
+        }
+        reshow_keyboard_ = false;
+        if (active == text_input_) return;
         text_input_ = active;
         if (active) SDL_StartTextInput(window_.get());
         else SDL_StopTextInput(window_.get());
@@ -1252,6 +1264,7 @@ private:
     Uint64 rebuild_after_ = 0;
     bool enter_consumed_ = false; // Enter belongs to an Alt+Enter until it is released
     bool text_input_ = false;
+    bool reshow_keyboard_ = false;
     // Touch: the finger that acts as the pointer, its last position in viewport coordinates,
     // and whether the pointer last moved by touch rather than by the mouse or a key.
     std::optional<SDL_FingerID> finger_;
