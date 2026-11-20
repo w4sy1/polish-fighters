@@ -109,6 +109,11 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "associate"; Description: "{cm:AssociateRecordings}"; GroupDescription: "{cm:FileTypes}"
 Name: "downloadlf2"; Description: "{cm:DownloadLF2}"; GroupDescription: "{cm:GameData}"; Check: NeedGameData
 
+[InstallDelete]
+; The scripts tree comes only from the installer (mods live in content-packs and the user profile).
+; Removing it before an update keeps no stale Lua or sound files of an older version.
+Type: filesandordirs; Name: "{app}\scripts"
+
 [Files]
 Source: "{#StageDir}\loading-roster.png"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
