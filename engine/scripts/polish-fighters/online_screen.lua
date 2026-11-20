@@ -37,7 +37,7 @@ function screen.rows(s)
   rows[#rows+1]={'logout','WYLOGUJ',520,230,234,34}
   for index=(s.page-1)*4+1,math.min(#client.rooms,s.page*4) do
    local room=client.rooms[index]
-   rows[#rows+1]={'join:'..index,tostring(room.name):gsub('[%c]',''):sub(1,48)..' / '..room.profile,40,310+(index-(s.page-1)*4-1)*34,714,30}
+   rows[#rows+1]={'join:'..index,client.room_title(room),40,310+(index-(s.page-1)*4-1)*34,714,30}
   end
   rows[#rows+1]={'prev','POPRZEDNIE',40,455,200,30}
   rows[#rows+1]={'next','NASTĘPNE',550,455,204,30}
@@ -78,7 +78,7 @@ function screen.activate(state,id,context)
   if not port or port%1~=0 or port<1024 or port>65535 then client.notice='Port: 1024–65535.';return end
   client.publish_port=port
   client.publish_relay=client.relay_available==true
-  local payload={port=port,name=s.room,profile=catalog.profile_id,
+  local payload={port=port,name=client.listing_name(client.name,s.room),profile=catalog.profile_id,
     capacity=require('polish-fighters/dashboard_model').current().room_capacity}
   if client.publish_relay then payload.relay=true else payload.host=s.host end
   ok,problem=client.request(s.endpoint,'publish-room',payload)

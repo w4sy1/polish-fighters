@@ -252,8 +252,10 @@ class Service:
                                 (room_id, user_id, name.strip(), str(address), port, profile, capacity, now + 90, int(private)))
                 return {'id': room_id, 'expires_in': 90}
             if operation == 'list-rooms':
-                rows = self.db.execute('SELECT id,name,host,port,profile,capacity FROM rooms WHERE private=0 OR owner=? ORDER BY name LIMIT 200', (user_id,)).fetchall()
-                keys = ('id', 'name', 'host', 'port', 'profile', 'capacity')
+                rows = self.db.execute('SELECT rooms.id,rooms.name,rooms.host,rooms.port,rooms.profile,rooms.capacity,users.name '
+                                       'FROM rooms LEFT JOIN users ON users.id=rooms.owner '
+                                       'WHERE rooms.private=0 OR rooms.owner=? ORDER BY rooms.name LIMIT 200', (user_id,)).fetchall()
+                keys = ('id', 'name', 'host', 'port', 'profile', 'capacity', 'owner')
                 rooms = [dict(zip(keys, row)) for row in rows]
                 for room in rooms:
                     room['relay'] = room['host'] == ''

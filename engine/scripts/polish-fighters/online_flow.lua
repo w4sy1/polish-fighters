@@ -8,10 +8,12 @@ return function(base)
   if session and session.host and (session.phase=='lobby' or session.phase=='greeting' or session.phase=='connecting') then
    client.maintain_relay(session)
   end
-  if client.host_started and client.room and not client.pending and session and
-    (session.phase=='idle' or session.phase=='failed') then
-   client.host_started=false
-   client.request(client.origin,'delete-room',{})
+  -- Leaving the lobby (POWRÓT/F4 drops state.network) or a closed/failed session ends
+  -- the hosted room: withdraw its listing and stop the heartbeat. A running match keeps
+  -- state.session, so the listing stays while the match is played.
+  if client.host_started and client.room and not state.session and
+    (not session or session.phase=='idle' or session.phase=='failed') then
+   client.host_started=false;client.hosting_relay=nil;client.cleanup_room=true
   end
   return result
  end

@@ -25,6 +25,29 @@ local function ipv4(value)
  return true
 end
 client.ipv4=ipv4
+-- Byte-bounded prefix that never splits a UTF-8 sequence (the server counts characters).
+local function utf8_prefix(text,limit)
+ text=tostring(text or ''):gsub('%c','')
+ if #text<=limit then return text end
+ local cut=limit
+ while cut>0 and text:byte(cut+1) and text:byte(cut+1)>=0x80 and text:byte(cut+1)<0xC0 do cut=cut-1 end
+ return text:sub(1,cut)
+end
+client.utf8_prefix=utf8_prefix
+-- Published name: the host's nick first, so the list shows who hosts each room
+-- even on servers that do not report the owner.
+function client.listing_name(nick,room)
+ nick=utf8_prefix(nick,24);room=utf8_prefix(room,48)
+ if nick=='' or room:sub(1,#nick+2)==nick..': ' then return utf8_prefix(room,48) end
+ return utf8_prefix(nick..': '..room,48)
+end
+-- One list row: "nick: room / module". Newer servers report the owner separately.
+function client.room_title(room)
+ local name=utf8_prefix(room.name,48)
+ local owner=type(room.owner)=='string' and utf8_prefix(room.owner,24) or ''
+ if owner~='' and name:sub(1,#owner+2)~=owner..': ' then name=owner..': '..name end
+ return utf8_prefix(name,60)..' / '..tostring(room.profile)
+end
 -- Players see and type the project page; its API lives in the page's /api folder.
 local project_page='https://www.projektocalenie.pl/projekty/polish-fighters'
 function client.api_endpoint(endpoint)
