@@ -13,7 +13,7 @@ $flags = @('/nologo', '/std:c++latest', '/EHsc', '/W4', '/WX', '/utf-8', '/permi
 $cases = @(
     @{ Name = 'background-layers-test'; Sources = @('tests/background_layers_test.cpp', 'engine/src/resources/background_data.cpp', 'engine/src/resources/data_file.cpp'); Args = @(); Libraries = @() },
     @{ Name = 'room-test'; Sources = @('tests/room_test.cpp', 'engine/src/engine/room.cpp'); Args = @(); Libraries = @() },
-    @{ Name = 'network-compat-test'; Sources = @('tests/network_compat_test.cpp', 'engine/src/adapters/network/transport.cpp'); Args = @(); Libraries = @('/link', 'ws2_32.lib') },
+    @{ Name = 'network-compat-test'; Sources = @('tests/network_compat_test.cpp', 'engine/src/adapters/network/transport.cpp'); Args = @(); Libraries = @('/link', 'ws2_32.lib', 'iphlpapi.lib') },
     @{ Name = 'object-blocks-test'; Sources = @('tests/object_blocks_test.cpp', 'engine/src/resources/object_data.cpp', 'engine/src/resources/data_file.cpp'); Args = @(); Libraries = @() },
     @{ Name = 'package-smoke'; Sources = @('tests/package_smoke.cpp', 'engine/src/engine/packages.cpp', 'engine/src/core/files.cpp'); Args = @("$projectRoot/engine/scripts"); Libraries = @() },
     @{ Name = 'package-assets-test'; Sources = @('tests/package_assets_test.cpp', 'engine/src/engine/packages.cpp', 'engine/src/core/files.cpp'); Args = @(); Libraries = @() }
@@ -34,7 +34,7 @@ try {
     }
     $sources = @('tests/room_host_runner.cpp', 'engine/src/engine/room_host.cpp', 'engine/src/engine/room.cpp', 'engine/src/core/json.cpp', 'engine/src/adapters/network/transport.cpp') |
         ForEach-Object { Join-Path $projectRoot $_ }
-    & cl @flags @sources /Fe:room-host-runner.exe /link ws2_32.lib 2>&1 |
+    & cl @flags @sources /Fe:room-host-runner.exe /link ws2_32.lib iphlpapi.lib 2>&1 |
         Tee-Object -FilePath (Join-Path $report 'room-host-build.log')
     if ($LASTEXITCODE -ne 0) { throw 'Room host compilation failed.' }
     & python (Join-Path $projectRoot 'tests/test_room_tcp.py') --runner (Join-Path $build 'room-host-runner.exe') --output (Join-Path $report 'tcp-results.json') 2>&1 |
@@ -42,7 +42,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Loopback TCP tests failed.' }
     $sources = @('tests/relay_link_runner.cpp', 'engine/src/engine/relay_link.cpp', 'engine/src/engine/room_host.cpp', 'engine/src/engine/room.cpp', 'engine/src/core/json.cpp', 'engine/src/adapters/network/transport.cpp') |
         ForEach-Object { Join-Path $projectRoot $_ }
-    & cl @flags @sources /Fe:relay-link-runner.exe /link ws2_32.lib 2>&1 |
+    & cl @flags @sources /Fe:relay-link-runner.exe /link ws2_32.lib iphlpapi.lib 2>&1 |
         Tee-Object -FilePath (Join-Path $report 'relay-link-build.log')
     if ($LASTEXITCODE -ne 0) { throw 'Relay link compilation failed.' }
     & python (Join-Path $projectRoot 'tests/test_relay_link.py') --runner (Join-Path $build 'relay-link-runner.exe') 2>&1 |
