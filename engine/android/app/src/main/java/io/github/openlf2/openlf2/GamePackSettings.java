@@ -21,6 +21,19 @@ final class GamePackSettings {
 
     GamePackSettings(File filesDirectory) { this.filesDirectory = filesDirectory; store = new MobileCodeSettings(filesDirectory); }
 
+    boolean needsFirstSetup() {
+        try {
+            return !store.read().has("little_fighters_start_profile");
+        } catch (IOException | JSONException error) {
+            android.util.Log.w("OpenLF2", "Could not read game profile", error);
+            return false;
+        }
+    }
+
+    boolean hasPack(String id) {
+        return new File(filesDirectory, "game/content-packs/" + id + "/package.manifest").isFile();
+    }
+
     String mode() throws IOException, JSONException {
         String mode = store.read().optString("little_fighters_start_profile", "lf_two");
         if (ALL.equals(mode) || CUSTOM.equals(mode)) return mode;

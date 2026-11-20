@@ -13,6 +13,7 @@ local rumble = require("base/game/rumble")
 local controls = require("base/ui/controls")
 local options = require("base/game/options")
 local culling = require("base/ui/culling")
+local command_hud = require("base/ui/team_command_hud")
 local screen = {}
 local replay_lines, mode_line
 
@@ -74,6 +75,7 @@ function screen.snapshot(state, snapshot)
             entry.pic_offset, entry.weapon, entry.team = value.pic_offset, value.weapon, value.team
             entry.hp, entry.max_hp, entry.human = value.hp, value.max_hp, value.human
             entry.lives = value.lives
+            entry.team_order_label = value.hp > 0 and value.team_order_label or nil
             advance_sparks(value.sparks, entry.sparks)
             order[count] = entry
         end
@@ -520,6 +522,18 @@ function screen.draw(state, context, window_bounds)
         draw_item(context, current.stage, view, entry, passable_bounds, lighting)
     end
     context.clip()
+    for _, entry in ipairs(view.items) do
+        if entry.team_order_label then
+            local x = entry.draw_offset + entry.x - view.camera
+            local left = passable_bounds and passable_bounds.left or 0
+            local right = passable_bounds and passable_bounds.right or constants.screen.width
+            if x >= left and x < right then
+                local frame = entry.record.frame(entry.frame)
+                local y = math.max(129, entry.z + entry.y - frame.center_y - 27)
+                command_hud.draw_order(context, entry.team_order_label, x, y, left, right)
+            end
+        end
+    end
     for _, command in ipairs(view.stage or {}) do
         if command[1] == "sprite" then context.sprite(command[2], command[3], command[4], command[5], true)
         elseif command[1] == "fill" then

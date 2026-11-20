@@ -567,6 +567,13 @@ int mods_operation(lua_State* state) {
 #else
     auto* bridge=resource_bridge(state);
     const auto* action=luaL_checkstring(state,1);
+    if(std::strcmp(action,"receipt")==0){
+        const auto id=luaL_checkstring(state,2);
+        const auto receipt=github_mod_receipt(id);
+        if(!receipt){lua_pushnil(state);return 1;}
+        lua_pushlstring(state,receipt->data(),receipt->size());
+        return 1;
+    }
     if(std::strcmp(action,"progress")==0){
         lua_pushnumber(state,static_cast<lua_Number>(bridge->mods_progress.received.load()));
         lua_pushnumber(state,static_cast<lua_Number>(bridge->mods_progress.total.load()));

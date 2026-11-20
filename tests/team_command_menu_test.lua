@@ -42,3 +42,15 @@ for _, screen in ipairs({l.screen, {left=-155,right=949,top=0,bottom=550}}) do
         assert(not state.open and not state.layout)
     end
 end
+
+for order in pairs(commands.signals) do
+    local label, tail
+    h.draw_order({
+        fill=function(x,y) if y==221 then tail=x end end,
+        text=function(text,x,y,align)
+            assert(x==38 and y==202 and align=="center")
+            label=text
+        end,
+    }, order, 7, 200, 0, 794)
+    assert(label==order:upper() and tail==5, "bubble must stay visible and point to the fighter")
+end

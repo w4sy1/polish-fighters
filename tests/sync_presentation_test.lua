@@ -11,6 +11,9 @@ end
 local pc,phone=flow(true),flow(false)
 assert(sync.digest(pc)==sync.digest(phone),'renderer capabilities must not abort a cross-platform match')
 assert(not captured:find('filters',1,true))
+phone.match.match.items[0].team_order_label='come'
+phone.match.match.items[0].team_order_ticks=45
+assert(sync.digest(pc)==sync.digest(phone),'order bubbles must not change the simulation digest')
 phone.match.match.items[0].hp=499
 assert(sync.digest(pc)~=sync.digest(phone),'real simulation divergence must still be detected')
 phone=flow(false);phone.match.match.held[0]='b'

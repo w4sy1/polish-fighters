@@ -41,8 +41,10 @@ final class SignedModPackage {
 
     /** Result of a verified envelope: the module ID and whether it is a full content pack. */
     static final class Prepared {
-        final String id; final boolean contentPack;
-        Prepared(String id, boolean contentPack) { this.id = id; this.contentPack = contentPack; }
+        final String id, version; final boolean contentPack;
+        Prepared(String id, String version, boolean contentPack) {
+            this.id = id; this.version = version; this.contentPack = contentPack;
+        }
     }
 
     interface Progress { void update(int done, int total); }
@@ -115,13 +117,13 @@ final class SignedModPackage {
             if (contentPack) {
                 unpackContentPack(payload, staging, id, unpacked, progress);
                 if (!payload.delete()) throw new IOException("Nie można usunąć pliku tymczasowego paczki.");
-                return new Prepared(id, true);
+                return new Prepared(id, version, true);
             }
             String moduleId = "mod-" + hex(digest().digest(
                     ("signed:" + id).getBytes(StandardCharsets.US_ASCII))).substring(0, 24);
             unpack(payload, staging, moduleId, unpacked);
             if (!payload.delete()) throw new IOException("Nie można usunąć pliku tymczasowego paczki.");
-            return new Prepared(moduleId, false);
+            return new Prepared(moduleId, version, false);
         } catch (JSONException | IllegalArgumentException error) {
             throw new IOException("Nieprawidłowe metadane podpisanej paczki.", error);
         }

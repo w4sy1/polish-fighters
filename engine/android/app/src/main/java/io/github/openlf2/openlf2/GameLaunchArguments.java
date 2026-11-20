@@ -33,11 +33,20 @@ final class GameLaunchArguments {
     }
     static String[] build(File files, String role, int port, File scripts) throws IOException, JSONException {
         File game = new File(files, "game");
-        if (!new File(game, ".ready").isFile()) return new String[] {files.getAbsolutePath()};
+        boolean bundled = new File(game, ".ready").isFile();
         List<String> args = new ArrayList<>();
-        args.add(game.getAbsolutePath());
-        add(args, "--installer", new File(game, "LF2_v2.0a.exe"));
-        add(args, "--scripts", scripts == null ? new File(game, "scripts") : scripts);
+        args.add((bundled ? game : files).getAbsolutePath());
+        File installer = new File(game, "LF2_v2.0a.exe");
+        if (bundled || installer.isFile()) add(args, "--installer", installer);
+        else {
+            // Keep the installer from older unbundled builds discoverable.
+            for (String name : new String[]{"LF2_v2.0a.exe", "lf2_v20a_Setup.exe"}) {
+                File previous = new File(files, name);
+                if (!previous.isFile()) previous = new File(files, "PolishFighters/" + name);
+                if (previous.isFile()) { add(args, "--installer", previous); break; }
+            }
+        }
+        add(args, "--scripts", scripts == null ? new File(bundled ? game : files, "scripts") : scripts);
         add(args, "--config-dir", new File(files, "settings"));
         GamePackSettings settings = new GamePackSettings(files);
         String mode = settings.mode();

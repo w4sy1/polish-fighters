@@ -68,3 +68,15 @@ poza repozytorium):
 python tools/build_mod_release.py --key <ścieżka>/catalog-ed25519-private.pem --engine 1.1.1
 gh release upload mods delivery/mods-release/*.zip --clobber
 ```
+
+## Jedno repozytorium pobierania
+
+Pobieranie w grze korzysta z podpisanego katalogu i wydań repozytorium
+`w4sy1/polish-fighters`. Domyślny katalog `stable` i wydanie `mods` zachowują
+obecne adresy. Lokalny import ZIP służy do instalacji pliku, który gracz już ma.
+
+Przed dodaniem paczki ustalić konkretną edycję, SHA-256 archiwum wejściowego,
+zgodność z silnikiem i prawa do dystrybucji. Wpis w rejestrze nazw nie wystarcza
+do udostępnienia modułu w grze. Kanały `test` i `dev` można później dodać jako
+osobno podpisane katalogi i wydania w tym samym repozytorium. Zmiana kanału
+powinna wymagać jawnego wyboru gracza.

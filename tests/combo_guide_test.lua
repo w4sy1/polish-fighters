@@ -15,7 +15,7 @@ for _,id in ipairs(guide.order) do
 end
 local screen=dofile(arg[1]..'/engine/scripts/polish-fighters/classic_shell.lua')({
  create=function() return {page='menu',background=1} end,update=function() end,draw=function() end,describe=function() return '' end})
-local s=screen.create({});s.pf_panel='combo-guide'
+local s=screen.create({});s.pf_panel='combo-guide';s.pf_root_panel='combo-guide'
 local context={action=function() end}
 local function click(index)
  screen.update(s,{keys={},nav={},click=true,pointer_x=420,pointer_y=219+(index-1)*25},context)

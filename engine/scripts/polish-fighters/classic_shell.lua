@@ -5,6 +5,7 @@ return function(base)
     local model=require("polish-fighters/dashboard_model")
     local options=require("base/game/options")
     local original_create,original_update,original_draw,original_describe=base.create,base.update,base.draw,base.describe
+    local back_target=nav.target(28,98,165,144)
     local function items(s)
         if s.pf_message then return {{"back","POWROT"}} end
         if s.pf_panel=="combo-guide" then
@@ -84,24 +85,30 @@ return function(base)
         local s=original_create(value);s.pf_navigation=nav.create();return s
     end
     local function activate(s,id,c)
+        if id=="back" and s.pf_typing then
+            s.pf_typing=false
+            if c.text_input then c.text_input(false) end
+            return
+        end
         if s.pf_typing and id~="unlock-input" and id~="unlock-submit" then
             s.pf_typing=false;if c.text_input then c.text_input(false) end
         end
         if id=="close" then s.pf_panel=nil
         elseif id=="back" then
-            if s.pf_typing then s.pf_typing=false;if c.text_input then c.text_input(false) end end
             if s.pf_message then s.pf_message=nil;s.pf_guide_message=nil
-            elseif s.pf_panel=='combo-guide' then s.pf_panel=nil
+            elseif s.pf_panel=="extras" or s.pf_panel==s.pf_root_panel then
+                s.pf_panel,s.pf_root_panel=nil,nil
             elseif s.pf_panel=='fighters' and s.pf_back_to_guide then s.pf_panel='combo-guide';s.pf_back_to_guide=nil
             elseif s.pf_panel=="fighters" or s.pf_panel=="campaigns" then s.pf_panel="pack-content"
             elseif s.pf_panel=="pack-content" then s.pf_panel="packs"
+            elseif s.pf_panel=="maps" then s.pf_panel=s.pf_maps_parent or "extras"
             else s.pf_panel="extras" end
         elseif id=="guest" then s.pf_panel=nil
         elseif id=='guide-basics' then s.pf_message=require('polish-fighters/combo_guide').basics;s.pf_guide_message=true
         elseif id:sub(1,6)=='guide:' then s.pf_message=require('polish-fighters/combo_guide').message(tonumber(id:sub(7)));s.pf_guide_message=true
         elseif id=='guide-roster' then
             local content,problem=model.contents()
-            if content then s.pf_contents=content;s.pf_panel='fighters';s.pf_content_page=1;s.pf_back_to_guide=true
+            if content then s.pf_contents=content;s.pf_panel='fighters';s.pf_back_to_guide=true
             else s.pf_message={'BŁĄD KATALOGU',tostring(problem)} end
         elseif id=="unlock-input" then
             s.pf_code="";s.pf_typing=true
@@ -149,7 +156,9 @@ return function(base)
         elseif id=="maps-next" then s.pf_map_page=(s.pf_map_page or 1)+1
         elseif id=="content-prev" then s.pf_content_page=math.max(1,(s.pf_content_page or 1)-1)
         elseif id=="content-next" then s.pf_content_page=(s.pf_content_page or 1)+1
-        elseif id=="fighters" or id=="campaigns" then s.pf_panel=id;s.pf_content_page=1
+        elseif id=="fighters" or id=="campaigns" then
+            s.pf_panel=id;s.pf_back_to_guide=nil
+        elseif id=="maps" then s.pf_maps_parent=s.pf_panel;s.pf_panel=id
         elseif id:sub(1,7)=="detail:" then
             local entry=s.pf_contents[s.pf_panel][tonumber(id:sub(8))]
             if s.pf_panel=="campaigns" and entry.path then
@@ -173,9 +182,10 @@ return function(base)
             if value<2 then value=2 end
             local ok=model.save({room_capacity=value})
             if not ok then s.pf_message={"NIE ZAPISANO USTAWIEN","Sprawdz dostep do plikow ustawien."} end
-        elseif id=="options" then s.pf_panel=nil;s.page="options";s.options=options.current();s.options_focus=1
+        elseif id=="options" then s.pf_settings_parent=s.pf_panel;s.pf_panel=nil;s.page="options";s.options=options.current();s.options_focus=1
         elseif id=="touch" then
-            s.pf_panel=nil;s.hud=require("base/ui/hybrid_editor").create(options.current(),"menu");s.page="hud"
+            s.pf_settings_parent=s.pf_panel;s.pf_panel=nil
+            s.hud=require("base/ui/hybrid_editor").create(options.current(),"menu");s.page="hud"
         elseif id:sub(1,4)=="map:" then
             local ok=model.save({map=tonumber(id:sub(5))})
             if not ok then s.pf_message={"NIE ZAPISANO MAPY","Sprawdz dostep do plikow ustawien."} end
@@ -197,7 +207,13 @@ return function(base)
         else s.pf_panel=id end
     end
     function base.update(s,input,c)
-        if s.page~="menu" then return original_update(s,input,c) end
+        if s.page~="menu" then
+            local result=original_update(s,input,c)
+            if s.page=="menu" and s.pf_settings_parent then
+                s.pf_panel,s.pf_settings_parent=s.pf_settings_parent,nil
+            end
+            return result
+        end
         if s.pf_panel=="unlock" and not s.pf_message then
             local text=input.text or ""
             if #text>0 then
@@ -217,23 +233,24 @@ return function(base)
             local enter=input.click and input.pointer_x>=260 and input.pointer_x<=535 and input.pointer_y>=414 and input.pointer_y<=444
             local f10=input.keys[121] and not s.pf_f10
             s.pf_f10=input.keys[121]
-            if enter or f10 then s.pf_panel="extras";return end
+            if enter or f10 then s.pf_panel,s.pf_root_panel="extras",nil;return end
             return original_update(s,input,c)
         end
         local list=items(s);local targets={}
         for index in ipairs(list) do targets[#targets+1]=nav.target(210,214+(index-1)*25,635,236+(index-1)*25) end
-        local mapped=nav.apply(s.pf_navigation,input,{page="classic:"..s.pf_panel..":"..tostring(s.pf_map_page or 1)..":"..tostring(s.pf_content_page or 1)..":"..tostring(s.pf_history_page or 1)..(s.pf_message and ":message" or ""),targets=targets,default=1})
+        list[#list+1]={"back"}
+        targets[#targets+1]=back_target
+        local page=s.pf_panel=="maps" and s.pf_map_page or s.pf_panel=="history" and s.pf_history_page
+            or (s.pf_panel=="fighters" or s.pf_panel=="campaigns") and s.pf_content_page
+        local mapped=nav.apply(s.pf_navigation,input,{page="classic:"..s.pf_panel..":"..tostring(page or 1)
+            ..(s.pf_message and ":message" or ""),targets=targets,remember=true})
+        if mapped.nav.cancel then activate(s,"back",c);return end
         s.pf_hover=nil
         for index,box in ipairs(targets) do
             if mapped.pointer_x>=box.left and mapped.pointer_x<=box.right and mapped.pointer_y>=box.top and mapped.pointer_y<=box.bottom then
                 s.pf_hover=index
-                if mapped.click then activate(s,list[index][1],c);break end
+                if mapped.click then s.pf_navigation.focus=index;activate(s,list[index][1],c);return end
             end
-        end
-        if mapped.nav.cancel then
-            if s.pf_typing then s.pf_typing=false;if c.text_input then c.text_input(false) end end
-            if s.pf_guide_message or s.pf_back_to_guide or s.pf_panel=='combo-guide' then activate(s,'back',c)
-            elseif s.pf_message then s.pf_message=nil elseif s.pf_panel=="extras" then s.pf_panel=nil else s.pf_panel="extras" end
         end
     end
     function base.draw(s,c)
@@ -265,7 +282,12 @@ return function(base)
                 else font.gdi(c,s.pf_message[i],210,270+(i-2)*28,0xffffff) end
             end
         end
-        for index,entry in ipairs(items(s)) do
+        local list=items(s)
+        local back_active=s.pf_hover==#list+1
+        c.fill(28,98,137,46,42,80,120,back_active and 255 or 190)
+        c.fill(28,98,137,2,157,190,224)
+        font.gdi(c,"< WSTECZ",48,113,0xf0f5ff)
+        for index,entry in ipairs(list) do
             if index==s.pf_hover then c.fill(200,212+(index-1)*25,442,24,42,80,120) end
             if c.text then c.text(entry[2],421,216+(index-1)*25,'center',13,0xe0eaff,nil,nil,true)
             else font.draw(c,entry[2],421,219+(index-1)*25,index==s.pf_hover and 4 or 1,nil,"center") end

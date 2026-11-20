@@ -1,5 +1,6 @@
 -- SPDX-License-Identifier: MIT
 local hud = {}
+local font = require("base/ui/font")
 local colors = {attack = {174, 31, 34}, stay = {169, 107, 14}, come = {38, 115, 41},
     defend = {29, 84, 152}}
 local icons = {
@@ -12,6 +13,22 @@ local icons = {
     defend = {"....#....", "..#####..", "#########", "##.....##", "##.....##",
         ".##...##.", "..##.##..", "...###...", "....#...."},
 }
+
+function hud.draw_order(context, order, x, y, left, right)
+    local width = 76
+    local center = math.max(left + width / 2, math.min(x, right - width / 2))
+    local r, g, b = unpack(colors[order])
+    context.fill(center - width / 2, y, width, 21, 229, 232, 243)
+    context.fill(center - width / 2 + 1, y + 1, width - 2, 19, r, g, b)
+    local tail = math.max(left + 2, math.min(x, right - 3))
+    context.fill(tail - 2, y + 21, 5, 3, r, g, b)
+    local label = order:upper()
+    if context.text then
+        context.text(label, center, y + 2, "center", 13, 0xffffff)
+    else
+        font.gdi(context, label, center, y + 2, 0xffffff, nil, "center")
+    end
+end
 
 function hud.draw(context, state)
     local layout = state and state.layout

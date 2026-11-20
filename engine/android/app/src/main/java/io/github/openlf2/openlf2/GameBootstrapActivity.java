@@ -75,10 +75,13 @@ public final class GameBootstrapActivity extends Activity {
             long started = android.os.SystemClock.elapsedRealtime();
             try {
                 prepare();
+                boolean configure = new GamePackSettings(getFilesDir()).needsFirstSetup();
                 android.util.Log.i("OpenLF2", "Startup prepare: " + (android.os.SystemClock.elapsedRealtime() - started) + " ms");
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) return;
-                    startActivity(new Intent(this, OpenLF2Activity.class));
+                    startActivity(configure
+                            ? new Intent(this, AndroidModsActivity.class).putExtra(AndroidModsActivity.FIRST_SETUP, true)
+                            : new Intent(this, OpenLF2Activity.class));
                     finish();
                 });
             } catch (Exception error) {

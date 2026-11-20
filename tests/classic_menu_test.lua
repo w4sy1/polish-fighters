@@ -55,7 +55,14 @@ click('profile_polish_fighters');assert(requested=='profile_polish_fighters')
 click('mods');assert(state.hub_mods,'catalogue did not open from library')
 require('polish-fighters/mod_browser').activate(state,'back',context);assert(not state.hub_mods)
 click('packs');click('toggle_lf_two');back();assert(state.hub_selected.lf_two,'cancel modified saved modules')
-state.hub_mode='root';click('online');click('unavailable');assert(state.hub_note==locale.text('offline'))
+state.hub_mode='root';click('online')
+assert(state.hub_online and state.hub_online.simple and state.hub_mode=='root','online must open directly')
+local online=require('polish-fighters/online_screen')
+local actions={}
+for _,row in ipairs(online.rows(state.hub_online)) do actions[row[1]]=true end
+assert(actions.publish and actions.find and not actions.refresh and not actions.accounts)
+assert(actions['local'],'LAN must be available on the same screen')
+online.activate(state,'back',context);assert(not state.hub_online)
 state.hub_mode='root';click('credits');back();assert(state.hub_mode=='root')
 -- A profile reload carries the requested mode once, without another thirteen-choice menu.
 state.hub_preselected=false;state.hub_mode='battle';click('mode_stage');state.hub_selected=nil;click('profile_dbz');assert(requested=='profile_dbz' and document.little_fighters_pending_mode=='stage')

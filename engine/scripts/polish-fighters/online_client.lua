@@ -64,6 +64,8 @@ function client.request(endpoint,operation,payload,purpose)
  if not body then return nil,problem end
  local ok;ok,problem=engine.account('start',client.api_endpoint(endpoint),operation,body,client.token or '')
  if not ok then return nil,problem end
+ if operation=='login' then client.last_login_error=nil end
+ if operation=='list-rooms' then client.listed_origin=nil end
  client.pending={operation=operation,endpoint=endpoint,purpose=purpose}
  client.notice='Łączenie z serwerem…'
  return true
@@ -85,13 +87,16 @@ function client.tick()
  local raw,problem=engine.account('poll')
  if raw=='pending' then return end
  local pending=client.pending;client.pending=nil
+ if pending.cancelled then return end
  if not raw then
+  if pending.operation=='publish-room' then client.cancel_publish=nil end
   -- The host's reason (DNS, TLS, timeout) stays visible, so a screenshot is enough to diagnose.
   client.notice=('Brak połączenia z serwerem kont: '..tostring(problem)):sub(1,150);return
  end
  local result;result,problem=engine.json_decode(raw)
  if type(result)~='table' then client.notice='Nieprawidłowa odpowiedź serwera.';return end
  if result.error then
+  if pending.operation=='login' then client.last_login_error=result.error end
   if pending.operation=='publish-room' then client.cancel_publish=nil end
   local friendly={['Nick in use']='Ten nick jest teraz zajęty. Wybierz inny.',
    ['Nick taken by an account']='Ten nick należy do konta z hasłem. Wybierz inny.'}
@@ -115,6 +120,7 @@ function client.tick()
   client.auto_refresh=true
  elseif operation=='list-rooms' then
   client.rooms={}
+  client.listed_origin=pending.endpoint
   client.relay_available=result.relay==true
   for _,room in ipairs(type(result.rooms)=='table' and result.rooms or {}) do
    if #client.rooms<200 and type(room.host)=='string' and type(room.port)=='number' and
@@ -168,7 +174,7 @@ end
 function client.logout()
  local ok,problem=client.request(client.origin,'logout',{})
  if not ok then return nil,problem end
- client.token=nil;client.name=nil;client.rooms={};client.room=nil;client.recovery=nil;client.hosting_relay=nil
+ client.token=nil;client.name=nil;client.rooms={};client.room=nil;client.recovery=nil;client.hosting_relay=nil;client.listed_origin=nil
  return true
 end
 return client

@@ -1,3 +1,12 @@
+## 2026-11-20 — Lista dalszych poprawek po próbie na Raptorze
+
+- Reinforced pobrany z katalogu GitHub użytkownika działa według jego próby na Raptorze.
+- Mod Manager: zmienić tło i oprawę ekranu na spójne z klasycznymi menu LF2.
+- LF2mod: odnaleźć folder wskazany przez użytkownika i zinwentaryzować kilkadziesiąt paczek, w tym najnowsze posiadane wydanie DB Super. Porównać z podpisanym katalogiem oraz sprawdzić zgodność z silnikiem i prawa do dystrybucji przed dodaniem.
+- Gra sieciowa: uprościć dołączanie do gry. Sprawdzić ścieżki Internet i LAN, liczbę ekranów oraz komunikaty w razie błędu.
+- Jedyne repozytorium pobierania w grze to `w4sy1/polish-fighters`. Podpisany katalog ma 9 paczek. Z menu pobierania usunięto zewnętrzne źródła; rejestr 103 nazw służy do inwentaryzacji. DragonBall Super Edition 1.1 jest opublikowane na stronie autora w ModDB jako `Super_Dragon_Ball.2.rar`, 83 878 252 B. Do udostępnienia w grze potrzebne są konwersja, próba działania i ustalenie praw do dystrybucji.
+- Znaleziony lokalny trop to `C:/Users/01dwa/Documents/LF2-Mods/wynik-pobierania.csv`. Raport ma 78 pozycji, z czego 14 ma zapis pobrania, ale żadna z zapisanych ścieżek do archiwum obecnie nie istnieje. DragonBall Super Edition 1.1 ma stan `manual` i puste pole z plikiem. Druga kopia inwentarza zawiera 19 historycznych sum SHA-256 w `C:/Users/01dwa/Documents/Codex/2026-11-19/foldery-mam-tez-w-dokumentach-x20/outputs/LF2-Mods-SHA256.json`.
+
 ## 2026-11-20 — Wydanie 0.18.13: gra sieciowa i pokoje online (Claude)
 
 - Mecz Windows ↔ Android w LAN (emulator `PolishFighters_Mod_QA`, 10.0.2.2): po starcie wspólnego ekranu wejście działa po obu stronach (W/S/A/D i Num7 na Windows, dotyk na Androidzie), wybór postaci, Przygoda i Pojedynek z komputerami przebiegają zsynchronizowanie. Symulacja nie stała. W 0.18.12 testowano Enter, J i S, a atak na Windows to Num7.

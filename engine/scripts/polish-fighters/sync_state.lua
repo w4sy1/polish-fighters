@@ -4,6 +4,7 @@ local sync={}
 local omit={capture=true,display=true,view=true,stage=true,recording=true,record=true,
  sounds=true,sound_events=true,rumble=true,backgrounds=true,fighters=true,
  pointer_x=true,pointer_y=true,nav=true,sparks=true,direct_sounds=true,
+ team_order_label=true,team_order_ticks=true,
  filters=true} -- Local renderer/window capabilities, also carried in match.held.
 local function serialize(value,seen)
  local kind=type(value)

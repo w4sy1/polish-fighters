@@ -14,8 +14,16 @@ local function strings() return words[locale.id()] end
 local profile_tags={lf_four_turbo='lf_four_turbo',dbz='dbz',one_piece='one_piece',kate='kate',reinforced='reinforced',
  ntsd='ntsd',bleach='bleach',polish_fighters='polish_fighters',all='mixed'}
 local function mods_api() return engine and engine.mods end
+local function github_receipt(entry) return entry.version..' '..entry.sha256 end
+local function github_state(entry)
+ local pl=locale.id()=='pl'
+ if entry.receipt==nil then return pl and 'Do pobrania' or 'Available' end
+ if entry.receipt==github_receipt(entry) then return pl and 'Zainstalowano' or 'Installed' end
+ if entry.receipt=='' then return pl and 'Zainstalowano, wersja nieznana' or 'Installed, version unknown' end
+ return pl and 'Dostępna aktualizacja' or 'Update available'
+end
 local function github_start(s)
- local w=strings();local api=mods_api();s.github={packages={},status=w.gh_loading}
+ local w=strings();local api=mods_api();s.github=s.github or {packages={},page=1};s.github.status=w.gh_loading
  if not api then s.github.status=w.gh_android;return end
  local ok,err=api('catalogue')
  if ok==true then s.github.busy='catalogue' else s.github.status=w.gh_failed..tostring(err or '') end
@@ -45,11 +53,12 @@ local function github_poll(state)
  if busy=='catalogue' then
   g.packages=type(result)=='table' and type(result.packages)=='table' and result.packages or {}
   table.sort(g.packages,function(a,b) return tostring(a.name)<tostring(b.name) end)
+  for _,entry in ipairs(g.packages) do entry.receipt=api('receipt',entry.id) end
   g.status=w.gh_ready
  else
-  g.fraction=1;g.installed=g.installed or {};g.installed[g.target]=true
+  g.fraction=1
   local name=g.target
-  for _,entry in ipairs(g.packages) do if entry.id==g.target then name=entry.name
+  for _,entry in ipairs(g.packages) do if entry.id==g.target then name=entry.name;entry.receipt=api('receipt',entry.id)
    local tag=profile_tags[entry.profile or '']
    if tag and state.hub_available then state.hub_available[tag]=true end
   end end
@@ -57,8 +66,12 @@ local function github_poll(state)
  end
 end
 screen.github_poll=github_poll
-function screen.open(state)
+function screen.open(state,context)
  state.hub_mods={query='',category=1,page=1,nav=navigation.create(),previous={}}
+ if context then
+  state.hub_mods.direct=true
+  screen.activate(state,'github',context)
+ end
 end
 function screen.filtered(s)
  local out={};local query=s.query:lower();local category=categories[s.category]
@@ -72,13 +85,25 @@ function screen.rows(s)
  local w=strings()
  if s.detail then return {{'back',w.back,30,480,220,32}} end
  if s.github then
+  local g=s.github
+  if g.detail then
+   local rows={{'back',w.back,534,445,230,32}}
+   if g.detail.receipt~=github_receipt(g.detail) then
+    rows[#rows+1]={'gh_install',locale.id()=='pl' and 'POBIERZ PACZKĘ' or 'DOWNLOAD PACKAGE',30,445,300,32}
+   end
+   return rows
+  end
   local rows={}
-  for i,entry in ipairs(s.github.packages) do
-   if i>9 then break end
-   local mark=(s.github.installed and s.github.installed[entry.id]) and w.gh_installed or ''
-   rows[#rows+1]={'gh:'..entry.id,tostring(entry.name)..'  ('..size_label(entry.size_bytes)..')'..mark,30,96+(i-1)*36,734,32}
+  local pages=math.max(1,math.ceil(#g.packages/8))
+  g.page=math.max(1,math.min(g.page or 1,pages))
+  local first=(g.page-1)*8+1
+  for i=first,math.min(first+7,#g.packages) do
+   local entry=g.packages[i]
+   rows[#rows+1]={'gh:'..entry.id,entry.name..' '..entry.version..'  ('..size_label(entry.size_bytes)..')  '..github_state(entry),30,96+(i-first)*36,734,32}
   end
   rows[#rows+1]={'gh_refresh',w.refresh,30,445,300,32};rows[#rows+1]={'back',w.back,534,445,230,32}
+  if g.page>1 then rows[#rows+1]={'gh_prev',w.prev,30,485,230,32} end
+  if g.page<pages then rows[#rows+1]={'gh_next',w.next,534,485,230,32} end
   return rows
  end
  local rows={{'search',w.search..s.query,30,82,470,32},{'github',w.github,514,82,250,32},{'category',w.category..w[categories[s.category]],30,125,734,32}}
@@ -93,7 +118,10 @@ end
 function screen.activate(state,id,context)
  local s=state.hub_mods
  if id=='back' then
-  if s.edit then s.edit=false elseif s.detail then s.detail=nil elseif s.github then s.github=nil else state.hub_mods=nil end
+  if s.edit then s.edit=false elseif s.detail then s.detail=nil
+  elseif s.github and s.github.busy then return
+  elseif s.github and s.github.detail then s.github.detail=nil
+  elseif s.github and not s.direct then s.github=nil else state.hub_mods=nil end
  elseif id=='github' or id=='gh_refresh' then
   if not (s.github and s.github.busy) then github_start(s) end
   -- Android installs from its native Mods screen; leave the game loop to open it.
@@ -101,7 +129,13 @@ function screen.activate(state,id,context)
    local opened,problem=require('polish-fighters/hub').open_android_mods(context)
    if not opened then s.github.status=strings().gh_failed..tostring(problem or '') end
   end
- elseif id:sub(1,3)=='gh:' then github_install(s,id:sub(4))
+ elseif id:sub(1,3)=='gh:' then
+  for _,entry in ipairs(s.github.packages) do
+   if entry.id==id:sub(4) and not s.github.busy then s.github.detail=entry;break end
+  end
+ elseif id=='gh_install' then github_install(s,s.github.detail.id)
+ elseif id=='gh_prev' then s.github.page=s.github.page-1
+ elseif id=='gh_next' then s.github.page=s.github.page+1
  elseif id=='search' then s.edit=not s.edit
  elseif id=='category' then s.category=s.category%#categories+1;s.page=1
  elseif id=='prev' then s.page=math.max(1,s.page-1)
@@ -143,6 +177,13 @@ function screen.draw(state,context)
  text(s.github and w.gh_title or w.title,397,24,24,nil,'center')
  if s.github then
   text(s.github.status or '',397,62,13,0xffdc82,'center')
+  if s.github.detail then
+   local entry=s.github.detail
+   text(entry.name,30,105,20)
+   text(w.version..entry.version..'  /  '..size_label(entry.size_bytes),30,150,15)
+   text(github_state(entry),30,185,15,0xffdc82)
+   text(entry.description or '',30,225,15)
+  end
   if s.github.busy=='install' or (s.github.fraction or 0)>0 then
    context.fill(30,418,734,12,122,157,255);context.fill(32,420,math.floor(730*math.min(1,s.github.fraction or 0)),8,255,220,130)
   end

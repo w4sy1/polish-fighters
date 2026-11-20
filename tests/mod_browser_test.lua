@@ -25,16 +25,18 @@ screen.activate(state,'back',context);assert(not state.hub_mods)
 
 -- Polish Fighters - GitHub: catalogue, progress and install through engine.mods.
 local calls={}
-local responses={catalogue={packages={{id='lf4-turbo',name='LF4 Turbo',profile='lf_four_turbo',size_bytes=47180842},
- {id='dbz',name='Dragon Ball Z',profile='dbz',size_bytes=152277588}}}}
+local sha=string.rep('a',64)
+local responses={catalogue={packages={{id='lf4-turbo',name='LF4 Turbo',profile='lf_four_turbo',size_bytes=47180842,version='1.0.0',sha256=sha},
+ {id='dbz',name='Dragon Ball Z',profile='dbz',size_bytes=152277588,version='1.0.0',sha256=sha}}}}
 local pending=1
 engine.mods=function(action,value)
  calls[#calls+1]=action..(value and (':'..value) or '')
  if action=='catalogue' or action=='install' then return true end
+ if action=='receipt' and value=='lf4-turbo' and responses.installed then return '1.0.0 '..sha end
  if action=='progress' then return 50,100,1,0 end
  if action=='poll' then
   if pending>0 then pending=pending-1;return 'pending' end
-  if calls[#calls-1]=='install:lf4-turbo' or responses.installing then return 'lf4-turbo' end
+  if responses.installing then responses.installed=true;return 'lf4-turbo' end
   return responses.catalogue
  end
 end
@@ -48,12 +50,15 @@ assert(not s2.hub_mods.github.busy and #s2.hub_mods.github.packages==2)
 local rows=screen.rows(s2.hub_mods);assert(rows[1][1]=='gh:dbz' and rows[2][1]=='gh:lf4-turbo')
 screen.draw(s2,ctx)
 pending=1;responses.installing=true
-screen.activate(s2,'gh:lf4-turbo',context);assert(s2.hub_mods.github.busy=='install')
+screen.activate(s2,'gh:lf4-turbo',context);assert(s2.hub_mods.github.detail.id=='lf4-turbo')
+screen.activate(s2,'gh_install',context);assert(s2.hub_mods.github.busy=='install')
 screen.update(s2,{keys={}},context);assert(s2.hub_mods.github.fraction==0.5)
 screen.draw(s2,ctx)
 screen.update(s2,{keys={}},context)
-assert(not s2.hub_mods.github.busy and s2.hub_mods.github.installed['lf4-turbo'])
+assert(not s2.hub_mods.github.busy and s2.hub_mods.github.detail.receipt=='1.0.0 '..sha)
+assert(#screen.rows(s2.hub_mods)==1,'the same package should not offer another download')
 assert(s2.hub_available.lf_four_turbo==true)
+screen.activate(s2,'back',context);assert(s2.hub_mods.github and not s2.hub_mods.github.detail)
 screen.activate(s2,'back',context);assert(s2.hub_mods and not s2.hub_mods.github)
 -- Without the native installer (Android), the screen explains where to install.
 engine.mods=function() return nil,'Mods handled by platform' end

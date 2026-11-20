@@ -27,6 +27,8 @@ function commands.issue(state,slot,command)
    v.team_anchor_x,v.team_anchor_z=v.x_int,v.z_int
    v.order_x,v.order_z=constants.no_order,constants.no_order
    v.follow_order=command=='come' and 1 or 0
+   owner.team_order_label=command
+   owner.team_order_ticks=45
   end
  end
 end

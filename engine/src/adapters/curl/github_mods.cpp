@@ -63,6 +63,7 @@ struct Sink {
     std::uint64_t received = 0;
     ModInstallProgress* progress = nullptr;
     bool failed = false;
+    long status = 0;
 };
 std::size_t receive(char* data, std::size_t size, std::size_t count, void* opaque) noexcept {
     auto& sink = *static_cast<Sink*>(opaque);
@@ -78,7 +79,7 @@ std::size_t receive(char* data, std::size_t size, std::size_t count, void* opaqu
     return length;
 }
 
-Result<void> transfer(std::string_view address, Sink& sink, long timeout) {
+Result<void> transfer(std::string_view address, Sink& sink, long timeout, std::uint64_t offset = 0) {
     if (session().status != CURLE_OK) return fail(ErrorCode::dependency, "HTTP unavailable");
     if (!allowed_host(address)) return fail(ErrorCode::format, "Download outside GitHub");
     std::unique_ptr<CURL, decltype(&curl_easy_cleanup)> handle(curl_easy_init(), curl_easy_cleanup);
@@ -88,6 +89,8 @@ Result<void> transfer(std::string_view address, Sink& sink, long timeout) {
     curl_easy_setopt(handle.get(), CURLOPT_USERAGENT, "PolishFighters-Mods/1");
     curl_easy_setopt(handle.get(), CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(handle.get(), CURLOPT_MAXREDIRS, 5L);
+    curl_easy_setopt(handle.get(), CURLOPT_FAILONERROR, 1L);
+    if (offset) curl_easy_setopt(handle.get(), CURLOPT_RESUME_FROM_LARGE, static_cast<curl_off_t>(offset));
 #if LIBCURL_VERSION_NUM >= 0x075500
     curl_easy_setopt(handle.get(), CURLOPT_PROTOCOLS_STR, "https");
     curl_easy_setopt(handle.get(), CURLOPT_REDIR_PROTOCOLS_STR, "https");
@@ -102,14 +105,14 @@ Result<void> transfer(std::string_view address, Sink& sink, long timeout) {
     curl_easy_setopt(handle.get(), CURLOPT_SSL_OPTIONS, static_cast<long>(CURLSSLOPT_NATIVE_CA));
 #endif
     const auto code = curl_easy_perform(handle.get());
+    curl_easy_getinfo(handle.get(), CURLINFO_RESPONSE_CODE, &sink.status);
     char* effective = nullptr;
     curl_easy_getinfo(handle.get(), CURLINFO_EFFECTIVE_URL, &effective);
     if (!effective || !allowed_host(effective)) return fail(ErrorCode::format, "Download left the GitHub hosts");
     if (sink.failed) return fail(ErrorCode::limit, "Download exceeds the expected size or cannot be written");
     if (code != CURLE_OK) return fail(ErrorCode::io, std::string("Download failed: ") + curl_easy_strerror(code));
-    long status = 0;
-    curl_easy_getinfo(handle.get(), CURLINFO_RESPONSE_CODE, &status);
-    if (status != 200) return fail(ErrorCode::io, "GitHub answered HTTP " + std::to_string(status));
+    if (sink.status != (offset ? 206 : 200))
+        return fail(ErrorCode::io, "GitHub answered HTTP " + std::to_string(sink.status));
     return {};
 }
 
@@ -341,6 +344,7 @@ std::string lowercase(std::string value) {
 }
 
 Result<std::string> install_envelope(const fs::path& envelope, const fs::path& packs, std::string_view id,
+                                     std::string_view expected_version, std::string_view receipt,
                                      ModInstallProgress& progress) {
     std::ifstream file(envelope, std::ios::binary);
     if (!file) return fail(ErrorCode::io, "Cannot open the downloaded package");
@@ -368,7 +372,8 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
     const auto sha = text(*manifest, "sha256");
     const auto* installation = field(*manifest, "installation");
     const auto* pins = field(*catalogue, "manifests");
-    if (text(*manifest, "id") != std::string(id) || !version || type != std::string("content-pack") || !size || !unpacked ||
+    if (text(*manifest, "id") != std::string(id) || !version || *version != expected_version ||
+        type != std::string("content-pack") || !size || !unpacked ||
         !sha || !installation || text(*installation, "method") != std::string("content-pack-zip") || !pins ||
         text(*catalogue, "channel") != std::string("stable") ||
         text(*pins, std::string(id) + "@" + *version) != sha256_text(*manifest_text))
@@ -433,6 +438,12 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
         }
         if (!declared) { cleanup(staging); return fail(ErrorCode::format, "package.manifest declares a different ID"); }
     }
+    {
+        std::ofstream installed(staging / ".github-install", std::ios::binary);
+        installed << receipt;
+        installed.close();
+        if (!installed) { cleanup(staging); return fail(ErrorCode::io, "Cannot save the installed mod version"); }
+    }
     const auto target = packs / std::string(id);
     const auto previous = packs / (".previous-" + std::string(id) + "-" + std::to_string(random() & 0xffffffff));
     const bool replace = fs::exists(target, error);
@@ -460,6 +471,19 @@ fs::path mod_content_directory() {
     return content_directory_value;
 }
 bool github_mods_supported() noexcept { return true; }
+
+std::optional<std::string> github_mod_receipt(std::string_view id) {
+    const auto packs = mod_content_directory();
+    if (packs.empty() || !valid_id(id)) return std::nullopt;
+    const auto folder = packs / std::string(id);
+    std::error_code error;
+    if (!fs::is_regular_file(folder / "package.manifest", error)) return std::nullopt;
+    std::ifstream file(folder / ".github-install", std::ios::binary);
+    std::array<char, 128> buffer{};
+    file.read(buffer.data(), buffer.size());
+    if (!file.eof() || file.bad()) return std::string{};
+    return std::string(buffer.data(), static_cast<std::size_t>(file.gcount()));
+}
 
 Result<std::string> github_mod_catalogue() {
     std::string raw, signature;
@@ -489,34 +513,63 @@ Result<std::string> github_mod_install(std::string_view verified_catalogue, std:
     const auto url = text(*entry, "url");
     const auto version = text(*entry, "version");
     const auto size = number(*entry, "size_bytes");
+    const auto unpacked = number(*entry, "unpacked_size_bytes");
     const auto sha = text(*entry, "sha256");
-    if (!url || !version || !size || !sha || !valid_hash(*sha) || *size == 0 || *size > envelope_limit ||
+    if (!url || !version || !size || !unpacked || *unpacked == 0 || *unpacked > unpacked_limit ||
+        !sha || !valid_hash(*sha) || *size == 0 || *size > envelope_limit ||
         !url->starts_with(asset_prefix) || *url != std::string(asset_prefix) + std::string(id) + "-" + *version + ".zip")
         return fail(ErrorCode::format, "Invalid catalogue entry");
     const auto packs = mod_content_directory();
     if (packs.empty()) return fail(ErrorCode::platform, "Content-pack folder is unknown");
+    const auto receipt = *version + " " + *sha;
+    if (github_mod_receipt(id) == receipt) return std::string(id);
     std::error_code error;
     fs::create_directories(packs, error);
-    const auto envelope = packs / (".download-" + std::string(id) + ".zip");
+    if (error) return fail(ErrorCode::io, "Cannot create the content-pack folder");
+    const auto envelope = packs / (".download-" + std::string(id) + "-" + *sha + ".part");
+    auto offset = fs::file_size(envelope, error);
+    if (error || offset >= *size) offset = 0;
+    const auto space = fs::space(packs, error);
+    if (!error && space.available < *size - offset + *unpacked + reserve)
+        return fail(ErrorCode::limit, "Not enough free disk space");
     progress.total = *size;
+    progress.received = offset;
     {
-        std::ofstream output(envelope, std::ios::binary | std::ios::trunc);
-        if (!output) return fail(ErrorCode::io, "Cannot write into the content-pack folder");
         std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> digest(EVP_MD_CTX_new(), EVP_MD_CTX_free);
         if (!digest || EVP_DigestInit_ex(digest.get(), EVP_sha256(), nullptr) != 1) return fail(ErrorCode::dependency, "SHA-256 unavailable");
-        Sink sink{nullptr, &output, digest.get(), *size, 0, &progress};
-        auto fetched = transfer(*url, sink, 60);
+        if (offset) {
+            std::ifstream saved(envelope, std::ios::binary);
+            std::array<char, 65536> buffer{};
+            auto remaining = offset;
+            while (remaining) {
+                const auto length = static_cast<std::streamsize>(std::min<std::uint64_t>(remaining, buffer.size()));
+                if (!saved.read(buffer.data(), length) || EVP_DigestUpdate(digest.get(), buffer.data(), length) != 1)
+                    return fail(ErrorCode::io, "Cannot read a partial mod download");
+                remaining -= static_cast<std::uint64_t>(length);
+            }
+        }
+        std::ofstream output(envelope, std::ios::binary | (offset ? std::ios::app : std::ios::trunc));
+        if (!output) return fail(ErrorCode::io, "Cannot write into the content-pack folder");
+        Sink sink{nullptr, &output, digest.get(), *size, offset, &progress};
+        auto fetched = transfer(*url, sink, 60, offset);
         output.close();
+        if (!fetched) {
+            const bool interrupted = fetched.error().code == ErrorCode::io && output &&
+                (sink.status == (offset ? 206 : 200) || (offset && sink.status == 0));
+            if (!interrupted || sink.received >= *size) fs::remove(envelope, error);
+            return std::unexpected(fetched.error());
+        }
+        if (output && sink.received < *size)
+            return fail(ErrorCode::io, "Download interrupted. Select the mod again to resume");
         std::array<unsigned char, 32> value{};
         unsigned produced = 0;
         EVP_DigestFinal_ex(digest.get(), value.data(), &produced);
-        if (!fetched || sink.received != *size || hex(value.data(), produced) != *sha) {
+        if (!output || sink.received != *size || hex(value.data(), produced) != *sha) {
             fs::remove(envelope, error);
-            return fetched ? fail(ErrorCode::format, "Downloaded file does not match the signed catalogue")
-                           : std::unexpected(fetched.error());
+            return fail(ErrorCode::format, "Downloaded file does not match the signed catalogue");
         }
     }
-    auto installed = install_envelope(envelope, packs, id, progress);
+    auto installed = install_envelope(envelope, packs, id, *version, receipt, progress);
     fs::remove(envelope, error);
     progress.phase = 0;
     return installed;

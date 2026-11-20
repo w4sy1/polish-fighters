@@ -26,7 +26,10 @@ return function(base)
  end
  local function activate(state,id,context)
   state.hub_note=nil;state.message=nil
-  if id=='battle' or id=='settings' or id=='online' or id=='credits' or id=='language' or id=='status' then
+  if id=='online' then
+   if catalog.profile_id=='mixed-all' then state.hub_note='Do gry w sieci wybierz samodzielny moduł.'
+   else online.open(state,true) end
+  elseif id=='battle' or id=='settings' or id=='credits' or id=='language' or id=='status' then
    state.hub_mode=id
   elseif id:sub(1,5)=='lang_' then
    local saved,problem=locale.select(id:sub(6))
@@ -44,7 +47,7 @@ return function(base)
   elseif id=='diagnostics' then state.page='diagnostics';state.diagnostics=require('base/ui/diagnostics').create()
   elseif id=='unavailable' then state.hub_note=locale.text('offline')
   elseif id=='account' then online.open(state)
-  elseif id=='mods' then mods.open(state)
+  elseif id=='mods' then mods.open(state,context)
   elseif id:sub(1,5)=='mode_' then
    local mode=id:sub(6)
    if mode=='demo' or mode=='replay' then context.action(mode)
@@ -118,6 +121,7 @@ return function(base)
    if id=="extras" then state.pf_panel="extras"
    elseif id=="maps" then state.pf_panel="maps"
    else state.pf_panel="combo-guide" end
+   state.pf_root_panel=state.pf_panel
   else context.action(id) end
  end
  function base.update(state,input,context)

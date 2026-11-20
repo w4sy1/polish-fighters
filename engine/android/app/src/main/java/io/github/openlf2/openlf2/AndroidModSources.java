@@ -72,6 +72,7 @@ final class AndroidModSources {
             size = entry.getLong("size_bytes"); unpacked = entry.getLong("unpacked_size_bytes");
         }
         String sizeLabel() { return String.format(Locale.ROOT, "%.1f MB", size / 1048576.0); }
+        String receipt() { return version + " " + sha256; }
     }
 
     interface DownloadProgress { boolean update(long received, long total); }
@@ -101,7 +102,8 @@ final class AndroidModSources {
                         || !item.version.matches("(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)")
                         || !ASSET_URL.matcher(item.url).matches() || !item.url.endsWith("/" + item.id + "-" + item.version + ".zip")
                         || !item.sha256.matches("[a-f0-9]{64}") || item.size < 1 || item.size > ENVELOPE_LIMIT
-                        || item.unpacked < 1 || item.name.isEmpty() || item.name.length() > 120)
+                        || item.unpacked < 1 || item.unpacked > 4L * 1024 * 1024 * 1024
+                        || item.name.isEmpty() || item.name.length() > 120)
                     throw new IOException("Nieprawidłowy wpis katalogu modów.");
                 result.add(item);
             }
@@ -117,22 +119,37 @@ final class AndroidModSources {
         MessageDigest digest;
         try { digest = MessageDigest.getInstance("SHA-256"); }
         catch (NoSuchAlgorithmException error) { throw new IOException(error); }
-        HttpURLConnection connection = openFollowing(item.url, 60000);
-        long received = 0;
-        try (InputStream input = connection.getInputStream(); FileOutputStream output = new FileOutputStream(partial)) {
+        long received = partial.length();
+        if (received >= item.size) received = 0;
+        HttpURLConnection connection = openFollowing(item.url, 60000, received);
+        try {
+            if (connection.getResponseCode() == 206) {
+                String range = "bytes " + received + "-" + (item.size - 1) + "/" + item.size;
+                if (!range.equals(connection.getHeaderField("Content-Range"))) {
+                    partial.delete();
+                    throw new IOException("GitHub zwrócił inny zakres pobierania. Spróbuj ponownie.");
+                }
+            } else {
+                received = 0;
+            }
             byte[] buffer = new byte[1 << 16];
             int n;
-            while ((n = input.read(buffer)) != -1) {
-                received += n;
-                if (received > item.size) throw new IOException("Plik jest większy niż w katalogu.");
-                digest.update(buffer, 0, n);
-                output.write(buffer, 0, n);
-                if (progress != null && !progress.update(received, item.size)) throw new IOException("Pobieranie anulowane.");
+            if (received > 0) {
+                try (InputStream saved = new java.io.FileInputStream(partial)) {
+                    while ((n = saved.read(buffer)) != -1) digest.update(buffer, 0, n);
+                }
             }
-        } catch (IOException error) {
-            partial.delete();
-            throw error;
+            try (InputStream input = connection.getInputStream(); FileOutputStream output = new FileOutputStream(partial, received > 0)) {
+                while ((n = input.read(buffer)) != -1) {
+                    received += n;
+                    if (received > item.size) throw new IOException("Plik jest większy niż w katalogu.");
+                    digest.update(buffer, 0, n);
+                    output.write(buffer, 0, n);
+                    if (progress != null && !progress.update(received, item.size)) throw new IOException("Pobieranie anulowane.");
+                }
+            }
         } finally { connection.disconnect(); }
+        if (received < item.size) throw new IOException("Pobieranie przerwane. Wybierz moduł ponownie, aby wznowić.");
         StringBuilder hex = new StringBuilder();
         for (byte b : digest.digest()) hex.append(String.format(Locale.ROOT, "%02x", b & 255));
         if (received != item.size || !hex.toString().equals(item.sha256)) {
@@ -151,7 +168,7 @@ final class AndroidModSources {
         } catch (IOException error) { return false; }
     }
 
-    private static HttpURLConnection openFollowing(String address, int timeout) throws IOException {
+    private static HttpURLConnection openFollowing(String address, int timeout, long offset) throws IOException {
         for (int redirects = 0; redirects <= 5; redirects++) {
             if (!githubHost(address)) throw new IOException("Pobieranie wyszło poza serwery GitHub.");
             HttpURLConnection connection = (HttpURLConnection) new URL(address).openConnection();
@@ -159,6 +176,7 @@ final class AndroidModSources {
             connection.setInstanceFollowRedirects(false);
             connection.setRequestProperty("User-Agent", "PolishFighters-Mods/1");
             connection.setRequestProperty("Accept-Encoding", "identity");
+            if (offset > 0) connection.setRequestProperty("Range", "bytes=" + offset + "-");
             int code = connection.getResponseCode();
             if (code >= 300 && code < 400) {
                 String location = connection.getHeaderField("Location");
@@ -167,14 +185,14 @@ final class AndroidModSources {
                 address = new URL(new URL(address), location).toExternalForm();
                 continue;
             }
-            if (code != 200) { connection.disconnect(); throw new IOException("GitHub odpowiedział kodem HTTP " + code + "."); }
+            if (code != 200 && !(offset > 0 && code == 206)) { connection.disconnect(); throw new IOException("GitHub odpowiedział kodem HTTP " + code + "."); }
             return connection;
         }
         throw new IOException("Za dużo przekierowań GitHub.");
     }
 
     private static byte[] fetchBytes(String address, int limit) throws IOException {
-        HttpURLConnection connection = openFollowing(address, 20000);
+        HttpURLConnection connection = openFollowing(address, 20000, 0);
         try (InputStream input = connection.getInputStream(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[8192];
             int n;

@@ -3,7 +3,7 @@ return {
  current_mod='CURRENT MOD: ',
  mods='MOD CATALOGUE',
  status='MODULE STATUS / COMPATIBILITY', audit_note='File audit at build time. Present assets do not prove complete mechanics compatibility.', assets='Assets: ', missing_files='Missing files: ',
- battle='BATTLE', play_main='PLAY', modules='MODULES', online='ONLINE GAME', settings='SETTINGS', language='LANGUAGE', credits='CREDITS', quit='QUIT',
+ battle='BATTLE', play_main='PLAY', modules='MODULES', online='PLAY ONLINE', settings='SETTINGS', language='LANGUAGE', credits='CREDITS', quit='QUIT',
  back='BACK', controls='CONTROLS', video='VIDEO / SOUND', extras='HISTORY / UNLOCKS', recording='RECORDING SETTINGS',
  versus='VS Mode', stage='Stage Mode', championship='1 on 1 Championship', team_championship='2 on 2 Championship',
  battle_setup='Battle Mode', demo='Demo', replay='Playback Recording',

@@ -688,6 +688,12 @@ function_keys = function(state)
 end
 
 local function control_item(state, index, value)
+    if value.team_order_ticks then
+        value.team_order_ticks = value.team_order_ticks - 1
+        if value.team_order_ticks == 0 then
+            value.team_order_ticks, value.team_order_label = nil, nil
+        end
+    end
     control.step(state, value)
     frame_rules.after_control(state, index, value)
 end

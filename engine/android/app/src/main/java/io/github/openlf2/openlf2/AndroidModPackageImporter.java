@@ -46,26 +46,27 @@ final class AndroidModPackageImporter {
     }
 
     /** Installs a signed envelope downloaded from the GitHub catalogue; it must contain `expectedId`. */
-    static String importDownloaded(File envelope, File filesDirectory, AssetManager assets, String expectedId,
+    static String importDownloaded(File envelope, File filesDirectory, AssetManager assets, AndroidModSources.Package item,
             Progress progress) throws IOException {
-        return importPackage(new java.io.BufferedInputStream(new java.io.FileInputStream(envelope), 1 << 16),
-                filesDirectory, () -> {
+        try (ZipInputStream zip = new ZipInputStream(new java.io.BufferedInputStream(new java.io.FileInputStream(envelope), 1 << 16))) {
+            return install(zip, filesDirectory, () -> {
                     try (InputStream key = assets.open(SignedModPackage.KEY_ASSET)) { return SignedModPackage.read(key, 32); }
                     catch (IOException error) { throw new IOException("Brak zaufanego klucza katalogu modów.", error); }
-                }, BuildConfig.MOD_ENGINE_VERSION, false, expectedId, progress);
+                }, BuildConfig.MOD_ENGINE_VERSION, false, item.id, item.receipt(), progress);
+        }
     }
 
     static String importPackage(InputStream raw, File filesDirectory, KeySource key, String engineVersion,
             boolean googlePlay, String expectedId, Progress progress) throws IOException {
         try (ZipInputStream zip = new ZipInputStream(raw)) {
-            return install(zip, filesDirectory, key, engineVersion, googlePlay, expectedId, progress);
+            return install(zip, filesDirectory, key, engineVersion, googlePlay, expectedId, null, progress);
         }
     }
 
     private static String install(ZipInputStream zip, File filesDirectory, KeySource key,
-            String engineVersion, boolean googlePlay, String expectedId, Progress progress) throws IOException {
+            String engineVersion, boolean googlePlay, String expectedId, String receipt, Progress progress) throws IOException {
         File game = new File(filesDirectory, "game").getCanonicalFile();
-        if (!new File(game, ".ready").isFile()) throw new IOException("Najpierw przygotuj pliki gry.");
+        if (receipt == null && !new File(game, ".ready").isFile()) throw new IOException("Najpierw przygotuj pliki gry.");
         File packs = new File(game, "content-packs");
         if (!packs.isDirectory() && !packs.mkdirs()) throw new IOException("Nie można utworzyć katalogu modułów.");
         File staging = new File(packs, ".import-" + Long.toHexString(System.nanoTime()));
@@ -84,8 +85,15 @@ final class AndroidModPackageImporter {
                 // A signed content pack carries its own Lua; trust comes from the publisher signature.
                 if (prepared.contentPack) {
                     if (googlePlay) throw new IOException("Ta wersja obsługuje tylko podpisane paczki danych.");
+                    if (receipt != null) {
+                        if (!receipt.startsWith(prepared.version + " ")) throw new IOException("Wersja paczki nie zgadza się z katalogiem.");
+                        try (FileOutputStream output = new FileOutputStream(new File(staging, ".github-install"))) {
+                            output.write(receipt.getBytes(StandardCharsets.US_ASCII));
+                        }
+                    }
                     return publishReplacing(staging, packs, prepared.id);
                 }
+                if (receipt != null) throw new IOException("Katalog oczekuje kompletnego modułu gry.");
                 if (!prepared.id.equals(validateManifest(staging))) throw new IOException("Nieprawidłowy identyfikator modułu.");
                 return publish(staging, packs, prepared.id);
             }
