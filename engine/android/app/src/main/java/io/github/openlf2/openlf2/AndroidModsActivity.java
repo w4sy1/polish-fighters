@@ -82,12 +82,13 @@ public final class AndroidModsActivity extends Activity {
         view.setTypeface(Typeface.MONOSPACE,bold?Typeface.BOLD:Typeface.NORMAL);return view;
     }
     private ClassicButton action(String label,Runnable click) {
-        ClassicButton button=new ClassicButton(this);button.setText(label);button.setAllCaps(false);button.setMinHeight(dp(44));button.setPadding(dp(8),dp(5),dp(8),dp(5));button.setBackgroundResource(R.drawable.pf_button);button.setBackgroundTintList(null);button.setOnClickListener(v->click.run());return button;
+        // The pixel font has no dashes or ellipsis; they would be drawn as "?".
+        ClassicButton button=new ClassicButton(this);button.setText(label.replace("—","-").replace("–","-").replace("…","..."));button.setContentDescription(label);button.setAllCaps(false);button.setMinHeight(dp(44));button.setPadding(dp(8),dp(5),dp(8),dp(5));button.setBackgroundResource(R.drawable.pf_button);button.setBackgroundTintList(null);button.setOnClickListener(v->click.run());return button;
     }
     private int dp(int value) { return Math.round(value*getResources().getDisplayMetrics().density); }
 
     private void addSource(AndroidModSources.Source source) {
-        ClassicButton button=action("PRZEGLĄDAJ: "+source.name,()->discover(source));
+        ClassicButton button=action(source.name,()->discover(source));button.setContentDescription("Przeglądaj: "+source.name);
         LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,dp(44));params.bottomMargin=dp(4);rows.addView(button,params);
     }
     private void discover(AndroidModSources.Source source) {
@@ -111,7 +112,7 @@ public final class AndroidModsActivity extends Activity {
     }
     private void showSources() {
         rows.removeAllViews();
-        ClassicButton github=action("POBIERZ: "+AndroidModSources.GITHUB_NAME.replace("—","-"),this::showGitHub);
+        ClassicButton github=action("POBIERZ: "+AndroidModSources.GITHUB_NAME,this::showGitHub);
         LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(github,params);
         for(AndroidModSources.Source source:AndroidModSources.SOURCES)addSource(source);
         status.setText("Wybierz źródło albo zaimportuj paczkę LF2.");
