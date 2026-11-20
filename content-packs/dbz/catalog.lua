@@ -3,6 +3,10 @@ return function(base)
  base.source_path="mods/dbz/a/002120.txt"
  base.stage_path="mods/dbz/a/001917.dat"
  base.profile_id="dbz"
+ -- DBZ uses its own character IDs, outside the classic LF2 random range.
+ function base.random_eligible(fighter)
+  return fighter.record >= 1 and base.selectable(fighter)
+ end
  base.campaigns={
  {id=0,name="Arcade_1_(Bandit_Hunt)",path="mods/dbz/a/000000.dat",start_id=0,background=8,requires_custom_unlock=false},
  {id=1,name="Arcade_2_(Namek)",path="mods/dbz/a/000002.dat",start_id=0,background=6,requires_custom_unlock=false},
