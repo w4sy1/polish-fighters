@@ -26,6 +26,13 @@ def pump(first, second, timeout=60):
     """Bounded buffers and back pressure; either disconnect closes the whole pair."""
     buffers = {first: bytearray(), second: bytearray()}
     other = {first: second, second: first}
+    for sock in other:
+        # One short line per frame: without TCP_NODELAY, Nagle holds each line until the
+        # previous one is acknowledged, and delayed ACKs stretch that to ~200 ms bursts.
+        try:
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        except OSError:
+            pass
     first.setblocking(False)
     second.setblocking(False)
     activity = time.monotonic()

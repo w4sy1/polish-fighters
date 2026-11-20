@@ -505,7 +505,8 @@ function flow.update(state, raw, context)
         else
             local hp = state.active == "match" and recording.hp_sum(state.match.match) or 0
             local digest
-            if state.session.room and state.session.frames > 0 and state.session.sent_checksum ~= state.session.frames - 1 then
+            -- Only on the frames that report it: the digest serializes the whole match.
+            if state.session.room and network.room_checksum_due and network.room_checksum_due(state.session) then
                 digest = require("polish-fighters/sync_state").digest(state)
             end
             local combined, problem = network.exchange(state.session, input, hp, digest)

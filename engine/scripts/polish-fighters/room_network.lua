@@ -104,6 +104,12 @@ return function(legacy)
   end
   return s.phase=="ready"
  end
+ -- The state digest serializes the whole simulation: callers compute it only on
+ -- the frames that report it, not on every frame (costly on phones).
+ function room.checksum_due(s)
+  local interval=s.checksum_interval or checksum_interval
+  return s.frames>0 and (s.frames-1)%interval==0 and s.sent_checksum~=s.frames-1
+ end
  function room.exchange(s,input,hp,digest)
   -- Rendering keeps polling while a network frame is pending. Preserve short taps
   -- until the next packet is sent instead of losing them between two barriers.
@@ -128,8 +134,7 @@ return function(legacy)
    if math.floor(marks/bit)%2==1 and math.floor(s.queued_unlock/bit)%2==0 then s.queued_unlock=s.queued_unlock+bit end
   end
   -- Report the completed previous simulation tick in the background, every interval.
-  local interval=s.checksum_interval or checksum_interval
-  if s.frames>0 and (s.frames-1)%interval==0 and s.sent_checksum~=s.frames-1 then
+  if room.checksum_due(s) then
    if not send(s,{op="checksum",frame=s.frames-1,state=digest}) then return nil,s.error end
    s.sent_checksum=s.frames-1
   end
@@ -177,6 +182,6 @@ return function(legacy)
   local original=legacy[name]
   legacy[name]=function(s,...) if s and s.room then return room[name](s,...) end;return original(s,...) end
  end
- legacy.room_ready=room.ready;legacy.room_begin=room.begin
+ legacy.room_ready=room.ready;legacy.room_begin=room.begin;legacy.room_checksum_due=room.checksum_due
  return legacy
 end

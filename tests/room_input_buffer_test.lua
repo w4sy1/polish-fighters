@@ -94,3 +94,13 @@ network.next_room=true
 s=network.create({network_profile=string.rep('a',64),network_internet=true});network.room_begin(s)
 assert(messages[#messages].delay==6,'internet delay default')
 print('PASS room start: leader announces LAN/internet input delay')
+
+-- The flow computes the costly state digest only on frames that report it.
+s=session(0,0);s.checksum_interval=30
+local due={}
+for frame=0,61 do
+ if network.room_checksum_due(s) then due[#due+1]=s.frames end
+ tick(s,frame);assert(network.exchange(s,{[0]='',functions=''},0,network.room_checksum_due(s) and 'd' or nil))
+end
+assert(#due==3 and due[1]==1 and due[2]==31 and due[3]==61,'digest due on wrong frames: '..table.concat(due,','))
+print('PASS room checksum: digest needed only every 30 frames')

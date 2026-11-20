@@ -155,6 +155,9 @@ struct ResourceBridge {
                 if (!sent) pending_network = std::unexpected(sent.error());
             } else if (operation == "poll") {
                 if (room_host) {
+                    // Relay -> room -> relay in one call: forwarding only once per frame
+                    // added up to two frames of latency to every internet tick.
+                    relay_bridge.poll(room_host->port());
                     auto progressed = room_host->poll();
                     if (!progressed) { pending_network = std::unexpected(progressed.error()); return true; }
                     relay_bridge.poll(room_host->port());

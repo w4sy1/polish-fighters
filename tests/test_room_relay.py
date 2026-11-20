@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 from account_service import Service, handler
-from room_relay import RelayServer, handshake
+from room_relay import RelayServer, handshake, pump
 from relay_bridge import open_channel, bridge
 
 
@@ -116,6 +116,27 @@ class RelayTest(unittest.TestCase):
         self.assertFalse(worker.is_alive(), 'disconnect must propagate')
         if errors:
             raise errors[0]
+
+    def test_pump_disables_nagle_on_both_sides(self):
+        listener = socket.create_server(('127.0.0.1', 0))
+        pairs = []
+        for _ in range(2):
+            outside = socket.create_connection(listener.getsockname())
+            inside, _ = listener.accept()
+            pairs.append((outside, inside))
+        listener.close()
+        first, second = pairs[0][1], pairs[1][1]
+        worker = threading.Thread(target=pump, args=(first, second, 2), daemon=True)
+        worker.start()
+        pairs[0][0].sendall(b'tick.')
+        self.assertEqual(pairs[1][0].recv(5), b'tick.')
+        for sock in (first, second):
+            self.assertTrue(sock.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY))
+        for outside, inside in pairs:
+            outside.close()
+        worker.join(timeout=5)
+        for outside, inside in pairs:
+            inside.close()
 
 
 if __name__ == '__main__':
