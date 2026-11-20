@@ -84,7 +84,7 @@ public final class AndroidModsActivity extends Activity {
     }
     private void showSources() {
         rows.removeAllViews();
-        ClassicButton github=action("POBIERZ: "+AndroidModSources.GITHUB_NAME,this::showGitHub);
+        ClassicButton github=action("POBIERZ: "+AndroidModSources.GITHUB_NAME.replace("—","-"),this::showGitHub);
         LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(github,params);
         for(AndroidModSources.Source source:AndroidModSources.SOURCES)addSource(source);
         status.setText("Wybierz źródło albo zaimportuj paczkę LF2.");
@@ -103,7 +103,7 @@ public final class AndroidModsActivity extends Activity {
         rows.removeAllViews();
         for(AndroidModSources.Package item:found) {
             boolean installed=new java.io.File(getFilesDir(),"game/content-packs/"+item.id+"/package.manifest").isFile();
-            ClassicButton button=action((installed?"✓ ":"")+item.name+"  ("+item.sizeLabel()+")",()->install(item));
+            ClassicButton button=action((installed?"OK: ":"")+item.name+" - "+item.sizeLabel(),()->install(item));
             button.setContentDescription("Pobierz i zainstaluj "+item.name);
             LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(button,params);
         }

@@ -178,4 +178,7 @@ Result<std::unique_ptr<Downloader>> make_downloader() {
     }
     return std::unique_ptr<Downloader>(std::make_unique<CurlDownloader>());
 }
+#ifdef __ANDROID__
+Result<std::string> android_system_ca_bundle() { return android_ca_bundle(); }
+#endif
 }

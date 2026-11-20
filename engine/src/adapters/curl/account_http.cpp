@@ -63,6 +63,14 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
     std::unique_ptr<curl_slist,decltype(&curl_slist_free_all)> headers(raw_headers,curl_slist_free_all);
     if(!headers)return fail(ErrorCode::limit,"Account header allocation failed");
     std::string response;
+#ifdef __ANDROID__
+    // Without the system bundle OpenSSL finds no trusted CA on Android and every HTTPS
+    // account request fails. Read it once; later requests reuse the copy.
+    static const Result<std::string> ca_bundle=android_system_ca_bundle();
+    if(!ca_bundle)return fail(ErrorCode::dependency,"Android CA certificates unavailable");
+    curl_blob certificates{const_cast<char*>(ca_bundle->data()),ca_bundle->size(),CURL_BLOB_NOCOPY};
+    curl_easy_setopt(handle.get(),CURLOPT_CAINFO_BLOB,&certificates);
+#endif
     curl_easy_setopt(handle.get(),CURLOPT_URL,endpoint.c_str());
     curl_easy_setopt(handle.get(),CURLOPT_HTTPHEADER,headers.get());
     curl_easy_setopt(handle.get(),CURLOPT_POST,1L);

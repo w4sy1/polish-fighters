@@ -27,6 +27,10 @@ Result<std::unique_ptr<Downloader>> make_downloader();
 // Bounded account API call. HTTPS remotely; plain HTTP is limited to loopback.
 Result<std::string> account_post(std::string_view base, std::string_view operation,
                                  std::string_view body, std::string_view bearer);
+#ifdef __ANDROID__
+// PEM bundle of the Android system CA certificates for libcurl (OpenSSL cannot read them in place).
+Result<std::string> android_system_ca_bundle();
+#endif
 // Public, bounded release metadata from this game's GitHub repository. No account token.
 Result<std::string> github_releases();
 }
