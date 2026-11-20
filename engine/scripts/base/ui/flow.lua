@@ -436,12 +436,13 @@ function flow.update(state, raw, context)
     local enabled = mode == "match" and player and player.hp > 0 and player.team > 0
     local geometry = touch_menu and hybrid_layout.geometry(state.hybrid.settings, input.screen or hybrid_layout.screen)
     local layout = enabled and command_menu.layout(input.screen, touch_menu, geometry)
-    local v, escape = false, false
+    local v_down = input.keys[86]
+    local v, escape = v_down and not menu_state.v_down, false
     for _, code in ipairs(input.presses or {}) do
         if code == 86 and not menu_state.v_down then v = true end
         if code == virtual_keys.escape then escape = true end
     end
-    menu_state.v_down = input.keys[86]
+    menu_state.v_down = v_down
     local escape_down = input.keys[virtual_keys.escape]
     escape = escape or escape_down and not menu_state.escape_down
     if v then
