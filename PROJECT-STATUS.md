@@ -4,6 +4,7 @@
 - Lagi przez internet: `flow.lua` liczył pełną sumę kontrolną stanu w każdej klatce, choć pokój wysyła ją co 30 klatek. Teraz tylko wtedy (`room_network.checksum_due`). Przekaźnik `tools/room_relay.py` ustawia TCP_NODELAY (Nagle + opóźnione ACK dawały paczki co ok. 200 ms) — wymaga ponownego uruchomienia `install-relay.sh` na serwerze przekaźnika. Gospodarz odpytuje mostek przekaźnika przed i po `RoomHost::poll`.
 - Martwe pokoje: POWRÓT (F4) w lobby zeruje `state.network`; `online_flow.lua` zleca wtedy `delete-room`, wyłącza heartbeat i kanał przekaźnika. W trakcie meczu ogłoszenie zostaje. Test `tests/online_dead_room_test.lua`.
 - Lista pokojów pokazuje nick gospodarza („nick: nazwa / moduł”). Gra publikuje nazwę z nickiem; `account_service.py` w repo zwraca też `owner` (serwera nie wdrażano).
+- Wspólne menu tytułowe w grze sieciowej czyta tylko klawisze graczy, a Hybrid Control był tam wyłączony: gracz z Androidem (także gospodarz) nie mógł wybrać trybu. W sesji sieciowej tytuł ma joystick i przyciski (`flow.hybrid_mode`, test `tests/network_title_touch_test.lua`).
 - Instalator Windows: `[InstallDelete]` dla `{app}\scripts`.
 - Wersja 0.18.13, build 10010. Zawiera 0.18.12.
 
