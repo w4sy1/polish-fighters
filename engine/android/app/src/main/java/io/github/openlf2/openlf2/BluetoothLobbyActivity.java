@@ -216,17 +216,6 @@ public final class BluetoothLobbyActivity extends Activity {
         }
         LinearLayout content = new LinearLayout(this); content.setOrientation(LinearLayout.VERTICAL);
         content.addView(codes); content.addView(duplicates);
-        TextView touchLabel = new TextView(this); touchLabel.setText(tr("Sterowanie dotykowe (wszystkie moduły)"));
-        content.addView(touchLabel);
-        android.widget.Spinner touch = new android.widget.Spinner(this);
-        android.widget.ArrayAdapter<String> layouts = new android.widget.ArrayAdapter<>(this,
-            android.R.layout.simple_spinner_item, new String[]{tr("1. Klasyczny LF"), "2. Joystick"});
-        layouts.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); touch.setAdapter(layouts);
-        try { touch.setSelection("modern".equals(settings.touchLayout()) ? 1 : 0); }
-        catch (java.io.IOException | org.json.JSONException error) {
-            Toast.makeText(this, tr("Nie można odczytać sterowania: ") + error.getMessage(), Toast.LENGTH_LONG).show(); return;
-        }
-        content.addView(touch);
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle(tr("Ustawienia"))
             .setView(content).setPositiveButton(tr("Zapisz"), null)
             .setNegativeButton(tr("Anuluj"), null).create();
@@ -234,7 +223,7 @@ public final class BluetoothLobbyActivity extends Activity {
             .setOnClickListener(view -> {
                 try {
                     boolean wasEnabled = settings.enabled();
-                    settings.save(codes.isChecked(), duplicates.isChecked(), touch.getSelectedItemPosition()==1 ? "modern" : "classic");
+                    settings.save(codes.isChecked(), duplicates.isChecked());
                     dialog.dismiss();
                     if (codes.isChecked() && !wasEnabled) {
                         new AlertDialog.Builder(this).setTitle("lamus")

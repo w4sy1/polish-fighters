@@ -14,9 +14,9 @@ local font = require("base/ui/font")
 local i18n = require("base/i18n/i18n")
 local network = require("base/game/network")
 local unlock = require("base/game/unlock")
-local control = require("base/game/control")
 local user_options = require("base/game/options")
-local touch_gamepad = require("base/ui/touch_gamepad")
+local hybrid = require("base/ui/hybrid_input")
+local hybrid_hud = require("base/ui/hybrid_hud")
 local quit_dialog = require("base/ui/quit_dialog")
 local flow = {}
 local function screen_module(name)
@@ -30,19 +30,16 @@ local function screen_module(name)
     if name == "launch" then return require("base/ui/launch") end
     return title
 end
--- Whether the current screen reads key sets directly (not mouse/touch via base/ui/navigation);
--- the on-screen gamepad only has something to drive there ("full"); while a match is paused or
--- replaying only its pause button shows ("pause"); in a live match it shows too ("match").
-local function gamepad_mode(state)
-    if state.active == "network" then return nil end
+local function hybrid_mode(state)
+    if state.quit_dialog then return nil end
     if state.active == "match" then
         local match = state.match.match
-        -- Paused or replaying: only the pause button stays, to resume.
-        if match.replay and not match.replay_ended then return "pause" end
-        if state.match.view and state.match.view.paused then return "pause" end
+        if match.replay and not match.replay_ended or state.match.view and state.match.view.paused then return "pause" end
         return "match"
     end
-    return "full"
+    if state.active == "characters" or state.active == "battle" or state.active == "championship" then
+        return "selection"
+    end
 end
 local function screen_state(state)
     return state[state.active]
@@ -58,9 +55,7 @@ function flow.create(options)
     local state = {active = "launch", title = title.create(options), options = options,
         launch = require("base/ui/launch").create({menu_seed = options.menu_seed, problem = settings.problem}),
         pointer_x = 0, pointer_y = 0, previous_button = false, volume_frames = 0,
-        touch_gamepad = touch_gamepad.create(user_options.current().gamepad, user_options.current().digipad), mouse_touch = false,
-        -- Optional mouse input can stand in for touch while testing the on-screen gamepad.
-        mouse_touch_enabled = options.mouse_touch == true}
+        hybrid = hybrid.create(user_options.current().hybrid)}
     music.play("bgm/main.wma")
     -- A startup recording is already queued by the host; route consumes it on the first frame.
     if options.start_screen == "replay" then state.active = "title" end
@@ -317,11 +312,8 @@ function flow.draw(state, context)
     else
         screen_module(state.active).draw(screen_state(state), context)
     end
-    -- The on-screen gamepad draws on top of every screen it drives; hidden while paused (it
-    -- would sit under the PAUSE picture).
-    if gamepad_mode(state) then
-        state.touch_gamepad.fast_on = speed.fast
-        touch_gamepad.draw(state.touch_gamepad, context, state.active == "match" and state.match.attack_preview)
+    if hybrid_mode(state) and state.hybrid.geometry then
+        hybrid_hud.draw(context, state.hybrid.geometry, state.hybrid)
     end
     local status = recording.status_text()
     if status then font.gdi(context, i18n.clip(status, 128), 3, 0x213, recording.status_color())
@@ -413,78 +405,38 @@ function flow.update(state, raw, context)
     else
         state.window_bounds = nil
     end
-    -- The on-screen gamepad drives player 1's slot, merged here before a networked match sends
-    -- input[0]. It only reads fingers on screens it drives, releasing/hiding otherwise.
-    local mode = gamepad_mode(state)
-    -- The Little Fighters hub and launch menu use the same key navigation as
-    -- character selection. Route touch directions and ATAK into that input.
-    local active_screen = mode ~= nil
-    if state.touch_options_revision~=user_options.revision() then
-        state.touch_gamepad=touch_gamepad.create(shown_options.gamepad,shown_options.digipad,shown_options.touch_layout)
-        state.touch_options_revision=user_options.revision()
+    local mode = hybrid_mode(state)
+    if state.hybrid_revision ~= user_options.revision() then
+        state.hybrid = hybrid.create(shown_options.hybrid)
+        state.hybrid_revision = user_options.revision()
     end
-    -- Mouse-as-touch stays active after release, like a held touch; real input or touch ends it.
-    -- The "Show gamepad" option shows the gamepad when a screen first drives it and lets the mouse
-    -- press it; keyboard or controller input hides it again until the mouse is used.
-    local always_gamepad = shown_options.show_gamepad
-    if not always_gamepad then
-        state.gamepad_shown = false
-    elseif active_screen and not state.gamepad_shown then
-        state.gamepad_shown = true
-        state.mouse_touch = true
-    end
-    local mouse_driven = state.mouse_touch_enabled or always_gamepad
-    if mouse_driven and not input.touch_active then
-        -- Presses are the key-downs since the last frame, so a tap that came and went still counts.
-        local keyboard_or_pad = next(input.keys) ~= nil or next(input.gamepad) ~= nil or #(input.presses or {}) > 0
-        for _, pad in ipairs(input.pads or {}) do
-            if next(pad.dirs) ~= nil or next(pad.buttons) ~= nil then keyboard_or_pad = true end
-        end
-        if keyboard_or_pad then
-            state.mouse_touch = nil
-        elseif active_screen and input.button and input.pointer_x and input.pointer_y
-               and not (input.pointer_x == -1 and input.pointer_y == -1) then
-            state.mouse_touch = true
+    local current_match = state.active == "match" and state.match.match or nil
+    local player = current_match and current_match.items[state.session and state.session.slot or 0]
+    local key = player and (catalog.profile_id .. ":" .. (player.record.path or tostring(player.record.id)))
+    local touch = input
+    if state.options.touch_device or state.options.mouse_touch then
+        touch = {touch_active = true, screen = input.screen, contacts = input.contacts, touches = input.touches}
+        if state.options.mouse_touch and not input.touch_active then
+            touch.contacts = false
+            touch.touches = input.button and input.pointer_x and input.pointer_y and {{id = 0, x = input.pointer_x, y = input.pointer_y}} or {}
         end
     end
-    if not mouse_driven then state.mouse_touch = nil end
-    local gamepad_input = input
-    if active_screen and state.mouse_touch and not input.touch_active then
-        gamepad_input = {touch_active = true, screen = input.screen,
-            touches = input.button and {{id = 0, x = input.pointer_x, y = input.pointer_y}} or {}}
+    state.hybrid.text = input.filters and input.filters.text
+    local waiting = state.session and (state.session.pending or state.session.waiting)
+    local delay = state.session and state.session.delay or 0
+    local sample = not current_match or (current_match.input_phase + delay) % 2 == 1
+    local touched, pause = hybrid.update(state.hybrid, touch, mode, player, key, sample and not waiting)
+    if pause then
+        input.function_presses = (input.function_presses or "") .. "1"
+        if not input.functions:find("1", 1, true) then input.functions = input.functions .. "1" end
     end
-    -- Chord buttons are enabled by what player 1's fighter can do right now.
-    local fighter = state.active == "match" and state.match and state.match.match and state.match.match.items[0] or nil
-    local available = {}
-    for _, chord in ipairs({"da", "dj", "daj"}) do available[chord] = control.chord_available(fighter, chord) end
-    touch_gamepad.set_available(state.touch_gamepad, available)
-    local classic_match = state.active == "match" and catalog.profile_id == "lf2-classic"
-    local touched, pause_held, fast_held, team_command = touch_gamepad.update(state.touch_gamepad,
-        active_screen and gamepad_input or {touch_active = false, screen = input.screen}, mode, classic_match)
-    if classic_match then
-        local local_slot = state.session and state.session.slot or 0
-        state.match.match.attack_preview_slot = state.touch_gamepad.preview_on and local_slot or nil
-        if not state.touch_gamepad.preview_on then state.match.attack_preview = nil end
-    end
-    -- The pause button is F1; the match toggles on its press.
-    if pause_held and state.active == "match" and not input.functions:find("1", 1, true) then
-        input.functions = input.functions .. "1"
-    end
-    -- The fast-forward button is F5.
-    if fast_held and state.active == "match" and not input.functions:find("5", 1, true) then
-        input.functions = input.functions .. "5"
-    end
-    local launch_touch = state.active == "launch" and mode == "full"
-    for _, letter in ipairs({"u", "d", "l", "r", "c", "b", "f"}) do
-        if touched:find(letter, 1, true) then
-            if launch_touch then
-                local key = ({u=virtual_keys.up,d=virtual_keys.down,l=virtual_keys.left,r=virtual_keys.right,c=virtual_keys.enter,b=virtual_keys.escape})[letter]
-                if key then input.keys[key]=true end
-            elseif not input[0]:find(letter, 1, true) then input[0] = input[0] .. letter end
-        end
+    if input[0]:find("[lr]") then touched = touched:gsub("[lr]", "") end
+    if input[0]:find("[ud]") then touched = touched:gsub("[ud]", "") end
+    if not sample then touched = "" end
+    for letter in touched:gmatch(".") do
+        if not input[0]:find(letter, 1, true) then input[0] = input[0] .. letter end
     end
     local local_keys = input.keys
-    if team_command then input[0]=require('base/game/team_commands').signals[team_command] end
     if state.active=='match' and state.match then
         if state.auto_advance_match~=state.match then
             state.auto_advance_match=state.match;state.auto_advance_driver={}

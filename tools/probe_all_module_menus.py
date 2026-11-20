@@ -1,4 +1,4 @@
-"""Run every installed profile with both saved touch layouts and return via F4."""
+"""Run every installed profile with both hybrid movement modes and return via F4."""
 import argparse
 import json
 import subprocess
@@ -14,14 +14,14 @@ if __name__ == '__main__':
     (probe/'package.manifest').write_text('id=qa-layout-menu\nversion=1\napi=1\nrequires=base@1\nrequires=polish-fighters@1\nextend=base/ui/flow|flow.lua\n')
     (probe/'flow.lua').write_text('''return function(base)
  local describe=base.describe
- function base.describe(s) return describe(s)..' touch='..s.touch_gamepad.style end
+ function base.describe(s) return describe(s)..' touch='..s.hybrid.settings.run end
  return base
 end''')
     results=[]
     for pack in ['', 'polish-originals','lf4-turbo','dbz','one-piece','kate','reinforced','ntsd','bleach','mixed-all']:
-        for style in ['classic','modern']:
+        for style in ['double','strong']:
             name=(pack or 'lf2')+'-'+style;config=output/name;config.mkdir(exist_ok=True)
-            saved={'version':1,'options':{'touch_layout':style},'qa_keep':{'progress':7}}
+            saved={'version':1,'options':{'hybrid':{'run':style}},'qa_keep':{'progress':7}}
             (config/'config.json').write_text(json.dumps(saved))
             command=[str(stage/'LittleFighters.exe'),'--installer',str(stage/'LF2_v2.0a.exe'),
                 '--scripts',str(stage/'scripts'),'--hub-menu','--config-dir',str(config),'--input-trace','4,,*4']
@@ -32,7 +32,7 @@ end''')
             log=run.stdout+run.stderr;(config/'run.log').write_text(log,encoding='utf-8')
             document=json.loads((config/'config.json').read_text())
             passed=run.returncode==0 and 'screen=launch' in log and 'hub=true:library' in log and 'touch='+style in log
-            passed=passed and document['qa_keep']==saved['qa_keep'] and document['options']['touch_layout']==style
+            passed=passed and document['qa_keep']==saved['qa_keep'] and document['options']['hybrid']['run']==style
             results.append(dict(pack=pack or 'lf2',style=style,passed=passed,exit=run.returncode))
             print(name,'PASS' if passed else 'FAIL',flush=True)
     (output/'results.json').write_text(json.dumps(results,indent=2))

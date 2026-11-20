@@ -15,8 +15,10 @@ module=ui/navigation|ui/navigation.lua
 module=ui/quit_dialog|ui/quit_dialog.lua
 module=ui/font|ui/font.lua
 module=ui/flow|ui/flow.lua
-module=ui/touch_gamepad|ui/touch_gamepad.lua
-module=ui/hud_editor|ui/hud_editor.lua
+module=ui/hybrid_layout|ui/hybrid_layout.lua
+module=ui/hybrid_input|ui/hybrid_input.lua
+module=ui/hybrid_hud|ui/hybrid_hud.lua
+module=ui/hybrid_editor|ui/hybrid_editor.lua
 module=ui/diagnostics|ui/diagnostics.lua
 module=ui/character_select|ui/character_select.lua
 module=game/catalog|game/catalog.lua
@@ -66,4 +68,3 @@ asset=mods/base/fonts/droid_sans_fallback.ttf|fonts/droid_sans_fallback.ttf
 module=i18n/polish|i18n/polish.lua
 
 module=ui/culling|ui/culling.lua
-asset=mods/base/attack-pl.wav|attack-pl.wav

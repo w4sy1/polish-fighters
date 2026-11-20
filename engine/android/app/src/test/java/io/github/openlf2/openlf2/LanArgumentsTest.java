@@ -39,13 +39,13 @@ public class LanArgumentsTest {
             try {GameLaunchArguments.lan(root,true,"",port);fail();} catch(IllegalArgumentException expected) {}
         }
     }
-    @Test public void touchChoiceSurvivesReloadAndPreservesOtherSettings() throws Exception {
+    @Test public void launcherOptionsPreserveHybridAndOtherSettings() throws Exception {
         MobileCodeSettings store=new MobileCodeSettings(temporary.getRoot());
-        store.write(new org.json.JSONObject("{\"controls\":{\"keep\":true},\"progress\":7}"));
-        store.save(false,true,"modern");
-        assertEquals("modern",new MobileCodeSettings(temporary.getRoot()).touchLayout());
+        store.write(new org.json.JSONObject("{\"controls\":{\"keep\":true},\"progress\":7,\"options\":{\"hybrid\":{\"buffer_ms\":325}}}"));
+        store.save(false,true);
+        assertEquals(325,store.read().getJSONObject("options").getJSONObject("hybrid").getInt("buffer_ms"));
         assertTrue(store.read().getJSONObject("controls").getBoolean("keep"));
         assertEquals(7,store.read().getInt("progress"));
-        store.save(true,false,"classic"); assertEquals("classic",store.touchLayout());
+        store.save(true,false); assertTrue(store.enabled());
     }
 }

@@ -31,14 +31,14 @@ public class MobileCodeSettingsTest {
     @Test public void changingCodesPreservesControlsProgressAndOtherOptions() throws Exception {
         File directory = temporary.newFolder("settings");
         File config = new File(directory, "config.json");
-        String original = "{\"options\":{\"language\":\"polish\",\"show_gamepad\":true},"
+        String original = "{\"options\":{\"language\":\"polish\",\"show_fps\":true},"
             + "\"controls\":[1,2,3],\"polish_fighters_progress\":{\"wins\":7}}";
         Files.write(config.toPath(), original.getBytes(StandardCharsets.UTF_8));
         MobileCodeSettings settings = new MobileCodeSettings(temporary.getRoot());
         settings.save(true);
         JSONObject saved = new JSONObject(new String(Files.readAllBytes(config.toPath()), StandardCharsets.UTF_8));
         assertEquals("polish", saved.getJSONObject("options").getString("language"));
-        assertTrue(saved.getJSONObject("options").getBoolean("show_gamepad"));
+        assertTrue(saved.getJSONObject("options").getBoolean("show_fps"));
         assertEquals("[1,2,3]", saved.getJSONArray("controls").toString());
         assertEquals(7, saved.getJSONObject("polish_fighters_progress").getInt("wins"));
         assertTrue(saved.getJSONObject("options").getBoolean("unlock_characters"));

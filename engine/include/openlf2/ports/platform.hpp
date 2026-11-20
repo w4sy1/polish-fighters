@@ -144,7 +144,7 @@ struct PadState {
 };
 inline constexpr std::size_t max_pads = 4;
 // One held finger: viewport position and a platform-assigned id, stable while it stays down.
-struct TouchPoint { int id; int x; int y; };
+struct ContactEvent { char phase; int id; int x; int y; std::uint64_t ms; };
 // The window's edges in viewport coordinates: beyond 0..width / 0..height when the picture is
 // letterboxed. Overlay draw commands use the same coordinates.
 struct ScreenExtent { int left = 0; int top = 0; int right = 0; int bottom = 0; };
@@ -164,7 +164,7 @@ struct InputSnapshot {
     ScreenExtent screen;
     // Every finger held down this poll, in viewport coordinates (letterbox bars included, so
     // coordinates can be negative or past the viewport size).
-    std::vector<TouchPoint> touches;
+    std::vector<ContactEvent> contacts;
     // True from the first touch until the mouse/keyboard is used again; drives touch-only UI.
     bool touch_active = false;
     // Printable ASCII typed since the previous poll that no key-down event accounted for: the

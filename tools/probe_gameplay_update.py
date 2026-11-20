@@ -7,8 +7,8 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 SCRIPTS={
 'hud': '''s.launch.hub_enabled=false;s.launch.page='hud'
- local options=require('base/game/options').current();options.touch_layout='modern'
- s.launch.hud=require('base/ui/hud_editor').create(options)''',
+ local options=require('base/game/options').current()
+ s.launch.hud=require('base/ui/hybrid_editor').create(options)''',
 'training': '''local catalog=require('base/game/catalog');local fighters=catalog.load();local row
  for n,f in ipairs(fighters) do if f.id==411 then row=n end end
  assert(row)

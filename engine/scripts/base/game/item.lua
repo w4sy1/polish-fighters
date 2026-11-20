@@ -32,7 +32,7 @@ item.empty_frame = empty_frame
 -- A record combines the catalog entry (id, type) with the parsed file.
 function item.record(entry, data)
     local record = {id = entry.id, kind = entry.kind, data = data, movement = data.movement,
-        frames = data.frames}
+        frames = data.frames, path = entry.path}
     function record.frame(frame_id) return data.frames[frame_id] or empty_frame end
     return record
 end

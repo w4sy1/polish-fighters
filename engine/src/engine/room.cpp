@@ -34,7 +34,7 @@ Result<void> Room::start(int requester) {
 Result<std::vector<RoomTick>> Room::submit(int slot,std::uint64_t frame,std::string buttons) {
     if(phase_!=RoomPhase::playing || !peers_.contains(slot))return fail(ErrorCode::format,"invalid match peer");
     if(frame<frame_ || frame>=frame_+input_window)return fail(ErrorCode::format,"out-of-order input frame");
-    if(buttons.size()>7 || buttons.find_first_not_of("udlrcbf")!=std::string::npos)
+    if(buttons.size()>8 || buttons.find_first_not_of("udlrcbfq")!=std::string::npos)
         return fail(ErrorCode::format,"invalid input buttons");
     for(char key:buttons)if(std::count(buttons.begin(),buttons.end(),key)>1)return fail(ErrorCode::format,"duplicate input button");
     if(!checksums_.empty() && checksums_.begin()->first+checksum_deadline<frame_){

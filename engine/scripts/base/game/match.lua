@@ -346,6 +346,10 @@ local function read_input(state, held)
             for _, key in ipairs(item.keys) do value.previous_keys[key] = value.keys[key] end
             if state.input_phase == 0 then
                 local keys = held[index] or ""
+                if keys:find("q", 1, true) then
+                    control.clear_sequence(value)
+                    keys = keys:gsub("q", "")
+                end
                 keys=require('base/game/team_commands').input(state,index,keys)
                 value.keys.up = keys:find("u", 1, true) ~= nil
                 value.keys.down = keys:find("d", 1, true) ~= nil
@@ -685,11 +689,7 @@ function_keys = function(state)
 end
 
 local function control_item(state, index, value)
-    local attack_started = control.step(state, value)
-    if attack_started and index == state.attack_preview_slot and value.human then
-        state.attack_started = {record = value.record, frame = value.frame,
-            pic_offset = value.pic_offset, facing = value.facing}
-    end
+    control.step(state, value)
     frame_rules.after_control(state, index, value)
 end
 

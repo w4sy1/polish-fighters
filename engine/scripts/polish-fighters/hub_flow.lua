@@ -104,8 +104,7 @@ return function(base)
   local x,y,w,h=button_area(state)
   if state.active=='characters' and context.text then
    local lines=require('polish-fighters/input_settings').selection_hint(
-    state.options.touch_device or (state.touch_gamepad and state.touch_gamepad.visible),
-    require('base/game/options').current().touch_layout,state.session and state.session.slot or 0)
+    state.options.touch_device or state.hybrid.visible,state.session and state.session.slot or 0)
    context.fill(0,512,794,38,16,27,47,240)
    for index,line in ipairs(lines) do context.text(line,8,515+(index-1)*16,'left',12,0xffffff,nil,nil,true) end
   elseif state.session and state.session.room and context.text then

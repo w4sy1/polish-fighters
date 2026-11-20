@@ -396,7 +396,10 @@ public:
             // picture and finger coordinates disagree (a tap on BLOCK lands on ATTACK). Coming back from the
             // background already rebuilt it; a resized surface now does the same.
             case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
-                if (event.window.windowID == SDL_GetWindowID(window_.get())) rebuild_pending_ = true;
+                if (event.window.windowID == SDL_GetWindowID(window_.get())) {
+                    cancel_contacts(input);
+                    rebuild_pending_ = true;
+                }
                 break;
 #endif
             case SDL_EVENT_WINDOW_MAXIMIZED:
@@ -440,7 +443,9 @@ public:
                 if (is_enter(event.key.scancode)) enter_consumed_ = false;
                 break;
             case SDL_EVENT_WINDOW_FOCUS_LOST:
+            case SDL_EVENT_WILL_ENTER_BACKGROUND:
                 enter_consumed_ = false;
+                cancel_contacts(input);
                 break;
             case SDL_EVENT_TEXT_INPUT:
                 for (const char* character = event.text.text; character != nullptr && *character != '\0'; ++character) {
@@ -533,14 +538,6 @@ public:
         previous_pads_ = input.pads;
         input.touch_active = pointer_from_touch_;
         input.screen = screen_extent();
-        input.touches.reserve(touches_.size());
-        for (const auto& [finger, point] : touches_) input.touches.push_back(point);
-        // Preserve a down/up tap that arrived between two polls for one script
-        // frame. Without this edge buffer, short phone taps disappear entirely.
-        for (const auto& [finger, point] : queued_touch_downs_) {
-            if (!touches_.contains(finger)) input.touches.push_back(point);
-        }
-        queued_touch_downs_.clear();
         window_placement();
         return input;
     }
@@ -1099,43 +1096,51 @@ private:
         }
         return false;
     }
-    // The first finger is the pointer, for menu clicks and dragging (unchanged below). Every
-    // finger is also kept in `touches_` regardless, in viewport coordinates, for scripts that
-    // compose their own multi-touch UI (an on-screen gamepad), letterbox bars included. A touch
-    // on a black bar never becomes the pointer, so it never clicks where a finger was before.
+    void cancel_contacts(InputSnapshot& input) {
+        contacts_.clear();
+        finger_.reset();
+        touching_ = false;
+        input.pressed = false;
+        input.contacts.clear();
+        input.contacts.push_back({'x', 0, 0, 0, SDL_GetTicks()});
+    }
+
+    // The first contact also supplies the ordinary pointer used by menus and text fields.
     void touch(const SDL_TouchFingerEvent& finger, Uint32 type, InputSnapshot& input) {
         if (finger.touchID == SDL_MOUSE_TOUCHID) return;
-        int width = 0;
-        int height = 0;
-        float x = 0.0f;
-        float y = 0.0f;
+        if (type == SDL_EVENT_FINGER_CANCELED) {
+            cancel_contacts(input);
+            return;
+        }
+        const auto key = std::pair{finger.touchID, finger.fingerID};
+        int width = 0, height = 0;
+        float x = 0.0f, y = 0.0f;
         const bool converted = SDL_GetWindowSize(window_.get(), &width, &height)
             && SDL_RenderCoordinatesFromWindow(renderer_.get(), finger.x * static_cast<float>(width),
                                                finger.y * static_cast<float>(height), &x, &y);
         const bool inside = converted && x >= 0.0f && y >= 0.0f && x < static_cast<float>(viewport_.width)
             && y < static_cast<float>(viewport_.height);
-        if (type == SDL_EVENT_FINGER_UP || type == SDL_EVENT_FINGER_CANCELED || !converted) {
-            touches_.erase(finger.fingerID);
-        } else {
-            auto entry = touches_.find(finger.fingerID);
-            const int id = entry != touches_.end() ? entry->second.id : next_touch_id_++;
-            const TouchPoint point{id, static_cast<int>(std::floor(x)), static_cast<int>(std::floor(y))};
-            touches_[finger.fingerID] = point;
-            if (type == SDL_EVENT_FINGER_DOWN) queued_touch_downs_[finger.fingerID] = point;
-            pointer_from_touch_ = true;
+        auto active = contacts_.find(key);
+        if (type == SDL_EVENT_FINGER_DOWN && converted && active == contacts_.end()) {
+            active = contacts_.emplace(key, next_contact_++).first;
         }
-        if (inside) {
-            touch_pointer_ = std::pair{static_cast<int>(std::floor(x)), static_cast<int>(std::floor(y))};
-            pointer_from_touch_ = true;
+        if (active != contacts_.end()) {
+            const char phase = type == SDL_EVENT_FINGER_DOWN ? 'd' : type == SDL_EVENT_FINGER_UP ? 'u' : 'm';
+            if (converted || phase == 'u') {
+                input.contacts.push_back({phase, active->second, static_cast<int>(std::floor(x)),
+                    static_cast<int>(std::floor(y)), finger.timestamp / 1'000'000});
+            }
+            if (phase == 'u') contacts_.erase(active);
         }
-        if (type == SDL_EVENT_FINGER_DOWN && finger_) return;
-        if (type != SDL_EVENT_FINGER_DOWN && (!finger_ || *finger_ != finger.fingerID)) return;
-        if (type == SDL_EVENT_FINGER_DOWN) {
-            if (!inside) return;
-            finger_ = finger.fingerID;
+        if (converted) pointer_from_touch_ = true;
+        if (type == SDL_EVENT_FINGER_DOWN && !finger_ && inside) {
+            finger_ = key;
             touching_ = true;
             input.pressed = true;
-        } else if (type != SDL_EVENT_FINGER_MOTION) {
+        }
+        if (finger_ != key) return;
+        if (inside) touch_pointer_ = std::pair{static_cast<int>(std::floor(x)), static_cast<int>(std::floor(y))};
+        if (type == SDL_EVENT_FINGER_UP) {
             finger_.reset();
             touching_ = false;
         }
@@ -1267,17 +1272,12 @@ private:
     bool reshow_keyboard_ = false;
     // Touch: the finger that acts as the pointer, its last position in viewport coordinates,
     // and whether the pointer last moved by touch rather than by the mouse or a key.
-    std::optional<SDL_FingerID> finger_;
+    std::optional<std::pair<SDL_TouchID, SDL_FingerID>> finger_;
     std::optional<std::pair<int, int>> touch_pointer_;
     bool touching_ = false;
     bool pointer_from_touch_ = false;
-    // Every held finger, keyed by SDL's own id; `TouchPoint::id` is a small id this adapter
-    // assigns instead, stable while that finger stays down.
-    std::map<SDL_FingerID, TouchPoint> touches_;
-    // A finger can go down and up between polls. Keep its initial point until one snapshot
-    // carries the press to Lua; an already-held finger is emitted from `touches_` instead.
-    std::map<SDL_FingerID, TouchPoint> queued_touch_downs_;
-    int next_touch_id_ = 1;
+    std::map<std::pair<SDL_TouchID, SDL_FingerID>, int> contacts_;
+    int next_contact_ = 1;
     // The previous poll's controller state, to tell a fresh press from one already held (see
     // gamepad_pressed/pads_pressed).
     GamepadButtons previous_gamepad_;

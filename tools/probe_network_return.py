@@ -19,14 +19,14 @@ if __name__=='__main__':
 end''')
     for name,trace,expected in [('old-press','c!@200_250,*3','root'),('new-press','c!@200_250,*3,!@200_250,*3','profile')]:
         config=out/name;config.mkdir(exist_ok=True)
-        (config/'config.json').write_text(json.dumps({'version':1,'qa_keep':7,'options':{'touch_layout':'modern'}}))
+        (config/'config.json').write_text(json.dumps({'version':1,'qa_keep':7,'options':{'hybrid':{'run':'strong'}}}))
         run=subprocess.run([str(stage/'LittleFighters.exe'),'--installer',str(stage/'LF2_v2.0a.exe'),
             '--scripts',str(stage/'scripts'),'--mod',str(probe),'--hub-menu','--config-dir',str(config),
             '--input-trace',trace],capture_output=True,text=True,timeout=30)
         log=run.stdout+run.stderr;(config/'run.log').write_text(log,encoding='utf-8')
         document=json.loads((config/'config.json').read_text())
         assert run.returncode==0 and 'hub=true:'+expected in log,log
-        assert document['qa_keep']==7 and document['options']['touch_layout']=='modern'
+        assert document['qa_keep']==7 and document['options']['hybrid']['run']=='strong'
         assert document['last_network_error']['reason']=='qa-disconnect'
         assert bytes.fromhex(document['last_network_error']['snapshot_hex'])
         print(name,'PASS',flush=True)

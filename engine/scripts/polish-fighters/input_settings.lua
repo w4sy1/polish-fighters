@@ -14,12 +14,10 @@ function screen.hint()
  end
  return "GRACZ 1: ATAK "..screen.key_label(set.keys[5]).."   SKOK "..screen.key_label(set.keys[6]).."   BLOK "..screen.key_label(set.keys[7])
 end
-function screen.selection_hint(touch,style,slot)
+function screen.selection_hint(touch,slot)
  local who='TY: GRACZ '..((slot or 0)+1)
  if touch then
-  return {who..' | DOTYK '..(style=='modern' and '2: JOYSTICK' or '1: KRZYŻAK'),
-   style=='modern' and 'Ruch: lewy drążek | ATAK: naciśnij | SKOK: wstecz' or
-    'Ruch: krzyżak | ATAK: wybór / OK | SKOK: cofnij | BLOK: obrona'}
+  return {who..' | HYBRID CONTROL', 'Ruch: joystick lub strzałki | ATAK: wybór | SKOK: wstecz'}
  end
  local set=controls.current().sets[1]
  if set.device~=0 then

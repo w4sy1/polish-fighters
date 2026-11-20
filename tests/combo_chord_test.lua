@@ -3,9 +3,7 @@
 --  * the classic keyboard timing (tap Defend, tap a direction, tap Attack/Jump as three
 --    separate presses) -- this must keep working exactly as before;
 --  * a single-tick chord where Defend and Attack (or Jump) land together while a direction
---    is already held -- this is what the Android touch "D+A"/"D+J"/"D+J+A" buttons send
---    (touch_gamepad.lua's chord_letters), and what a fast keyboard/controller press can also
---    produce if both keys are read in the same sampled tick.
+--    is already held, as a fast keyboard or controller press can produce.
 -- There was no existing test exercising control.lua's combo state machine at all.
 engine = {new_array = function() return {} end, random = function() return 0 end}
 local root = arg[1]

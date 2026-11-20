@@ -73,13 +73,6 @@ return function(base)
         elseif s.pf_panel=="connection" then
             return {{"room","POKOJ LAN (2-8 URZADZEN)"},{"tcp","STARE POLACZENIE (2 URZADZENIA)"},{"capacity","LIMIT POKOJU: "..model.current().room_capacity..""},
                 {"lan","HOTSPOT / SIEC LOKALNA"},{"bluetooth","BLUETOOTH"},{"back","POWROT"}}
-        elseif s.pf_panel=="touch" then
-            return {{"touch-small","MALE PRZYCISKI"},{"touch-medium","SREDNIE PRZYCISKI"},
-                {"touch-large","DUZE PRZYCISKI"},{"touch-opacity","PRZEZROCZYSTOSC"},
-                {"touch-left","PRZESUN PRZYCISKI W LEWO"},{"touch-right","PRZESUN PRZYCISKI W PRAWO"},
-                {"touch-up","PRZESUN PRZYCISKI W GORE"},{"touch-down","PRZESUN PRZYCISKI W DOL"},
-                {"touch-reset","PRZYWROC UKLAD"},{"touch-classic","UKLAD: KLASYCZNY LF"},
-                {"touch-modern","UKLAD: NOWOCZESNY JOYSTICK"},{"back","POWROT"}}
         end
         local title=require("polish-fighters/hub").title(require("base/game/catalog").profile_id)
         return {{"play","GRAJ W "..title:upper()},{"maps","WYBIERZ MAPE"},{"packs","PAKIETY I POSTACIE"},
@@ -181,33 +174,8 @@ return function(base)
             local ok=model.save({room_capacity=value})
             if not ok then s.pf_message={"NIE ZAPISANO USTAWIEN","Sprawdz dostep do plikow ustawien."} end
         elseif id=="options" then s.pf_panel=nil;s.page="options";s.options=options.current();s.options_focus=1
-        elseif id:sub(1,6)=="touch-" then
-            local values=options.current()
-            local layout=values.gamepad
-            local scales={["touch-small"]=0.8,["touch-medium"]=1,["touch-large"]=1.2}
-            if id=="touch-classic" or id=="touch-modern" then
-                values.touch_layout=id=="touch-classic" and "classic" or "modern"
-                values.digipad=values.touch_layout=="classic"
-            elseif id=="touch-reset" then values.gamepad=options.default_gamepad()
-            elseif scales[id] then
-                local defaults=options.default_gamepad()
-                for name,entry in pairs(layout) do
-                    if entry.radius then entry.radius=math.floor(defaults[name].radius*scales[id]+0.5) end
-                end
-            elseif id=="touch-opacity" then
-                local value=layout.appearance.opacity
-                layout.appearance.opacity=value<0.4 and 0.66 or (value<0.8 and 1 or 0.25)
-            else
-                for _,name in ipairs({"c","b","f","da","dj","daj"}) do
-                    local entry=layout[name]
-                    if id=="touch-left" then entry.right=math.min(600,entry.right+16)
-                    elseif id=="touch-right" then entry.right=math.max(entry.radius,entry.right-16)
-                    elseif id=="touch-up" then entry.bottom=math.min(450,entry.bottom+16)
-                    elseif id=="touch-down" then entry.bottom=math.max(entry.radius,entry.bottom-16) end
-                end
-            end
-            local ok,problem=options.save(values)
-            s.pf_message={ok and "ZAPISANO STEROWANIE" or "BLAD ZAPISU",ok and "Uklad zostanie uzyty w kolejnym meczu." or tostring(problem)}
+        elseif id=="touch" then
+            s.pf_panel=nil;s.hud=require("base/ui/hybrid_editor").create(options.current(),"menu");s.page="hud"
         elseif id:sub(1,4)=="map:" then
             local ok=model.save({map=tonumber(id:sub(5))})
             if not ok then s.pf_message={"NIE ZAPISANO MAPY","Sprawdz dostep do plikow ustawien."} end
@@ -286,7 +254,7 @@ return function(base)
         end
         c.fill(186,164,470,359,16,27,47,220)
         c.fill(186,164,470,2,224,72,92)
-        local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOŚĆ",connection="POŁĄCZENIA",touch="STEROWANIE DOTYKOWE",
+        local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOŚĆ",connection="POŁĄCZENIA",
             ["pack-content"]="ZAWARTOŚĆ PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA",['combo-guide']='PORADNIK KOMBOSÓW'}
         local title=s.pf_message and s.pf_message[1] or titles[s.pf_panel]
         if c.text then c.text(title,421,181,'center',20,0xf0f5ff,nil,nil,true)

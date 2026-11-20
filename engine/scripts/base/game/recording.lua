@@ -147,6 +147,9 @@ function recording.pack_keys(letters)
     for _, bit in ipairs(key_bits) do
         if letters:find(bit[1], 1, true) then value = value + bit[2] end
     end
+    -- The low bit clears an unfinished touch combo. Keep 0xff unavailable:
+    -- the classic TCP packet offsets the byte by one to reserve NUL.
+    if value < 254 and letters:find("q", 1, true) then value = value + 1 end
     return value
 end
 function recording.unpack_keys(value)
@@ -154,6 +157,7 @@ function recording.unpack_keys(value)
     for _, bit in ipairs(key_bits) do
         if math.floor(value / bit[2]) % 2 == 1 then letters[#letters + 1] = bit[1] end
     end
+    if value % 2 == 1 then letters[#letters + 1] = "q" end
     return table.concat(letters)
 end
 -- Function-key flags of byte 8.

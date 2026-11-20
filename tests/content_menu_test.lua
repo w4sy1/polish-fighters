@@ -7,6 +7,8 @@ for index=1,17 do maps[index]={path='arena'..index} end
 package.preload['base/game/catalog']=function() return {profile_id='ntsd',stage_path='stage.dat',
     load=function() return fighters end,backgrounds=function() return maps end,selectable=function() return true end} end
 package.preload['base/game/background']=function() return {load=function(path) return {name=path} end} end
+package.preload['base/ui/hybrid_editor']=function() return {
+    create=function(values, destination) return {values=values,destination=destination} end} end
 local drawn={}
 package.preload['base/ui/font']=function() return {draw=function(c,text) drawn[#drawn+1]=text end,gdi=function() end} end
 package.preload['base/ui/navigation']=function() return {create=function() return {} end,
@@ -44,12 +46,10 @@ click(9)
 assert(state.pf_map_page==2)
 click(1)
 assert(model.current().map==8,'second page retains original map indices')
-state.pf_panel='touch'
-click(3)
-assert(require('base/game/options').current().gamepad.c.radius==53)
-click(1) -- dismiss save message
-click(4)
-assert(require('base/game/options').current().gamepad.appearance.opacity==1)
+state.pf_panel='extras'
+click(7)
+assert(state.page=='hud' and state.hud.destination=='menu' and state.hud.values.hybrid)
+state.page='menu';state.hud=nil
 state.pf_message=nil;state.pf_panel='unlock'
 local presses={}
 for letter in ('POLISHFIGHTERS'):gmatch('.') do presses[#presses+1]=letter:byte() end

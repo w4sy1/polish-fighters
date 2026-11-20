@@ -184,8 +184,6 @@ end
 -- `available` gets the host's features and the values being edited; a dropdown's `display` turns a
 -- value into its text (default: translated).
 local option_rows = {
-    {key="touch_layout",label="Touch layout",choices=function() return options.touch_layouts end,
-        display=function(value) return value=="classic" and "1. Klasyczny LF" or "2. Joystick + celowanie" end},
     -- Only hosts that can draw TrueType text have another language to offer; elsewhere the page stays as it was.
     {key = "language", label = "Language", choices = options.available_languages, display = i18n.language_label,
         available = function(features) return features.text end},
@@ -194,6 +192,7 @@ local option_rows = {
     {key = "unlock_characters", label = "Unlock hidden characters"},
     {key = "upscaling_filter", label = "Upscaling filter", choices = options.available_filters},
     {key = "battlefield_layout", label = "Battlefield layout", choices = function() return options.battlefield_layouts end},
+    {key = "auto_advance", label = "Auto advance in Stage Mode"},
     {key = "fullscreen", label = "Fullscreen", available = function(features) return features.window end},
     {key = "show_fps", label = "Show FPS"},
     {key = "rumble", label = "Rumble"},
@@ -293,8 +292,8 @@ local function options_page(state, input)
     add(state, {"fill", panel.x, panel.y, panel.width, panel.height, 0xa0, 0xa0, 0xc0})
     add(state, {"fill", panel.x + 2, panel.y + 2, panel.width - 4, panel.height - 4, 0x10, 0x20, 0x50})
     bold(state, i18n.tr("Options"), panel.x + 0x1e, panel.y + 0x14, constants.font_variants.blue)
-    if button(state,input,{x=panel.x+350,y=panel.y+14,width=120,height=26},"EDYTOR HUD",state.option_open) then
-        state.hud=require('base/ui/hud_editor').create(state.options)
+    if button(state,input,{x=panel.x+350,y=panel.y+14,width=120,height=26},"HYBRID CONTROL",state.option_open) then
+        state.hud=require('base/ui/hybrid_editor').create(state.options)
         state.page='hud'
         return
     end
@@ -663,9 +662,9 @@ function screen.update(state, flow_input, context)
         return
     end
     if state.page=='hud' then
-        local result=require('base/ui/hud_editor').update(state.hud,flow_input)
+        local result=require('base/ui/hybrid_editor').update(state.hud,flow_input)
         if result=='apply' or result=='cancel' then
-            state.page='options';state.options=options.current();state.hud=nil
+            state.page=state.hud.destination;state.options=options.current();state.hud=nil
         end
         return
     end
@@ -713,7 +712,7 @@ end
 
 function screen.draw(state, context)
     if state.page=='diagnostics' then require('base/ui/diagnostics').draw(state.diagnostics,context);return end
-    if state.page=='hud' then require('base/ui/hud_editor').draw(state.hud,context);return end
+    if state.page=='hud' then require('base/ui/hybrid_editor').draw(state.hud,context);return end
     context.viewport(constants.screen.width, constants.screen.height, 16, 32, 108)
     for _, command in ipairs(state.display) do
         local kind = command[1]

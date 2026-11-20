@@ -20,21 +20,4 @@ for name,signal in pairs(commands.signals) do
  assert(commands.decode(recording.unpack_keys(recording.pack_keys(signal)))==name,'recording lost command')
 end
 assert(commands.decode('rc')==nil and commands.decode('udlr')==nil)
-engine={read_settings=function() return {} end}
-local options=require('base/game/options')
-local pad=require('base/ui/touch_gamepad')
-local p=pad.create(options.default_gamepad(),false,'modern')
-pad.set_available(p,{})
-local function touch(t) return pad.update(p,{touch_active=true,touches=t},'match') end
-touch({{id=1,x=p.commands.x,y=p.commands.y}});assert(p.command_open)
-touch({})
-local choice=p.command_choices[2]
-local _,_,_,signal=touch({{id=2,x=choice.x,y=choice.y}})
-assert(signal=='stay' and not p.command_open and p.confirmation_ticks>0)
-assert(not p.held.c and not p.held.b and not p.finger,'bubble selection leaked attack/jump/movement')
-local _,_,_,repeated=touch({{id=2,x=choice.x,y=choice.y}})
-assert(not repeated,'held bubble generated duplicate command')
-pad.update(p,{touch_active=false})
-touch({{id=2,x=p.commands.x,y=p.commands.y}})
-assert(p.command_open,'finger ID reused after hiding was ignored')
-print('PASS team commands: owner/team filters, follow/stay/attack/defend AI, existing recording bits, bubble selection and confirmation')
+print('PASS team commands: filters, follow/stay/attack/defend AI and recording bits')

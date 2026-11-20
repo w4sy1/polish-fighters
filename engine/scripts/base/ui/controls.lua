@@ -306,13 +306,12 @@ function controls.read(settings, raw)
                 input.pads[index] = pad
             end
         end
-        -- " h": touch flag (0/1), then each held finger's id,x,y, comma separated.
-        local touch_flag, touch_list = raw:match(" h([01])([%d:,-]*)")
-        if touch_flag then
-            input.touch_active = touch_flag == "1"
-            for id, tx, ty in touch_list:gmatch("(%d+):(%-?%d+):(%-?%d+)") do
-                input.touches[#input.touches + 1] = {id = tonumber(id), x = tonumber(tx), y = tonumber(ty)}
-            end
+        input.touch_active = raw:find(" h1", 1, true) ~= nil
+        input.contacts = {}
+        for phase, id, tx, ty, ms in (raw:match(" v([%w:,-]*)") or ""):gmatch(
+                "([dmux])(%d+):(%-?%d+):(%-?%d+):(%d+)") do
+            input.contacts[#input.contacts + 1] = {phase = phase, id = tonumber(id),
+                x = tonumber(tx), y = tonumber(ty), ms = tonumber(ms)}
         end
         -- " e": the window's edges in viewport coordinates (live only): left,top,right,bottom.
         local left, top, right, bottom = raw:match(" e(%-?%d+),(%-?%d+),(%-?%d+),(%-?%d+)")

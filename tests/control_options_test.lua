@@ -26,32 +26,4 @@ settings.sets[1].device=constants.input_devices.controller_one
 settings.sets[1].buttons={0,0,2}
 assert(#controls.conflicts(settings)==1,'button zero is assigned')
 
-local options=require('base/game/options')
-local layout=options.default_gamepad()
-layout.c.radius=100
-assert(options.default_gamepad().c.radius==44,'defaults must be independent')
-local values=options.current()
-values.gamepad.appearance.opacity=0.25
-assert(options.save(values))
-assert(options.load().gamepad.appearance.opacity==0.25)
-values.gamepad.appearance.opacity=0/0
-assert(options.save(values))
-assert(options.current().gamepad.appearance.opacity==0.66,'NaN must be rejected')
-assert(document.unrelated.keep)
-
-local pad=require('base/ui/touch_gamepad')
-local config=options.default_gamepad()
-config.appearance.opacity=0.25
-local state=pad.create(config,true)
-local held=pad.update(state,{touch_active=true,touches={
-    {id=1,x=125,y=405},{id=2,x=606,y=458}
-}})
-assert(held:find('u') and held:find('c'),'move and attack must work simultaneously')
-local alphas={}
-local context={overlay=function() end,fill=function(x,y,w,h,r,g,b,a) alphas[a]=true end}
--- Avoid text rendering dependencies; shapes still use the real renderer path.
-package.loaded['base/ui/font'].draw=function() end
-pad.draw(state,context)
-assert(alphas[64] and alphas[32],'configured opacity must affect buttons and stick')
-assert(pad.update(state,{touch_active=false})=='','hiding must release held input')
-print('PASS: conflicts, save preservation, layout defaults, opacity and multitouch')
+print('PASS: keyboard and controller conflicts, save preservation')

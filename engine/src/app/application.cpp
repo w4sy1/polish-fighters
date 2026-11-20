@@ -1206,6 +1206,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     std::string typed;
     GamepadButtons gamepad;
     std::vector<PadState> pads; // the same, per controller
+    std::vector<ContactEvent> contacts;
     const auto save_window = [&] {
         const auto placement = platform->window_placement();
         if (!placement) return;
@@ -1226,6 +1227,17 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         }
         for (const int code : input.key_downs) {
             if (key_downs.size() < 256) key_downs.push_back(code);
+        }
+        for (const auto& contact : input.contacts) {
+            if (contact.phase == 'x') {
+                pressed = false;
+                contacts.clear();
+            }
+            if (contacts.size() >= 512) {
+                contacts.clear();
+                contacts.push_back({'x', 0, 0, 0, contact.ms});
+            }
+            contacts.push_back(contact);
         }
         pressed = pressed || input.pressed;
         toggle_fullscreen = toggle_fullscreen || input.toggle_fullscreen;
@@ -1324,16 +1336,13 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
             }
             if (!draining) pads.clear();
         }
-        // Then " h" for a touch-driven UI (an on-screen gamepad): '1' or '0' for whether the
-        // pointer above last moved by touch, then each held finger as its id, x and y, comma
-        // separated (not accumulated across polls, like the pointer above: a finger lifted
-        // between two script frames never reaches a script frame as held).
-        if (input.touch_active || !input.touches.empty()) {
-            held += input.touch_active ? " h1" : " h0";
-            for (const auto& touch : input.touches) {
-                held += ',' + std::to_string(touch.id) + ':' + std::to_string(touch.x) + ':' + std::to_string(touch.y);
-            }
+        held += input.touch_active ? " h1" : " h0";
+        held += " v";
+        for (const auto& contact : contacts) {
+            held += contact.phase + std::to_string(contact.id) + ':' + std::to_string(contact.x) + ':'
+                + std::to_string(contact.y) + ':' + std::to_string(contact.ms) + ',';
         }
+        if (!draining) contacts.clear();
         // Then " e" and the window edges in viewport coordinates (left,top,right,bottom), beyond the
         // viewport when the picture is letterboxed.
         if (input.screen.right > input.screen.left && input.screen.bottom > input.screen.top) {
