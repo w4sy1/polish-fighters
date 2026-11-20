@@ -140,8 +140,11 @@ constexpr std::array profile_definitions{
     ProfileDefinition{"profile_bleach", "bleach"}, ProfileDefinition{"profile_mixed", "mixed-all"}};
 struct ProfileRequest { std::string directory; std::vector<std::string> remaining_trace; };
 std::filesystem::path content_directory(const Configuration& config) {
+    // Android stages fresh Lua modules in files/scripts while the unpacked game
+    // and downloaded modules stay in files/game/content-packs.
     for (const auto& path : {config.scripts.parent_path() / "content-packs",
-                             config.scripts.parent_path().parent_path() / "content-packs"}) {
+                             config.scripts.parent_path().parent_path() / "content-packs",
+                             config.scripts.parent_path() / "game" / "content-packs"}) {
         std::error_code error;
         if (std::filesystem::is_directory(path, error)) return path;
     }
