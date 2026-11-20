@@ -107,6 +107,7 @@ local function actions(s)
         if saved then return "apply" end
         s.error = "Błąd zapisu: " .. tostring(problem)
     end)
+    rows[#rows].primary = true
     return rows
 end
 
@@ -142,8 +143,9 @@ function editor.draw(s, context)
     context.viewport(794, 550, 23, 23, 33)
     local native = require("base/i18n/i18n").can_draw_text() and context.text ~= nil
     local function text(label, x, y, size)
+        label = hud.tr(label)
         if native then context.text(label, x, y, "center", size, 0xf6f1ff)
-        else font.draw(context, label, x, y, nil, nil, "center") end
+        else font.draw(context, hud.ascii(label), x, y, nil, nil, "center") end
     end
     context.fill(0, 0, 794, 61, 33, 31, 46, 255)
     text("Polish Fighters", 104, 12, 21)
@@ -165,7 +167,7 @@ function editor.draw(s, context)
     text("Przeciągnij element, aby zmienić pozycję", 195, 443, 12)
     for _, row in ipairs(actions(s)) do
         local r, g, b = 50, 43, 68
-        if row.text == "Zapisz" then r, g, b = 108, 48, 184 end
+        if row.primary then r, g, b = 108, 48, 184 end
         if row.run then context.fill(row.x, row.y, row.w, 30, r, g, b, 255) end
         text(row.text, row.x + math.floor(row.w / 2), row.y + 7, 13)
     end

@@ -26,18 +26,18 @@ def run(runner,count):
  try:
   line=process.stdout.readline();assert line.startswith('LISTEN '),line+process.stderr.read()
   port=int(line.rsplit(':',1)[1])
-  bad=Client(port);extra.append(bad);bad.send(op='hello',protocol=2,profile='b'*64,name='wrong');assert 'mismatch' in bad.until('error')['reason']
+  bad=Client(port);extra.append(bad);bad.send(op='hello',protocol=3,profile='b'*64,name='wrong');assert 'mismatch' in bad.until('error')['reason']
   malformed=Client(port);extra.append(malformed);malformed.socket.sendall(b'not-json\n');assert 'JSON' in malformed.until('error')['reason']
   oversize=Client(port);extra.append(oversize);oversize.socket.sendall(b'x'*4100+b'\n');assert 'exceed' in oversize.until('error')['reason']
   # Fragment the first greeting across TCP writes; the host must not treat reads as messages.
-  first=Client(port);clients.append(first);hello=json.dumps({'op':'hello','protocol':2,'profile':PROFILE,'name':'player0'}).encode()+b'\n'
+  first=Client(port);clients.append(first);hello=json.dumps({'op':'hello','protocol':3,'profile':PROFILE,'name':'player0'}).encode()+b'\n'
   for start in range(0,len(hello),7):
    first.socket.sendall(hello[start:start+7]);time.sleep(0.002)
   assert first.until('welcome')['slot']==0
   first.send(op='start');assert 'two devices' in first.until('error')['reason']
   for index in range(1,count):
-   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=2,profile=PROFILE,name=('Player \"Two\" \\ name' if index==1 else 'player'+str(index)));assert peer.until('welcome')['slot']==index
-  ninth=Client(port);extra.append(ninth);ninth.send(op='hello',protocol=2,profile=PROFILE,name='extra');assert 'full' in ninth.until('error')['reason']
+   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=3,profile=PROFILE,name=('Player \"Two\" \\ name' if index==1 else 'player'+str(index)));assert peer.until('welcome')['slot']==index
+  ninth=Client(port);extra.append(ninth);ninth.send(op='hello',protocol=3,profile=PROFILE,name='extra');assert 'full' in ninth.until('error')['reason']
   for client in clients:client.send(op='ready',value=True)
   snapshot=first.until('lobby',lambda m:len(m['peers'])==count and all(p['ready'] for p in m['peers']))
   assert snapshot['peers'][1]['name']=='Player \"Two\" \\ name'
@@ -79,7 +79,7 @@ def interruption_case(runner,timeout=False,unauthorized=False,queued=None,old_pr
    assert 'version mismatch' in peer.until('error')['reason']
    return {'test':'old_protocol_rejected','passed':True}
   for slot in range(2):
-   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=2,profile=PROFILE,name='peer'+str(slot));peer.until('welcome');peer.send(op='ready',value=True)
+   peer=Client(port);clients.append(peer);peer.send(op='hello',protocol=3,profile=PROFILE,name='peer'+str(slot));peer.until('welcome');peer.send(op='ready',value=True)
   clients[0].until('lobby',lambda v:len(v['peers'])==2 and all(p['ready'] for p in v['peers']))
   clients[0].send(op='start')
   for peer in clients:peer.until('start')

@@ -5,7 +5,7 @@ return function(legacy)
  local timeout=30000
  -- Protocol 2: inputs are sent `delay` frames ahead, so the network round trip is hidden
  -- behind the input delay instead of stalling every frame. The room leader chooses it.
- local protocol=2
+ local protocol=3
  local lan_delay,internet_delay=2,6
  local checksum_interval=30
  local tick_window=64

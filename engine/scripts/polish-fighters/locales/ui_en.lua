@@ -1,5 +1,13 @@
 -- Existing Polish extension screens; names of characters/modules remain unchanged.
 return {
+ ['Ustawienia sterowania']='Control settings', ['Przeciągnij element, aby zmienić pozycję']='Drag an element to move it',
+ ['Rozmiar ']='Size ', ['Krycie ']='Opacity ', ['Martwa strefa ']='Dead zone ', ['Bufor ']='Buffer ',
+ ['Kształt: okrągły']='Shape: round', ['Kształt: prostokątny']='Shape: rectangle', ['Widoczny']='Visible', ['Ukryty']='Hidden',
+ ['Bieg: dwa wychylenia']='Run: double tilt', ['Bieg: mocne wychylenie']='Run: strong tilt', ['Strzałki']='Arrows', ['Postać']='Fighter',
+ ['  Włączony']='  On', ['  Wyłączony']='  Off', ['Brak przypisania']='Not assigned', ['Przywróć domyślne']='Restore defaults',
+ ['Anuluj']='Cancel', ['Zapisz']='Save', ['Błąd zapisu: ']='Save failed: ', ['OBRONA']='DEFEND',
+ ['Przód + atak']='Forward + attack', ['Góra + atak']='Up + attack', ['Dół + atak']='Down + attack',
+ ['Przód + skok']='Forward + jump', ['Góra + skok']='Up + jump', ['Dół + skok']='Down + jump', ['Skok + atak']='Jump + attack',
  ['USTAWIENIA STEROWANIA']='CONTROL SETTINGS', ['Wybierz gracza, urządzenie i kliknij akcję do przypisania.']='Select a player, device and action to bind.',
  ['Naciśnij nowy klawisz / przycisk. ESC anuluje.']='Press a key / button / direction. ESC cancels.',
  ['Wspólne klawisze graczy. Użyj USUŃ KOLIZJE Z INNYMI.']='Shared player keys. Use CLEAR OTHER PLAYERS CONFLICTS.',

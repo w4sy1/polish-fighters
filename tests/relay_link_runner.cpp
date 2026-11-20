@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
             peer->received.append(bytes->begin(), bytes->end());
             if (!peer->hello && peer->socket->status() == NetworkStatus::connected) {
                 peer->hello = true;
-                peer->send(std::string(R"({"op":"hello","protocol":2,"profile":")") + profile + R"(","name":")" +
+                peer->send(std::string(R"({"op":"hello","protocol":3,"profile":")") + profile + R"(","name":")" +
                            (peer == &leader ? "host" : "guest") + "\"}");
             }
         }

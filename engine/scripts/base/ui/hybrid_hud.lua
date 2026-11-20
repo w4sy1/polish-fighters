@@ -2,6 +2,23 @@
 local layout = require("base/ui/hybrid_layout")
 local font = require("base/ui/font")
 local hud = {}
+local has_locale, locale = pcall(require, "polish-fighters/menu_locale")
+-- Translates the editor's and the buttons' Polish labels when the game runs in English.
+function hud.tr(text)
+    if has_locale then
+        local translated, value = pcall(locale.translate, text)
+        if translated and type(value) == "string" then return value end
+    end
+    return text
+end
+-- The bitmap font draws one byte per glyph, so UTF-8 letters and symbols need ASCII stand-ins.
+local ascii = {["ą"] = "a", ["ć"] = "c", ["ę"] = "e", ["ł"] = "l", ["ń"] = "n", ["ó"] = "o", ["ś"] = "s",
+    ["ź"] = "z", ["ż"] = "z", ["Ą"] = "A", ["Ć"] = "C", ["Ę"] = "E", ["Ł"] = "L", ["Ń"] = "N", ["Ó"] = "O",
+    ["Ś"] = "S", ["Ź"] = "Z", ["Ż"] = "Z", ["−"] = "-", ["›"] = ">", ["←"] = "<", ["→"] = ">", ["↑"] = "^",
+    ["↓"] = "v", ["↖"] = "<", ["↙"] = "<", ["↗"] = ">", ["↘"] = ">"}
+function hud.ascii(text)
+    return (text:gsub("[\xC2-\xF4][\x80-\xBF]+", function(character) return ascii[character] or "?" end))
+end
 local colors = {
     attack = {133, 21, 48, 255, 141, 168}, jump = {161, 74, 4, 255, 194, 125},
     defend = {15, 75, 147, 133, 205, 255}, special = {80, 25, 133, 209, 155, 255},
@@ -46,12 +63,11 @@ local function plate(context, x, y, rx, ry, shape, color, opacity, pressed)
 end
 
 local function label(context, text, x, y, size, native_text)
+    text = hud.tr(text)
     if native_text and context.text then
         context.text(text, math.floor(x), math.floor(y - size * 0.57), "center", size, 0xffffff, 0x262032)
     else
-        local fallback = ({["←"] = "<", ["→"] = ">", ["↑"] = "^", ["↓"] = "v",
-            ["↖"] = "<", ["↙"] = "<", ["↗"] = ">", ["↘"] = ">"})[text] or text
-        font.draw(context, fallback, math.floor(x), math.floor(y - 8), nil, nil, "center")
+        font.draw(context, hud.ascii(text), math.floor(x), math.floor(y - 8), nil, nil, "center")
     end
 end
 

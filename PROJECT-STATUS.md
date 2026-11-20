@@ -1,3 +1,11 @@
+## 2026-11-20 — Poprawki po przeglądzie Hybrid Control (Claude)
+
+- Protokół pokoi sieciowych podniesiony do wersji 3, bo wejście zawiera nowy znak `q`. Starsze wersje dostają komunikat o aktualizacji gry. Wcześniej odrzucał je tylko niezgodny skrót skryptów.
+- Na `main` wrócił commit z raportem emulatora 0.18.6 i plikiem `.sha256` instalatora Windows z LF i samą nazwą pliku. Wydanie `v0.18.7-hybrid` zbudowano bez tej poprawki.
+- Edytor i przyciski Hybrid Control mają angielskie tłumaczenia (`locales/ui_en.lua`, przegenerowany `classic-menu.json`) oraz zamienniki ASCII dla czcionki bitmapowej.
+- Przyciski okrągłe i prostokątne są trafiane według tej samej, liniowej miary odległości.
+- Testy: Lua (103 PASS), Python (121 OK, 1 pominięty). Tag `v0.18.7-hybrid` nie zawiera tych zmian.
+
 ## 2026-11-20 — Wydanie 0.18.7 Hybrid Control
 
 - Kod w `main` i tagu `v0.18.7-hybrid` pochodzi z commita `523b1a6`.

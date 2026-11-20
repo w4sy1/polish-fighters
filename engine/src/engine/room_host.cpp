@@ -10,7 +10,7 @@
 namespace openlf2 {
 namespace {
 using Clock=std::chrono::steady_clock;
-constexpr std::int32_t protocol_version=2,max_input_delay=15,checksum_interval=30;
+constexpr std::int32_t protocol_version=3,max_input_delay=15,checksum_interval=30;
 ScriptValue object(ScriptTable table){return ScriptValue{std::move(table)};}
 const ScriptValue* field(const ScriptValue& value,std::string_view key){
  const auto* fields=std::get_if<ScriptTable>(&value.value);if(!fields)return nullptr;

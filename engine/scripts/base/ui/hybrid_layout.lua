@@ -78,7 +78,8 @@ function layout.hit(geometry, x, y, show_disabled, paused)
         local item = geometry[name]
         if item and (item.enabled or show_disabled) and (not paused or name == "pause") then
             local dx, dy = math.abs(x - item.x) / item.rx, math.abs(y - item.y) / item.ry
-            local distance = item.shape == "rect" and math.max(dx, dy) or dx * dx + dy * dy
+            -- Both shapes use a linear, edge-normalized distance so overlapping buttons compare fairly.
+            local distance = item.shape == "rect" and math.max(dx, dy) or math.sqrt(dx * dx + dy * dy)
             if distance <= 1 and (not nearest or distance <= nearest) then chosen, nearest = name, distance end
         end
     end

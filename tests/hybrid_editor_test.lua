@@ -57,4 +57,25 @@ s = editor.create(settings.current())
 tap(575, 258)
 assert(not tap(700, 491) and s.error:find("read-only", 1, true))
 assert(settings.current().hybrid.buffer_ms == 325 and document.options.hybrid.buffer_ms == 325)
+
+-- Bitmap-font fallback: Polish letters and UI symbols become ASCII, unknown UTF-8 becomes '?'.
+local hud = require("base/ui/hybrid_hud")
+assert(hud.ascii("Kszta\xC5\x82t \xE2\x88\x92 \xE2\x80\xBA \xE2\x86\x90") == "Ksztalt - > <")
+assert(hud.ascii("\xE2\x9C\x93 ok") == "? ok")
+-- English labels go through the Polish Fighters locale; Polish stays as written.
+assert(hud.tr("Zapisz") == "Zapisz")
+local menu_locale = require("polish-fighters/menu_locale")
+local language = menu_locale.id
+menu_locale.id = function() return "en" end
+assert(hud.tr("Zapisz") == "Save" and hud.tr("Rozmiar 100%") == "Size 100%" and hud.tr("OBRONA") == "DEFEND")
+menu_locale.id = language
+
+-- Hit testing compares round and rectangular buttons with the same linear distance.
+local geometry = {
+    stick = {enabled = true, x = 0, y = 0, rx = 10, ry = 10, shape = "round"},
+    left = {enabled = true, x = 15, y = 0, rx = 10, ry = 10, shape = "rect"},
+}
+assert(layout.hit(geometry, 6, 0) == "stick")
+-- 0.8 of the stick's radius against 0.7 of the arrow's half-width: the arrow is nearer.
+assert(layout.hit(geometry, 8, 0) == "left")
 print("PASS Hybrid Control editor: drag, mixed shapes, sizes, transparency, binding, save, cancel and reset")
