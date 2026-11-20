@@ -14,7 +14,7 @@ local function strings() return words[locale.id()] end
 local profile_tags={lf_four_turbo='lf_four_turbo',dbz='dbz',one_piece='one_piece',kate='kate',reinforced='reinforced',
  ntsd='ntsd',bleach='bleach',polish_fighters='polish_fighters',all='mixed'}
 local function mods_api() return engine and engine.mods end
-local function github_receipt(entry) return entry.version..' '..entry.sha256 end
+local function github_receipt(entry) return tostring(entry.version)..' '..tostring(entry.sha256) end
 local function github_state(entry)
  local pl=locale.id()=='pl'
  if entry.receipt==nil then return pl and 'Do pobrania' or 'Available' end
@@ -99,7 +99,7 @@ function screen.rows(s)
   local first=(g.page-1)*8+1
   for i=first,math.min(first+7,#g.packages) do
    local entry=g.packages[i]
-   rows[#rows+1]={'gh:'..entry.id,entry.name..' '..entry.version..'  ('..size_label(entry.size_bytes)..')  '..github_state(entry),30,96+(i-first)*36,734,32}
+   rows[#rows+1]={'gh:'..tostring(entry.id),tostring(entry.name)..' '..tostring(entry.version or '')..'  ('..size_label(entry.size_bytes)..')  '..github_state(entry),30,96+(i-first)*36,734,32}
   end
   rows[#rows+1]={'gh_refresh',w.refresh,30,445,300,32};rows[#rows+1]={'back',w.back,534,445,230,32}
   if g.page>1 then rows[#rows+1]={'gh_prev',w.prev,30,485,230,32} end
@@ -179,8 +179,8 @@ function screen.draw(state,context)
   text(s.github.status or '',397,62,13,0xffdc82,'center')
   if s.github.detail then
    local entry=s.github.detail
-   text(entry.name,30,105,20)
-   text(w.version..entry.version..'  /  '..size_label(entry.size_bytes),30,150,15)
+   text(tostring(entry.name),30,105,20)
+   text(w.version..tostring(entry.version or '')..'  /  '..size_label(entry.size_bytes),30,150,15)
    text(github_state(entry),30,185,15,0xffdc82)
    text(entry.description or '',30,225,15)
   end

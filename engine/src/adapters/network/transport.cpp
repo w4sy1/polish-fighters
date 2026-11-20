@@ -12,9 +12,13 @@
 #endif
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <iphlpapi.h>
+#include <vector>
 #else
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
 #include <netinet/tcp.h>
 #include <poll.h>
 #include <sys/socket.h>
@@ -269,5 +273,58 @@ Result<std::unique_ptr<NetworkTransport>> make_network_transport() {
     auto started = transport->initialize();
     if (!started) return std::unexpected(started.error());
     return transport;
+}
+std::vector<std::string> local_ipv4_addresses() {
+    std::vector<std::string> found;
+    const auto add = [&found](const in_addr& address) {
+        std::array<char, INET_ADDRSTRLEN> text{};
+#ifdef _WIN32
+        if (!inet_ntop(AF_INET, &address, text.data(), text.size())) return;
+#else
+        if (!inet_ntop(AF_INET, &address, text.data(), static_cast<socklen_t>(text.size()))) return;
+#endif
+        const std::string value(text.data());
+        if (value.starts_with("127.") || value.starts_with("169.254.") || value == "0.0.0.0") return;
+        for (const auto& known : found) if (known == value) return;
+        if (found.size() < 8) found.push_back(value);
+    };
+#ifdef _WIN32
+    ULONG size = 16 * 1024;
+    std::vector<unsigned char> buffer(size);
+    const ULONG flags = GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER;
+    auto status = GetAdaptersAddresses(AF_INET, flags, nullptr, reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data()), &size);
+    if (status == ERROR_BUFFER_OVERFLOW) {
+        buffer.resize(size);
+        status = GetAdaptersAddresses(AF_INET, flags, nullptr, reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data()), &size);
+    }
+    if (status != NO_ERROR) return found;
+    for (auto* adapter = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data()); adapter; adapter = adapter->Next) {
+        if (adapter->OperStatus != IfOperStatusUp || adapter->IfType == IF_TYPE_SOFTWARE_LOOPBACK) continue;
+        for (auto* unicast = adapter->FirstUnicastAddress; unicast; unicast = unicast->Next) {
+            const auto* address = unicast->Address.lpSockaddr;
+            if (address && address->sa_family == AF_INET) add(reinterpret_cast<const sockaddr_in*>(address)->sin_addr);
+        }
+    }
+#else
+    // SIOCGIFCONF instead of getifaddrs: Android only has getifaddrs from API 24, the app supports 21.
+    const int probe = ::socket(AF_INET, SOCK_DGRAM, 0);
+    if (probe < 0) return found;
+    std::array<ifreq, 32> requests{};
+    ifconf configuration{};
+    configuration.ifc_len = static_cast<int>(sizeof(requests));
+    configuration.ifc_req = requests.data();
+    if (::ioctl(probe, SIOCGIFCONF, &configuration) == 0) {
+        const auto count = static_cast<std::size_t>(configuration.ifc_len) / sizeof(ifreq);
+        for (std::size_t index = 0; index < count && index < requests.size(); ++index) {
+            auto request = requests[index];
+            if (request.ifr_addr.sa_family != AF_INET) continue;
+            const auto address = reinterpret_cast<const sockaddr_in*>(&request.ifr_addr)->sin_addr;
+            if (::ioctl(probe, SIOCGIFFLAGS, &request) == 0 && (!(request.ifr_flags & IFF_UP) || (request.ifr_flags & IFF_LOOPBACK))) continue;
+            add(address);
+        }
+    }
+    ::close(probe);
+#endif
+    return found;
 }
 }

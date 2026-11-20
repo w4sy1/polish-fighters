@@ -86,7 +86,7 @@ local function cancel_simple(s)
  local pending=client.pending
  if pending and pending.purpose=='quick-join' then pending.cancelled=true end
  if pending and pending.operation=='publish-room' then client.cancel_publish=true end
- s.focus,s.intent,s.login_requested,s.joining,s.refresh_requested=nil,nil,nil,nil,nil
+ s.focus,s.intent,s.login_requested,s.joining,s.refresh_requested,s.publish_listed=nil,nil,nil,nil,nil,nil
 end
 
 local function tick_simple(state,s,context)
@@ -121,7 +121,9 @@ local function tick_simple(state,s,context)
   return
  end
  local room=s.intent
- if s.intent=='publish' and client.listed_origin==s.endpoint then
+ -- Publishing waits for a room list requested for this click, so the relay flag is current.
+ if s.intent=='publish' and s.publish_listed and client.listed_origin==s.endpoint then
+  s.publish_listed=nil
   s.intent=nil
   if not client.relay_available then client.notice='Przekaźnik niedostępny. Możesz utworzyć pokój w LAN.';return end
   client.publish_port=12345
@@ -145,7 +147,7 @@ local function tick_simple(state,s,context)
   if s.intent=='list' then s.intent=nil end
   s.refresh_at=now+5000
   local ok,problem=client.request(s.endpoint,'list-rooms',{})
-  if ok and s.intent=='publish' then s.refresh_requested=true
+  if ok and s.intent=='publish' then s.refresh_requested=true;s.publish_listed=true
   elseif not ok then s.intent=nil;client.notice=tostring(problem) end
  end
 end
@@ -175,7 +177,7 @@ local function activate_simple(state,s,id,context)
   network_action(state,context,{host=true,address='0.0.0.0',port=12345,internet=false})
  elseif id=='find' or id=='publish' then
   if client.pending and client.pending.operation~='list-rooms' then return end
-  s.focus=nil;s.joining=id=='find';s.intent=s.joining and 'list' or 'publish';s.guest_retry=nil
+  s.focus=nil;s.joining=id=='find';s.intent=s.joining and 'list' or 'publish';s.guest_retry=nil;s.publish_listed=nil
   tick_simple(state,s,context)
  elseif id:sub(1,5)=='join:' then
   local room=client.rooms[tonumber(id:sub(6))]
