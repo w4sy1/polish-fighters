@@ -136,6 +136,23 @@ public final class OpenLF2Activity extends SDLActivity {
             startActivity(new Intent(this, AndroidModsActivity.class).putExtra(AndroidModsActivity.RETURN_TO_GAME, true));
         }
     }
+    /**
+     * The Back key is the game's Esc. When no SDL view holds focus (for example right after
+     * the account screen stops text input) Android used to finish the activity instead,
+     * which closed the whole game. The soft keyboard still consumes Back before this point.
+     */
+    @Override public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        if (event.getKeyCode() == android.view.KeyEvent.KEYCODE_BACK
+            && (event.getSource() & android.view.InputDevice.SOURCE_MOUSE) != android.view.InputDevice.SOURCE_MOUSE) {
+            if (event.getAction() == android.view.KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                SDLActivity.onNativeKeyDown(android.view.KeyEvent.KEYCODE_BACK);
+            } else if (event.getAction() == android.view.KeyEvent.ACTION_UP) {
+                SDLActivity.onNativeKeyUp(android.view.KeyEvent.KEYCODE_BACK);
+            }
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
     @Override protected void onResume() {
         super.onResume();
         if (lanWifi == null) lanWifi = new LanWifiMode(this);

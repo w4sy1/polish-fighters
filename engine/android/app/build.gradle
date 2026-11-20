@@ -75,8 +75,8 @@ android {
         buildConfigField 'String', 'MOD_ENGINE_VERSION', '"' + engineVersion + '"'
         buildConfigField 'boolean', 'MOD_GOOGLE_PLAY', (project.findProperty('openlf2GooglePlay') == 'true').toString()
         targetSdk 35
-        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 10008
-        versionName project.findProperty('openlf2VersionName') ?: '0.18.11'
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 10009
+        versionName project.findProperty('openlf2VersionName') ?: '0.18.12'
     }
 
     // A fixed key, so each build is signed the same and installs over the previous one; the

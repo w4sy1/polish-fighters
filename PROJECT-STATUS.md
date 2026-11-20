@@ -1,3 +1,10 @@
+## 2026-11-20 — Wydanie 0.18.12: Android, mody i Wstecz (Claude)
+
+- Android: gdy APK kopiuje świeże skrypty do `files/scripts`, `content_directory()` szukał paczek w `files/content-packs`, a leżą w `files/game/content-packs`. Menu MODUŁY oznaczało zainstalowane mody jako [BRAK DANYCH] i nie dało się ich wybrać w grze. Silnik sprawdza teraz także `files/game/content-packs`.
+- Android: Wstecz na ekranie „Konto i pokoje” zamykał całą grę. Po wyłączeniu wpisywania tekstu żaden widok SDL nie miał fokusu i Android kończył aktywność. `OpenLF2Activity.dispatchKeyEvent` przekazuje teraz Wstecz do gry jako Esc.
+- Android, ekran Mody: czcionka przycisków nie ma znaku „—”, więc „Little Fighter Empire — wersje” pokazywało „?”. Przyciski zamieniają pauzy na „-”.
+- Wersja 0.18.12, build 10009. Zawiera 0.18.11.
+
 ## 2026-11-20 — Wydanie 0.18.11: ekran modów Android (Claude)
 
 - `AndroidModsActivity` ma układ ekranu startowego: grafika `pf_loading_art_landscape` z przyciemnieniem, lewa kolumna (tytuł, opis, stan, import, POWRÓT) i prawa karta `pf_loading_surface` z listą źródeł. Lista przewija się w karcie z wygaszaniem krawędzi. Odstępy uwzględniają pasek stanu, wycięcie aparatu i pasek nawigacji. Logika pobierania i importu bez zmian.
