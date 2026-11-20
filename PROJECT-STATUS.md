@@ -1,3 +1,9 @@
+## 2026-11-20 — Wydanie 0.18.8 (Claude)
+
+- [Publiczne wydanie v0.18.8](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.8) jest oznaczone jako najnowsze. Tag wskazuje commit `9c86332` (wersja 0.18.8, build 10005). Wydanie ma instalator Windows x64, APK Android ARM64 i x86_64 oraz sumy SHA-256.
+- [Kompilacja](https://github.com/w4sy1/polish-fighters/actions/runs/44734522415) i [testy](https://github.com/w4sy1/polish-fighters/actions/runs/44734507342) zakończyły się sukcesem. Sumy SHA-256 publicznych plików się zgadzają. Pliki `.sha256` mają LF i samą nazwę pliku. W obu APK są skrypty z wersją 0.18.8 i protokołem 3.
+- 0.18.7 nie łączy się z 0.18.8, bo zmienił się protokół. Testy na fizycznym Androidzie pozostają otwarte.
+
 ## 2026-11-20 — Poprawki po przeglądzie Hybrid Control (Claude)
 
 - Protokół pokoi sieciowych podniesiony do wersji 3, bo wejście zawiera nowy znak `q`. Starsze wersje dostają komunikat o aktualizacji gry. Wcześniej odrzucał je tylko niezgodny skrót skryptów.
