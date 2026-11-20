@@ -42,13 +42,28 @@ final class AndroidModPackageImporter {
 
     static String importPackage(InputStream raw, File filesDirectory, KeySource key,
             String engineVersion, boolean googlePlay, Progress progress) throws IOException {
+        return importPackage(raw, filesDirectory, key, engineVersion, googlePlay, null, progress);
+    }
+
+    /** Installs a signed envelope downloaded from the GitHub catalogue; it must contain `expectedId`. */
+    static String importDownloaded(File envelope, File filesDirectory, AssetManager assets, String expectedId,
+            Progress progress) throws IOException {
+        return importPackage(new java.io.BufferedInputStream(new java.io.FileInputStream(envelope), 1 << 16),
+                filesDirectory, () -> {
+                    try (InputStream key = assets.open(SignedModPackage.KEY_ASSET)) { return SignedModPackage.read(key, 32); }
+                    catch (IOException error) { throw new IOException("Brak zaufanego klucza katalogu modów.", error); }
+                }, BuildConfig.MOD_ENGINE_VERSION, false, expectedId, progress);
+    }
+
+    static String importPackage(InputStream raw, File filesDirectory, KeySource key, String engineVersion,
+            boolean googlePlay, String expectedId, Progress progress) throws IOException {
         try (ZipInputStream zip = new ZipInputStream(raw)) {
-            return install(zip, filesDirectory, key, engineVersion, googlePlay, progress);
+            return install(zip, filesDirectory, key, engineVersion, googlePlay, expectedId, progress);
         }
     }
 
     private static String install(ZipInputStream zip, File filesDirectory, KeySource key,
-            String engineVersion, boolean googlePlay, Progress progress) throws IOException {
+            String engineVersion, boolean googlePlay, String expectedId, Progress progress) throws IOException {
         File game = new File(filesDirectory, "game").getCanonicalFile();
         if (!new File(game, ".ready").isFile()) throw new IOException("Najpierw przygotuj pliki gry.");
         File packs = new File(game, "content-packs");
@@ -64,10 +79,17 @@ final class AndroidModPackageImporter {
         try {
             ZipEntry first = zip.getNextEntry();
             if (first != null && SignedModPackage.FIRST_ENTRY.equals(first.getName())) {
-                String id = SignedModPackage.prepare(zip, staging, key.load(), engineVersion);
-                if (!id.equals(validateManifest(staging))) throw new IOException("Nieprawidłowy identyfikator modułu.");
-                return publish(staging, packs, id);
+                SignedModPackage.Prepared prepared = SignedModPackage.prepare(zip, staging, key.load(), engineVersion,
+                        expectedId, progress == null ? null : (done, all) -> progress.update(done));
+                // A signed content pack carries its own Lua; trust comes from the publisher signature.
+                if (prepared.contentPack) {
+                    if (googlePlay) throw new IOException("Ta wersja obsługuje tylko podpisane paczki danych.");
+                    return publishReplacing(staging, packs, prepared.id);
+                }
+                if (!prepared.id.equals(validateManifest(staging))) throw new IOException("Nieprawidłowy identyfikator modułu.");
+                return publish(staging, packs, prepared.id);
             }
+            if (expectedId != null) throw new IOException("Pobrany plik nie jest podpisaną paczką.");
             if (googlePlay) throw new IOException("Ta wersja obsługuje tylko podpisane paczki danych.");
                 byte[] buffer = new byte[65536];
                 for (ZipEntry entry = first; entry != null; entry = zip.getNextEntry()) {
@@ -117,6 +139,24 @@ final class AndroidModPackageImporter {
             deleteTree(staging);
             throw error;
         }
+    }
+
+    /** Installs or updates a signed content pack in place of an older copy of the same ID. */
+    private static synchronized String publishReplacing(File staging, File packs, String id) throws IOException {
+        // `id` passed the manifest ID pattern, so it is one plain directory name under packs.
+        File destination = new File(packs, id);
+        File previous = null;
+        if (destination.exists()) {
+            previous = new File(packs, ".previous-" + id + "-" + Long.toHexString(System.nanoTime()));
+            if (!destination.renameTo(previous)) { deleteTree(staging); throw new IOException("Nie można zastąpić starszej wersji modułu."); }
+        }
+        if (!staging.renameTo(destination)) {
+            if (previous != null) previous.renameTo(destination);
+            deleteTree(staging);
+            throw new IOException("Nie można bezpiecznie zatwierdzić importu.");
+        }
+        if (previous != null) deleteTree(previous);
+        return id;
     }
 
     private static synchronized String publish(File staging, File packs, String id) throws IOException {

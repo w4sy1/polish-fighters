@@ -33,10 +33,31 @@ final class SignedModPackage {
     private static final long RESERVE = 64L * 1024 * 1024;
     private static final String ASSET = "assets/a/(?!(con|prn|aux|nul|com[1-9]|lpt[1-9])\\.)[a-z0-9]{1,40}\\.(txt|dat|bmp|png|jpg|jpeg|wav|ogg|mp3|json)";
 
+    static final String CONTENT_PACK = "content-pack";
+    private static final long PACK_ZIP_LIMIT = 2047L * 1024 * 1024;
+    private static final long PACK_TOTAL_LIMIT = 4L * 1024 * 1024 * 1024;
+    private static final int PACK_FILES = 20000;
+    private static final String FORBIDDEN = ".*\\.(exe|dll|so|dylib|bat|cmd|ps1|sh|py|com|scr|msi|jar|apk|dex|vbs|js)";
+
+    /** Result of a verified envelope: the module ID and whether it is a full content pack. */
+    static final class Prepared {
+        final String id; final boolean contentPack;
+        Prepared(String id, boolean contentPack) { this.id = id; this.contentPack = contentPack; }
+    }
+
+    interface Progress { void update(int done, int total); }
+
     private SignedModPackage() {}
 
     static String prepare(ZipInputStream stream, File staging, byte[] key, String engineVersion)
             throws IOException {
+        Prepared result = prepare(stream, staging, key, engineVersion, null, null);
+        if (result.contentPack) throw new IOException("Pełną paczkę instaluje ekran Mody.");
+        return result.id;
+    }
+
+    static Prepared prepare(ZipInputStream stream, File staging, byte[] key, String engineVersion,
+            String expectedId, Progress progress) throws IOException {
         try {
             byte[] index = read(stream, META_LIMIT);
             expect(stream, "catalog.sig");
@@ -51,12 +72,18 @@ final class SignedModPackage {
             String version = manifest.getString("version");
             String minimum = manifest.getString("min_engine_version");
             JSONObject installation = manifest.getJSONObject("installation");
+            boolean contentPack = CONTENT_PACK.equals(manifest.getString("package_type"));
             if (manifest.getInt("schema_version") != 2 || !id.matches("[a-z0-9]+(-[a-z0-9]+)*")
-                    || id.length() > 64 || !version.matches("(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)")
-                    || !"data-only".equals(manifest.getString("package_type"))
-                    || !"managed-data-zip".equals(installation.getString("method"))
-                    || !"module.json".equals(installation.getString("entrypoint")))
+                    || id.length() > 64 || id.startsWith("mod-")
+                    || !version.matches("(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)")
+                    || !(contentPack ? "content-pack-zip".equals(installation.getString("method"))
+                            && "package.manifest".equals(installation.getString("entrypoint"))
+                        : "data-only".equals(manifest.getString("package_type"))
+                            && "managed-data-zip".equals(installation.getString("method"))
+                            && "module.json".equals(installation.getString("entrypoint"))))
                 throw new IOException("Nieobsługiwany manifest podpisanej paczki.");
+            if (expectedId != null && !expectedId.equals(id))
+                throw new IOException("Pobrany plik zawiera inny moduł niż wybrany.");
             if (!atLeast(engineVersion, minimum))
                 throw new IOException("Paczka wymaga nowszej wersji silnika.");
             boolean android = false;
@@ -71,7 +98,8 @@ final class SignedModPackage {
                 throw new IOException("Manifest nie figuruje w zaufanym indeksie.");
             long size = manifest.getLong("size_bytes");
             long unpacked = manifest.getLong("unpacked_size_bytes");
-            if (size < 1 || size > ZIP_LIMIT || unpacked < 1 || unpacked > TOTAL_LIMIT)
+            if (size < 1 || size > (contentPack ? PACK_ZIP_LIMIT : ZIP_LIMIT) || unpacked < 1
+                    || unpacked > (contentPack ? PACK_TOTAL_LIMIT : TOTAL_LIMIT))
                 throw new IOException("Paczka przekracza limit rozmiaru.");
             if (staging.getFreeSpace() < size + unpacked + RESERVE)
                 throw new IOException("Za mało wolnego miejsca na podpisaną paczkę.");
@@ -84,11 +112,16 @@ final class SignedModPackage {
             }
             if (!hex(hash.digest()).equals(manifest.getString("sha256")) || stream.getNextEntry() != null)
                 throw new IOException("Niezgodny SHA-256 lub nadmiarowe wpisy paczki.");
+            if (contentPack) {
+                unpackContentPack(payload, staging, id, unpacked, progress);
+                if (!payload.delete()) throw new IOException("Nie można usunąć pliku tymczasowego paczki.");
+                return new Prepared(id, true);
+            }
             String moduleId = "mod-" + hex(digest().digest(
                     ("signed:" + id).getBytes(StandardCharsets.US_ASCII))).substring(0, 24);
             unpack(payload, staging, moduleId, unpacked);
             if (!payload.delete()) throw new IOException("Nie można usunąć pliku tymczasowego paczki.");
-            return moduleId;
+            return new Prepared(moduleId, false);
         } catch (JSONException | IllegalArgumentException error) {
             throw new IOException("Nieprawidłowe metadane podpisanej paczki.", error);
         }
@@ -155,6 +188,61 @@ final class SignedModPackage {
                     + " for k,v in pairs(base.fixed_files) do base.fixed_files[k]=paths[v] or v end\n"
                     + " for k,v in pairs(base.menu) do base.menu[k]=paths[v] or v end\n return base\nend\n");
         }
+    }
+
+    /** Unpacks a signed full content pack (its Lua is trusted through the publisher signature). */
+    private static void unpackContentPack(File payload, File staging, String id, long expected,
+            Progress progress) throws IOException {
+        String root = staging.getCanonicalPath() + File.separator;
+        Set<String> names = new HashSet<>();
+        long total = 0;
+        try (ZipFile archive = new ZipFile(payload)) {
+            ArrayList<ZipEntry> files = new ArrayList<>();
+            Enumeration<? extends ZipEntry> entries = archive.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (entry.isDirectory()) continue;
+                String name = entry.getName();
+                String lower = name.toLowerCase(java.util.Locale.ROOT);
+                if (files.size() >= PACK_FILES || !safePath(name) || lower.matches(FORBIDDEN)
+                        || !names.add(lower) || entry.getSize() < 0 || (total += entry.getSize()) > expected)
+                    throw new IOException("Nieprawidłowy plik w paczce modułu: " + name);
+                files.add(entry);
+            }
+            if (total != expected || !names.contains("package.manifest"))
+                throw new IOException("Niekompletna paczka modułu.");
+            int done = 0;
+            for (ZipEntry entry : files) {
+                File target = new File(staging, entry.getName()).getCanonicalFile();
+                if (!target.getPath().startsWith(root)) throw new IOException("Ścieżka wychodzi poza paczkę.");
+                File parent = target.getParentFile();
+                if (!parent.isDirectory() && !parent.mkdirs()) throw new IOException("Nie można utworzyć katalogu paczki.");
+                if (staging.getFreeSpace() < entry.getSize() + RESERVE)
+                    throw new IOException("Za mało miejsca na zasoby modułu.");
+                try (CheckedInputStream input = new CheckedInputStream(archive.getInputStream(entry), new CRC32());
+                     FileOutputStream output = new FileOutputStream(target)) {
+                    if (copy(input, output, entry.getSize(), null) != entry.getSize()
+                            || input.getChecksum().getValue() != entry.getCrc())
+                        throw new IOException("Uszkodzony plik paczki: " + entry.getName());
+                }
+                if (progress != null && (++done % 50 == 0 || done == files.size())) progress.update(done, files.size());
+            }
+        }
+        String manifest;
+        try (InputStream input = new java.io.FileInputStream(new File(staging, "package.manifest"))) {
+            manifest = new String(read(input, META_LIMIT), StandardCharsets.UTF_8);
+        }
+        boolean declared = false;
+        for (String line : manifest.split("\\r?\\n")) declared |= line.equals("id=" + id);
+        if (!declared) throw new IOException("package.manifest opisuje inny moduł.");
+    }
+
+    private static boolean safePath(String name) {
+        if (name.isEmpty() || name.length() > 240 || name.startsWith("/") || name.indexOf('\\') >= 0
+                || name.indexOf(':') >= 0 || name.indexOf('\0') >= 0) return false;
+        for (String part : name.split("/", -1))
+            if (part.isEmpty() || part.equals(".") || part.equals("..")) return false;
+        return true;
     }
 
     private static JSONObject signed(byte[] raw, byte[] signature, byte[] key)

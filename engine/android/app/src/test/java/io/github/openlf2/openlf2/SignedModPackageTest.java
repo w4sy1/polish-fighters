@@ -61,6 +61,66 @@ public class SignedModPackageTest {
         assertEquals(0, new File(root, "game/content-packs").list().length);
     }
 
+    @Test public void installsAndUpdatesSignedContentPack() throws Exception {
+        File root = readyRoot();
+        assertEquals("lf4-turbo", installPack(root, contentEnvelope("lf4-turbo", "assets/a/000001.bmp", false), "lf4-turbo", false));
+        File pack = new File(root, "game/content-packs/lf4-turbo");
+        assertTrue(new File(pack, "catalog.lua").isFile());
+        assertTrue(new File(pack, "assets/a/000001.bmp").isFile());
+        assertEquals("lf4-turbo", installPack(root, contentEnvelope("lf4-turbo", "assets/a/000002.bmp", false), "lf4-turbo", false));
+        assertFalse(new File(pack, "assets/a/000001.bmp").exists());
+        assertTrue(new File(pack, "assets/a/000002.bmp").isFile());
+        assertEquals(1, new File(root, "game/content-packs").list().length);
+    }
+
+    @Test public void rejectsUnsafeOrUnexpectedContentPacks() throws Exception {
+        File root = readyRoot();
+        assertThrows(IOException.class, () -> installPack(root, contentEnvelope("kate", "assets/a/000001.bmp", true), "kate", false));
+        assertThrows(IOException.class, () -> installPack(root, contentEnvelope("kate", "assets/a/000001.bmp", false), "dbz", false));
+        assertThrows(IOException.class, () -> installPack(root, contentEnvelope("kate", "assets/a/000001.bmp", false), null, true));
+        assertEquals(0, new File(root, "game/content-packs").list().length);
+    }
+
+    private String installPack(File root, byte[] input, String expected, boolean play) throws IOException {
+        return AndroidModPackageImporter.importPackage(new ByteArrayInputStream(input), root,
+                () -> signer.generatePublicKey().getEncoded(), "1.1.1", play, expected, null);
+    }
+
+    private byte[] contentEnvelope(String id, String asset, boolean executable) throws Exception {
+        byte[] manifestText = bytes("id=" + id + "\nversion=1\napi=1\nasset=mods/" + id + "/"
+                + asset.substring(7) + "|" + asset + "\n");
+        byte[] catalog = bytes("return function(base)\n return base\nend\n");
+        byte[] image = bytes("BMimage");
+        byte[] tool = bytes("MZ");
+        ByteArrayOutputStream inner = new ByteArrayOutputStream();
+        try (ZipOutputStream zip = new ZipOutputStream(inner)) {
+            put(zip, "package.manifest", manifestText);
+            put(zip, "catalog.lua", catalog);
+            put(zip, asset, image);
+            if (executable) put(zip, "assets/run.exe", tool);
+        }
+        byte[] payload = inner.toByteArray();
+        long expanded = manifestText.length + catalog.length + image.length + (executable ? tool.length : 0);
+        byte[] manifest = bytes("{\"author\":\"Test\",\"category\":\"content-pack\",\"conflicts\":[],\"dependencies\":[],"
+                + "\"id\":\"" + id + "\",\"installation\":{\"entrypoint\":\"package.manifest\",\"method\":\"content-pack-zip\"},"
+                + "\"license\":\"Test\",\"min_engine_version\":\"1.1.1\",\"name\":\"Pack\",\"package_type\":\"content-pack\","
+                + "\"platforms\":[\"windows\",\"android\"],\"required_assets\":[],\"schema_version\":2,"
+                + "\"sha256\":\"" + hash(payload) + "\",\"size_bytes\":" + payload.length
+                + ",\"source\":{\"type\":\"github-release-asset\",\"url\":\"https://github.com/w4sy1/polish-fighters/releases/download/mods/" + id + "-1.0.0.zip\"},"
+                + "\"test_status\":{\"android\":\"pending\",\"windows\":\"pending\"},\"unpacked_size_bytes\":"
+                + expanded + ",\"version\":\"1.0.0\"}");
+        byte[] index = bytes("{\"channel\":\"stable\",\"manifests\":{\"" + id + "@1.0.0\":\"" + hash(manifest) + "\"},\"revision\":1}");
+        ByteArrayOutputStream outer = new ByteArrayOutputStream();
+        try (ZipOutputStream zip = new ZipOutputStream(outer)) {
+            put(zip, "catalog.json", index);
+            put(zip, "catalog.sig", sign(index));
+            put(zip, "manifest.json", manifest);
+            put(zip, "manifest.sig", sign(manifest));
+            put(zip, "package.zip", payload);
+        }
+        return outer.toByteArray();
+    }
+
     private String install(File root, byte[] input) throws IOException {
         return AndroidModPackageImporter.importPackage(new ByteArrayInputStream(input), root,
                 () -> signer.generatePublicKey().getEncoded(), "1.1.1", true, null);

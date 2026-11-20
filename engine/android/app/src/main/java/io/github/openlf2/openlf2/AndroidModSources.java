@@ -1,6 +1,15 @@
 package io.github.openlf2.openlf2;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+import org.bouncycastle.crypto.signers.Ed25519Signer;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -42,6 +51,140 @@ final class AndroidModSources {
     private static final Pattern LINK=Pattern.compile("(?is)<a\\b[^>]*href\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>(.*?)</a>");
     private static final Map<String,Long> LAST_REQUEST=new ConcurrentHashMap<>();
     private AndroidModSources() {}
+
+    // --- Polish Fighters — GitHub: signed catalogue of mod packs published as release assets.
+    static final String GITHUB_NAME = "Polish Fighters — GitHub";
+    static final String GITHUB_CATALOGUE = "https://raw.githubusercontent.com/w4sy1/polish-fighters/main/mods/catalog.json";
+    static final String GITHUB_SIGNATURE = "https://raw.githubusercontent.com/w4sy1/polish-fighters/main/mods/catalog.sig";
+    private static final Pattern ASSET_URL = Pattern.compile("https://github\\.com/w4sy1/polish-fighters/releases/download/mods/[a-z0-9-]{1,64}-[0-9.]{5,20}\\.zip");
+    private static final List<String> DOWNLOAD_HOSTS = Arrays.asList("github.com", "raw.githubusercontent.com",
+            "objects.githubusercontent.com", "release-assets.githubusercontent.com");
+    private static final long ENVELOPE_LIMIT = 2047L * 1024 * 1024;
+
+    /** One verified entry of the signed GitHub catalogue. */
+    static final class Package {
+        final String id, name, version, description, profile, url, sha256;
+        final long size, unpacked;
+        Package(JSONObject entry) throws JSONException {
+            id = entry.getString("id"); name = entry.getString("name"); version = entry.getString("version");
+            description = entry.optString("description", ""); profile = entry.optString("profile", "");
+            url = entry.getString("url"); sha256 = entry.getString("sha256");
+            size = entry.getLong("size_bytes"); unpacked = entry.getLong("unpacked_size_bytes");
+        }
+        String sizeLabel() { return String.format(Locale.ROOT, "%.1f MB", size / 1048576.0); }
+    }
+
+    interface DownloadProgress { boolean update(long received, long total); }
+
+    static List<Package> fetchGitHubCatalogue(byte[] key) throws IOException {
+        byte[] raw = fetchBytes(GITHUB_CATALOGUE, 1024 * 1024);
+        byte[] signature = fetchBytes(GITHUB_SIGNATURE, 64);
+        return parseGitHubCatalogue(raw, signature, key);
+    }
+
+    static List<Package> parseGitHubCatalogue(byte[] raw, byte[] signature, byte[] key) throws IOException {
+        if (key == null || key.length != 32 || signature == null || signature.length != 64)
+            throw new IOException("Brak zaufanego klucza lub podpisu katalogu.");
+        Ed25519Signer verifier = new Ed25519Signer();
+        verifier.init(false, new Ed25519PublicKeyParameters(key, 0));
+        verifier.update(raw, 0, raw.length);
+        if (!verifier.verifySignature(signature)) throw new IOException("Podpis katalogu modów jest nieprawidłowy.");
+        try {
+            JSONObject catalogue = new JSONObject(new String(raw, StandardCharsets.UTF_8));
+            if (!"polish-fighters-mods".equals(catalogue.getString("format")) || !"stable".equals(catalogue.getString("channel"))
+                    || catalogue.getInt("revision") < 1) throw new IOException("Nieobsługiwany katalog modów.");
+            JSONArray packages = catalogue.getJSONArray("packages");
+            List<Package> result = new ArrayList<>();
+            for (int i = 0; i < packages.length() && i < 200; i++) {
+                Package item = new Package(packages.getJSONObject(i));
+                if (!item.id.matches("[a-z0-9]+(-[a-z0-9]+)*") || item.id.length() > 64 || item.id.startsWith("mod-")
+                        || !item.version.matches("(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)")
+                        || !ASSET_URL.matcher(item.url).matches() || !item.url.endsWith("/" + item.id + "-" + item.version + ".zip")
+                        || !item.sha256.matches("[a-f0-9]{64}") || item.size < 1 || item.size > ENVELOPE_LIMIT
+                        || item.unpacked < 1 || item.name.isEmpty() || item.name.length() > 120)
+                    throw new IOException("Nieprawidłowy wpis katalogu modów.");
+                result.add(item);
+            }
+            return result;
+        } catch (JSONException error) {
+            throw new IOException("Nieprawidłowy katalog modów.", error);
+        }
+    }
+
+    /** Downloads one envelope into `target`; size and SHA-256 must match the signed catalogue. */
+    static void download(Package item, File target, DownloadProgress progress) throws IOException {
+        File partial = new File(target.getPath() + ".part");
+        MessageDigest digest;
+        try { digest = MessageDigest.getInstance("SHA-256"); }
+        catch (NoSuchAlgorithmException error) { throw new IOException(error); }
+        HttpURLConnection connection = openFollowing(item.url, 60000);
+        long received = 0;
+        try (InputStream input = connection.getInputStream(); FileOutputStream output = new FileOutputStream(partial)) {
+            byte[] buffer = new byte[1 << 16];
+            int n;
+            while ((n = input.read(buffer)) != -1) {
+                received += n;
+                if (received > item.size) throw new IOException("Plik jest większy niż w katalogu.");
+                digest.update(buffer, 0, n);
+                output.write(buffer, 0, n);
+                if (progress != null && !progress.update(received, item.size)) throw new IOException("Pobieranie anulowane.");
+            }
+        } catch (IOException error) {
+            partial.delete();
+            throw error;
+        } finally { connection.disconnect(); }
+        StringBuilder hex = new StringBuilder();
+        for (byte b : digest.digest()) hex.append(String.format(Locale.ROOT, "%02x", b & 255));
+        if (received != item.size || !hex.toString().equals(item.sha256)) {
+            partial.delete();
+            throw new IOException("Pobrany plik nie zgadza się z podpisanym katalogiem.");
+        }
+        if (target.exists() && !target.delete()) { partial.delete(); throw new IOException("Nie można zastąpić pobranego pliku."); }
+        if (!partial.renameTo(target)) { partial.delete(); throw new IOException("Nie można zapisać pobranego pliku."); }
+    }
+
+    static boolean githubHost(String address) {
+        try {
+            URL url = new URL(address);
+            return "https".equalsIgnoreCase(url.getProtocol()) && DOWNLOAD_HOSTS.contains(url.getHost().toLowerCase(Locale.ROOT))
+                    && (url.getPort() == -1 || url.getPort() == 443) && url.getUserInfo() == null;
+        } catch (IOException error) { return false; }
+    }
+
+    private static HttpURLConnection openFollowing(String address, int timeout) throws IOException {
+        for (int redirects = 0; redirects <= 5; redirects++) {
+            if (!githubHost(address)) throw new IOException("Pobieranie wyszło poza serwery GitHub.");
+            HttpURLConnection connection = (HttpURLConnection) new URL(address).openConnection();
+            connection.setConnectTimeout(15000); connection.setReadTimeout(timeout);
+            connection.setInstanceFollowRedirects(false);
+            connection.setRequestProperty("User-Agent", "PolishFighters-Mods/1");
+            connection.setRequestProperty("Accept-Encoding", "identity");
+            int code = connection.getResponseCode();
+            if (code >= 300 && code < 400) {
+                String location = connection.getHeaderField("Location");
+                connection.disconnect();
+                if (location == null) throw new IOException("GitHub zwrócił niepełne przekierowanie.");
+                address = new URL(new URL(address), location).toExternalForm();
+                continue;
+            }
+            if (code != 200) { connection.disconnect(); throw new IOException("GitHub odpowiedział kodem HTTP " + code + "."); }
+            return connection;
+        }
+        throw new IOException("Za dużo przekierowań GitHub.");
+    }
+
+    private static byte[] fetchBytes(String address, int limit) throws IOException {
+        HttpURLConnection connection = openFollowing(address, 20000);
+        try (InputStream input = connection.getInputStream(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int n;
+            while ((n = input.read(buffer)) != -1) {
+                if (output.size() + n > limit) throw new IOException("Odpowiedź GitHub przekracza limit.");
+                output.write(buffer, 0, n);
+            }
+            return output.toByteArray();
+        } finally { connection.disconnect(); }
+    }
 
     static List<Candidate> discover(Source source) throws IOException {
         if (!host(source.page).equals(source.host)) throw new IOException("Źródło nie pasuje do listy zaufanych domen.");

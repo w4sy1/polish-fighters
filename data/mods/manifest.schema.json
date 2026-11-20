@@ -79,7 +79,10 @@
       "$ref": "#/$defs/text"
     },
     "package_type": {
-      "const": "data-only"
+      "enum": [
+        "data-only",
+        "content-pack"
+      ]
     },
     "dependencies": {
       "type": "array",
@@ -98,12 +101,12 @@
     "size_bytes": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 268435456
+      "maximum": 2147483647
     },
     "unpacked_size_bytes": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 1073741824
+      "maximum": 4294967296
     },
     "sha256": {
       "type": "string",
@@ -124,7 +127,7 @@
         },
         "url": {
           "type": "string",
-          "pattern": "^https://github\\.com/w4sy1/polish-fighters-mody/releases/download/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+\\.zip$"
+          "pattern": "^https://github\\.com/w4sy1/polish-fighters(-mody)?/releases/download/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+\\.zip$"
         }
       }
     },
@@ -160,11 +163,14 @@
       "additionalProperties": false,
       "properties": {
         "method": {
-          "const": "managed-data-zip"
+          "enum": [
+            "managed-data-zip",
+            "content-pack-zip"
+          ]
         },
         "entrypoint": {
           "type": "string",
-          "pattern": "^[A-Za-z0-9_./-]+\\.json$",
+          "pattern": "^([A-Za-z0-9_./-]+\\.json|package\\.manifest)$",
           "maxLength": 256
         }
       }
@@ -190,5 +196,62 @@
     "test_status",
     "required_assets",
     "installation"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "package_type": {
+            "const": "data-only"
+          }
+        },
+        "required": [
+          "package_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "installation": {
+            "properties": {
+              "method": {
+                "const": "managed-data-zip"
+              }
+            }
+          },
+          "size_bytes": {
+            "maximum": 268435456
+          },
+          "unpacked_size_bytes": {
+            "maximum": 1073741824
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "package_type": {
+            "const": "content-pack"
+          }
+        },
+        "required": [
+          "package_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "installation": {
+            "properties": {
+              "method": {
+                "const": "content-pack-zip"
+              },
+              "entrypoint": {
+                "const": "package.manifest"
+              }
+            }
+          }
+        }
+      }
+    }
   ]
 }

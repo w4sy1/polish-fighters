@@ -58,6 +58,9 @@ def main():
     importer.add_argument('archive'); importer.add_argument('destination'); importer.add_argument('--id', required=True)
     importer.add_argument('--data-only', action='store_true', help='Explicitly skip executable and unsupported archive entries; import supported data only')
     commands.add_parser('sources')
+    commands.add_parser('github-list', help='Signed Polish Fighters catalogue on GitHub')
+    github = commands.add_parser('github-install', help='Download, verify and install a mod from Polish Fighters — GitHub')
+    github.add_argument('id'); github.add_argument('--packs', type=Path, help='Target content-packs directory of the game')
     discovery = commands.add_parser('discover')
     discovery.add_argument('source', choices=[item['id'] for item in sources()])
     discovery.add_argument('--page')
@@ -78,6 +81,20 @@ def main():
         elif args.command == 'inspect': result = inspect_zip(args.archive)
         elif args.command == 'import': result = import_zip(args.archive, args.destination, args.id, args.data_only)
         elif args.command == 'sources': result = sources()
+        elif args.command == 'github-list':
+            import github_mods
+            result = github_mods.fetch_catalogue()['packages']
+        elif args.command == 'github-install':
+            import github_mods
+            entry = next((item for item in github_mods.fetch_catalogue()['packages'] if item['id'] == args.id), None)
+            if not entry: raise ValueError('Unknown mod: ' + args.id)
+            packs = args.packs or github_mods.default_packs_directory()
+            packs.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryDirectory(prefix='.download-', dir=packs) as work:
+                envelope = github_mods.download(entry, Path(work) / entry['file'],
+                                                lambda done, total: print(f'\r{done * 100 // total}%', end='', file=sys.stderr, flush=True))
+                print(file=sys.stderr)
+                result = github_mods.install_envelope(envelope, packs, expected_id=entry['id'])
         elif args.command == 'discover':
             result = discover(args.source, args.page)
             if args.output:

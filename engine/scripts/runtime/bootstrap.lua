@@ -26,6 +26,7 @@ local json_encode, json_decode, state_digest = openlf2_json_encode, openlf2_json
 local network, network_time = openlf2_network, openlf2_network_time
 local account = openlf2_account
 local updates = openlf2_updates
+local mods = openlf2_mods
 local set_environment = setfenv
 local unpack_values = unpack or table.unpack
 local traceback = debug.traceback
@@ -54,7 +55,7 @@ local function evaluate(declaration, previous)
             reset_random_sequence = reset_random_sequence, save_recording = save_recording,
             take_recording = take_recording, local_time = local_time, build_label = build_label,
             json_encode = json_encode, json_decode = json_decode, state_digest = state_digest,
-            network = network, network_time = network_time, account = account, updates = updates},
+            network = network, network_time = network_time, account = account, updates = updates, mods = mods},
     }
     environment.math.random = nil
     environment.math.randomseed = nil

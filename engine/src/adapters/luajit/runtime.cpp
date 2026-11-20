@@ -7,6 +7,9 @@
 #include "openlf2/engine/relay_link.hpp"
 #include "openlf2/ports/digest.hpp"
 #include "openlf2/ports/download.hpp"
+#ifdef _WIN32
+#include "openlf2/ports/github_mods.hpp"
+#endif
 #include "openlf2/core/files.hpp"
 #include "openlf2_build_info.hpp"
 #include <algorithm>
@@ -82,6 +85,13 @@ struct ResourceBridge {
     std::optional<Result<std::string>> account_result;
     std::future<Result<std::string>> updates_future;
     std::optional<Result<std::string>> updates_result;
+#ifdef _WIN32
+    // Declared before mods_future: the worker writes progress until the future is destroyed.
+    ModInstallProgress mods_progress;
+#endif
+    std::string mods_action;
+    std::string mods_catalogue;
+    std::future<Result<std::string>> mods_future;
     bool network_operation(std::string_view operation, std::string_view value, std::uint16_t port) noexcept {
         try {
             pending_network = std::string{};
@@ -545,6 +555,51 @@ int updates_operation(lua_State* state) {
     lua_pushboolean(state,1);return 1;
 #endif
 }
+int mods_operation(lua_State* state) {
+#ifndef _WIN32
+    lua_pushnil(state);lua_pushliteral(state,"Mods handled by platform");return 2;
+#else
+    auto* bridge=resource_bridge(state);
+    const auto* action=luaL_checkstring(state,1);
+    if(std::strcmp(action,"progress")==0){
+        lua_pushnumber(state,static_cast<lua_Number>(bridge->mods_progress.received.load()));
+        lua_pushnumber(state,static_cast<lua_Number>(bridge->mods_progress.total.load()));
+        lua_pushnumber(state,static_cast<lua_Number>(bridge->mods_progress.phase.load()));
+        lua_pushnumber(state,static_cast<lua_Number>(bridge->mods_progress.files.load()));
+        return 4;
+    }
+    if(std::strcmp(action,"poll")==0){
+        if(!bridge->mods_future.valid() || bridge->mods_future.wait_for(std::chrono::seconds(0))!=std::future_status::ready){
+            lua_pushliteral(state,"pending");return 1;
+        }
+        Result<std::string> result=fail(ErrorCode::io,"Mod worker failed");
+        try {result=bridge->mods_future.get();} catch(...) {}
+        if(!result){lua_pushnil(state);lua_pushstring(state,result.error().message.c_str());return 2;}
+        if(bridge->mods_action=="catalogue"){
+            bridge->mods_catalogue=*result;
+            bridge->pending_value=parse_json(*result);
+            if(!bridge->pending_value->has_value()){bridge->pending_value.reset();lua_pushnil(state);lua_pushliteral(state,"Invalid catalogue");return 2;}
+            push_value(state,bridge->pending_value->value(),0);bridge->pending_value.reset();return 1;
+        }
+        lua_pushlstring(state,result->data(),result->size());return 1;
+    }
+    if(bridge->mods_future.valid()){lua_pushnil(state);lua_pushliteral(state,"Mod request already pending");return 2;}
+    try {
+        if(std::strcmp(action,"catalogue")==0){
+            bridge->mods_action="catalogue";
+            bridge->mods_future=std::async(std::launch::async,[]{return github_mod_catalogue();});
+        } else if(std::strcmp(action,"install")==0){
+            std::size_t size=0;
+            const auto* id=luaL_checklstring(state,2,&size);
+            if(bridge->mods_catalogue.empty()){lua_pushnil(state);lua_pushliteral(state,"Load the catalogue first");return 2;}
+            bridge->mods_action="install";
+            bridge->mods_future=std::async(std::launch::async,[bridge,value=std::string(id,size),catalogue=bridge->mods_catalogue]{
+                return github_mod_install(catalogue,value,bridge->mods_progress);});
+        } else {lua_pushnil(state);lua_pushliteral(state,"Unknown mod action");return 2;}
+    } catch(...) {lua_pushnil(state);lua_pushliteral(state,"Cannot start mod request");return 2;}
+    lua_pushboolean(state,1);return 1;
+#endif
+}
 int network_time(lua_State* state) {
     lua_pushnumber(state, std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now().time_since_epoch()).count());
     return 1;
@@ -881,7 +936,7 @@ int open_libraries(lua_State* state) {
         {"openlf2_json_encode", json_encode}, {"openlf2_json_decode", json_decode}, {"openlf2_state_digest", state_digest},
         {"openlf2_network", network_operation}, {"openlf2_network_time", network_time},
         {"openlf2_account", account_operation},
-        {"openlf2_updates", updates_operation},
+        {"openlf2_updates", updates_operation}, {"openlf2_mods", mods_operation},
         {"openlf2_random_state", random_state}, {"openlf2_set_random_state", set_random_state},
         {"openlf2_reset_random_sequence", reset_random_sequence}, {"openlf2_save_recording", save_recording},
         {"openlf2_take_recording", take_recording}, {"openlf2_local_time", local_time}};

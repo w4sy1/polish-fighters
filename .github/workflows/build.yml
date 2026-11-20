@@ -30,6 +30,11 @@ jobs:
   android:
     runs-on: ubuntu-24.04
     timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        # arm64-v8a is the release APK; x86_64 runs on the Android emulator for testing.
+        abi: [arm64-v8a, x86_64]
     defaults:
       run:
         working-directory: engine
@@ -55,16 +60,17 @@ jobs:
             "$RUNNER_TEMP/conan-venv/bin/pip" install cmake==3.28.3 ninja
           fi
           pkg-config --version
-      - name: Build Android ARM64
-        run: bash dist/build-android.sh arm64-v8a
+      - name: Build Android ${{ matrix.abi }}
+        run: bash dist/build-android.sh ${{ matrix.abi }}
       - name: Check bundled Polish Fighters scripts and application ID
-        run: python3 ../tools/check_apk.py out/PolishFighters-Android-arm64-v8a.apk
+        run: python3 ../tools/check_apk.py out/PolishFighters-Android-${{ matrix.abi }}.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: PolishFighters-Android-arm64
-          path: engine/out/PolishFighters-Android-arm64-v8a.apk*
+          name: ${{ matrix.abi == 'arm64-v8a' && 'PolishFighters-Android-arm64' || format('PolishFighters-Android-{0}', matrix.abi) }}
+          path: engine/out/PolishFighters-Android-${{ matrix.abi }}.apk*
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
+        if: matrix.abi == 'arm64-v8a'
         with:
           name: AndroidStudio-ARM64-native
           path: |

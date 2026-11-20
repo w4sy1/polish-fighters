@@ -1,5 +1,6 @@
 """Desktop companion for the Mod Manager; no package code or installers are run."""
 import json
+import tempfile
 import queue as messages
 import threading
 import tkinter as tk
@@ -12,6 +13,7 @@ from mod_http import validate_url
 from mod_manager import ROOT, catalog
 from mod_sources import discover, sources
 from mod_library import Library
+import github_mods
 
 
 class Manager:
@@ -24,9 +26,23 @@ class Manager:
         self.library = Library(self.home); self.game_exe = None
         root.title('Polish Little Fighters — Mod Manager (etap 2)'); root.geometry('960x700')
         tabs = ttk.Notebook(root); tabs.pack(fill='both', expand=True, padx=12, pady=10)
-        library = ttk.Frame(tabs); network = ttk.Frame(tabs); downloads = ttk.Frame(tabs); installed = ttk.Frame(tabs)
+        github = ttk.Frame(tabs); library = ttk.Frame(tabs); network = ttk.Frame(tabs); downloads = ttk.Frame(tabs); installed = ttk.Frame(tabs)
+        tabs.add(github, text=github_mods.SOURCE_NAME)
         tabs.add(library, text='Katalog i import'); tabs.add(network, text='Źródła internetowe'); tabs.add(downloads, text='Pobieranie i historia')
         tabs.add(installed, text='Zainstalowane i profile')
+        self.github_packs = tk.StringVar(value=str(github_mods.default_packs_directory()))
+        target = ttk.Frame(github); target.pack(fill='x', pady=6)
+        ttk.Label(target, text='Folder content-packs gry:').pack(side='left')
+        ttk.Entry(target, textvariable=self.github_packs).pack(side='left', fill='x', expand=True, padx=4)
+        ttk.Button(target, text='Wybierz…', command=self.choose_packs).pack(side='left')
+        self.github_rows = self.tree(github, ('name','size','installed'), ('Mod','Rozmiar','Zainstalowany'))
+        self.github_entries = {}
+        self.github_progress = ttk.Progressbar(github, maximum=1000); self.github_progress.pack(fill='x', pady=5)
+        self.github_status = tk.StringVar(value='Odśwież katalog, wybierz mod i kliknij Pobierz i zainstaluj.')
+        ttk.Label(github, textvariable=self.github_status, wraplength=900).pack(fill='x')
+        buttons = ttk.Frame(github); buttons.pack(fill='x', pady=8)
+        ttk.Button(buttons, text='Odśwież podpisany katalog', command=self.github_refresh).pack(side='left', padx=3)
+        ttk.Button(buttons, text='Pobierz i zainstaluj', command=self.github_install).pack(side='left', padx=3)
         self.query = tk.StringVar(); ttk.Entry(library, textvariable=self.query).pack(fill='x', pady=6)
         self.query.trace_add('write', lambda *_: self.filter())
         self.mods = self.tree(library, ('name','category','author'), ('Nazwa','Kategoria','Autor'))
@@ -94,6 +110,35 @@ class Manager:
             try: self.events.put((name, task(), None))
             except Exception as error: self.events.put((name, None, str(error)))
         threading.Thread(target=work, name='mods-' + name, daemon=False).start()
+
+    def choose_packs(self):
+        folder = filedialog.askdirectory(title='Folder content-packs gry', initialdir=self.github_packs.get())
+        if folder: self.github_packs.set(folder); self.github_show()
+
+    def github_refresh(self):
+        self.github_status.set('Pobieram podpisany katalog…')
+        self.background('katalog GitHub', github_mods.fetch_catalogue)
+
+    def github_show(self):
+        packs = Path(self.github_packs.get())
+        self.github_rows.delete(*self.github_rows.get_children())
+        for entry in self.github_entries.values():
+            installed = 'tak' if (packs / entry['id'] / 'package.manifest').is_file() else ''
+            self.github_rows.insert('', 'end', iid=entry['id'], values=(entry['name'], f"{entry['size_bytes'] / 1048576:.1f} MiB", installed))
+
+    def github_install(self):
+        selected = self.github_rows.selection()
+        if not selected: return messagebox.showinfo('Polish Fighters — GitHub', 'Najpierw odśwież katalog i wybierz mod.')
+        entry = self.github_entries[selected[0]]; packs = Path(self.github_packs.get())
+        def report(done, total):
+            self.events.put(('postęp GitHub', (done, total), None))
+        def task():
+            packs.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryDirectory(prefix='.download-', dir=packs) as work:
+                envelope = github_mods.download(entry, Path(work) / entry['file'], report)
+                self.events.put(('postęp GitHub', 'install', None))
+                return github_mods.install_envelope(envelope, packs, expected_id=entry['id'])
+        self.background('instalacja ' + entry['name'], task)
 
     def filter(self):
         self.mods.delete(*self.mods.get_children())
@@ -304,6 +349,19 @@ class Manager:
         while True:
             try: name, result, error = self.events.get_nowait()
             except messages.Empty: break
+            if name == 'postęp GitHub':
+                if result == 'install': self.github_status.set('Sprawdzam podpis i instaluję…')
+                else:
+                    self.github_progress['value'] = result[0] * 1000 // max(1, result[1])
+                    self.github_status.set(f'Pobieranie: {result[0] / 1048576:.1f} / {result[1] / 1048576:.1f} MiB')
+                continue
+            if name == 'katalog GitHub':
+                if result: self.github_entries = {entry['id']: entry for entry in result['packages']}; self.github_show()
+                self.github_status.set(str(error) if error else f"Podpis katalogu poprawny. Modów: {len(self.github_entries)}.")
+            if name.startswith('instalacja '):
+                self.github_progress['value'] = 0 if error else 1000
+                self.github_status.set('Instalacja przerwana: ' + str(error) if error else f"Zainstalowano {result['name']} {result['version']}.")
+                self.github_show()
             self.busy.discard(name)
             self.notice.set(str(error) if error else 'Zakończono: ' + name)
             if name == 'profil' and not error: self.profile_id.set(self.library.read()['selected_profile'])

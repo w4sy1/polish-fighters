@@ -33,7 +33,7 @@ public final class AndroidModsActivity extends Activity {
         LinearLayout page=new LinearLayout(this);page.setOrientation(LinearLayout.VERTICAL);page.setPadding(dp(18),dp(12),dp(18),dp(10));page.setBackgroundColor(NAVY);
         TextView title=new TextView(this);title.setText("MODS / MODUŁY");title.setTextColor(TEXT);title.setTextSize(20);title.setTypeface(Typeface.MONOSPACE,Typeface.BOLD);title.setGravity(android.view.Gravity.CENTER);page.addView(title,new LinearLayout.LayoutParams(-1,dp(34)));
         View rule=new View(this);rule.setBackgroundColor(BLUE);page.addView(rule,new LinearLayout.LayoutParams(-1,dp(2)));
-        TextView note=body("Katalog otwiera strony projektów. ZIP pobierasz ze strony i wskazujesz tutaj.");
+        TextView note=body("Polish Fighters — GitHub pobiera i instaluje podpisane mody w grze. Inne źródła otwierają strony.");
         note.setPadding(dp(10),dp(7),dp(10),dp(7));note.setBackground(panel());
         LinearLayout.LayoutParams noteParams=new LinearLayout.LayoutParams(-1,dp(48));noteParams.topMargin=dp(9);page.addView(note,noteParams);
         status=body("Wybierz źródło albo zaimportuj paczkę LF2.");status.setContentDescription("Status importu");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
@@ -44,7 +44,7 @@ public final class AndroidModsActivity extends Activity {
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);rows=new LinearLayout(this);rows.setOrientation(LinearLayout.VERTICAL);scroll.addView(rows);page.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         ClassicButton back=action("POWRÓT",this::finish);LinearLayout.LayoutParams backParams=new LinearLayout.LayoutParams(-1,dp(44));backParams.topMargin=dp(5);page.addView(back,backParams);
         setContentView(page);
-        for(AndroidModSources.Source source:AndroidModSources.SOURCES) addSource(source);
+        showSources();
     }
 
     private TextView body(String value) {
@@ -82,8 +82,74 @@ public final class AndroidModsActivity extends Activity {
         setBusy(false,status.getText().toString());
     }
     private void showSources() {
-        rows.removeAllViews();for(AndroidModSources.Source source:AndroidModSources.SOURCES)addSource(source);
-        status.setText("Wybierz źródło. ZIP pobierz ze strony, a potem zaimportuj.");
+        rows.removeAllViews();
+        ClassicButton github=action("POBIERZ: "+AndroidModSources.GITHUB_NAME,this::showGitHub);
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(github,params);
+        for(AndroidModSources.Source source:AndroidModSources.SOURCES)addSource(source);
+        status.setText("Wybierz źródło albo zaimportuj paczkę LF2.");
+    }
+    private byte[] trustedKey() throws java.io.IOException {
+        try(java.io.InputStream key=getAssets().open(SignedModPackage.KEY_ASSET)){return SignedModPackage.read(key,32);}
+    }
+    private void showGitHub() {
+        if(importing)return;setBusy(true,"Pobieram podpisany katalog: "+AndroidModSources.GITHUB_NAME);
+        worker.submit(()->{
+            try { List<AndroidModSources.Package> found=AndroidModSources.fetchGitHubCatalogue(trustedKey());runOnUiThread(()->showPackages(found)); }
+            catch(Exception error) { runOnUiThread(()->setBusy(false,"Nie udało się pobrać katalogu. "+safe(error.getMessage()))); }
+        });
+    }
+    private void showPackages(List<AndroidModSources.Package> found) {
+        rows.removeAllViews();
+        for(AndroidModSources.Package item:found) {
+            boolean installed=new java.io.File(getFilesDir(),"game/content-packs/"+item.id+"/package.manifest").isFile();
+            ClassicButton button=action((installed?"✓ ":"")+item.name+"  ("+item.sizeLabel()+")",()->install(item));
+            button.setContentDescription("Pobierz i zainstaluj "+item.name);
+            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(button,params);
+        }
+        ClassicButton back=action("WRÓĆ DO ŹRÓDEŁ",this::showSources);
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(back,params);
+        setBusy(false,"Podpis katalogu poprawny. Mody: "+found.size()+". Wybierz, aby pobrać i zainstalować.");
+    }
+    private void install(AndroidModSources.Package item) {
+        if(importing)return;
+        java.io.File folder=new java.io.File(getCacheDir(),"mods");
+        if(!folder.isDirectory()&&!folder.mkdirs()){setBusy(false,"Nie można przygotować katalogu pobierania.");return;}
+        long needed=2*item.size+item.unpacked+64L*1024*1024;
+        if(getFilesDir().getFreeSpace()<needed){setBusy(false,"Za mało miejsca: potrzeba około "+(needed>>20)+" MB.");return;}
+        setBusy(true,"Pobieram "+item.name+"…");progress.setIndeterminate(false);progress.setMax(1000);progress.setProgress(0);
+        worker.submit(()->{
+            java.io.File envelope=new java.io.File(folder,item.id+"-"+item.version+".zip");
+            try {
+                final long[] shown={-1};
+                AndroidModSources.download(item,envelope,(received,total)->{
+                    long permille=total>0?received*1000/total:0;
+                    if(permille!=shown[0]){shown[0]=permille;runOnUiThread(()->{progress.setProgress((int)permille);
+                        status.setText("Pobieram "+item.name+": "+(received>>20)+" / "+(total>>20)+" MB ("+permille/10+"%)");});}
+                    return !worker.isShutdown();
+                });
+                runOnUiThread(()->{progress.setIndeterminate(true);status.setText("Sprawdzam podpis i instaluję "+item.name+"…");});
+                String id=AndroidModPackageImporter.importDownloaded(envelope,getFilesDir(),getAssets(),item.id,
+                    files->runOnUiThread(()->status.setText("Instaluję "+item.name+": plików "+files)));
+                String message="Zainstalowano "+item.name+" "+item.version+".";
+                try {
+                    GamePackSettings settings=new GamePackSettings(getFilesDir());
+                    if(!item.profile.isEmpty()){settings.save(item.profile,settings.selection(),settings.hideDuplicates());message+=" Moduł wybrany do gry.";}
+                } catch(Exception saveError) { message+=" Wybierz go w menu Moduły."; }
+                final String done=message;
+                runOnUiThread(()->{setBusy(false,done);showPackagesAgain();});
+                android.util.Log.i("OpenLF2","GitHub mod installed: "+id);
+            } catch(Exception error) {
+                android.util.Log.w("OpenLF2","GitHub mod install failed",error);
+                runOnUiThread(()->setBusy(false,"Instalacja przerwana: "+safe(error.getMessage())));
+            } finally { envelope.delete(); }
+        });
+    }
+    private void showPackagesAgain() {
+        worker.submit(()->{
+            try { List<AndroidModSources.Package> found=AndroidModSources.fetchGitHubCatalogue(trustedKey());
+                runOnUiThread(()->{String keep=status.getText().toString();showPackages(found);status.setText(keep);}); }
+            catch(Exception ignored) {}
+        });
     }
     private void openPage(String address,String host) {
         try { Uri uri=Uri.parse(address);if(!"https".equals(uri.getScheme())||!host.equalsIgnoreCase(uri.getHost()))throw new IllegalArgumentException();startActivity(new Intent(Intent.ACTION_VIEW,uri)); }
@@ -106,7 +172,7 @@ public final class AndroidModsActivity extends Activity {
             } catch(Exception error) { runOnUiThread(()->setBusy(false,"Import przerwany: "+safe(error.getMessage()))); }
         });
     }
-    private void setBusy(boolean busy,String message) { importing=busy;status.setText(message);progress.setVisibility(busy?View.VISIBLE:View.GONE); }
+    private void setBusy(boolean busy,String message) { importing=busy;status.setText(message);if(!busy)progress.setIndeterminate(true);progress.setVisibility(busy?View.VISIBLE:View.GONE); }
     private static String safe(String value) { if(value==null)return "nieznany błąd";String text=value.replaceAll("[\\r\\n\\p{Cntrl}]"," ");return text.substring(0,Math.min(text.length(),240)); }
     @Override protected void onDestroy() { worker.shutdownNow();super.onDestroy(); }
 }

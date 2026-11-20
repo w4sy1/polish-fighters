@@ -13,6 +13,9 @@
 #include <cstdio>
 #include <ctime>
 #include "openlf2/ports/download.hpp"
+#ifdef _WIN32
+#include "openlf2/ports/github_mods.hpp"
+#endif
 #include "openlf2/ports/platform.hpp"
 #include "openlf2/ports/scripts.hpp"
 #include "openlf2/resources/background_data.hpp"
@@ -1504,6 +1507,9 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
         }
         while (true) {
             std::optional<ProfileRequest> profile_request;
+#ifdef _WIN32
+            set_mod_content_directory(content_directory(*config));
+#endif
             auto result = run(*config, profile_request);
             if (!result) { std::cerr << result.error().message << '\n'; return 1; }
             if (!profile_request) break;

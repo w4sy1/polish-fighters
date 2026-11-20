@@ -249,6 +249,11 @@ if(NOT OPENLF2_DEPENDENCY_PROVIDER STREQUAL "web")
     target_link_libraries(openlf2_adapter_download PRIVATE CURL::libcurl)
     target_sources(openlf2_adapter_download PRIVATE src/adapters/curl/account_http.cpp)
     target_link_libraries(openlf2_adapter_luajit PRIVATE openlf2_adapter_download)
+    if(WIN32)
+        # In-game installer for signed mods from the Polish Fighters GitHub catalogue.
+        target_sources(openlf2_adapter_download PRIVATE src/adapters/curl/github_mods.cpp)
+        target_link_libraries(openlf2_adapter_download PRIVATE OpenSSL::Crypto ZLIB::ZLIB)
+    endif()
 endif()
 openlf2_target(openlf2_adapter_download)
 
