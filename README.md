@@ -6,9 +6,11 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Pobranie
 
-**[Pobierz Polish Fighters 0.18.10](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.10).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
+**[Pobierz Polish Fighters 0.18.11](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.11).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
 
 ## Aktualności
+
+**0.18.11 — nowy wygląd ekranu modów na Androidzie.** Ekran „Mody i moduły” ma tło z grafiką gry, dwie kolumny i listę źródeł w karcie z płynnym przewijaniem. Tytuł nie chowa się już pod paskiem stanu. Zawiera poprawki 0.18.10.
 
 **0.18.10 — poprawki gry przez internet i menu.** Na Windowsie działa logowanie nickiem i kontem (gra nie ufała certyfikatowi serwera). Przycisk POWRÓT w „Graj przez internet” nie zamyka już gry. Najechanie myszą na opcję w menu nie odtwarza już utworu z paczki. Przy błędzie połączenia ekran pokazuje jego przyczynę.
 

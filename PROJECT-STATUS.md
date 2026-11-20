@@ -1,3 +1,9 @@
+## 2026-11-20 — Wydanie 0.18.11: ekran modów Android (Claude)
+
+- `AndroidModsActivity` ma układ ekranu startowego: grafika `pf_loading_art_landscape` z przyciemnieniem, lewa kolumna (tytuł, opis, stan, import, POWRÓT) i prawa karta `pf_loading_surface` z listą źródeł. Lista przewija się w karcie z wygaszaniem krawędzi. Odstępy uwzględniają pasek stanu, wycięcie aparatu i pasek nawigacji. Logika pobierania i importu bez zmian.
+- Wydania `v0.18.7`, `v0.18.7-hybrid` i `v0.18.8` oznaczone jako niedziałające (błąd startu z literą `v` w wejściu).
+- Wersja 0.18.11, build 10008.
+
 ## 2026-11-20 — Wydanie 0.18.10: zgłoszenia graczy (Claude)
 
 - Windows: `account_post` nie ustawiał `CURLSSLOPT_NATIVE_CA`, więc OpenSSL nie ufał żadnemu certyfikatowi i każde logowanie (nick, konto, rejestracja) kończyło się „Account request failed or timed out”. Teraz używa magazynu Windows oraz wbudowanych ISRG Root X1 i X2 (`letsencrypt_roots.hpp`, odciski SHA-256 w nagłówku). Limity czasu 10 s i 25 s. Błąd zawiera kod i opis z libcurl.

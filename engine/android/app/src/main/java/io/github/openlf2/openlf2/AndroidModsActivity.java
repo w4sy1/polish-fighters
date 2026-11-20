@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -20,7 +22,7 @@ import java.util.concurrent.Executors;
 public final class AndroidModsActivity extends Activity {
     static final String RETURN_TO_GAME="return_to_game";
     private static final int PICK_PACKAGE=7301;
-    private static final int NAVY=0xff040a41, PANEL=0xff102164, BLUE=0xff4f9bff, TEXT=0xfff4f5ff, MUTED=0xffb6c5d9;
+    private static final int NAVY=0xff040a41, BLUE=0xff7a9dff, RED=0xffff5262, TEXT=0xfff4f5ff, MUTED=0xffb6c5d9;
     private final ExecutorService worker=Executors.newSingleThreadExecutor();
     private LinearLayout rows;
     private TextView status;
@@ -31,28 +33,53 @@ public final class AndroidModsActivity extends Activity {
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
-        LinearLayout page=new LinearLayout(this);page.setOrientation(LinearLayout.VERTICAL);page.setPadding(dp(18),dp(12),dp(18),dp(10));page.setBackgroundColor(NAVY);
-        TextView title=new TextView(this);title.setText("MODS / MODUŁY");title.setTextColor(TEXT);title.setTextSize(20);title.setTypeface(Typeface.MONOSPACE,Typeface.BOLD);title.setGravity(android.view.Gravity.CENTER);page.addView(title,new LinearLayout.LayoutParams(-1,dp(34)));
-        View rule=new View(this);rule.setBackgroundColor(BLUE);page.addView(rule,new LinearLayout.LayoutParams(-1,dp(2)));
-        TextView note=body("Polish Fighters — GitHub pobiera i instaluje podpisane mody w grze. Inne źródła otwierają strony.");
-        note.setPadding(dp(10),dp(7),dp(10),dp(7));note.setBackground(panel());
-        LinearLayout.LayoutParams noteParams=new LinearLayout.LayoutParams(-1,dp(48));noteParams.topMargin=dp(9);page.addView(note,noteParams);
-        status=body("Wybierz źródło albo zaimportuj paczkę LF2.");status.setContentDescription("Status importu");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        status.setPadding(dp(8),dp(5),dp(8),dp(5));page.addView(status,new LinearLayout.LayoutParams(-1,dp(38)));
-        progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);progress.setVisibility(View.GONE);page.addView(progress,new LinearLayout.LayoutParams(-1,dp(4)));
-        ClassicButton install=action("IMPORTUJ PACZKĘ ZIP",this::pickPackage);LinearLayout.LayoutParams installParams=new LinearLayout.LayoutParams(-1,dp(48));installParams.topMargin=dp(4);page.addView(install,installParams);
-        TextView sources=body("ŹRÓDŁA MODÓW");sources.setTextColor(BLUE);sources.setTypeface(Typeface.MONOSPACE,Typeface.BOLD);sources.setPadding(dp(4),dp(5),0,0);page.addView(sources,new LinearLayout.LayoutParams(-1,dp(28)));
-        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);rows=new LinearLayout(this);rows.setOrientation(LinearLayout.VERTICAL);scroll.addView(rows);page.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
-        ClassicButton back=action("POWRÓT",this::leave);LinearLayout.LayoutParams backParams=new LinearLayout.LayoutParams(-1,dp(44));backParams.topMargin=dp(5);page.addView(back,backParams);
-        setContentView(page);
+        // Same look as the start screen: the game art, darkened towards the text, with rounded cards.
+        FrameLayout root=new FrameLayout(this);root.setBackgroundColor(NAVY);
+        ImageView art=new ImageView(this);art.setImageResource(R.drawable.pf_loading_art_landscape);art.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);root.addView(art,new FrameLayout.LayoutParams(-1,-1));
+        View scrim=new View(this);scrim.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,new int[]{0xf5040a41,0xd9040a41,0x99040a41}));
+        root.addView(scrim,new FrameLayout.LayoutParams(-1,-1));
+
+        LinearLayout page=new LinearLayout(this);page.setOrientation(LinearLayout.HORIZONTAL);root.addView(page,new FrameLayout.LayoutParams(-1,-1));
+        // Keep the title and buttons clear of the status bar, the camera cut-out and the navigation bar.
+        root.setOnApplyWindowInsetsListener((view,insets)->{
+            page.setPadding(insets.getSystemWindowInsetLeft()+dp(20),insets.getSystemWindowInsetTop()+dp(14),
+                insets.getSystemWindowInsetRight()+dp(20),insets.getSystemWindowInsetBottom()+dp(12));
+            return insets;
+        });
+        page.setPadding(dp(20),dp(14),dp(20),dp(12));
+
+        LinearLayout side=new LinearLayout(this);side.setOrientation(LinearLayout.VERTICAL);
+        page.addView(side,new LinearLayout.LayoutParams(0,-1,0.92f));
+        TextView kicker=label("POLISH FIGHTERS",11,RED,true);side.addView(kicker,wrap());
+        TextView title=label("MODY I MODUŁY",24,TEXT,true);side.addView(title,wrap());
+        View rule=new View(this);rule.setBackgroundColor(RED);LinearLayout.LayoutParams ruleParams=new LinearLayout.LayoutParams(dp(56),dp(3));ruleParams.topMargin=dp(6);ruleParams.bottomMargin=dp(10);side.addView(rule,ruleParams);
+        TextView note=label("Mody z GitHuba gra pobiera i instaluje sama, po sprawdzeniu podpisu. Inne źródła otwierają się w przeglądarce.",12,MUTED,false);
+        note.setLineSpacing(dp(2),1f);side.addView(note,wrap());
+        LinearLayout statusCard=new LinearLayout(this);statusCard.setOrientation(LinearLayout.VERTICAL);statusCard.setBackgroundResource(R.drawable.pf_loading_surface);statusCard.setPadding(dp(12),dp(9),dp(12),dp(9));
+        status=label("Wybierz źródło albo zaimportuj paczkę LF2.",12,TEXT,false);status.setContentDescription("Status importu");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        statusCard.addView(status,wrap());
+        progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);progress.setVisibility(View.GONE);
+        LinearLayout.LayoutParams progressParams=new LinearLayout.LayoutParams(-1,dp(6));progressParams.topMargin=dp(6);statusCard.addView(progress,progressParams);
+        LinearLayout.LayoutParams statusParams=wrap();statusParams.topMargin=dp(12);side.addView(statusCard,statusParams);
+        side.addView(new View(this),new LinearLayout.LayoutParams(1,0,1));
+        ClassicButton install=action("IMPORTUJ PACZKĘ ZIP",this::pickPackage);side.addView(install,new LinearLayout.LayoutParams(-1,dp(46)));
+        ClassicButton back=action("POWRÓT",this::leave);LinearLayout.LayoutParams backParams=new LinearLayout.LayoutParams(-1,dp(46));backParams.topMargin=dp(8);side.addView(back,backParams);
+
+        LinearLayout list=new LinearLayout(this);list.setOrientation(LinearLayout.VERTICAL);list.setBackgroundResource(R.drawable.pf_loading_surface);list.setPadding(dp(12),dp(10),dp(12),dp(6));
+        LinearLayout.LayoutParams listParams=new LinearLayout.LayoutParams(0,-1,1.08f);listParams.leftMargin=dp(18);page.addView(list,listParams);
+        TextView sources=label("ŹRÓDŁA MODÓW",12,BLUE,true);sources.setPadding(dp(2),0,0,dp(8));list.addView(sources,wrap());
+        // Rows scroll inside the card and fade at its edges instead of being cut off mid-line.
+        ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setVerticalFadingEdgeEnabled(true);scroll.setFadingEdgeLength(dp(18));scroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        rows=new LinearLayout(this);rows.setOrientation(LinearLayout.VERTICAL);scroll.addView(rows);list.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+        setContentView(root);
         showSources();
     }
 
-    private TextView body(String value) {
-        TextView view=new TextView(this);view.setText(value);view.setTextColor(MUTED);view.setTextSize(12);view.setTypeface(Typeface.MONOSPACE);view.setGravity(android.view.Gravity.CENTER_VERTICAL);return view;
-    }
-    private GradientDrawable panel() {
-        GradientDrawable drawable=new GradientDrawable();drawable.setColor(PANEL);drawable.setCornerRadius(dp(3));drawable.setStroke(dp(1),BLUE);return drawable;
+    private LinearLayout.LayoutParams wrap() { return new LinearLayout.LayoutParams(-1,ViewGroup.LayoutParams.WRAP_CONTENT); }
+    private TextView label(String value,int size,int color,boolean bold) {
+        TextView view=new TextView(this);view.setText(value);view.setTextColor(color);view.setTextSize(size);
+        view.setTypeface(Typeface.MONOSPACE,bold?Typeface.BOLD:Typeface.NORMAL);return view;
     }
     private ClassicButton action(String label,Runnable click) {
         ClassicButton button=new ClassicButton(this);button.setText(label);button.setAllCaps(false);button.setMinHeight(dp(44));button.setPadding(dp(8),dp(5),dp(8),dp(5));button.setBackgroundResource(R.drawable.pf_button);button.setBackgroundTintList(null);button.setOnClickListener(v->click.run());return button;
