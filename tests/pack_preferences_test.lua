@@ -11,7 +11,7 @@ assert(packs.save(hub.profiles,selected))
 assert(doc.options.language=='english' and doc.controls.keep)
 assert(packs.read(hub.profiles).bleach==false)
 local rows=hub.rows({hub_mode='root',hub_selected=selected})
-assert(#rows==7,'classic main menu must keep its seven top-level actions')
+assert(#rows==8,'classic main menu must keep its eight top-level actions')
 local modules=false;for _,row in ipairs(rows) do if row[1]=='library' then modules=true end end
 assert(modules,'module library is missing from the main menu')
 local standalone=false

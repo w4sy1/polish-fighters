@@ -25,17 +25,21 @@ local function tinted(color, tint)
     return result
 end
 -- Estimated width in pixels of TrueType text: layouts here only know the bitmap font's metrics.
+local function use_ttf(text)
+    -- Default retains the bitmap for original ASCII and single-byte labels.
+    return i18n.active() or (i18n.can_draw_text() and text:find("[\194-\244][\128-\191]") ~= nil)
+end
 local function ttf_width(text) return math.floor(i18n.width(text, ttf_size)) end
 -- Width of `text` drawn by font.draw.
 function font.width(text)
-    return i18n.active() and ttf_width(text) or #text * 8
+    return use_ttf(text) and ttf_width(text) or #text * 8
 end
 
 -- `tint`: 0xRRGGBB multiplied into the glyph colors (nil leaves them). `align`: "left" (default),
 -- "center" or "right": `x` is that edge of the text. Text drawn in a translated language goes through
 -- i18n.tr first, so labels the scripts build (difficulties, slot names ...) are translated too.
 function font.draw(context, text, x, y, variant, tint, align)
-    if i18n.active() then
+    if use_ttf(text) then
         text = i18n.tr(text)
         if text == "" then return end
         local colors = variant_colors[variant or font_variants.white]
@@ -114,7 +118,7 @@ end
 
 -- Width of GDI text in pixels: the advances of `gdi` below.
 function font.gdi_width(text)
-    if i18n.active() then return ttf_width(text) end
+    if use_ttf(text) then return ttf_width(text) end
     if not gdi_widths then measure() end
     local width = 0
     for position = 1, #text do
@@ -128,7 +132,7 @@ end
 -- swapped for COLORREF); `background`, if given, paints an opaque box behind the text (16px high).
 -- `align` as for font.draw; `size` is the TrueType font size (translated languages only).
 function font.gdi(context, text, x, y, color, background, align, size)
-    if i18n.active() then
+    if use_ttf(text) then
         text = i18n.tr(text)
         if text == "" then return end
         context.text(text, x, y, align or "left", size or ttf_size, color or 0xffffff, nil, background, i18n.antialias())

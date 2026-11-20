@@ -1,4 +1,5 @@
 return {
+ guide='PORADNIK KOMBOSÓW',
  current_mod='BIEŻĄCY MOD: ',
  mods='KATALOG MODÓW',
  status='STAN / ZGODNOŚĆ MODUŁÓW', audit_note='Stan plików przy budowie. Obecność zasobów nie oznacza pełnej zgodności mechanik.', assets='Zasoby: ', missing_files='Brakujące pliki: ',

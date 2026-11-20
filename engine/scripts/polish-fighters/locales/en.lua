@@ -1,4 +1,5 @@
 return {
+ guide='COMBO GUIDE',
  current_mod='CURRENT MOD: ',
  mods='MOD CATALOGUE',
  status='MODULE STATUS / COMPATIBILITY', audit_note='File audit at build time. Present assets do not prove complete mechanics compatibility.', assets='Assets: ', missing_files='Missing files: ',

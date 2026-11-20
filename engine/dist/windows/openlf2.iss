@@ -72,7 +72,7 @@ english.RecordingType=Little Fighter 2 recording
 english.Downloading=Downloading Little Fighter 2
 english.DownloadingDesc=Fetching LF2_v2.0a.exe (checked by its SHA-256 checksum).
 english.DownloadFailed=The download failed or was canceled. The installation continues; OpenLF2 offers the download again at its first start.
-english.RemoveUserData=Remove OpenLF2's settings, recordings and the downloaded game data from your user profile too?
+english.RemoveUserData=Also remove the Polish Fighters settings, recordings, and downloaded game data from your user profile?
 
 german.GameData=Spieldaten:
 german.DownloadLF2=Den Original-Installer von Little Fighter 2 jetzt herunterladen (ca. 30 MB, zum Spielen nötig; sonst bietet OpenLF2 es beim ersten Start an)
@@ -82,7 +82,7 @@ german.RecordingType=Little-Fighter-2-Aufnahme
 german.Downloading=Little Fighter 2 wird heruntergeladen
 german.DownloadingDesc=LF2_v2.0a.exe wird geladen (Prüfung per SHA-256-Prüfsumme).
 german.DownloadFailed=Der Download ist fehlgeschlagen oder wurde abgebrochen. Die Installation wird fortgesetzt; OpenLF2 bietet den Download beim ersten Start erneut an.
-german.RemoveUserData=Auch die Einstellungen, Aufnahmen und die heruntergeladenen Spieldaten von OpenLF2 aus deinem Benutzerprofil entfernen?
+german.RemoveUserData=Auch die Einstellungen, Aufnahmen und die heruntergeladenen Spieldaten von Polish Fighters aus deinem Benutzerprofil entfernen?
 
 chinesesimplified.GameData=游戏数据：
 chinesesimplified.DownloadLF2=立即下载原版小朋友齐打交安装程序（约 30 MB，游玩所需；否则 OpenLF2 会在首次启动时提供下载）
@@ -92,7 +92,7 @@ chinesesimplified.RecordingType=小朋友齐打交录像
 chinesesimplified.Downloading=正在下载小朋友齐打交
 chinesesimplified.DownloadingDesc=正在获取 LF2_v2.0a.exe（以 SHA-256 校验和检查）。
 chinesesimplified.DownloadFailed=下载失败或已取消。安装将继续；OpenLF2 会在首次启动时再次提供下载。
-chinesesimplified.RemoveUserData=是否同时从用户配置文件中删除 OpenLF2 的设置、录像和已下载的游戏数据？
+chinesesimplified.RemoveUserData=是否同时从用户配置文件中删除 Polish Fighters 的设置、录像和已下载的游戏数据？
 
 chinesetraditional.GameData=遊戲資料：
 chinesetraditional.DownloadLF2=立即下載原版小朋友齊打交安裝程式（約 30 MB，遊玩所需；否則 OpenLF2 會在首次啟動時提供下載）
@@ -102,7 +102,7 @@ chinesetraditional.RecordingType=小朋友齊打交錄影檔
 chinesetraditional.Downloading=正在下載小朋友齊打交
 chinesetraditional.DownloadingDesc=正在取得 LF2_v2.0a.exe（以 SHA-256 檢查碼驗證）。
 chinesetraditional.DownloadFailed=下載失敗或已取消。安裝將繼續；OpenLF2 會在首次啟動時再次提供下載。
-chinesetraditional.RemoveUserData=是否同時從使用者設定檔中刪除 OpenLF2 的設定、錄影檔和已下載的遊戲資料？
+chinesetraditional.RemoveUserData=是否同時從使用者設定檔中刪除 Polish Fighters 的設定、錄影檔和已下載的遊戲資料？
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -151,10 +151,10 @@ var
   DownloadPage: TDownloadWizardPage;
   GameDownloaded: Boolean;
 
-// OpenLF2 keeps its configuration, recordings and the game installer in %APPDATA%\OpenLF2.
+// OpenLF2 keeps its configuration, recordings and the game installer in %APPDATA%\PolishFighters.
 function UserDataDir: String;
 begin
-  Result := ExpandConstant('{userappdata}\OpenLF2');
+  Result := ExpandConstant('{userappdata}\PolishFighters');
 end;
 
 function NeedGameData: Boolean;
