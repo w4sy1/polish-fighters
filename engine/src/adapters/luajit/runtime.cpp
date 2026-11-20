@@ -432,7 +432,10 @@ Result<ScriptFrame> decode_frame(lua_State* state, int table, int count) {
                 if (frame.render_filter) throw std::runtime_error("duplicate render filter");
                 frame.render_filter = static_cast<RenderFilter>(reader.integer(0, 2));
                 break;
-            case FrameOpcode::text_input: set_flag(frame.text_input); break;
+            // Text input is a state, not an event: a screen may close itself (text_input false)
+            // after its own per-frame update already set it. The last value wins; failing here
+            // ended the engine with code 1 when POWRÓT or Back left "Konto i pokoje".
+            case FrameOpcode::text_input: frame.text_input = reader.flag(); break;
             case FrameOpcode::replay_drop: set_flag(frame.replay_drop); break;
             case FrameOpcode::fullscreen: set_flag(frame.fullscreen); break;
             case FrameOpcode::text: {

@@ -10,7 +10,7 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Aktualności
 
-**0.18.12 — Android: mody i przycisk Wstecz.** Zainstalowane mody nie są już oznaczane w menu jako [BRAK DANYCH] i można je wybrać w grze. Przycisk Wstecz na ekranie „Konto i pokoje” wraca do menu zamiast zamykać grę. Nazwy źródeł na ekranie Mody nie pokazują już znaku „?”. Zawiera zmiany 0.18.11.
+**0.18.12 — Android: mody i przycisk Wstecz.** Zainstalowane mody nie są już oznaczane w menu jako [BRAK DANYCH] i można je wybrać w grze. POWRÓT i Wstecz na ekranie „Konto i pokoje” wracają do menu zamiast zamykać grę (Windows i Android). Nazwy źródeł na ekranie Mody nie pokazują już znaku „?”. Zawiera zmiany 0.18.11.
 
 **0.18.11 — nowy wygląd ekranu modów na Androidzie.** Ekran „Mody i moduły” ma tło z grafiką gry, dwie kolumny i listę źródeł w karcie z płynnym przewijaniem. Tytuł nie chowa się już pod paskiem stanu. Zawiera poprawki 0.18.10.
 

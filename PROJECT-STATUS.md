@@ -1,7 +1,8 @@
 ## 2026-11-20 — Wydanie 0.18.12: Android, mody i Wstecz (Claude)
 
 - Android: gdy APK kopiuje świeże skrypty do `files/scripts`, `content_directory()` szukał paczek w `files/content-packs`, a leżą w `files/game/content-packs`. Menu MODUŁY oznaczało zainstalowane mody jako [BRAK DANYCH] i nie dało się ich wybrać w grze. Silnik sprawdza teraz także `files/game/content-packs`.
-- Android: Wstecz na ekranie „Konto i pokoje” zamykał całą grę. Po wyłączeniu wpisywania tekstu żaden widok SDL nie miał fokusu i Android kończył aktywność. `OpenLF2Activity.dispatchKeyEvent` przekazuje teraz Wstecz do gry jako Esc.
+- Ekran „Konto i pokoje” (Windows i Android): POWRÓT albo Wstecz/Esc kończył silnik kodem 1. Ekran w tej samej klatce ustawiał `text_input` dwa razy (aktualizacja pola i zamknięcie), a `decode_frame` odrzucał to jako „duplicate frame flag”. `text_input` jest stanem, więc wygrywa ostatnia wartość. Test `tests/online_back_hub_test.lua` przechodzi przez cały hub.
+- Android: Wstecz mógł też zamknąć grę systemowo: po wyłączeniu wpisywania tekstu żaden widok SDL nie miał fokusu i Android kończył aktywność. `OpenLF2Activity.dispatchKeyEvent` przekazuje teraz Wstecz do gry jako Esc.
 - Android, ekran Mody: czcionka przycisków nie ma znaku „—”, więc „Little Fighter Empire — wersje” pokazywało „?”. Przyciski zamieniają pauzy na „-”.
 - Wersja 0.18.12, build 10009. Zawiera 0.18.11.
 
