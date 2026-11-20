@@ -97,6 +97,11 @@ struct ResourceBridge {
             pending_network = std::string{};
             if (operation == "profile") {
                 pending_network = data.network_profile();
+            } else if (operation == "addresses") {
+                // Space-separated IPv4 list for the LAN lobby; empty when none is known.
+                std::string joined;
+                for (const auto& address : local_ipv4_addresses()) joined += (joined.empty() ? "" : " ") + address;
+                pending_network = joined;
             } else if (operation == "relay_join") {
                 // numeric relay IPv4:single-use ticket from the account server's relay-ticket.
                 std::string_view address; std::string ticket;

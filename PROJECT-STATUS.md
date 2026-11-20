@@ -1,3 +1,10 @@
+## 2026-11-20 — Prosty ekran online: IP gospodarza LAN i świeży stan przekaźnika (Claude)
+
+- Gospodarz LAN widzi swoje adresy IPv4 na ekranie oczekiwania i w lobby (`engine.network('addresses')`: Windows `GetAdaptersAddresses`, Android/Linux `SIOCGIFCONF`, bo minSdk 21 nie ma `getifaddrs`). Gospodarz przez przekaźnik (127.0.0.1) ich nie pokazuje.
+- UTWÓRZ POKÓJ (Internet) zawsze pyta serwer o listę przed publikacją. Wcześniej stara flaga `relay` z poprzedniej listy blokowała publikację albo ją przepuszczała.
+- `mod_browser.lua` nie przerywa się na wpisie katalogu bez nazwy lub wersji.
+- Testy: nowy `tests/online_simple_test.lua`, rozszerzony `tests/lan_menu_test.lua`.
+
 ## 2026-11-20 — Lista dalszych poprawek po próbie na Raptorze
 
 - Reinforced pobrany z katalogu GitHub użytkownika działa według jego próby na Raptorze.

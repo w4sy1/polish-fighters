@@ -23,4 +23,5 @@ private:
 Result<std::unique_ptr<NetworkTransport>> make_network_transport() {
     return std::unique_ptr<NetworkTransport>(std::make_unique<BrowserTransport>());
 }
+std::vector<std::string> local_ipv4_addresses() { return {}; }
 }

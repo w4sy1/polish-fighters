@@ -6,7 +6,9 @@
 #include <cstdint>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <vector>
 
 namespace openlf2 {
 enum class NetworkStatus { idle, listening, connecting, connected };
@@ -29,4 +31,6 @@ public:
     }
 };
 Result<std::unique_ptr<NetworkTransport>> make_network_transport();
+// Up, non-loopback IPv4 addresses of this device, so a LAN host can tell the others where to join.
+std::vector<std::string> local_ipv4_addresses();
 }

@@ -240,7 +240,7 @@ openlf2_target(openlf2_adapter_network)
 target_link_libraries(openlf2_engine PRIVATE openlf2_adapter_network)
 target_link_libraries(openlf2_adapter_network PRIVATE openlf2_core)
 if(WIN32)
-    target_link_libraries(openlf2_adapter_network PRIVATE ws2_32)
+    target_link_libraries(openlf2_adapter_network PRIVATE ws2_32 iphlpapi)
 endif()
 
 add_library(openlf2_adapter_download STATIC ${openlf2_download_source})

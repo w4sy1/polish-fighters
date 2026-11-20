@@ -39,6 +39,12 @@ function screen.begin(state, host, address)
             state.message='Wpisz IPv4 gospodarza (np. 192.168.1.82), opcjonalnie :12345.';return
         end
     end
+    state.host_addresses = nil
+    if host and address ~= "127.0.0.1" then
+        -- A LAN host must read its own address to the others; relay hosts listen on loopback.
+        local ok, list = pcall(engine.network, "addresses")
+        if ok and type(list) == "string" and list:match("%d") then state.host_addresses = list:gsub(" ", ", ") end
+    end
     if transport.start(state.session, host, address) then state.page = "waiting"
     else state.message = state.session.error end
     state.started = engine.network_time()
@@ -146,6 +152,9 @@ function screen.draw(state, context)
         font.draw(context,"GOTOWOSC",300,427,4,nil,"center")
         if state.session.slot==0 then font.draw(context,"START",500,427,4,nil,"center") end
         font.gdi(context,state.session.notice or "Gospodarz uruchamia gre. ESC: rozlacz",210,470,0xffffff)
+        if state.host_addresses and state.session.slot==0 then
+            font.gdi(context,"Twoje IP: "..state.host_addresses.."  port "..state.session.port,210,405,0xffdc82)
+        end
     elseif state.page == "waiting" then
         sprite(state.session.host and 10 or 11, 0xec, 0x122)
         sprite(12, 0x142, 0x169)
@@ -168,7 +177,11 @@ function screen.draw(state, context)
     end
     font.gdi(context,state.transport_label..': jeden gospodarz, pozostali dołączają.',30,180,0xffffff)
     if state.page~='lobby' then
-        font.gdi(context,'IP gospodarza: Windows: ipconfig / IPv4; Android: ekran Utwórz pokój.',20,450,0xffffff)
+        if state.page=='waiting' and state.host_addresses then
+            font.gdi(context,'Twoje IP: '..state.host_addresses..'  (podaj je graczom, którzy dołączają)',20,450,0xffdc82)
+        else
+            font.gdi(context,'IP gospodarza: Windows: ipconfig / IPv4; Android: ekran Utwórz pokój.',20,450,0xffffff)
+        end
         font.gdi(context,'Ten sam moduł i wersja gry. Domyślny TCP 12345. Dołącz: IP lub IP:port.',20,470,0xffffff)
         if state.transport_label=='Hotspot Bluetooth / PAN' then
             font.gdi(context,'Najpierw połącz urządzenia przez udostępnianie sieci Bluetooth w systemie.',20,430,0xffdc82)

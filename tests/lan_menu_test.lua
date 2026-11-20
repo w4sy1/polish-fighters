@@ -21,4 +21,23 @@ end
 screen.begin(state,false,'192.168.1.82:23456')
 assert(started.address=='192.168.1.82' and started.port==23456 and state.page=='waiting')
 screen.begin(state,true,'0.0.0.0');assert(started.host and started.address=='0.0.0.0')
-print('PASS LAN: lazy identity, reuse, IPv4/port validation, remote target, wildcard host')
+-- The LAN host sees its own addresses; a relay host (loopback) does not ask for them.
+local real_network=engine.network
+engine.network=function(op) if op=='addresses' then return '192.168.1.82 10.0.0.5' end return real_network(op) end
+screen.begin(state,true,'0.0.0.0');assert(state.host_addresses=='192.168.1.82, 10.0.0.5','LAN host lost its own IP')
+local drawn={}
+local font=require('base/ui/font')
+local gdi=font.gdi
+font.gdi=function(_,text) drawn[#drawn+1]=text end
+local draw_context={viewport=function() end,image=function() end,sprite=function() end,fill=function() end}
+state.session.host,state.session.slot,state.session.peers,state.session.capacity=true,0,{},2
+for _,page in ipairs({'waiting','lobby'}) do
+ state.page=page;drawn={};screen.draw(state,draw_context)
+ assert(table.concat(drawn,'|'):find('192.168.1.82, 10.0.0.5',1,true),'host IP missing on '..page)
+end
+font.gdi=gdi
+screen.begin(state,true,'127.0.0.1');assert(not state.host_addresses,'relay host showed LAN addresses')
+engine.network=function(op) if op=='addresses' then return '' end return real_network(op) end
+screen.begin(state,true,'0.0.0.0');assert(not state.host_addresses)
+engine.network=real_network
+print('PASS LAN: lazy identity, reuse, IPv4/port validation, remote target, wildcard host, host IP shown')
