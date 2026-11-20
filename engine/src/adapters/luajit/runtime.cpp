@@ -1014,10 +1014,10 @@ public:
         // "&n_x_y" a held finger, "?x"/"?w" a renderer/window capability, "~n" a measured fps)
         // or "k", comma-separated virtual-key codes, " m" x,y,button and
         // optionally " p" with the key-down codes, " t" with typed character codes, " g" with
-        // controller button letters, " h" with the touch state and " f" with the scaling modes
+        // controller buttons, " h" with touch state, " v" with touch contacts, and " f" with the scaling modes
         // the renderer offers. The bound covers 256 held keys and 256 key-downs.
         const bool keys = input.starts_with('k');
-        const auto allowed = keys ? std::string_view("0123456789,mptgfjhudlrabcexyswk -:")
+        const auto allowed = keys ? std::string_view("0123456789,mptgfjhudlrabcexyswkv -:")
                                   : std::string_view("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/@_!#%^.?$&~");
         if (input.size() > 4096 || input.substr(keys ? 1 : 0).find_first_not_of(allowed) != std::string_view::npos) {
             return fail(ErrorCode::script, "invalid input action");
