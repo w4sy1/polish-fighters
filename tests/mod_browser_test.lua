@@ -58,3 +58,10 @@ screen.activate(s2,'back',context);assert(s2.hub_mods and not s2.hub_mods.github
 -- Without the native installer (Android), the screen explains where to install.
 engine.mods=function() return nil,'Mods handled by platform' end
 screen.activate(s2,'github',context);assert(not s2.hub_mods.github.busy)
+-- Android: the GitHub button leaves the game loop and asks Java for the native Mods screen.
+local saved,actions={}, {}
+engine.write_settings=function(value) saved=value;return true end
+local android={hub_android=true}
+screen.open(android)
+screen.activate(android,'github',{text_input=function() end,action=function(name) actions[#actions+1]=name end})
+assert(saved.little_fighters_open_android_mods==true and actions[1]=='quit')

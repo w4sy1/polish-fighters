@@ -94,7 +94,13 @@ function screen.activate(state,id,context)
  local s=state.hub_mods
  if id=='back' then
   if s.edit then s.edit=false elseif s.detail then s.detail=nil elseif s.github then s.github=nil else state.hub_mods=nil end
- elseif id=='github' or id=='gh_refresh' then if not (s.github and s.github.busy) then github_start(s) end
+ elseif id=='github' or id=='gh_refresh' then
+  if not (s.github and s.github.busy) then github_start(s) end
+  -- Android installs from its native Mods screen; leave the game loop to open it.
+  if s.github and s.github.status==strings().gh_android and state.hub_android and context.action then
+   local opened,problem=require('polish-fighters/hub').open_android_mods(context)
+   if not opened then s.github.status=strings().gh_failed..tostring(problem or '') end
+  end
  elseif id:sub(1,3)=='gh:' then github_install(s,id:sub(4))
  elseif id=='search' then s.edit=not s.edit
  elseif id=='category' then s.category=s.category%#categories+1;s.page=1

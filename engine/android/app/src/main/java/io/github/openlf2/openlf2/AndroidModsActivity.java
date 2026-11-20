@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 
 /** LF2-styled source browser and file-picker importer for converted packages. */
 public final class AndroidModsActivity extends Activity {
+    static final String RETURN_TO_GAME="return_to_game";
     private static final int PICK_PACKAGE=7301;
     private static final int NAVY=0xff040a41, PANEL=0xff102164, BLUE=0xff4f9bff, TEXT=0xfff4f5ff, MUTED=0xffb6c5d9;
     private final ExecutorService worker=Executors.newSingleThreadExecutor();
@@ -42,7 +43,7 @@ public final class AndroidModsActivity extends Activity {
         ClassicButton install=action("IMPORTUJ PACZKĘ ZIP",this::pickPackage);LinearLayout.LayoutParams installParams=new LinearLayout.LayoutParams(-1,dp(48));installParams.topMargin=dp(4);page.addView(install,installParams);
         TextView sources=body("ŹRÓDŁA MODÓW");sources.setTextColor(BLUE);sources.setTypeface(Typeface.MONOSPACE,Typeface.BOLD);sources.setPadding(dp(4),dp(5),0,0);page.addView(sources,new LinearLayout.LayoutParams(-1,dp(28)));
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(false);rows=new LinearLayout(this);rows.setOrientation(LinearLayout.VERTICAL);scroll.addView(rows);page.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
-        ClassicButton back=action("POWRÓT",this::finish);LinearLayout.LayoutParams backParams=new LinearLayout.LayoutParams(-1,dp(44));backParams.topMargin=dp(5);page.addView(back,backParams);
+        ClassicButton back=action("POWRÓT",this::leave);LinearLayout.LayoutParams backParams=new LinearLayout.LayoutParams(-1,dp(44));backParams.topMargin=dp(5);page.addView(back,backParams);
         setContentView(page);
         showSources();
     }
@@ -172,6 +173,11 @@ public final class AndroidModsActivity extends Activity {
             } catch(Exception error) { runOnUiThread(()->setBusy(false,"Import przerwany: "+safe(error.getMessage()))); }
         });
     }
+    private void leave() {
+        if(getIntent().getBooleanExtra(RETURN_TO_GAME,false)) startActivity(new Intent(this,OpenLF2Activity.class));
+        finish();
+    }
+    @Override public void onBackPressed() { leave(); }
     private void setBusy(boolean busy,String message) { importing=busy;status.setText(message);if(!busy)progress.setIndeterminate(true);progress.setVisibility(busy?View.VISIBLE:View.GONE); }
     private static String safe(String value) { if(value==null)return "nieznany błąd";String text=value.replaceAll("[\\r\\n\\p{Cntrl}]"," ");return text.substring(0,Math.min(text.length(),240)); }
     @Override protected void onDestroy() { worker.shutdownNow();super.onDestroy(); }

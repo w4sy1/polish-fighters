@@ -18,16 +18,19 @@ function hub.title(profile)
  return "Little Fighters"
 end
 local L=require('polish-fighters/menu_locale').text
-function hub.open_android_tools(context)
+local function open_android_screen(context,key)
  local settings,problem=engine.read_settings()
  if problem then return nil,problem end
  settings=type(settings)=='table' and settings or {}
- settings.little_fighters_open_android_tools=true
+ settings[key]=true
  local saved,problem=engine.write_settings(settings)
  if not saved then return nil,problem end
  context.action('quit')
  return true
 end
+function hub.open_android_tools(context) return open_android_screen(context,'little_fighters_open_android_tools') end
+-- Android: the native Mods screen downloads and installs signed mods from Polish Fighters - GitHub.
+function hub.open_android_mods(context) return open_android_screen(context,'little_fighters_open_android_mods') end
 function hub.rows(state,active_profile)
  local mode=state.hub_mode
  local function row(id,key) return {id,(L(key or id))} end

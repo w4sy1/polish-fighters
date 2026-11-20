@@ -163,5 +163,5 @@ with ZipFile(sys.argv[1]) as package:
     if missing:
         raise SystemExit(f"APK is missing license files: {sorted(missing)}")
 PY
-sha256sum "$artifact" > "$artifact.sha256"
+(cd "$(dirname "$artifact")" && sha256sum "$(basename "$artifact")") > "$artifact.sha256"
 echo "Created $artifact"
