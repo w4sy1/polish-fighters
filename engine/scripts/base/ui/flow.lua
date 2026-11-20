@@ -43,7 +43,11 @@ local function hybrid_mode(state)
     if state.active == "characters" or state.active == "battle" or state.active == "championship" then
         return "selection"
     end
+    -- A network game shares only player keys, never taps on menu items: on the shared title
+    -- menu a touch device needs its stick and buttons, or only keyboard players can choose a mode.
+    if state.active == "title" and state.session then return "selection" end
 end
+flow.hybrid_mode = hybrid_mode
 local function screen_state(state)
     return state[state.active]
 end
