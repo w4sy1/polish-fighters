@@ -6,7 +6,9 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Pobranie
 
-**Najnowszy kod jest w domyślnej gałęzi `main`.** [Pełna gra Windows i APK Android na Dysku Google](https://drive.google.com/drive/folders/1vcpOvSZaoTbZmctIKFq1myZqGjtew2jV) — [instrukcja pobierania, łączenia części i sumy kontrolne](tools/distribution/GOOGLE-DOWNLOADS.md). To paczki testowe z 11.11.2026; folder Google ma dostęp właściciela do czasu włączenia udostępniania linkiem.
+**[Pobierz opublikowane wydanie v0.18.5-nick](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.5-nick).** Strona zawiera instalator Windows x64, APK Android ARM64 i pliki z sumami SHA-256. Na Windows zgłoszono błąd startu gry po instalacji.
+
+**Archiwalne pliki testowe.** [Pełna gra Windows i APK Android na Dysku Google](https://drive.google.com/drive/folders/1vcpOvSZaoTbZmctIKFq1myZqGjtew2jV) — [instrukcja pobierania, łączenia części i sumy kontrolne](tools/distribution/GOOGLE-DOWNLOADS.md). To paczki testowe z 11.11.2026; folder Google ma dostęp właściciela do czasu włączenia udostępniania linkiem.
 
 **Starsze wydanie testowe 0.10.0 (2026-11-11): [APK Android i aktualizacja Windows](https://github.com/w4sy1/polish-fighters/releases/tag/fixes-test-2026-11-11).** Wybór pojedynczych modułów i własnej puli, ukrycie powtórzeń LF2, poprawione przejście kampanii, powrót do wyboru modułów oraz ograniczenie samopowielania klonów. [Instrukcja, pliki i wyniki testów](docs/POPRAWKI-0.10-2026-11-11.md). Pełna paczka Windows jest w [poprzednim wydaniu 0.9.0](https://github.com/w4sy1/polish-fighters/releases/tag/mobile-test-2026-11-11); nowy mały ZIP nakłada dziewięć plików Lua. Fizyczny telefon i radio Bluetooth nadal wymagają prób.
 

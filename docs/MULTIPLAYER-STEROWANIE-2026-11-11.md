@@ -1,7 +1,7 @@
 # Multiplayer i sterowanie — lokalny test 2026-11-11
 
 Repozytorium: `C:\Users\01dwa\Documents\Little-Fighter-Work\Polish-Fighters`.
-Gałąź początkowa i końcowa: `codex/local-leumas-combo-guide-2026-11-11`.
+Prace wykonano na jednej gałęzi roboczej.
 Punkt początkowy: `8b7030f296771979489a516459c0545bddc64cb0`, zgodny ze zdalnym HEAD
 w chwili rozpoczęcia. Brak zmian w śledzonych plikach przed zadaniem; dwa zastane ZIP-y
 w `artifacts` zachowano. Po testach zapisano commit `16c5a11` i wypchnięto roboczą gałąź na GitHuba. Nie utworzono release ani wdrożenia.

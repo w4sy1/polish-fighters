@@ -18,10 +18,9 @@ Stan sprawdzony 31.10.2026. To zestaw zadań do kontynuowania prac, nie informac
    Wynik bez tych narzędzi to kod do pobrania i polecenia do uruchomienia lokalnie.
 
 Kod źródłowy ZIP:
-https://github.com/w4sy1/polish-fighters/raw/refs/heads/codex/maps-build-2026-10-30/artifacts/PolishFighters-AndroidStudio-mixed-online-2026-10-31.zip
+https://github.com/w4sy1/polish-fighters/raw/dd5048e0430a25b45794ff833f6bd2397e03825d/artifacts/PolishFighters-AndroidStudio-mixed-online-2026-10-31.zip
 
 Repozytorium: https://github.com/w4sy1/polish-fighters
-Branch: codex/maps-build-2026-10-30
 Ostatni potwierdzony commit: dd5048e0430a25b45794ff833f6bd2397e03825d
 
 ZIP nie zawiera importowanych danych LF2 i modów. Do pracy nad konkretną
@@ -41,7 +40,7 @@ Kontynuuj istniejący projekt Little Fighters / Polish Fighters z załączonego 
 Nie twórz nowej gry od zera. Najpierw sprawdź pliki i raporty, potem wprowadzaj
 rzeczywiste, ograniczone zmiany. Odpowiadaj po polsku.
 
-Źródło: github.com/w4sy1/polish-fighters, branch codex/maps-build-2026-10-30,
+Źródło: github.com/w4sy1/polish-fighters, archiwalne źródła,
 punkt odniesienia dd5048e0430a25b45794ff833f6bd2397e03825d z 31.10.2026.
 Lokalna ścieżka użytkownika to:
 C:\Users\01dwa\Documents\Little-Fighter-Work\Polish-Fighters

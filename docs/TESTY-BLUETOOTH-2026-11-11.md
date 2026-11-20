@@ -40,7 +40,7 @@ Implementacja używa bezpiecznego RFCOMM oraz dwukierunkowego przekaźnika do pr
 
 Nowa funkcja: `BluetoothLobbyActivity.java`, `MobileCodeSettings.java`, dwa pliki testów Androida, `app/build.gradle` i `gradle.properties`; aktualizacja lokalnego skryptu budowy APK, testu kodu Lua i narzędzi weryfikacji paczek. Dokumentacja: ten plik, README, README_PL, ANDROID_STUDIO i centralny PROJECT-STATUS.
 
-Publikowane źródła zawierają także wcześniej lokalne, przetestowane zmiany Heroes/Bluetooth wymagane do odtworzenia aktualnej gry. Nie cofnięto ich i nie nadpisano wcześniejszych paczek. Przed pracą zapisano kopię zmian i plików nieśledzonych w lokalnym katalogu walidacji. Utworzono osobny branch `codex/bluetooth-mobile-test-2026-11-11`. Nie zmieniano produkcyjnego podpisywania, Firebase, identyfikatora aplikacji ani historii Git.
+Publikowane źródła zawierają także wcześniej lokalne, przetestowane zmiany Heroes/Bluetooth wymagane do odtworzenia aktualnej gry. Nie cofnięto ich i nie nadpisano wcześniejszych paczek. Przed pracą zapisano kopię zmian i plików nieśledzonych w lokalnym katalogu walidacji. Utworzono osobną gałąź do testów mobilnych Bluetooth. Nie zmieniano produkcyjnego podpisywania, Firebase, identyfikatora aplikacji ani historii Git.
 
 Wzorce typowych sekretów sprawdzono w 526 plikach tekstowych, a nazwy plików prywatnych w 1925 wpisach istniejących śledzonych ZIP-ów — bez trafień. Publiczny klucz debug do testowych instalacji jest celowym, dotychczasowym elementem repozytorium. Lokalne dane użytkownika i konfiguracje środowiska są wyłączone przez `.gitignore`.
 

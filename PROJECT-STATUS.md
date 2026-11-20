@@ -1,4 +1,9 @@
+## Odbiór wydania Windows i Android
+
+Ostatnie opublikowane wydanie to [v0.18.5-nick](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.5-nick). [PR #6](https://github.com/w4sy1/polish-fighters/pull/6) ma zaliczone [testy CI](https://github.com/w4sy1/polish-fighters/actions/runs/44620392754) i [build Windows x64 oraz Android ARM64](https://github.com/w4sy1/polish-fighters/actions/runs/44620424767) dla `69a1a40`. Odbiór nowego wydania wymaga sprawdzenia startu i rozgrywki z gotowych plików na obu platformach oraz weryfikacji logowania, synchronizacji i importu modów.
+
 ## 2026-11-19 — NTSD 2.4_2.0a w Mod Managerze
+
 
 - Import dla rozpoznanego wydania sprawdza SHA-256 surowego katalogu i 37 plików źródłowych DAT. Wykorzystuje zmierzone wyniki x86 VC80 `sscanf %d` dla 364 wartości. `import-report.json` podaje wydanie, metodę, pliki i liczbę zmian. Inne wydania nadal podlegają standardowej walidacji liczb.
 - Obrazy w plikach DAT importowanych przez Mod Manager mają krótkie odwołania rozwiązywane we własnej przestrzeni zasobów pakietu. Zachowano limity parsera, format manifestów, identyfikatory pakietów i weryfikację plików biblioteki.
@@ -174,8 +179,7 @@ automatycznymi (walidacja URL/SSRF, robots.txt, wznawianie pobierania z Range/ET
 weryfikacja SHA-256, wykrywanie typu archiwum po magic bytes, maszyna stanów
 pause/resume/cancel). Użyto lokalnego serwera HTTPS z samopodpisanym certyfikatem (bez
 żadnego ruchu do internetu). Wynik: Python 97 PASS / 1 SKIP (było 70/1), Lua 70 PASS,
-składnia 145 plików PASS - bez regresji. Brak dostępu push do GitHub w tej sesji
-(organizacja nie ma zainstalowanej aplikacji Claude GitHub dla tego repo) - zmiany
+składnia 145 plików PASS - bez regresji. Brak dostępu push do GitHub w tej sesji. Zmiany
 pozostają lokalnie w klonie roboczym, nie opublikowano niczego.
 
 ## 2026-11-13 — 0.16.0 menu LF2 i importer Androida (wydanie testowe)
@@ -305,7 +309,7 @@ Lokalnie pozostawiono najnowszy pelny folder Windows, ZIP, APK i aktualny silnik
 ---
 # Sterowanie, LAN i płynność — test lokalny 2026-11-11
 
-Gałąź robocza `codex/local-leumas-combo-guide-2026-11-11`. Zmiany źródeł i testów zapisano w commicie `16c5a11` i wypchnięto na roboczą gałąź GitHuba; nie utworzono release. F4/przycisk MENU wraca do modułów; wybór dotykowy 1/2 zachowuje się w ekranie walki i wyborze postaci. Wi‑Fi: host TCP 12345 lub klient po IPv4; Android i Windows wcześniej połączyły się fizycznie, ale końcowy APK nie został ponownie sprawdzony na telefonie. Bluetooth PAN/radio nadal niepotwierdzone.
+Zmiany źródeł i testów zapisano w commicie `16c5a11` i wypchnięto na roboczą gałąź GitHuba; nie utworzono release. F4/przycisk MENU wraca do modułów; wybór dotykowy 1/2 zachowuje się w ekranie walki i wyborze postaci. Wi‑Fi: host TCP 12345 lub klient po IPv4; Android i Windows wcześniej połączyły się fizycznie, ale końcowy APK nie został ponownie sprawdzony na telefonie. Bluetooth PAN/radio nadal niepotwierdzone.
 
 Windowsowy profil zapisano jako WASD + Num7 atak / Num8 blok / Num9 skok, z kopią poprzedniego pliku ustawień poza repozytorium. Ładowanie offline przy rozgrzanym cache: mediana 5,55 → 1,25 s; mikrobenchmark oczekiwania 1 ms: 11,49 → 1,60 ms. Build Windows i Android Gradle PASS; 41 testów Lua, 53 Python (52 PASS/1 SKIP), 27 testów Android PASS. Lint nadal zgłasza 27 błędów/39 ostrzeżeń w generowanych plikach SDL. Końcowa poprawa płynności wymaga próby na prawdziwym telefonie i komputerze; użytkownik nie podłącza telefonu ponownie.
 
@@ -326,7 +330,7 @@ Strona wydania: https://github.com/w4sy1/polish-fighters/releases/tag/guide-upda
 
 # Lokalna 0.11 — Leumas, poradnik i aktualizacje — 2026-11-11
 
-Zmiany na branchu codex/local-leumas-combo-guide-2026-11-11. LeumasEX bez
+Zmiany na gałęzi roboczej. LeumasEX bez
 przywoływania postaci; poradnik 42 kombosów pięciu bohaterów i mecha; Windows
 i Android sprawdzają nowe wydania GitHuba przy starcie. Bez nowej publikacji: użytkownik
 chciał najpierw pomysły. Bieżący raport: docs/LOKALNE-0.11-2026-11-11.md.
