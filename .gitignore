@@ -41,3 +41,5 @@ validation/**
 
 !validation/emulator-0.18.6/
 !validation/emulator-0.18.6/**
+!validation/0.18.12/
+!validation/0.18.12/**
