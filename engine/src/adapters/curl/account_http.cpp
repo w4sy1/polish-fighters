@@ -1,4 +1,5 @@
 #include "openlf2/ports/download.hpp"
+#include "letsencrypt_roots.hpp"
 #include <curl/curl.h>
 #include <memory>
 #include <string>
@@ -70,19 +71,37 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
     if(!ca_bundle)return fail(ErrorCode::dependency,"Android CA certificates unavailable");
     curl_blob certificates{const_cast<char*>(ca_bundle->data()),ca_bundle->size(),CURL_BLOB_NOCOPY};
     curl_easy_setopt(handle.get(),CURLOPT_CAINFO_BLOB,&certificates);
+#elif defined(_WIN32)
+    // The Windows store is used as well (CURLSSLOPT_NATIVE_CA below); these roots cover PCs
+    // whose store was never filled with ISRG Root X1, the root of the project's server.
+    curl_blob certificates{const_cast<char*>(letsencrypt_roots_pem),sizeof(letsencrypt_roots_pem)-1,CURL_BLOB_NOCOPY};
+    curl_easy_setopt(handle.get(),CURLOPT_CAINFO_BLOB,&certificates);
 #endif
+    // Like the update check and the mod downloads; without it OpenSSL on Windows trusts no root
+    // at all and every account request failed.
+#if (defined(_WIN32) || defined(__APPLE__)) && defined(CURLSSLOPT_NATIVE_CA)
+    curl_easy_setopt(handle.get(),CURLOPT_SSL_OPTIONS,static_cast<long>(CURLSSLOPT_NATIVE_CA));
+#endif
+    char error_text[CURL_ERROR_SIZE]{};
+    curl_easy_setopt(handle.get(),CURLOPT_ERRORBUFFER,error_text);
     curl_easy_setopt(handle.get(),CURLOPT_URL,endpoint.c_str());
     curl_easy_setopt(handle.get(),CURLOPT_HTTPHEADER,headers.get());
     curl_easy_setopt(handle.get(),CURLOPT_POST,1L);
     curl_easy_setopt(handle.get(),CURLOPT_POSTFIELDS,body.data());
     curl_easy_setopt(handle.get(),CURLOPT_POSTFIELDSIZE,static_cast<long>(body.size()));
-    curl_easy_setopt(handle.get(),CURLOPT_CONNECTTIMEOUT,3L);
-    curl_easy_setopt(handle.get(),CURLOPT_TIMEOUT,10L);
+    // Shared hosting may start the service on the first request after a quiet period.
+    curl_easy_setopt(handle.get(),CURLOPT_CONNECTTIMEOUT,10L);
+    curl_easy_setopt(handle.get(),CURLOPT_TIMEOUT,25L);
     curl_easy_setopt(handle.get(),CURLOPT_NOSIGNAL,1L);
     curl_easy_setopt(handle.get(),CURLOPT_FOLLOWLOCATION,0L);
     curl_easy_setopt(handle.get(),CURLOPT_WRITEFUNCTION,receive);
     curl_easy_setopt(handle.get(),CURLOPT_WRITEDATA,&response);
-    if(curl_easy_perform(handle.get())!=CURLE_OK)return fail(ErrorCode::io,"Account request failed or timed out");
+    if(const auto code=curl_easy_perform(handle.get());code!=CURLE_OK){
+        // The reason is shown to the player, so a report says whether it was DNS, TLS or a timeout.
+        std::string reason=error_text[0]?std::string(error_text):std::string(curl_easy_strerror(code));
+        if(reason.size()>160)reason.resize(160);
+        return fail(ErrorCode::io,"Account request failed ("+std::to_string(static_cast<int>(code))+"): "+reason);
+    }
     long status=0;curl_easy_getinfo(handle.get(),CURLINFO_RESPONSE_CODE,&status);
     if(status<200 || status>=500)return fail(ErrorCode::io,"Account server unavailable");
     return response;

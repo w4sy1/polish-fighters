@@ -150,7 +150,7 @@ return function(base)
     end
    end
   end
-  if previous and previous~=state.hub_hover and state.hub_hover then sounds.direct(state,'pass') end
+  -- No sound on hover: data/m_pass.wav is LF2's stage-clear jingle, and packs map it to music.
   if mapped.nav.cancel and state.hub_mode~='root' then
    if state.hub_mode=='packs' then state.hub_pack_edit=nil;state.hub_mode='library'
    elseif state.hub_mode=='status' then state.hub_note=locale.text('audit_note')

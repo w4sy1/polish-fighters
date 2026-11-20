@@ -59,4 +59,18 @@ assert(client.pending and wire.payload.nick==true and wire.payload.name=='kuba_7
 assert(wire.payload.nick_key==string.rep('k',43))
 response={token=string.rep('m',32),name='kuba_7',nick_key=string.rep('k',43)};client.tick()
 screen.activate(state,'back',context);assert(typing==false and state.hub_online==nil)
+-- POWRÓT clicked while Escape (Android Back, or F4 turned into Escape) arrives in the same frame:
+-- the screen closes once and the frame must not touch it again (0.18.9 crashed here).
+local escape=27
+screen.open(state);frame({})
+local back
+for _,row in ipairs(screen.rows(state.hub_online)) do if row[1]=='back' then back=row end end
+frame({click=true,pointer_x=back[3]+5,pointer_y=back[4]+5,keys={[escape]=true}})
+assert(state.hub_online==nil,'POWRÓT did not close the online screen')
+screen.activate(state,'back',context)
+-- A failed request names the host's reason in Polish instead of a bare "failed or timed out".
+client.token=nil;client.pending=nil
+engine.account=function(action) if action=='start' then return true end return nil,'Account request failed (60): SSL certificate problem' end
+assert(client.request('https://accounts.example','login',{nick=true,name='kuba'}));client.tick()
+assert(client.notice:find('Brak połączenia z serwerem kont',1,true) and client.notice:find('SSL certificate',1,true),client.notice)
 print('PASS: actual account response state, origin binding, room list, publish, logout, nick play and no persisted credentials')

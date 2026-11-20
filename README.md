@@ -6,9 +6,11 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Pobranie
 
-**[Pobierz Polish Fighters 0.18.9](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.9).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
+**[Pobierz Polish Fighters 0.18.10](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.10).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
 
 ## Aktualności
+
+**0.18.10 — poprawki gry przez internet i menu.** Na Windowsie działa logowanie nickiem i kontem (gra nie ufała certyfikatowi serwera). Przycisk POWRÓT w „Graj przez internet” nie zamyka już gry. Najechanie myszą na opcję w menu nie odtwarza już utworu z paczki. Przy błędzie połączenia ekran pokazuje jego przyczynę.
 
 **0.18.9 — menu komend drużynowych.** W trakcie walki otwórz dymek i wybierz ATTACK, STAY, COME lub DEFEND. Na Windowsie użyj myszy lub klawisza V do otwarcia, jeśli V jest wolny. Na Androidzie dymek jest nad przyciskami Hybrid Control. Klasyczne sekwencje klawiszy komend zostały usunięte.
 

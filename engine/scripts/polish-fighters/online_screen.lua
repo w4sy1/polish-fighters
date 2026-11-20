@@ -48,6 +48,7 @@ function screen.rows(s)
 end
 function screen.activate(state,id,context)
  local s=state.hub_online
+ if not s then return end
  if id:sub(1,6)=='field:' then s.focus=id:sub(7);return end
  s.focus=nil
  if id=='accounts' then s.accounts=true;return elseif id=='nickmode' then s.accounts=nil;s.password='';return end
@@ -126,10 +127,11 @@ function screen.update(state,input,context)
  local mapped=navigation.apply(s.nav,input,{page='online:'..tostring(client.token~=nil),targets=targets,default=1})
  for index,box in ipairs(targets) do
   if mapped.click and mapped.pointer_x>=box.left and mapped.pointer_x<=box.right and mapped.pointer_y>=box.top and mapped.pointer_y<=box.bottom then
-   screen.activate(state,rows[index][1],context);break
+   -- POWRÓT and LAN close the screen; a cancel in the same frame must not act on it again.
+   screen.activate(state,rows[index][1],context);return
   end
  end
- if mapped.nav.cancel then screen.activate(state,'back',context) end
+ if mapped.nav.cancel and state.hub_online then screen.activate(state,'back',context) end
 end
 function screen.draw(state,context)
  context.viewport(794,550,8,13,27);context.image('pe/menu_back1',0,0,true)

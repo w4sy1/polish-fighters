@@ -1,3 +1,10 @@
+## 2026-11-20 — Wydanie 0.18.10: zgłoszenia graczy (Claude)
+
+- Windows: `account_post` nie ustawiał `CURLSSLOPT_NATIVE_CA`, więc OpenSSL nie ufał żadnemu certyfikatowi i każde logowanie (nick, konto, rejestracja) kończyło się „Account request failed or timed out”. Teraz używa magazynu Windows oraz wbudowanych ISRG Root X1 i X2 (`letsencrypt_roots.hpp`, odciski SHA-256 w nagłówku). Limity czasu 10 s i 25 s. Błąd zawiera kod i opis z libcurl.
+- Ekran „Konto i pokoje”: kliknięcie POWRÓT razem z Esc lub Wstecz w tej samej klatce indeksowało zamknięty ekran (`online_screen.lua:52`) i zamykało grę. Test w `tests/online_client_test.lua`.
+- Hub: najechanie na opcję odtwarzało `data/m_pass.wav`, czyli dżingiel zaliczenia etapu. Paczki mapują go na długie utwory (DBZ 1,8 MB, One Piece 1,35 MB), więc gracz słyszał muzykę od nowa. Najechanie jest teraz ciche, jak w menu LF2.
+- Wersja 0.18.10, build 10007.
+
 ## 2026-11-20 — Wydanie 0.18.8 (Claude)
 
 - [Publiczne wydanie v0.18.8](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.8) jest oznaczone jako najnowsze. Tag wskazuje commit `9c86332` (wersja 0.18.8, build 10005). Wydanie ma instalator Windows x64, APK Android ARM64 i x86_64 oraz sumy SHA-256.

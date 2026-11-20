@@ -62,7 +62,10 @@ function client.tick()
  local raw,problem=engine.account('poll')
  if raw=='pending' then return end
  local pending=client.pending;client.pending=nil
- if not raw then client.notice=tostring(problem);return end
+ if not raw then
+  -- The host's reason (DNS, TLS, timeout) stays visible, so a screenshot is enough to diagnose.
+  client.notice=('Brak połączenia z serwerem kont: '..tostring(problem)):sub(1,150);return
+ end
  local result;result,problem=engine.json_decode(raw)
  if type(result)~='table' then client.notice='Nieprawidłowa odpowiedź serwera.';return end
  if result.error then
