@@ -5,6 +5,7 @@
 - Android: Wstecz mógł też zamknąć grę systemowo: po wyłączeniu wpisywania tekstu żaden widok SDL nie miał fokusu i Android kończył aktywność. `OpenLF2Activity.dispatchKeyEvent` przekazuje teraz Wstecz do gry jako Esc.
 - Android, ekran Mody: czcionka przycisków nie ma znaku „—”, więc „Little Fighter Empire — wersje” pokazywało „?”. Przyciski zamieniają pauzy na „-”.
 - Android: moduł wybrany w menu gry nie był zapamiętywany. Przy następnym starcie `GamePackSettings` czytał stary `little_fighters_start_profile`. Hub zapisuje teraz wybór na Androidzie, a desktop bez zmian (test w `tests/classic_menu_test.lua`).
+- Gra przez internet Windows ↔ Android: instalator Windows ma skrypty Lua z CRLF, APK z LF, a tożsamość sieciowa była liczona z surowego tekstu. Gracz z Androida był rozłączany zaraz po wejściu do pokoju z Windows („Drugi uczestnik rozłączył się”). Tożsamość pomija teraz znaki CR.
 - Wersja 0.18.12, build 10009. Zawiera 0.18.11.
 
 ## 2026-11-20 — Wydanie 0.18.11: ekran modów Android (Claude)

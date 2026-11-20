@@ -1033,6 +1033,9 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     if (cached_profile) return *cached_profile;
     const auto started = std::chrono::steady_clock::now();
     auto identity = sources + (config.jit ? "\nJIT=1" : "\nJIT=0") + "\nENGINE=" + OPENLF2_ENGINE_SIGNATURE;
+    // The Windows installer ships the Lua scripts with CRLF (checked out on Windows), the APK with
+    // LF. The same game must match across platforms, so line endings are not part of the identity.
+    std::erase(identity, '\r');
     // Equal scripts are not enough: imported fighters/maps may carry different data.
     for (const auto& asset : scripts->assets) {
         auto bytes = resources.read(asset.resource);
