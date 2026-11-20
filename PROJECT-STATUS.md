@@ -1,3 +1,10 @@
+## 2026-11-20 — Wydanie 0.18.7 Hybrid Control
+
+- Kod w `main` i tagu `v0.18.7-hybrid` pochodzi z commita `523b1a6`.
+- [Publiczne wydanie v0.18.7-hybrid](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.7-hybrid) jest oznaczone jako najnowsze. Ma instalator Windows x64, APK Android ARM64 i x86_64, sumy SHA-256 oraz dwa PNG.
+- [GitHub Actions](https://github.com/w4sy1/polish-fighters/actions/runs/44725115384) zakończył trzy pełne kompilacje. Sprawdzono zgodność sum SHA-256, zawartość i podpisy APK oraz publiczne adresy pobrań.
+- Testy na fizycznym Androidzie pozostają otwarte.
+
 ## 2026-11-20 — Hybrid Control Android
 
 - Gałąź robocza `feature/android-hybrid-control`. Przed zmianami stan `main` był czysty. Usunięto `ui/touch_gamepad.lua`, `ui/hud_editor.lua`, dźwięk podglądu ataku, dawny wybór układu Androida, stare kontrolki w menu i bufor zapisujący wyłącznie przytrzymane palce. Konfiguracja gry usuwa stare klucze podczas zapisu ustawień.
