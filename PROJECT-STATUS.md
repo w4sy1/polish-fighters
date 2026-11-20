@@ -4,6 +4,7 @@
 - Ekran „Konto i pokoje” (Windows i Android): POWRÓT albo Wstecz/Esc kończył silnik kodem 1. Ekran w tej samej klatce ustawiał `text_input` dwa razy (aktualizacja pola i zamknięcie), a `decode_frame` odrzucał to jako „duplicate frame flag”. `text_input` jest stanem, więc wygrywa ostatnia wartość. Test `tests/online_back_hub_test.lua` przechodzi przez cały hub.
 - Android: Wstecz mógł też zamknąć grę systemowo: po wyłączeniu wpisywania tekstu żaden widok SDL nie miał fokusu i Android kończył aktywność. `OpenLF2Activity.dispatchKeyEvent` przekazuje teraz Wstecz do gry jako Esc.
 - Android, ekran Mody: czcionka przycisków nie ma znaku „—”, więc „Little Fighter Empire — wersje” pokazywało „?”. Przyciski zamieniają pauzy na „-”.
+- Android: moduł wybrany w menu gry nie był zapamiętywany. Przy następnym starcie `GamePackSettings` czytał stary `little_fighters_start_profile`. Hub zapisuje teraz wybór na Androidzie, a desktop bez zmian (test w `tests/classic_menu_test.lua`).
 - Wersja 0.18.12, build 10009. Zawiera 0.18.11.
 
 ## 2026-11-20 — Wydanie 0.18.11: ekran modów Android (Claude)

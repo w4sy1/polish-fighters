@@ -19,6 +19,11 @@ return function(base)
   state.hub_selected=selected;state.hub_note=problem
   return state
  end
+ -- Android starts the game with the module saved by GamePackSettings (same settings file);
+ -- without this a module picked in the menu was replaced by the old one on the next start.
+ local function remember_android_profile(state,doc,tag)
+  if state.hub_android then doc.little_fighters_start_profile=(tag=='mixed' and 'all' or tag) end
+ end
  local function activate(state,id,context)
   state.hub_note=nil;state.message=nil
   if id=='battle' or id=='settings' or id=='online' or id=='credits' or id=='language' or id=='status' then
@@ -75,6 +80,7 @@ return function(base)
     local doc,problem=engine.read_settings()
     if problem then state.hub_note=tostring(problem);return end
     doc=type(doc)=='table' and doc or {};doc.little_fighters_pending_mode=state.hub_pending_mode
+    remember_android_profile(state,doc,tag)
     local saved,problem=engine.write_settings(doc)
     if not saved then state.hub_note=tostring(problem);return end
     context.action(id)
@@ -88,6 +94,7 @@ return function(base)
       if problem then state.hub_note=tostring(problem);return end
       doc=type(doc)=='table' and doc or {}
       doc.little_fighters_pending_mode=state.hub_pending_mode
+      remember_android_profile(state,doc,tag)
       local saved,problem=engine.write_settings(doc)
       if not saved then state.hub_note=tostring(problem);return end
       context.action(id)

@@ -59,6 +59,11 @@ state.hub_mode='root';click('online');click('unavailable');assert(state.hub_note
 state.hub_mode='root';click('credits');back();assert(state.hub_mode=='root')
 -- A profile reload carries the requested mode once, without another thirteen-choice menu.
 state.hub_preselected=false;state.hub_mode='battle';click('mode_stage');state.hub_selected=nil;click('profile_dbz');assert(requested=='profile_dbz' and document.little_fighters_pending_mode=='stage')
+-- Desktop keeps its start profile; Android stores the choice for its next start (GamePackSettings).
+assert(document.little_fighters_start_profile==nil,'desktop wrote the Android start profile')
+state.hub_android=true;state.hub_preselected=false;state.hub_mode='battle';click('mode_stage');state.hub_selected=nil
+click('profile_dbz');assert(document.little_fighters_start_profile=='dbz','Android forgot the chosen module')
+state.hub_android=nil
 local flow=dofile(arg[1]..'/engine/scripts/polish-fighters/hub_flow.lua')({create=function() return {launch={}} end})
 local fresh=flow.create({profile_start=true});assert(fresh.launch.hub_mode=='players' and fresh.launch.hub_pending_mode=='stage' and document.little_fighters_pending_mode==nil)
 -- Every target stays inside the fixed viewport and contains no overlapping button.
