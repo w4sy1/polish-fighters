@@ -6,9 +6,11 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Pobranie
 
-**[Pobierz Polish Fighters 0.18.12](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.12).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
+**[Pobierz Polish Fighters 0.18.13](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.13).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
 
 ## Aktualności
+
+**0.18.13 — płynniejsza gra przez internet.** Mecz sieciowy nie liczy już co klatkę kosztownej sumy kontrolnej, więc telefony nie spowalniają rozgrywki. Gospodarz szybciej przekazuje ruchy przez serwer pośredniczący. Pokój znika z listy po wyjściu z lobby przez POWRÓT, a lista pokazuje nick gospodarza. Aktualizacja Windows usuwa stare pliki skryptów. Zawiera zmiany 0.18.12.
 
 **0.18.12 — Android: mody i przycisk Wstecz.** Zainstalowane mody nie są już oznaczane w menu jako [BRAK DANYCH] i można je wybrać w grze. Wybrany moduł zostaje po ponownym uruchomieniu. Gracze z Windows i Androida mogą grać w jednym pokoju przez internet. POWRÓT i Wstecz na ekranie „Konto i pokoje” wracają do menu zamiast zamykać grę (Windows i Android). Zawiera zmiany 0.18.11.
 

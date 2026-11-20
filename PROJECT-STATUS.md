@@ -1,3 +1,12 @@
+## 2026-11-20 — Wydanie 0.18.13: gra sieciowa i pokoje online (Claude)
+
+- Mecz Windows ↔ Android w LAN (emulator `PolishFighters_Mod_QA`, 10.0.2.2): po starcie wspólnego ekranu wejście działa po obu stronach (W/S/A/D i Num7 na Windows, dotyk na Androidzie), wybór postaci, Przygoda i Pojedynek z komputerami przebiegają zsynchronizowanie. Symulacja nie stała. W 0.18.12 testowano Enter, J i S, a atak na Windows to Num7.
+- Lagi przez internet: `flow.lua` liczył pełną sumę kontrolną stanu w każdej klatce, choć pokój wysyła ją co 30 klatek. Teraz tylko wtedy (`room_network.checksum_due`). Przekaźnik `tools/room_relay.py` ustawia TCP_NODELAY (Nagle + opóźnione ACK dawały paczki co ok. 200 ms) — wymaga ponownego uruchomienia `install-relay.sh` na serwerze przekaźnika. Gospodarz odpytuje mostek przekaźnika przed i po `RoomHost::poll`.
+- Martwe pokoje: POWRÓT (F4) w lobby zeruje `state.network`; `online_flow.lua` zleca wtedy `delete-room`, wyłącza heartbeat i kanał przekaźnika. W trakcie meczu ogłoszenie zostaje. Test `tests/online_dead_room_test.lua`.
+- Lista pokojów pokazuje nick gospodarza („nick: nazwa / moduł”). Gra publikuje nazwę z nickiem; `account_service.py` w repo zwraca też `owner` (serwera nie wdrażano).
+- Instalator Windows: `[InstallDelete]` dla `{app}\scripts`.
+- Wersja 0.18.13, build 10010. Zawiera 0.18.12.
+
 ## 2026-11-20 — Wydanie 0.18.12: Android, mody i Wstecz (Claude)
 
 - Android: gdy APK kopiuje świeże skrypty do `files/scripts`, `content_directory()` szukał paczek w `files/content-packs`, a leżą w `files/game/content-packs`. Menu MODUŁY oznaczało zainstalowane mody jako [BRAK DANYCH] i nie dało się ich wybrać w grze. Silnik sprawdza teraz także `files/game/content-packs`.
