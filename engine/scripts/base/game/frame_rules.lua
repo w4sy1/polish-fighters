@@ -202,42 +202,4 @@ function frame_rules.before_advance(state, index, value)
     end
 end
 
--- A living player's last four key presses can command their team (defend=9, jump=0, attack=5):
--- defend-jump-defend-jump spawns an order marker (record 998, +/-40px); four defends makes the
--- team follow; defend-attack-defend-attack cancels that.
-function frame_rules.team_orders(state, index, value)
-    if index >= 10 or value.hp <= 0 or value.record.kind ~= record_kinds.character then return end
-    local h = value.key_history
-    local code = constants.team_order_codes.none
-    if h[2] == constants.key_history_codes.defend then
-        if h[3] == constants.key_history_codes.jump and h[4] == constants.key_history_codes.defend
-           and h[5] == constants.key_history_codes.jump then code = constants.team_order_codes.move_to_marker end
-        if h[3] == constants.key_history_codes.defend and h[4] == constants.key_history_codes.defend
-           and h[5] == constants.key_history_codes.defend then code = constants.team_order_codes.follow end
-        if h[3] == constants.key_history_codes.attack and h[4] == constants.key_history_codes.defend
-           and h[5] == constants.key_history_codes.attack then code = constants.team_order_codes.cancel_follow end
-    end
-    if code == constants.team_order_codes.none then return end
-    value.key_history = {0, 0, 0, 0, 0}
-    local slot = objects.free_slot(state)
-    if slot == -1 or not objects.record(state, constants.record_ids.team_order_marker) then return end
-    local marker = objects.place(state, slot, constants.record_ids.team_order_marker)
-    marker.x_int, marker.y_int, marker.z_int = value.x_int, 0, value.z_int
-    marker.frame = code - constants.team_order_codes.move_to_marker
-    marker.z, marker.y, marker.x = marker.z_int, marker.y_int, marker.x_int
-    marker.vx, marker.vy = 0.0, 0.0
-    for other = 0, constants.item_slots - 1 do
-        local member = state.items[other]
-        if member and member.hp > 0 and member.record.kind == record_kinds.character and member.team == value.team then
-            if code == constants.team_order_codes.move_to_marker then
-                member.order_x = random(81) - 40 + marker.x_int
-                member.order_z = random(81) - 40 + marker.z_int
-            elseif code == constants.team_order_codes.follow then
-                member.follow_order = 1
-            else
-                member.follow_order = 0
-            end
-        end
-    end
-end
 return frame_rules

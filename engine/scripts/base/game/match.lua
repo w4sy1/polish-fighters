@@ -582,7 +582,6 @@ after_advance = function(state, index, value)
     end
     -- Without a spawn, destroyed weapons burst; otherwise players' key codes give team orders.
     if not objects.spawn_from_frame(state, index, value) and not weapons.break_apart(state, index, value) then
-        frame_rules.team_orders(state, index, value)
     end
     objects.state_effects(state, index, value)
     value.state_frame = value.frame

@@ -10,7 +10,6 @@ local sequence_second_pressed = constants.combo_states.second_pressed
 local facing_left = constants.facings.left
 local facing_right = constants.facings.right
 local fusion_merged = constants.fusion_states.merged
-local input_history_length = constants.input.history_length
 local input_press_frames = constants.input.press_frames
 local input_run_double_tap_frames = constants.input.run_double_tap_frames
 local record_kinds = constants.record_kinds
@@ -424,7 +423,6 @@ end
 local key_press = {right = "right_press", left = "left_press", up = "up_press", down = "down_press",
     defend = "defend_press", jump = "jump_press", attack = "attack_press"}
 local press_order = {"right", "left", "up", "down", "defend", "jump", "attack"}
-local key_codes = constants.key_history_codes
 
 function control.step(match, value)
     for _, field in ipairs(press_fields) do
@@ -434,9 +432,6 @@ function control.step(match, value)
     for _, key in ipairs(press_order) do
         if not value.previous_keys[key] and value.keys[key] then
             value[key_press[key]] = input_press_frames
-            local history = value.key_history
-            table.remove(history, 1)
-            history[input_history_length] = key_codes[key]
         end
     end
     local attack_frame

@@ -17,6 +17,9 @@ local unlock = require("base/game/unlock")
 local user_options = require("base/game/options")
 local hybrid = require("base/ui/hybrid_input")
 local hybrid_hud = require("base/ui/hybrid_hud")
+local hybrid_layout = require("base/ui/hybrid_layout")
+local command_menu = require("base/ui/team_command_menu")
+local command_hud = require("base/ui/team_command_hud")
 local quit_dialog = require("base/ui/quit_dialog")
 local flow = {}
 local function screen_module(name)
@@ -315,6 +318,7 @@ function flow.draw(state, context)
     if hybrid_mode(state) and state.hybrid.geometry then
         hybrid_hud.draw(context, state.hybrid.geometry, state.hybrid)
     end
+    if hybrid_mode(state) == "match" then command_hud.draw(context, state.command_menu) end
     local status = recording.status_text()
     if status then font.gdi(context, i18n.clip(status, 128), 3, 0x213, recording.status_color())
     elseif state.volume_text then font.gdi(context, state.volume_text, 3, 0x213, 0x00ff00) end
@@ -381,7 +385,8 @@ end
 -- raw: the host's input; screens get it per player slot, with the last known pointer position
 -- and `click`, a fresh press of the left button.
 function flow.update(state, raw, context)
-    local input = controls.read(controls.current(), raw)
+    local bindings = controls.current()
+    local input = controls.read(bindings, raw)
     -- Local navigation must work even while a network frame is waiting for its peer.
     input.click = input.button and not state.previous_button
     input.pointer_x = input.pointer_x or state.pointer_x
@@ -421,6 +426,41 @@ function flow.update(state, raw, context)
             touch.touches = input.button and input.pointer_x and input.pointer_y and {{id = 0, x = input.pointer_x, y = input.pointer_y}} or {}
         end
     end
+    local touch_menu = state.options.touch_device or input.touch_active or state.options.mouse_touch
+    local menu_state = state.command_menu or {owned = {}}
+    state.command_menu = menu_state
+    if menu_state.match ~= current_match then
+        menu_state.match, menu_state.open, menu_state.pending = current_match, false, nil
+        menu_state.progress = 0
+    end
+    local enabled = mode == "match" and player and player.hp > 0 and player.team > 0
+    local geometry = touch_menu and hybrid_layout.geometry(state.hybrid.settings, input.screen or hybrid_layout.screen)
+    local layout = enabled and command_menu.layout(input.screen, touch_menu, geometry)
+    local v, escape = false, false
+    for _, code in ipairs(input.presses or {}) do
+        if code == 86 and not menu_state.v_down then v = true end
+        if code == virtual_keys.escape then escape = true end
+    end
+    menu_state.v_down = input.keys[86]
+    local escape_down = input.keys[virtual_keys.escape]
+    escape = escape or escape_down and not menu_state.escape_down
+    if v then
+        for _, set in ipairs(bindings.sets) do
+            if set.device == constants.input_devices.keyboard then
+                for _, code in ipairs(set.keys) do if code == 86 then v = false end end
+            end
+        end
+    end
+    if command_menu.update(menu_state, input, enabled, layout, v and not touch_menu, escape,
+        touch_menu and touch) then menu_state.eat_escape = true end
+    if menu_state.eat_escape then
+        input.keys[virtual_keys.escape] = nil
+        for i = #(input.presses or {}), 1, -1 do
+            if input.presses[i] == virtual_keys.escape then table.remove(input.presses, i) end
+        end
+        if not escape_down then menu_state.eat_escape = nil end
+    end
+    menu_state.escape_down = escape_down
     state.hybrid.text = input.filters and input.filters.text
     local waiting = state.session and (state.session.pending or state.session.waiting)
     local delay = state.session and state.session.delay or 0
@@ -443,6 +483,18 @@ function flow.update(state, raw, context)
         end
         input[0]=require('base/game/campaign_advance').input(state.auto_advance_driver,
             state.match.match,input[0],shown_options.auto_advance)
+    end
+    if raw:sub(1, 1) == "k" then
+        for slot = 0, 7 do
+            local keys = input[slot]
+            if keys:find("u", 1, true) and keys:find("d", 1, true)
+                and keys:find("l", 1, true) and keys:find("r", 1, true) then
+                input[slot] = keys:gsub("[udlr]", "")
+            end
+        end
+    end
+    if (sample or state.session and state.session.room) and menu_state.pending and (not waiting or state.session.room) then
+        input[0], menu_state.pending = menu_state.pending, nil
     end
     if state.session then
         unlock.observe(input)

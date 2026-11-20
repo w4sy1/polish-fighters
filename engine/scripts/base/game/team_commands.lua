@@ -1,6 +1,8 @@
 -- Commands travel as reserved combinations of existing LF2 input bits. This
 -- keeps room transport and recordings deterministic without a second channel.
 local constants=require('base/game/constants')
+local objects=require('base/game/objects')
+local sounds=require('base/game/sounds')
 local commands={signals={come='udlrc',stay='udlrb',attack='udlrf',defend='udlrcb'}}
 function commands.decode(keys)
  for _,d in ipairs({'u','d','l','r'}) do if not keys:find(d,1,true) then return nil end end
@@ -13,6 +15,12 @@ end
 function commands.issue(state,slot,command)
  local owner=state.items[slot]
  if not owner or owner.hp<=0 or owner.record.kind~=0 or owner.team<=0 or owner.team==constants.teams.enemies then return end
+ -- Classic COME used frame 2 of the order marker, whose next frame carries the
+ -- shared voice. Read its resource in the active pack without spawning a marker.
+ if command=='come' and state.records then
+  local marker=objects.record(state,constants.record_ids.team_order_marker)
+  if marker then sounds.item(state,owner.x_int,marker.frame(3).sound) end
+ end
  for i,v in pairs(state.items) do
   if i~=slot and not v.human and v.hp>0 and v.record.kind==0 and v.team==owner.team then
    v.team_command=command;v.team_command_owner=slot

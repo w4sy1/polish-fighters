@@ -7,7 +7,6 @@ local combo_right_attack = constants.combo_indices.right_attack
 local sequence_idle = constants.combo_states.idle
 local facing_right = constants.facings.right
 local fusion_unmerged = constants.fusion_states.unmerged
-local input_history_length = constants.input.history_length
 local item_slots = constants.item_slots
 local no_order = constants.no_order
 local nobody_near = constants.nobody_near
@@ -57,7 +56,6 @@ function item.create(record)
         frame_at_pass = 0, state_frame = 0, sparks = {}, hit_this_frame = false,
         kills = 0, damage_dealt = 0, pickings = 0,
         order_x = no_order, order_z = no_order, follow_order = 0, last_target = -1,
-        key_history = {},
         chase_target = -1, thrower = -1, regen_timer = 0, heal_timer = 0,
         catching = 0, caught_by = 0, catch_timer = 0, transformed_to = -1,
         -- Stage entries: lives (+0x30c), and the hp/lives with which a beaten enemy joins the
@@ -68,7 +66,6 @@ function item.create(record)
     for index = combo_right_attack, combo_jump_attack do
         new.sequences[index] = sequence_idle
     end
-    for index = 1, input_history_length do new.key_history[index] = 0 end
     for _, key in ipairs(keys) do
         new.keys[key] = false
         new.previous_keys[key] = false

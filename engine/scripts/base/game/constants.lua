@@ -119,22 +119,6 @@ return {
         controller_three = 3,
         controller_four = 4,
     },
-    -- Key-history codes used by control.lua and the team-order recognizer (not virtual keys).
-    key_history_codes = {
-        jump = 0,
-        down = 2,
-        left = 4,
-        attack = 5,
-        right = 6,
-        up = 8,
-        defend = 9,
-    },
-    team_order_codes = {
-        none = 0,
-        move_to_marker = 100,
-        follow = 102,
-        cancel_follow = 104,
-    },
     -- Shared options-panel rows; background selects a stage level in Stage mode.
     match_option_rows = {
         start = 0,
@@ -176,7 +160,6 @@ return {
     },
     input = {
         press_frames = 5,
-        history_length = 5,
         run_double_tap_frames = 10,
         defend_lock_frames = 3,
     },

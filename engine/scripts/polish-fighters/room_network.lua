@@ -115,7 +115,7 @@ return function(legacy)
   if back and not s.observed_back then s.queued_back=true end
   s.observed_back=back
   for _,action in ipairs({'c','b','f'}) do
-   local held=(input[0] or ''):find(action,1,true)~=nil
+   local held=not command and (input[0] or ''):find(action,1,true)~=nil
    if held and not s.observed_actions[action] then
     s.queued_actions[action]=true;s.queued_action_directions=(input[0] or ''):gsub('[^udlr]','')
    end
