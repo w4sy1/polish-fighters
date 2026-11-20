@@ -114,5 +114,6 @@ Invoke-Checked $iscc @('/Qp', "/DAppVersion=$version", "/DArch=$Architecture", "
     "/DOutputBase=$installerBase", (Join-Path $root 'dist/windows/openlf2.iss'))
 $installer = Join-Path $root "out/$installerBase.exe"
 $hash = (Get-FileHash -Algorithm SHA256 $installer).Hash.ToLowerInvariant()
-Set-Content -Path "$installer.sha256" -Value "$hash  $(Split-Path -Leaf $installer)"
+# LF line ending and the bare file name, so `sha256sum -c` works on every system.
+[IO.File]::WriteAllText("$installer.sha256", "$hash  $(Split-Path -Leaf $installer)`n")
 Write-Host "Created $installer"
