@@ -4,6 +4,9 @@
 // Downloads and installs signed content packs listed in the Polish Fighters GitHub catalogue.
 // Trust chain: Ed25519 catalogue signature -> envelope size and SHA-256 -> manifest signature
 // -> package.zip SHA-256. Nothing from the archive is executed while installing it.
+#if defined(_WIN32) && !defined(NOMINMAX)
+#define NOMINMAX // curl.h pulls in windows.h; keep std::min/std::max usable.
+#endif
 #include "openlf2/ports/github_mods.hpp"
 #include "openlf2/core/json.hpp"
 #include <algorithm>
