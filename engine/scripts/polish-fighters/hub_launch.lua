@@ -46,6 +46,8 @@ return function(base)
    local ok,problem=model.save({room_capacity=value})
    if not ok then state.hub_note=tostring(problem) end
   elseif id=='information' then state.hub_mode=id
+  elseif id=='discord' then context.action('open_discord')
+  elseif id=='report_bug' then context.action('report_bug')
   elseif id=='check_android_update' then context.action(id)
   elseif id=='battle' or id=='settings' or id=='credits' or id=='language' or id=='status' then
    state.hub_mode=id
@@ -299,8 +301,10 @@ return function(base)
    if not version or version=='' then version=require('polish-fighters/updates').version end
    text(context,'ZAINSTALOWANA WERSJA '..version,397,252,variants.yellow,'center')
   elseif state.hub_mode=='credits' then
-   text(context,locale.text('credit_text'),397,235,variants.white,'center')
-   text(context,locale.text('credit_packs'),397,280,variants.white,'center')
+   -- Rows (Discord / Zgłoś błąd / Wstecz) occupy y=207..286 (layout.box, 3 rows); the credits
+   -- text sits below them so the two don't overlap.
+   text(context,locale.text('credit_text'),397,300,variants.white,'center')
+   text(context,locale.text('credit_packs'),397,330,variants.white,'center')
   elseif state.hub_mode=='online' then text(context,locale.text('offline'),397,416,variants.yellow,'center')
   elseif state.hub_mode=='library' then text(context,locale.text('absent_turbo'),397,479,variants.yellow,'center')
   elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,variants.yellow,'center')

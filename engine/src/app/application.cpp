@@ -1592,12 +1592,15 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
             }
             if (action == "open_website" || action == "open_original_website"
                 || action == "open_recording_help" || action == "open_special_moves"
-                || action == "open_marti_website" || action == "open_starsky_website") {
+                || action == "open_marti_website" || action == "open_starsky_website"
+                || action == "open_discord" || action == "report_bug") {
                 const auto url = action == "open_recording_help" ? "https://lf2.net/record/record.html"
                     : action == "open_special_moves" ? "https://lf2.net/control.html"
                     : action == "open_marti_website" ? "http://martiwong.com"
                     : action == "open_starsky_website" ? "https://lf2.net/starsky"
                     : action == "open_original_website" ? "https://lf2.net/"
+                    : action == "open_discord" ? "https://discord.gg/ypuFkbuyj"
+                    : action == "report_bug" ? "mailto:prestigetechkoszalin@gmail.com?subject=Polish%20Fighters%20-%20zg%C5%82oszenie%20b%C5%82%C4%99du"
                     : "https://openlf2.github.io/OpenLF2/";
                 auto shown = platform->open_url(url);
                 if (!shown) std::cerr << "Website: " << shown.error().message << '\n';
