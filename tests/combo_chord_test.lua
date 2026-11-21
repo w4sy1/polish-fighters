@@ -232,4 +232,24 @@ rapid.y_int = -1
 press(rapid, {jump = true, attack = true})
 assert(rapid.frame == character_frames.jump_attack, "ordinary airborne JUMP+ATTACK regressed")
 
-print("PASS: host keyboard/gamepad frames, touch contact streams, rapid attack/block and reversal, and ordinary jump attack")
+-- The AI completes sideways jump specials directly (ai.lua) without holding Defend.
+-- A block it started earlier during an attack must not cancel that decision.
+local combo_right_jump = constants.combo_indices.right_jump
+local combo_complete = constants.combo_states.complete
+local function ai_sideways_jump(block_in_attack)
+    local value = item.create(record)
+    if block_in_attack then
+        value.frame = 300
+        press(value, {defend = true})
+        assert(value.attack_block, "attack-cancel block was not recorded")
+        for _ = 1, 8 do press(value, {}) end
+    end
+    value.frame = character_frames.defend
+    value.sequences[combo_right_jump] = combo_complete
+    press(value, {})
+    return value.frame
+end
+assert(ai_sideways_jump(false) == 310, "AI sideways jump special did not execute")
+assert(ai_sideways_jump(true) == 310, "an earlier attack-cancel block suppressed the AI sideways jump special")
+
+print("PASS: host keyboard/gamepad frames, touch contact streams, rapid attack/block and reversal, ordinary jump attack and AI sideways jump")
