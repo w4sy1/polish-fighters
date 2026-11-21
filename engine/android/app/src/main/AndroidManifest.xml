@@ -36,5 +36,8 @@
         <activity android:name=".BluetoothLobbyActivity" android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode" />
+        <activity android:name=".BluetoothPairingActivity" android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode" />
     </application>
 </manifest>
