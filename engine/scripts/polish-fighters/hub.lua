@@ -24,6 +24,7 @@ hub.optional_profiles={
  {id="ce_lf2", profile="ce-lf2", title="CE LF2"},
  {id="ntsd_community", profile="ntsd-community", title="NTSD Community"},
  {id="ntsd_ce_setup", profile="ntsd-ce-setup", title="NTSD CE"},
+ {id="killer_lf2", profile="killer-lf2", title="Killer LF2", campaign=false},
 }
 function hub.title(profile)
  if profile=='mixed-all' then return 'Polish Fighters: wszystkie mody' end
@@ -53,8 +54,11 @@ function hub.rows(state,active_profile)
   return {row('library','modules'),row('battle','play_main'),row('online'),row('settings'),row('guide'),row('language'),row('credits'),row('quit')}
  elseif mode=='profile' or mode=='battle' then
   local rows={}
-  for _,id in ipairs({'versus','stage','championship','team_championship','battle_setup','demo','replay'}) do rows[#rows+1]=row('mode_'..id,id) end
-  rows[#rows+1]={'resume_campaign','WZNOW KAMPANIE / RESUME'}
+  local campaign=(mode=='battle' and not state.hub_preselected) or require('base/game/catalog').stage_path~=false
+  for _,id in ipairs({'versus','stage','championship','team_championship','battle_setup','demo','replay'}) do
+   rows[#rows+1]=(id=='stage' and not campaign) and row('campaign_unavailable') or row('mode_'..id,id)
+  end
+  if campaign then rows[#rows+1]={'resume_campaign','WZNOW KAMPANIE / RESUME'} end
   rows[#rows+1]={'training','TRENING / TRAINING'}
   rows[#rows+1]=row('root','back');return rows
  elseif mode=='status' then

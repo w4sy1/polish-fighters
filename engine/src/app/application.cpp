@@ -148,7 +148,8 @@ constexpr std::array profile_definitions{
     ProfileDefinition{"profile_wlf2_al", "wlf2-al"},
     ProfileDefinition{"profile_ce_lf2", "ce-lf2"},
     ProfileDefinition{"profile_ntsd_community", "ntsd-community"},
-    ProfileDefinition{"profile_ntsd_ce_setup", "ntsd-ce-setup"}};
+    ProfileDefinition{"profile_ntsd_ce_setup", "ntsd-ce-setup"},
+    ProfileDefinition{"profile_killer_lf2", "killer-lf2"}};
 struct ProfileRequest { std::string directory; std::vector<std::string> remaining_trace; };
 std::filesystem::path content_directory(const Configuration& config) {
     // Android stages fresh Lua modules in files/scripts while the unpacked game

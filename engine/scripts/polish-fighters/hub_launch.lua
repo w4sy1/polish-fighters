@@ -37,6 +37,7 @@ return function(base)
   elseif id:sub(1,7)=='status_' then
    local item=require('polish-fighters/module_inventory')[id:sub(8)]
    state.hub_note=locale.text('assets')..item.assets..' / '..locale.text('missing_files')..item.missing
+  elseif id=='campaign_unavailable' then state.hub_note=locale.text('campaign_unavailable')
   elseif id=='resume_campaign' then
    local saved,problem=require('base/game/campaign_save').options(catalog.profile_id)
    if saved then context.action(id) else state.hub_note=tostring(problem) end
@@ -97,6 +98,9 @@ return function(base)
    end
    for _,entry in ipairs(profiles) do
     if entry.id==tag then
+     if entry.campaign==false and state.hub_pending_mode=='stage' then
+      state.hub_note=locale.text('campaign_unavailable');return
+     end
      if catalog.profile_id==entry.profile then state.hub_preselected=true;state.hub_mode=state.hub_pending_mode and 'players' or 'profile'
      else
       local doc,problem=engine.read_settings()

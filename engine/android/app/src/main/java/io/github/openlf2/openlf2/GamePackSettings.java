@@ -56,6 +56,7 @@ final class GamePackSettings {
             case "ce_lf2": return "CE LF2";
             case "ntsd_community": return "NTSD Community";
             case "ntsd_ce_setup": return "NTSD CE";
+            case "killer_lf2": return "Killer LF2";
             default: return null;
         }
     }

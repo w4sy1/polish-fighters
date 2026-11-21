@@ -52,10 +52,17 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
    if relative:
     if relative in files:raise ValueError('Case-colliding resource: '+relative)
     files[relative]=path
- catalog_bytes=files['data/data.txt'].read_bytes()
+ catalog_path='data/data.txt'
+ if pack_id=='killer-lf2' and catalog_path not in files:
+  catalog_path='data/dat.noes.bak'
+ catalog_bytes=files[catalog_path].read_bytes()
  catalog=catalog_bytes.decode('latin1').replace('\r\n','\n').replace('\r','\n')
  catalog_sha256=hashlib.sha256(catalog.encode('latin1')).hexdigest()
  source_hash=hashlib.sha256(catalog_bytes).hexdigest()
+ killer=pack_id=='killer-lf2' and source_hash=='fc0ac2c8da23df91e83c20ce82981a51cb6cdfbe585cba53144175da79e20c46'
+ if catalog_path!='data/data.txt' and not killer:raise ValueError('Unknown Killer LF2 backup catalogue')
+ no_campaign=killer and 'data/stage.dat' not in files
+ if killer:from normalize_ntsd_vc80 import FIELD,normalize
  repair=CATALOG_ID_REPAIRS.get(pack_id)
  if repair and source_hash!=repair[0]:repair=None
  source_decode=decode_ce_lf2 if repair and pack_id=='ce-lf2' else decode
@@ -63,6 +70,7 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
  id_repair=None
  normalization=None
  normalized_files=[]
+ killer_repairs=[]
  if managed_import:
   from normalize_ntsd_vc80 import import_profile, normalize
   normalization=import_profile(source_hash,files)
@@ -102,7 +110,8 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   path=resolve(path)
   if path not in mapping:mapping[path]=f'a/{len(mapping):06d}'+Path(path).suffix
   return prefix+mapping[path]
- queue=[p for _,_,p in records]+[p for _,p in bgs]+['data/stage.dat']
+ queue=[p for _,_,p in records]+[p for _,p in bgs]
+ if not no_campaign:queue.append('data/stage.dat')
  # Copy fixed/menu sounds too, so legacy menu/combat audio can be redirected.
  queue += [p for p in files if re.fullmatch(r'data/(?:\d{3}|m_[a-z]+)\.wav',p)]
  converted={};missing=set();fighters=[];disabled_sounds=[]
@@ -118,6 +127,12 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
      raise ValueError('NTSD source DAT changed during import: '+path)
     text,fields=normalize(text,normalization[2])
     normalized_files.append({'path':path,'fields_changed':len(fields)})
+   if killer:
+    # killer.exe's static %d scanner accumulates and stores the low 32 bits.
+    values={field[2]:(int(field[2])+2**31)%2**32-2**31 for field in FIELD.finditer(text)
+            if not -2**31<=int(field[2])<2**31}
+    text,fields=normalize(text,values)
+    if fields:killer_repairs.append({'path':path,'fields':fields})
    def replace(match):
     # The native frame reader recognizes the exact token sound:, not #sound:.
     # Keep disabled author annotations without inventing an asset dependency.
@@ -177,11 +192,15 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   for c in campaigns:
    campaign_lua+=' {id='+str(c['id'])+',name='+json.dumps(c['name'],ensure_ascii=False)+',path='+json.dumps(c['path'])+',start_id='+str(c['start_id'])+((',background='+str(c['background'])) if c['background'] is not None else '')+',requires_custom_unlock='+str(c['requires_custom_unlock']).lower()+'},\n'
   campaign_lua+=' }\n' if campaigns else ''
-  if not campaigns:campaign_lua=''
-  (destination/'catalog.lua').write_text('return function(base)\n base.source_path="'+register('data/data.txt')+'"\n base.stage_path="'+register('data/stage.dat')+'"\n base.profile_id="'+pack_id+'"'+campaign_lua+'\n return base\nend\n')
+  if not campaigns:campaign_lua='\n base.campaigns={}' if no_campaign else ''
+  stage_path='false' if no_campaign else json.dumps(register('data/stage.dat'))
+  (destination/'catalog.lua').write_text('return function(base)\n base.source_path="'+register('data/data.txt')+'"\n base.stage_path='+stage_path+'\n base.profile_id="'+pack_id+'"'+campaign_lua+'\n return base\nend\n')
   sound_paths={p:register(p) for p in converted if p.endswith('.wav')}
   (destination/'sounds.lua').write_text('return function(base)\n local paths={\n'+''.join(' ["'+k+'"]="'+v+'",\n' for k,v in sorted(sound_paths.items()))+' }\n for k,v in pairs(base.fixed_files) do base.fixed_files[k]=paths[v] or v end\n for k,v in pairs(base.menu) do base.menu[k]=paths[v] or v end\n return base\nend\n')
   report={'pack_id':pack_id,'fighters':fighters,'objects':len(records),'backgrounds':len(bgs),'assets':len(converted),'source_catalog_sha256':catalog_sha256,'mode':'isolated, original IDs retained','executable_patches_emulated':False,'gameplay_verified':False,'png_aliases':aliases,'catalog_markers_not_emulated':markers,'custom_catalog_labels':custom_labels,'missing_resources':sorted(missing),'experimental':True}
+  if killer:
+   report['campaign_available']=not no_campaign
+   report['killer_integer_normalization']=killer_repairs
   if id_repair:
    report['mode']='isolated, one conflicting object ID reassigned'
    report['catalog_id_repair']=id_repair
