@@ -6,7 +6,7 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Pobranie
 
-**[Pobierz Polish Fighters 0.18.13](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.13).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
+**[Pobierz Polish Fighters 0.18.14](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.14).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
 
 ## Aktualności
 

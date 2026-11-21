@@ -1,3 +1,10 @@
+## 2026-11-21 — Wydanie 0.18.14: sterowanie, lista ruchów, Tiger, poprawka AI (Claude)
+
+- Wersja 0.18.14, build 10017 (wyżej niż testowe raptor.4–6 na telefonie, więc instaluje się jako aktualizacja).
+- BLOCK + JUMP: zwolniony blok z ataku nie odpala skoku w bok (6cbf24d, 113f112). AI znowu robi D>J / D<J po bloku w ataku (PR #11).
+- Hybrid Control: przycisk S+ i do 3 stron skrótów, lista ruchów z danych postaci, poradnik sterowania przy pierwszym starcie i w pauzie (684369c).
+- Klasyczny TCP: znacznik `q` nie psuje już bajtu klawiszy (496d7c7). Tiger: skróty Genkidama i dalszy ryk (af46f8a).
+
 ## 2026-11-20 — Prosty ekran online: IP gospodarza LAN i świeży stan przekaźnika (Claude)
 
 - Gospodarz LAN widzi swoje adresy IPv4 na ekranie oczekiwania i w lobby (`engine.network('addresses')`: Windows `GetAdaptersAddresses`, Android/Linux `SIOCGIFCONF`, bo minSdk 21 nie ma `getifaddrs`). Gospodarz przez przekaźnik (127.0.0.1) ich nie pokazuje.
