@@ -28,10 +28,8 @@ click('guide');assert(state.hub_classic and state.pf_panel=='combo-guide')
 state.hub_classic=nil;state.pf_panel=nil
 click('battle');assert(#hub.rows(state)==10)
 for _,mode in ipairs({'versus','stage','championship','team_championship','battle_setup'}) do
- state.hub_preselected=false;state.hub_mode='battle';click('mode_'..mode);assert(state.hub_mode=='library' and state.hub_pending_mode==mode)
- click('profile_lf_two');assert(state.hub_mode=='players')
- click('controls');assert(state.hub_edit);require('polish-fighters/input_settings').activate(state,'cancel')
- click('start_mode');assert(requested==(mode=='battle_setup' and 'battle' or mode));back();assert(state.hub_mode=='library');back();assert(state.hub_mode=='battle')
+ state.hub_preselected=false;state.hub_mode='battle';click('mode_'..mode)
+ assert(requested==(mode=='battle_setup' and 'battle' or mode) and state.hub_mode=='battle')
 end
 state.hub_mode='battle';click('mode_demo');assert(requested=='demo');click('mode_replay');assert(requested=='replay')
 state.hub_mode='root';click('language');click('lang_en');assert(locale.id()=='en' and hub.rows({hub_mode='root'})[1][2]=='MODULES' and hub.rows({hub_mode='root'})[2][2]=='PLAY')
@@ -61,18 +59,29 @@ local online=require('polish-fighters/online_screen')
 local actions={}
 for _,row in ipairs(online.rows(state.hub_online)) do actions[row[1]]=true end
 assert(actions.publish and actions.find and not actions.refresh and not actions.accounts)
-assert(actions['local'],'LAN must be available on the same screen')
+assert(not actions['local'],'LAN must be separate from Internet rooms')
 online.activate(state,'back',context);assert(not state.hub_online)
 state.hub_mode='root';click('credits');back();assert(state.hub_mode=='root')
--- A profile reload carries the requested mode once, without another thirteen-choice menu.
-state.hub_preselected=false;state.hub_mode='battle';click('mode_stage');state.hub_selected=nil;click('profile_dbz');assert(requested=='profile_dbz' and document.little_fighters_pending_mode=='stage')
--- Desktop keeps its start profile; Android stores the choice for its next start (GamePackSettings).
-assert(document.little_fighters_start_profile==nil,'desktop wrote the Android start profile')
-state.hub_android=true;state.hub_preselected=false;state.hub_mode='battle';click('mode_stage');state.hub_selected=nil
-click('profile_dbz');assert(document.little_fighters_start_profile=='dbz','Android forgot the chosen module')
+state.hub_mode='root';click('settings');click('lan')
+assert(state.hub_online.lan)
+online.activate(state,'back',context)
+click('information');assert(state.hub_mode=='information')
+back();assert(state.hub_mode=='settings')
+state.hub_mode='library';state.hub_selected=nil;click('profile_dbz')
+assert(requested=='profile_dbz' and document.little_fighters_start_profile==nil)
+state.hub_android=true;click('profile_dbz')
+assert(document.little_fighters_start_profile=='dbz','Android forgot the chosen module')
 state.hub_android=nil
-local flow=dofile(arg[1]..'/engine/scripts/polish-fighters/hub_flow.lua')({create=function() return {launch={}} end})
-local fresh=flow.create({profile_start=true});assert(fresh.launch.hub_mode=='players' and fresh.launch.hub_pending_mode=='stage' and document.little_fighters_pending_mode==nil)
+local flow=dofile(arg[1]..'/engine/scripts/polish-fighters/hub_flow.lua')({create=function() return {launch={page='menu'}} end})
+document.controls_guide_seen=true
+local fresh=flow.create({profiles_available=true})
+assert(fresh.launch.hub_current_controls and not fresh.launch.pf_panel)
+fresh.launch.hub_navigation=state.hub_navigation
+shell.update(fresh.launch,{keys={[27]=true},gamepad={}},context)
+assert(fresh.launch.hub_current_controls and not document.current_controls_seen)
+shell.update(fresh.launch,{keys={},gamepad={},pointer_x=397,pointer_y=369,click=true},context)
+assert(not fresh.launch.hub_current_controls and document.current_controls_seen)
+assert(not flow.create({profiles_available=true}).launch.hub_current_controls)
 -- Every target stays inside the fixed viewport and contains no overlapping button.
 for _,mode in ipairs({'root','battle','library','packs','players','settings','online','language','credits','status'}) do
  state.hub_mode=mode;state.hub_pack_edit={};local rows=hub.rows(state)

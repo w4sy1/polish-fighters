@@ -27,6 +27,21 @@ function screen.selection_hint(touch,slot)
  return {who..' | RUCH '..screen.key_label(set.keys[1])..' / '..screen.key_label(set.keys[2])..' / '..screen.key_label(set.keys[3])..' / '..screen.key_label(set.keys[4]),
   'ATAK / OK '..screen.key_label(set.keys[5])..' | SKOK / WSTECZ '..screen.key_label(set.keys[6])..' | BLOK '..screen.key_label(set.keys[7])}
 end
+function screen.current_lines(touch)
+ if not touch then return screen.selection_hint(false,0) end
+ local layout=require('base/ui/hybrid_layout')
+ local shown=require('base/game/options').current().hybrid.controls
+ local movement={}
+ for _,name in ipairs({'stick','left','up','right','down'}) do
+  if shown[name].enabled then movement[#movement+1]=layout.labels[name] end
+ end
+ local buttons={}
+ for _,name in ipairs({'attack','defend','jump','s1','s2','s3','skills'}) do
+  if shown[name].enabled then buttons[#buttons+1]=layout.labels[name] end
+ end
+ return {'RUCH: '..(#movement>0 and table.concat(movement,' / ') or 'WYŁĄCZONY'),
+  'PRZYCISKI: '..(#buttons>0 and table.concat(buttons,' / ') or 'WYŁĄCZONE')}
+end
 function screen.shared_keys(state)
  local set=state.hub_edit.sets[state.hub_player];local shared={}
  if set.device~=0 then return shared end

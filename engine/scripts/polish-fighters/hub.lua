@@ -51,9 +51,12 @@ function hub.rows(state,active_profile)
   rows[#rows+1]={'unavailable',L('absent_turbo')};rows[#rows+1]=row('library','back');return rows
  elseif mode=='settings' then
   local rows={row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'}}
+  rows[#rows+1]={'lan','GRA W SIECI LOKALNEJ'}
+  rows[#rows+1]={'information','INFORMACJE'}
   if state.hub_android then rows[#rows+1]={'android_tools','ANDROID / BLUETOOTH'} end
   rows[#rows+1]=row('root','back')
   return rows
+ elseif mode=='information' then return {row('settings','back')}
  elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
  elseif mode=='credits' then return {row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}

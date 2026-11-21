@@ -29,6 +29,10 @@ return function(base)
   if id=='online' then
    if catalog.profile_id=='mixed-all' then state.hub_note='Do gry w sieci wybierz samodzielny moduł.'
    else online.open(state,true) end
+  elseif id=='lan' then
+   if catalog.profile_id=='mixed-all' then state.hub_note='Do gry w sieci wybierz samodzielny moduł.'
+   else online.open(state,true,true) end
+  elseif id=='information' then state.hub_mode=id
   elseif id=='battle' or id=='settings' or id=='credits' or id=='language' or id=='status' then
    state.hub_mode=id
   elseif id:sub(1,5)=='lang_' then
@@ -50,8 +54,7 @@ return function(base)
   elseif id=='mods' then mods.open(state,context)
   elseif id:sub(1,5)=='mode_' then
    local mode=id:sub(6)
-   if mode=='demo' or mode=='replay' then context.action(mode)
-   else state.hub_pending_mode=mode;state.hub_mode=state.hub_preselected and 'players' or 'library' end
+   context.action(mode=='battle_setup' and 'battle' or mode)
   elseif id=='start_mode' then context.action(state.hub_pending_mode=='battle_setup' and 'battle' or state.hub_pending_mode or 'versus')
   elseif id=="packs" then
    local hide,problem=packs.hide_duplicates()
@@ -134,21 +137,32 @@ return function(base)
    if input.button or input.keys[13] or pad.a or pad.s then return end
    state.hub_wait_release=nil
   end
+  if state.hub_current_controls then
+   state.hub_controls_nav=state.hub_controls_nav or nav.create()
+   local button=nav.target(332,350,462,387)
+   local mapped=nav.apply(state.hub_controls_nav,input,{page='current-controls',targets={button},default=1,autofocus=true})
+   if mapped.click and mapped.pointer_x>=button.left and mapped.pointer_x<=button.right
+    and mapped.pointer_y>=button.top and mapped.pointer_y<=button.bottom then
+    local saved,problem=engine.read_settings()
+    if not problem then
+     saved=type(saved)=='table' and saved or {}
+     saved.current_controls_seen=true
+     local ok
+     ok,problem=engine.write_settings(saved)
+     if not ok and not problem then problem='Błąd zapisu' end
+    end
+    state.hub_current_controls,state.hub_controls_nav=nil,nil
+    state.hub_wait_release=true
+    if problem then state.hub_note=locale.text('save_error')..tostring(problem) end
+   end
+   return
+  end
   if state.hub_edit then return input_settings.update(state,input) end
   if state.hub_online then return online.update(state,input,context) end
   if state.hub_mods then return mods.update(state,input,context) end
   if state.page~="menu" then return update(state,input,context) end
   if state.hub_classic then
    update(state,input,context)
-   if state.hub_intro_guide and not state.pf_message then
-    state.hub_intro_guide,state.pf_panel,state.pf_root_panel=nil,nil,nil
-    local saved,problem=engine.read_settings()
-    if not problem then
-     saved=type(saved)=='table' and saved or {}
-     saved.controls_guide_seen=true
-     engine.write_settings(saved)
-    end
-   end
    if not state.pf_panel then state.hub_classic=nil end
    return
   end
@@ -172,7 +186,8 @@ return function(base)
   end
   -- No sound on hover: data/m_pass.wav is LF2's stage-clear jingle, and packs map it to music.
   if mapped.nav.cancel and state.hub_mode~='root' then
-   if state.hub_mode=='packs' then state.hub_pack_edit=nil;state.hub_mode='library'
+   if state.hub_mode=='information' then state.hub_mode='settings'
+   elseif state.hub_mode=='packs' then state.hub_pack_edit=nil;state.hub_mode='library'
    elseif state.hub_mode=='status' then state.hub_note=locale.text('audit_note')
   elseif state.hub_mode=='players' then state.hub_mode='library'
    elseif state.hub_mode=='library' and state.hub_pending_mode then state.hub_mode='battle'
@@ -200,6 +215,7 @@ return function(base)
   context.sprite('pe/menu_clip',{0,41,434,80},155,96,true)
   context.sprite('pe/menu_clip',{434,41,62,68},589,96,true)
   local heading=state.hub_edit and locale.text('controls') or
+   (state.hub_mode=='information' and 'INFORMACJE') or
    locale.text(({root='battle',profile='battle',library='modules',packs='modules',players='players'})[state.hub_mode] or state.hub_mode or 'battle')
   if state.hub_mode~='root' and not state.hub_edit then text(context,heading,397,181,variants.blue,'center') end
   if state.hub_edit then
@@ -233,7 +249,9 @@ return function(base)
    text(context,id:upper(),x+math.floor(w/2),y+4,locale.id()==id and variants.white or variants.blue,'center')
   end
   text(context,locale.text('active')..hub.title(catalog.profile_id),16,492,variants.yellow)
-  if state.hub_mode=='credits' then
+  if state.hub_mode=='information' then
+   text(context,'ZAINSTALOWANA WERSJA '..require('polish-fighters/updates').version,397,252,variants.yellow,'center')
+  elseif state.hub_mode=='credits' then
    text(context,locale.text('credit_text'),397,235,variants.white,'center')
    text(context,locale.text('credit_packs'),397,280,variants.white,'center')
   elseif state.hub_mode=='online' then text(context,locale.text('offline'),397,416,variants.yellow,'center')
@@ -250,6 +268,18 @@ return function(base)
  function base.draw(state,context)
   draw_menu(state,context)
   if state.hub_enabled and state.page=="menu" then
+   if state.hub_current_controls then
+    if context.fill then
+     context.fill(163,225,468,175,98,181,239,255)
+     context.fill(165,227,464,171,16,27,77,255)
+     context.fill(332,350,130,37,20,42,82,255)
+    end
+    text(context,'AKTUALNE STEROWANIE',397,246,variants.white,'center')
+    for i,line in ipairs(input_settings.current_lines(state.hub_android)) do
+     text(context,line,397,278+(i-1)*28,variants.blue,'center')
+    end
+    text(context,'OK',397,359,variants.white,'center')
+   end
    local x,y=state.hub_pointer_x,state.hub_pointer_y
    if x and y and x>=0 and x<794 and y>=0 and y<550 then
     context.image("pe/lf2_cursor",math.min(x,775),math.min(y+2,535),true)

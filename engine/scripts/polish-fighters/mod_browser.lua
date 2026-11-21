@@ -164,15 +164,21 @@ function screen.update(state,input,context)
  s.previous={};for k,v in pairs(keys) do s.previous[k]=v end
  local rows=screen.rows(s);local targets={}
  for _,row in ipairs(rows) do targets[#targets+1]=navigation.target(row[3],row[4],row[3]+row[5],row[4]+row[6]) end
- local mapped=navigation.apply(s.nav,input,{page='mods:'..s.page..':'..s.category..':'..tostring(s.detail and s.detail.id)..(s.github and ':gh' or ''),targets=targets,default=1})
+ local mapped=navigation.apply(s.nav,input,{page='mods:'..s.page..':'..s.category..':'..tostring(s.detail and s.detail.id)..(s.github and ':gh' or ''),targets=targets,default=1,remember=true})
+ s.hover=nil
  for index,box in ipairs(targets) do
-  if mapped.click and mapped.pointer_x>=box.left and mapped.pointer_x<=box.right and mapped.pointer_y>=box.top and mapped.pointer_y<=box.bottom then screen.activate(state,rows[index][1],context);break end
+  if mapped.pointer_x and mapped.pointer_y and mapped.pointer_x>=box.left and mapped.pointer_x<=box.right and mapped.pointer_y>=box.top and mapped.pointer_y<=box.bottom then
+   s.hover=rows[index][1]
+   if mapped.click then screen.activate(state,s.hover,context);return end
+   break
+  end
  end
  if state.hub_mods and mapped.nav.cancel then screen.activate(state,'back',context) end
 end
 function screen.draw(state,context)
  local s=state.hub_mods;local w=strings()
- context.viewport(794,550,4,10,65);context.image('pe/menu_back1',0,0,true);context.fill(0,0,794,550,4,10,65,210)
+ context.viewport(794,550,16,32,108)
+ context.image('pe/menu_back'..(state.background or 0),0,0,true)
  local function text(value,x,y,size,color,align) context.text(value,x,y,align or 'left',size,color or 0xf4f5ff,nil,nil,true) end
  text(s.github and w.gh_title or w.title,397,24,24,nil,'center')
  if s.github then
@@ -200,9 +206,9 @@ function screen.draw(state,context)
   if #filtered==0 then text(w.empty,397,220,16,nil,'center') end
  end
  for _,row in ipairs(screen.rows(s)) do
-  context.fill(row[3],row[4],row[5],row[6],122,157,255)
-  context.fill(row[3]+2,row[4]+2,row[5]-4,row[6]-4,16,33,100)
-  text(row[2],row[3]+10,row[4]+7,14)
+  local selected=row[1]==s.hover
+  if selected then context.fill(row[3],row[4],row[5],row[6],20,42,82,220) end
+  text(row[2],row[3]+10,row[4]+7,14,selected and 0xf4f5ff or 0x62b5ef)
  end
  if s.edit then text(w.search_hint,30,521,12,0xffdc82) end
 end

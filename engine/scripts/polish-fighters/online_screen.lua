@@ -5,17 +5,15 @@ local navigation=require('base/ui/navigation')
 local screen={}
 -- The project's own account and relay server; any other server can still be typed in.
 screen.default_server='https://www.projektocalenie.pl/projekty/polish-fighters/api'
-function screen.open(state,simple)
+function screen.open(state,simple,lan)
  local doc=engine.read_settings() or {}
  state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server:match('%S') and doc.account_server or screen.default_server),
   name='',password='',room='Pokój Polish Fighters',nick=type(doc.online_nick)=='string' and doc.online_nick:sub(1,24) or '',host='127.0.0.1',port='12345',
-  page=1,nav=navigation.create(),previous={},simple=simple,lan=false}
+  page=1,nav=navigation.create(),previous={},simple=simple,lan=lan==true,address=''}
  if simple then client.notice='' end
 end
 local function simple_rows(s)
  local rows={
-  {'internet','INTERNET'..(s.lan and '' or ' [X]'),40,100,340,34},
-  {'local','LAN / HOTSPOT'..(s.lan and ' [X]' or ''),414,100,340,34},
   {'publish','UTWÓRZ POKÓJ',40,153,340,45},
   {'find','DOŁĄCZ',414,153,340,45},
  }
@@ -156,11 +154,6 @@ local function activate_simple(state,s,id,context)
  if id=='back' then
   if context.text_input then context.text_input(false) end
   cancel_simple(s);state.hub_online=nil
- elseif id=='local' or id=='internet' then
-  if s.lan~=(id=='local') then
-   cancel_simple(s)
-   s.lan=id=='local';s.address=s.address or '';s.page=1;client.notice=''
-  end
  elseif id=='prev' or id=='next' then
   s.page=math.max(1,s.page+(id=='next' and 1 or -1))
  elseif id=='field:address' then s.focus='address'
@@ -284,13 +277,18 @@ function screen.update(state,input,context)
    screen.activate(state,rows[index][1],context);return
   end
  end
- if mapped.nav.cancel and state.hub_online then screen.activate(state,'back',context) end
+ if mapped.nav.cancel and state.hub_online then
+  if s.focus then
+   s.focus=nil
+   if context.text_input then context.text_input(false) end
+  else screen.activate(state,'back',context) end
+ end
 end
 function screen.draw(state,context)
  context.viewport(794,550,8,13,27);context.image('pe/menu_back1',0,0,true)
  context.fill(0,0,794,550,8,13,27,185)
  local s=state.hub_online
- context.text(s.simple and 'GRAJ PRZEZ INTERNET' or 'POLISH FIGHTERS / KONTO I POKOJE',397,25,'center',25,0xf0f5ff,nil,nil,true)
+ context.text(s.simple and (s.lan and 'GRA W SIECI LOKALNEJ' or 'GRAJ PRZEZ INTERNET') or 'POLISH FIGHTERS / KONTO I POKOJE',397,25,'center',25,0xf0f5ff,nil,nil,true)
  if not s.simple then
  context.text((client.token or state.hub_online.accounts) and 'HTTPS dla serwera zdalnego. Hasło i sesja nie są zapisywane na dysku.'
   or 'Wpisz nick i kliknij GRAJ. Bez hasła i bez zakładania konta.',397,68,'center',13,0xadc3df,nil,nil,true)

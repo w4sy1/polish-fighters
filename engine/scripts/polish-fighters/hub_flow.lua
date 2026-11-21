@@ -45,12 +45,8 @@ return function(base)
    saved.little_fighters_pending_mode=nil;engine.write_settings(saved)
   end
   if state.launch.hub_enabled and options.profiles_available and not options.profile_start
-   and not saved.controls_guide_seen and state.launch.hub_mode=='root' and state.launch.page=='menu' then
-   state.launch.hub_intro_guide=true
-   state.launch.hub_classic=true
-   state.launch.pf_panel='combo-guide'
-   state.launch.pf_guide_message=true
-   state.launch.pf_message=require('polish-fighters/combo_guide').basics
+   and not saved.current_controls_seen and state.launch.hub_mode=='root' and state.launch.page=='menu' then
+   state.launch.hub_current_controls=true
   end
   return state
  end
@@ -96,7 +92,7 @@ return function(base)
   local back=escape and not state.hub_escape_held
   state.hub_escape_held=escape
   if back and not state.session and (state.active=='characters' or state.active=='battle' or state.active=='championship') then
-   state.active='launch';state.launch.page='menu';state.launch.hub_mode='players';state.wait_release=true
+   state.active='launch';state.launch.page='menu';state.launch.hub_mode='battle';state.wait_release=true
    return true
   end
   local x,y,w,h=button_area(state)

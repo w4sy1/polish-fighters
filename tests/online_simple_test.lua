@@ -57,7 +57,7 @@ assert(#actions==0 and client.notice:find('Przekaźnik niedostępny',1,true),'pu
 
 -- LAN: loopback is refused, IPv4:port joins directly without the internet input delay.
 reset()
-state={};screen.open(state,true);screen.activate(state,'local',context)
+state={};screen.open(state,true,true)
 state.hub_online.address='127.0.0.1';screen.activate(state,'find',context)
 assert(#actions==0 and client.notice:find('IPv4',1,true))
 state.hub_online.address='192.168.1.5:12346';screen.activate(state,'find',context)
