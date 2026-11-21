@@ -18,7 +18,6 @@ import org.robolectric.shadows.ShadowAlertDialog;
 @Config(sdk=28,qualifiers="w800dp-h360dp-land-mdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class StartScreenTest {
- @Before public void offlineUpdates(){GitHubUpdates.resetForTest();}
  private void render(View view,String name) throws Exception {
   view.measure(View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY));
   view.layout(0,0,800,360);

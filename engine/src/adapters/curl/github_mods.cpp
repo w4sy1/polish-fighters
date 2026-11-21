@@ -563,7 +563,7 @@ Result<std::string> github_mod_install(std::string_view verified_catalogue, std:
             auto remaining = offset;
             while (remaining) {
                 const auto length = static_cast<std::streamsize>(std::min<std::uint64_t>(remaining, buffer.size()));
-                if (!saved.read(buffer.data(), length) || EVP_DigestUpdate(digest.get(), buffer.data(), length) != 1)
+                if (!saved.read(buffer.data(), length) || EVP_DigestUpdate(digest.get(), buffer.data(), static_cast<std::size_t>(length)) != 1)
                     return fail(ErrorCode::io, "Cannot read a partial mod download");
                 remaining -= static_cast<std::uint64_t>(length);
             }

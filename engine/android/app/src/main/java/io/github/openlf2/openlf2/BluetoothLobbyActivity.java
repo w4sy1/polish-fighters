@@ -33,7 +33,6 @@ public final class BluetoothLobbyActivity extends Activity {
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
-        GitHubUpdates.attach(this);
         setContentView(R.layout.activity_game_home);
         status = findViewById(R.id.pf_status);
         moduleButton = findViewById(R.id.pf_module);
