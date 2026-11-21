@@ -164,7 +164,11 @@ public:
         if (status_ != NetworkStatus::connected) return fail(ErrorCode::io, "Network peer is not connected");
         if (bytes.size() > buffer_limit - outgoing_.size()) return fail(ErrorCode::limit, "Network send queue exceeds 64 KiB");
         outgoing_.insert(outgoing_.end(), bytes.begin(), bytes.end());
-        return {};
+        // Input and room replies should leave now, even when polling is tied to
+        // the next render frame. The socket is nonblocking and retains unsent bytes.
+        auto result = flush_outgoing();
+        if (!result) close();
+        return result;
     }
     Result<Bytes> poll() override {
         auto result = progress();
@@ -232,7 +236,23 @@ private:
             if (error != 0) return socket_error("connect", error);
             status_ = NetworkStatus::connected;
         }
-        // Bounded work per poll. Remaining data stays queued for the next call.
+        auto flushed = flush_outgoing();
+        if (!flushed) return std::unexpected(flushed.error());
+        std::array<char, 8192> buffer{};
+#ifdef _WIN32
+        const auto receive_size = static_cast<int>(buffer.size());
+#else
+        const auto receive_size = buffer.size();
+#endif
+        const auto received = ::recv(socket_.get(), buffer.data(), receive_size, 0);
+        if (received < 0) {
+            if (pending(last_error())) return Bytes{};
+            return socket_error("receive");
+        }
+        if (received == 0) return fail(ErrorCode::io, "Network peer disconnected");
+        return Bytes(buffer.begin(), buffer.begin() + received);
+    }
+    Result<void> flush_outgoing() {
         if (!outgoing_.empty()) {
 #ifdef MSG_NOSIGNAL
             constexpr int send_flags = MSG_NOSIGNAL;
@@ -250,19 +270,7 @@ private:
             } else if (sent == 0) return fail(ErrorCode::io, "Network connection closed while sending");
             else outgoing_.erase(outgoing_.begin(), outgoing_.begin() + sent);
         }
-        std::array<char, 8192> buffer{};
-#ifdef _WIN32
-        const auto receive_size = static_cast<int>(buffer.size());
-#else
-        const auto receive_size = buffer.size();
-#endif
-        const auto received = ::recv(socket_.get(), buffer.data(), receive_size, 0);
-        if (received < 0) {
-            if (pending(last_error())) return Bytes{};
-            return socket_error("receive");
-        }
-        if (received == 0) return fail(ErrorCode::io, "Network peer disconnected");
-        return Bytes(buffer.begin(), buffer.begin() + received);
+        return {};
     }
     static constexpr std::size_t buffer_limit = 65536;
     SocketSession session_; // destroyed after sockets

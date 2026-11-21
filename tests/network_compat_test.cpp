@@ -9,12 +9,12 @@ int main(){
  const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(3);
  bool sent=false;std::string received;
  while(std::chrono::steady_clock::now()<deadline){
-  auto input=(*client)->poll();assert(input);
+  if(!sent){auto input=(*client)->poll();assert(input);}
   auto peer=(*server)->poll();assert(peer);received.append(peer->begin(),peer->end());
   if(!sent && (*client)->status()==openlf2::NetworkStatus::connected){
    std::string text="legacy-two-peer";assert((*client)->send(std::span<const char>(text.data(),text.size())));sent=true;
   }
-  if(received=="legacy-two-peer"){std::cout<<"PASS: legacy two-peer TCP listen/connect/poll unchanged\n";return 0;}
+  if(received=="legacy-two-peer"){std::cout<<"PASS: TCP delivers data without another sender poll\n";return 0;}
   std::this_thread::sleep_for(std::chrono::milliseconds(1));
  }
  return 1;

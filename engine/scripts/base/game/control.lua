@@ -450,7 +450,14 @@ function control.step(match, value)
         end
     end
     if value.defend_press == input_press_frames then
-        value.attack_block = value.record.frame(value.frame).state == constants.frame_states.attacking
+        local current = value.record.frame(value.frame)
+        value.attack_block = current.state == constants.frame_states.attacking
+        -- Drinking consumes the block as a cancel, even when another key lands
+        -- on the same tick. It must not seed a combo in the next stance.
+        if current.state == constants.frame_states.drinking and current.hits.d ~= 0
+            and control.enter_frame(match, value, current.hits.d) then
+            control.clear_sequence(value)
+        end
     end
     local attack_frame
     for index = combo_right_attack, combo_jump_attack do

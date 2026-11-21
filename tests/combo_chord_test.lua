@@ -148,6 +148,24 @@ end
 
 print("PASS: attack-cancel release, held and simultaneous specials, and classic jump specials on both sides")
 
+-- Defend cancels drinking before the same input can arm a special.
+frames[character_frames.drinking] = make_frame(frame_states.drinking)
+for _, direction in ipairs({"left", "right"}) do
+    for _, hold_block in ipairs({false, true}) do
+        local fighter = item.create(record)
+        fighter.frame = character_frames.drinking
+        press(fighter, {defend = true})
+        assert(fighter.frame == character_frames.defend, "block did not cancel drinking")
+        press(fighter, {[direction] = true, defend = hold_block})
+        press(fighter, {[direction] = true, defend = hold_block, jump = true})
+        assert(fighter.frame == character_frames.jump, "drinking cancel armed a sideways special: " .. direction)
+    end
+    local fighter = item.create(record)
+    fighter.frame = character_frames.drinking
+    press(fighter, {defend = true, [direction] = true, jump = true})
+    assert(fighter.frame == character_frames.defend, "same-tick jump special overrode drinking cancel")
+end
+
 local function press_letters(fighter, keys)
     local held = {}
     for key, symbol in pairs({attack = "c", defend = "f", jump = "b", left = "l", right = "r"}) do
