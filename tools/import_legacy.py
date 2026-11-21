@@ -122,6 +122,10 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   raw=files[path].read_bytes()
   if path.endswith('.dat'):
    text=source_decode(raw)
+   if pack_id=='ntsd-community' and path=='data/stage.dat' and hashlib.sha256(raw).hexdigest()==(
+       'c7ba49cc76a9ce2e9502058e2ede92584e757b3c47d786b243b495c714ba37d4'):
+    # VC80 sscanf does not assign a value for the second x: - 250; keep x: 1200.
+    text=text.replace('x: 1200  x: - 250  y: -300','x: 1200  y: -300',1)
    if normalization and path in normalization[1]:
     if hashlib.sha256(raw).hexdigest()!=normalization[1][path]:
      raise ValueError('NTSD source DAT changed during import: '+path)
