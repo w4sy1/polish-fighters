@@ -86,7 +86,7 @@ function hub.rows(state,active_profile)
   local missing=state.hub_available and state.hub_available[id]==false
   rows[#rows+1]={'profile_'..id,title..(missing and L('missing') or ''),profile==active_profile}
  end
- local available=not state.hub_android and state.hub_available
+ local available=state.hub_available
  if mode=='optional_modules' then
   for _,entry in ipairs(hub.optional_profiles) do
    if available and available[entry.id] then profile_row(entry.id,entry.title,entry.profile) end

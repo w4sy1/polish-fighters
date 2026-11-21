@@ -57,6 +57,8 @@ final class GameLaunchArguments {
         } else if (mode.matches("mod-[a-f0-9]{24}")) {
             add(args, "--mod", new File(game, "content-packs/polish-originals"));
             add(args, "--mod", new File(game, "content-packs/" + mode));
+        } else if (GamePackSettings.optionalTitle(mode) != null) {
+            add(args, "--mod", new File(game, "content-packs/" + mode.replace('_', '-')));
         } else {
             for (int i = 0; i < GamePackSettings.IDS.length; i++) {
                 if (GamePackSettings.IDS[i].equals(mode) && !GamePackSettings.PACKS[i].isEmpty()) {

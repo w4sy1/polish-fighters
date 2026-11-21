@@ -90,7 +90,7 @@ return function(base)
     return
    end
    local profiles=hub.profiles
-   if not state.hub_android and state.hub_available and state.hub_available[tag] then
+   if state.hub_available and state.hub_available[tag] then
     for _,entry in ipairs(hub.optional_profiles) do
      if entry.id==tag then profiles={entry};break end
     end

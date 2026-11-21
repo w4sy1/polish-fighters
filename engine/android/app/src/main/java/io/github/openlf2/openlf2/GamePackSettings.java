@@ -38,8 +38,27 @@ final class GamePackSettings {
         String mode = store.read().optString("little_fighters_start_profile", "lf_two");
         if (ALL.equals(mode) || CUSTOM.equals(mode)) return mode;
         for (String id : IDS) if (id.equals(mode)) return mode;
-        if (isImported(mode)) return mode;
+        if (isImported(mode) || isOptionalInstalled(mode)) return mode;
         return "lf_two";
+    }
+
+    static String optionalTitle(String id) {
+        switch (id) {
+            case "dragon_ball_super": return "Dragon Ball Super";
+            case "fighter_hero": return "Fighter Hero";
+            case "gf2": return "GF2";
+            case "lf2_ns": return "LF2 NS";
+            case "sx2": return "Sx2";
+            case "lf2_sv": return "LF2 SV";
+            case "rn_lf2": return "RN LF2";
+            case "lf_seed": return "LF Seed";
+            case "wlf2_al": return "WLF2 AL";
+            default: return null;
+        }
+    }
+
+    private boolean isOptionalInstalled(String id) {
+        return optionalTitle(id) != null && hasPack(id.replace('_', '-'));
     }
 
     private boolean isImported(String id) {
@@ -61,6 +80,7 @@ final class GamePackSettings {
         if (ALL.equals(mode)) return "Wszystkie razem";
         if (CUSTOM.equals(mode)) return "Własny zestaw modułów";
         for (int i = 0; i < IDS.length; i++) if (IDS[i].equals(mode)) return TITLES[i];
+        if (isOptionalInstalled(mode)) return optionalTitle(mode);
         if (isImported(mode)) return "MOD " + mode.substring(4, 12);
         throw new IllegalStateException("Unknown game profile");
     }
@@ -79,7 +99,7 @@ final class GamePackSettings {
     void save(String mode, boolean[] selected, boolean hideDuplicates) throws IOException, JSONException {
         boolean valid = ALL.equals(mode) || CUSTOM.equals(mode);
         for (String id : IDS) valid |= id.equals(mode);
-        valid |= isImported(mode);
+        valid |= isImported(mode) || isOptionalInstalled(mode);
         if (!valid) throw new IllegalArgumentException("Nieznany moduł");
         if (selected == null || selected.length != IDS.length) throw new IllegalArgumentException("Nieprawidłowa lista modułów");
         int count = 0;

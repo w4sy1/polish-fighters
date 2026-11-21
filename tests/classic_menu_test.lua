@@ -51,7 +51,12 @@ for _,entry in ipairs(hub.optional_profiles) do
  assert(hub.title(entry.profile)==entry.title)
 end
 back();assert(state.hub_mode=="library")
-state.hub_android=true;assert(#hub.rows(state)==14)
+state.hub_android=true;assert(#hub.rows(state)==15)
+click('optional_modules')
+click('profile_dragon_ball_super')
+assert(requested=='profile_dragon_ball_super' and document.little_fighters_start_profile=='dragon_ball_super')
+document.little_fighters_start_profile=nil
+back();assert(state.hub_mode=='library')
 state.hub_android=nil
 state.hub_available.gf2=false
 click("optional_modules");assert(#hub.rows(state)==9)
