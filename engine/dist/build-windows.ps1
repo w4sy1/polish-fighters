@@ -60,6 +60,9 @@ foreach ($dll in $dlls) {
 Copy-Item -Force (Join-Path $binaryDir 'openlf2.exe') $packageDir
 foreach ($dll in $dlls) { Copy-Item -Force $dll.FullName $packageDir }
 Copy-Item -Recurse -Force (Join-Path $root 'scripts') $packageDir
+# All content-packs (mods) are staged here; the installer only *installs* the ones the
+# user ticks on the "Additional modules" page (openlf2.iss [Tasks]/[Files] Tasks: filter).
+Copy-Item -Recurse -Force (Join-Path $root '../content-packs') $packageDir
 Copy-Item -Force (Join-Path $root 'dist/loading/loading-roster.png') $packageDir
 Copy-Item -Force (Join-Path $root 'README.md') $packageDir
 Copy-Item -Force (Join-Path $root 'LICENSE') $packageDir

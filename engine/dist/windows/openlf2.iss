@@ -2,7 +2,7 @@
 ; Inno Setup script of the Windows installer (see dist/build-windows.ps1, which passes the /D defines):
 ;   AppVersion   project version, e.g. 1.1.0
 ;   Arch         x86, x64 or arm64
-;   StageDir     the staged package: openlf2.exe, the DLLs, scripts\, licenses\, README.md, LICENSE
+;   StageDir     the staged package: openlf2.exe, the DLLs, scripts\, content-packs\, licenses\, README.md, LICENSE
 ;   IconDir      tools/icons/make_icons.py output (openlf2.ico, windows\wizard*.bmp)
 ;   LanguageDir  the unofficial Chinese message files
 ;   OutputDir    where the installer goes
@@ -73,6 +73,14 @@ english.Downloading=Downloading Little Fighter 2
 english.DownloadingDesc=Fetching LF2_v2.0a.exe (checked by its SHA-256 checksum).
 english.DownloadFailed=The download failed or was canceled. The installation continues; OpenLF2 offers the download again at its first start.
 english.RemoveUserData=Also remove the Polish Fighters settings, recordings, and downloaded game data from your user profile?
+english.ModsGroup=Additional modules (content-packs):
+english.ModLf4Turbo=LF4 Turbo
+english.ModBleach=Bleach
+english.ModKate=Kate
+english.ModReinforced=Reinforced
+english.ModDbz=Dragon Ball
+english.ModNtsd=NTSD / Naruto
+english.ModOnePiece=One Piece
 
 german.GameData=Spieldaten:
 german.DownloadLF2=Den Original-Installer von Little Fighter 2 jetzt herunterladen (ca. 30 MB, zum Spielen nötig; sonst bietet OpenLF2 es beim ersten Start an)
@@ -83,6 +91,14 @@ german.Downloading=Little Fighter 2 wird heruntergeladen
 german.DownloadingDesc=LF2_v2.0a.exe wird geladen (Prüfung per SHA-256-Prüfsumme).
 german.DownloadFailed=Der Download ist fehlgeschlagen oder wurde abgebrochen. Die Installation wird fortgesetzt; OpenLF2 bietet den Download beim ersten Start erneut an.
 german.RemoveUserData=Auch die Einstellungen, Aufnahmen und die heruntergeladenen Spieldaten von Polish Fighters aus deinem Benutzerprofil entfernen?
+german.ModsGroup=Zusätzliche Module (Content-Packs):
+german.ModLf4Turbo=LF4 Turbo
+german.ModBleach=Bleach
+german.ModKate=Kate
+german.ModReinforced=Reinforced
+german.ModDbz=Dragon Ball
+german.ModNtsd=NTSD / Naruto
+german.ModOnePiece=One Piece
 
 chinesesimplified.GameData=游戏数据：
 chinesesimplified.DownloadLF2=立即下载原版小朋友齐打交安装程序（约 30 MB，游玩所需；否则 OpenLF2 会在首次启动时提供下载）
@@ -93,6 +109,14 @@ chinesesimplified.Downloading=正在下载小朋友齐打交
 chinesesimplified.DownloadingDesc=正在获取 LF2_v2.0a.exe（以 SHA-256 校验和检查）。
 chinesesimplified.DownloadFailed=下载失败或已取消。安装将继续；OpenLF2 会在首次启动时再次提供下载。
 chinesesimplified.RemoveUserData=是否同时从用户配置文件中删除 Polish Fighters 的设置、录像和已下载的游戏数据？
+chinesesimplified.ModsGroup=附加模块（内容包）：
+chinesesimplified.ModLf4Turbo=LF4 Turbo
+chinesesimplified.ModBleach=死神 Bleach
+chinesesimplified.ModKate=Kate
+chinesesimplified.ModReinforced=Reinforced
+chinesesimplified.ModDbz=龙珠 Dragon Ball
+chinesesimplified.ModNtsd=NTSD / 火影忍者
+chinesesimplified.ModOnePiece=海贼王 One Piece
 
 chinesetraditional.GameData=遊戲資料：
 chinesetraditional.DownloadLF2=立即下載原版小朋友齊打交安裝程式（約 30 MB，遊玩所需；否則 OpenLF2 會在首次啟動時提供下載）
@@ -103,11 +127,26 @@ chinesetraditional.Downloading=正在下載小朋友齊打交
 chinesetraditional.DownloadingDesc=正在取得 LF2_v2.0a.exe（以 SHA-256 檢查碼驗證）。
 chinesetraditional.DownloadFailed=下載失敗或已取消。安裝將繼續；OpenLF2 會在首次啟動時再次提供下載。
 chinesetraditional.RemoveUserData=是否同時從使用者設定檔中刪除 Polish Fighters 的設定、錄影檔和已下載的遊戲資料？
+chinesetraditional.ModsGroup=附加模組（內容包）：
+chinesetraditional.ModLf4Turbo=LF4 Turbo
+chinesetraditional.ModBleach=死神 Bleach
+chinesetraditional.ModKate=Kate
+chinesetraditional.ModReinforced=Reinforced
+chinesetraditional.ModDbz=七龍珠 Dragon Ball
+chinesetraditional.ModNtsd=NTSD / 火影忍者
+chinesetraditional.ModOnePiece=海賊王 One Piece
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "associate"; Description: "{cm:AssociateRecordings}"; GroupDescription: "{cm:FileTypes}"
 Name: "downloadlf2"; Description: "{cm:DownloadLF2}"; GroupDescription: "{cm:GameData}"; Check: NeedGameData
+Name: "mod_lf4turbo"; Description: "{cm:ModLf4Turbo}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_bleach"; Description: "{cm:ModBleach}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_kate"; Description: "{cm:ModKate}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_reinforced"; Description: "{cm:ModReinforced}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_dbz"; Description: "{cm:ModDbz}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_ntsd"; Description: "{cm:ModNtsd}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_onepiece"; Description: "{cm:ModOnePiece}"; GroupDescription: "{cm:ModsGroup}"
 
 [InstallDelete]
 ; The scripts tree comes only from the installer (mods live in content-packs and the user profile).
@@ -119,6 +158,17 @@ Source: "{#StageDir}\loading-roster.png"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\scripts\*"; DestDir: "{app}\scripts"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Flagship content (polish-originals) and the cross-pack mix always install; the other content-packs
+; are optional modules picked on the Tasks page above, so this is no longer all-or-nothing.
+Source: "{#StageDir}\content-packs\polish-originals\*"; DestDir: "{app}\content-packs\polish-originals"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StageDir}\content-packs\mixed-all\*"; DestDir: "{app}\content-packs\mixed-all"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StageDir}\content-packs\lf4-turbo\*"; DestDir: "{app}\content-packs\lf4-turbo"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_lf4turbo
+Source: "{#StageDir}\content-packs\bleach\*"; DestDir: "{app}\content-packs\bleach"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_bleach
+Source: "{#StageDir}\content-packs\kate\*"; DestDir: "{app}\content-packs\kate"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_kate
+Source: "{#StageDir}\content-packs\reinforced\*"; DestDir: "{app}\content-packs\reinforced"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_reinforced
+Source: "{#StageDir}\content-packs\dbz\*"; DestDir: "{app}\content-packs\dbz"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_dbz
+Source: "{#StageDir}\content-packs\ntsd\*"; DestDir: "{app}\content-packs\ntsd"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_ntsd
+Source: "{#StageDir}\content-packs\one-piece\*"; DestDir: "{app}\content-packs\one-piece"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_onepiece
 Source: "{#StageDir}\licenses\*"; DestDir: "{app}\licenses"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StageDir}\README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
