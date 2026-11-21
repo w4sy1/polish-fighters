@@ -169,8 +169,10 @@ def main():
     parser.add_argument('--catalogue-only', action='store_true',
                         help='Re-sign mods/catalog.json from envelopes already in --output')
     parser.add_argument('--content-packs', type=Path, default=ROOT / 'content-packs')
-    parser.add_argument('packs', nargs='*', choices=tuple(PACKS), default=list(DEFAULT_PACKS))
+    parser.add_argument('packs', nargs='*', metavar='PACK', default=list(DEFAULT_PACKS))
     args = parser.parse_args()
+    if unknown := set(args.packs) - PACKS.keys():
+        parser.error('Unknown content pack: ' + ', '.join(sorted(unknown)))
     if ROOT in args.key.resolve().parents:
         parser.error('The private key must stay outside the repository')
     key = serialization.load_pem_private_key(args.key.read_bytes(), None)
