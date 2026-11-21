@@ -30,7 +30,7 @@ local function open_android_screen(context,key)
 end
 function hub.open_android_tools(context) return open_android_screen(context,'little_fighters_open_android_tools') end
 -- Android: the native Mods screen downloads and installs signed mods from Polish Fighters - GitHub.
-function hub.open_android_mods(context) return open_android_screen(context,'little_fighters_open_android_mods') end
+function hub.open_android_mods(context) context.action('open_android_mods') end
 function hub.rows(state,active_profile)
  local mode=state.hub_mode
  local function row(id,key) return {id,(L(key or id))} end

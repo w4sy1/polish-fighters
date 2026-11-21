@@ -19,19 +19,25 @@ import org.libsdl.app.SDLActivity;
 public final class OpenLF2Activity extends SDLActivity {
     private static final String TAG = "OpenLF2";
     private static final String OPEN_ANDROID_TOOLS = "little_fighters_open_android_tools";
-    private static final String OPEN_ANDROID_MODS = "little_fighters_open_android_mods";
     private LanWifiMode lanWifi;
     private File stagedScripts;
     private volatile boolean openAndroidTools;
-    private volatile boolean openAndroidMods;
     @Override protected void main() {
         GameDiagnostics.write(this, "launch-last.txt", "Native engine launch\n" + android.os.Build.VERSION.RELEASE);
         takeAndroidToolsRequest(); // Discard requests left behind by an interrupted game.
-        takeRequest(OPEN_ANDROID_MODS);
         int result = SDLActivity.nativeRunMain(getMainSharedObject(), getMainFunction(), getArguments());
         openAndroidTools = result == 0 && takeAndroidToolsRequest();
-        openAndroidMods = result == 0 && takeRequest(OPEN_ANDROID_MODS);
         if (result != 0) GameDiagnostics.write(this, "native-return.txt", "Native engine exit code: " + result);
+    }
+
+    /** Called by the SDL main thread while the game's menu is active. */
+    public void showModManager() {
+        runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                startActivity(new Intent(this, AndroidModsActivity.class)
+                    .putExtra(AndroidModsActivity.FROM_RUNNING_GAME, true));
+            }
+        });
     }
 
     private boolean takeAndroidToolsRequest() { return takeRequest(OPEN_ANDROID_TOOLS); }
@@ -132,8 +138,6 @@ public final class OpenLF2Activity extends SDLActivity {
         super.onDestroy();
         if (isFinishing() && openAndroidTools) {
             startActivity(new Intent(this, BluetoothLobbyActivity.class));
-        } else if (isFinishing() && openAndroidMods) {
-            startActivity(new Intent(this, AndroidModsActivity.class).putExtra(AndroidModsActivity.RETURN_TO_GAME, true));
         }
     }
     /**

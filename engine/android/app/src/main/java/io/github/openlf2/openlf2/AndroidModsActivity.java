@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 
 /** LF2-styled source browser and file-picker importer for converted packages. */
 public final class AndroidModsActivity extends Activity {
-    static final String RETURN_TO_GAME="return_to_game";
+    static final String FROM_RUNNING_GAME="from_running_game";
     static final String FIRST_SETUP="first_setup";
     private static final int PICK_PACKAGE=7301;
     private static final int NAVY=0xff040a41, BLUE=0xff7a9dff, RED=0xffff5262, TEXT=0xfff4f5ff, MUTED=0xffb6c5d9;
@@ -302,7 +302,7 @@ public final class AndroidModsActivity extends Activity {
                 String message="Zainstalowano "+item.name+" "+item.version+".";
                 try {
                     GamePackSettings settings=new GamePackSettings(getFilesDir());
-                    if(!item.profile.isEmpty()){settings.save(item.profile,settings.selection(),settings.hideDuplicates());message+=" Moduł wybrany do gry.";}
+                    if(!item.profile.isEmpty()){settings.save(item.profile,settings.selection(),settings.hideDuplicates());message+=selectionMessage();}
                 } catch(Exception saveError) { message+=" Wybierz go w menu Moduły."; }
                 final String done=message;
                 runOnUiThread(()->{setBusy(false,done);showPackage(item,catalogue,sourceOffset,catalogueOffset);});
@@ -355,15 +355,17 @@ public final class AndroidModsActivity extends Activity {
         worker.submit(()->{
             try {
                 String id=AndroidModPackageImporter.importPackage(getContentResolver(),selected,getFilesDir(),getAssets(),entries->runOnUiThread(()->status.setText("Sprawdzono plików: "+entries)));
-                try { GamePackSettings settings=new GamePackSettings(getFilesDir());settings.save(id,settings.selection(),settings.hideDuplicates());runOnUiThread(()->setBusy(false,"Zaimportowano "+id+". Moduł został wybrany; zgodność gry nie jest potwierdzona.")); }
+                try { GamePackSettings settings=new GamePackSettings(getFilesDir());settings.save(id,settings.selection(),settings.hideDuplicates());runOnUiThread(()->setBusy(false,"Zaimportowano "+id+"."+selectionMessage()+" Zgodność gry nie jest potwierdzona.")); }
                 catch(Exception saveError) { runOnUiThread(()->setBusy(false,"Paczka "+id+" jest zainstalowana, ale nie zapisano jej wyboru: "+safe(saveError.getMessage()))); }
             } catch(Exception error) { runOnUiThread(()->setBusy(false,"Import przerwany: "+safe(error.getMessage()))); }
         });
     }
-    private void leave() {
-        if(getIntent().getBooleanExtra(RETURN_TO_GAME,false)) startActivity(new Intent(this,OpenLF2Activity.class));
-        finish();
+    private String selectionMessage() {
+        return getIntent().getBooleanExtra(FROM_RUNNING_GAME, false)
+            ? " Wybór zapisany na następne uruchomienie gry."
+            : " Moduł wybrany do gry.";
     }
+    private void leave() { finish(); }
     private void restoreScroll(int offset) { scroll.post(() -> scroll.scrollTo(0,offset)); }
     private void goBack() {
         if (importing) return;

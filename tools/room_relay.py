@@ -67,6 +67,7 @@ class RelayServer(socketserver.ThreadingTCPServer):
 
     def __init__(self, address, service):
         self.service = service
+        self.publish_readiness = getattr(service, 'set_relay_readiness', None)
         self.condition = threading.Condition()
         self.waiting = {}
         self.active = {}
@@ -75,10 +76,12 @@ class RelayServer(socketserver.ThreadingTCPServer):
         super().__init__(address, RelayHandler)
 
     def report_readiness(self, room):
+        if self.publish_readiness is None:
+            return
         with self.readiness_locks[hash(room) % len(self.readiness_locks)]:
             with self.condition:
                 ready = bool(self.waiting.get(room))
-            self.service.set_relay_readiness(room, ready)
+            self.publish_readiness(room, ready)
 
     def process_request(self, request, address):
         if not self.slots.acquire(blocking=False):

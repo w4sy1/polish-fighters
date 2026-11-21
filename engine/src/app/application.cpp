@@ -46,6 +46,10 @@
 #include <sstream>
 #include <thread>
 #include <system_error>
+#ifdef __ANDROID__
+#include <SDL3/SDL.h>
+#include <jni.h>
+#endif
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -59,6 +63,24 @@ void wait_milliseconds(std::uint32_t milliseconds) {
     precise_delay(milliseconds);
 #endif
 }
+#ifdef __ANDROID__
+bool open_android_mods() {
+    auto* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
+    if (env == nullptr) return false;
+    auto activity = static_cast<jobject>(SDL_GetAndroidActivity());
+    if (activity == nullptr) return false;
+    const auto activity_class = env->GetObjectClass(activity);
+    if (activity_class != nullptr) {
+        const auto open = env->GetMethodID(activity_class, "showModManager", "()V");
+        if (open != nullptr) env->CallVoidMethod(activity, open);
+        env->DeleteLocalRef(activity_class);
+    }
+    env->DeleteLocalRef(activity);
+    if (!env->ExceptionCheck()) return activity_class != nullptr;
+    env->ExceptionClear();
+    return false;
+}
+#endif
 double elapsed_ms(std::chrono::steady_clock::time_point start) {
     return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
 }
@@ -1431,6 +1453,12 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
                 save_window();
                 return {};
             }
+#ifdef __ANDROID__
+            if (action == "open_android_mods") {
+                if (!open_android_mods()) std::cerr << "Could not open the Android Mod Manager\n";
+                continue;
+            }
+#endif
             if (action == "open_recordings") {
                 if (const auto folder = recording_directory->path()) {
                     auto shown = platform->open_folder(*folder);
