@@ -69,3 +69,13 @@ assert(base.global_navigation_update(paused,{functions='',keys={[27]=true}},cont
 paused.session={}
 assert(not base.global_navigation_update(paused,open_help,context) and not paused.paused_guide)
 print('PASS: local pause help opens and closes without intercepting multiplayer')
+
+-- Etap 1.14 / Etap 2: GRAJ LOKALNIE (battle) must never lead into a network hub_mode.
+local hub=require('polish-fighters/hub')
+for _,row in ipairs(hub.rows({hub_mode='battle'},'battle')) do
+ local id=row[1]
+ assert(id:sub(1,7)~='network' and id:sub(1,7)~='account' and id:sub(1,3)~='lan' and id:sub(1,6)~='remote',
+  'GRAJ LOKALNIE must not expose a network row: '..id)
+end
+assert(require('polish-fighters/menu_locale').text('play_main')=='GRAJ LOKALNIE')
+print('PASS: GRAJ LOKALNIE has no network row, label pinned')
