@@ -27,3 +27,45 @@ settings.sets[1].buttons={0,0,2}
 assert(#controls.conflicts(settings)==1,'button zero is assigned')
 
 print('PASS: keyboard and controller conflicts, save preservation')
+
+-- Etap 1.14 / Zadanie 5.1: hybrid control mode toggle + HUD editor rows,
+-- Android-only, staged until 'save' like the rest of this screen.
+package.loaded['base/game/catalog']={profile_id='test',
+ load=function() return {{name='Davis',path='davis.dat'}} end,
+ backgrounds=function() return {{path='arena'}} end,selectable=function() return true end}
+package.loaded['base/game/background']={load=function() return {} end,create_state=function() return {} end}
+package.loaded['base/game/object_data']={load=function(path) return {frames={[0]={hits={}},[300]={hits={}}}} end}
+local input_settings=require('polish-fighters/input_settings')
+local function row_ids(rows) local ids={} for _,row in ipairs(rows) do ids[row[1]]=true end return ids end
+
+local desktop={}
+input_settings.open(desktop)
+assert(not row_ids(input_settings.rows(desktop,{})).hybrid_mode,'desktop must not expose hybrid_mode')
+assert(not row_ids(input_settings.rows(desktop,{})).hybrid_hud,'desktop must not expose hybrid_hud')
+
+local android={hub_android=true}
+input_settings.open(android)
+local ids=row_ids(input_settings.rows(android,{}))
+assert(ids.hybrid_mode and ids.hybrid_hud,'Android must expose hybrid_mode and hybrid_hud rows')
+
+local saved_document
+engine.write_settings=function(value) saved_document=value;writes=writes+1;return true end
+engine.read_settings=function() return {} end
+local before_mode=android.hub_hybrid_mode
+input_settings.activate(android,'hybrid_mode')
+assert(android.hub_hybrid_mode~=before_mode,'hybrid_mode must flip the staged value')
+input_settings.activate(android,'save')
+assert(saved_document and saved_document.options.hybrid.controls.stick.enabled==(android.hub_hybrid_mode=='stick'),
+ 'save must persist the staged hybrid mode into options.hybrid.controls')
+assert(saved_document.options.hybrid.controls.left.enabled==(android.hub_hybrid_mode=='arrows'))
+
+-- hybrid_hud opens the HUD editor on the shared state.page dispatch and drops hub_edit,
+-- so hub_launch's own update() falls through to the wrapped base's 'hud' page instead of
+-- staying routed into input_settings.update.
+local hud_state={hub_android=true}
+input_settings.open(hud_state)
+input_settings.activate(hud_state,'hybrid_hud')
+assert(hud_state.page=='hud' and hud_state.hud and not hud_state.hub_edit,
+ 'hybrid_hud must open the editor and release hub_edit')
+assert(hud_state.hud.destination=='menu','HUD editor must return to the hub menu, not the options page default')
+print('PASS: Android hybrid control toggle + HUD editor rows, staged until save')

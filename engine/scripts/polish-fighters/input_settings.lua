@@ -56,6 +56,11 @@ end
 function screen.open(state)
  state.hub_edit=controls.copy(controls.current());state.hub_player=1
  state.hub_capture=nil;state.hub_control_message=nil;state.hub_input_nav=nav.create()
+ -- Etap 1.14 / Etap 5: hybrid_layout has no single joystick/arrows "mode" field --
+ -- movement is a set of independently-enabled controls (stick vs left/up/right/down).
+ -- The toggle below treats them as one group, staged here and applied on save like
+ -- the rest of this screen's changes.
+ state.hub_hybrid_mode=require('base/game/options').current().hybrid.controls.stick.enabled and 'stick' or 'arrows'
 end
 local function preset(state,kind)
  local set=state.hub_edit.sets[state.hub_player]
@@ -85,6 +90,10 @@ function screen.rows(state,input)
  rows[#rows+1]={"defaults","PRZYWRÓĆ ORYGINALNE LF2",500,316,265,31}
  rows[#rows+1]={"resolve","USUŃ KOLIZJE Z INNYMI",500,358,265,31}
  rows[#rows+1]={"classic","NAZWY GRACZY / PANEL LF2",500,400,265,31}
+ if state.hub_android then
+  rows[#rows+1]={"hybrid_mode","RUCH: "..(state.hub_hybrid_mode=='stick' and "JOYSTICK" or "STRZAŁKI"),30,445,215,32}
+  rows[#rows+1]={"hybrid_hud","EDYTOR HUD",255,445,215,32}
+ end
  rows[#rows+1]={"save","ZAPISZ",210,480,180,34}
  rows[#rows+1]={"cancel","ANULUJ",410,480,180,34}
  return rows
@@ -107,11 +116,29 @@ function screen.activate(state,id)
  elseif id=="classic" then
   state.editing=state.hub_edit;state.hub_edit=nil;state.page="controls"
   state.name_player=0;state.previous_keys={}
+ elseif id=="hybrid_mode" then
+  state.hub_hybrid_mode=state.hub_hybrid_mode=='stick' and 'arrows' or 'stick'
+ elseif id=="hybrid_hud" then
+  -- Clear hub_edit so the next frame falls through to the wrapped launch.lua base's
+  -- own state.page=='hud' dispatch (hub_launch.base.update checks hub_edit first).
+  state.hub_edit=nil
+  state.hud=require('base/ui/hybrid_editor').create(require('base/game/options').current(),'menu')
+  state.page='hud'
  elseif id=="save" then
   if #screen.shared_keys(state)>0 then
    state.hub_control_message="Kolizje z innymi graczami. Najpierw użyj USUŃ KOLIZJE.";return
   end
   local saved,problem=controls.save(state.hub_edit)
+  if saved and state.hub_android then
+   local options=require('base/game/options')
+   local values=options.current()
+   local wanted=state.hub_hybrid_mode=='stick'
+   if values.hybrid.controls.stick.enabled~=wanted then
+    values.hybrid.controls.stick.enabled=wanted
+    for _,name in ipairs({'left','right','up','down'}) do values.hybrid.controls[name].enabled=not wanted end
+    saved,problem=options.save(values)
+   end
+  end
   if saved then state.hub_edit=nil;state.hub_note="ZAPISANO STEROWANIE"
   else state.hub_control_message="Nie zapisano: "..tostring(problem) end
  elseif id=="cancel" then state.hub_edit=nil end
