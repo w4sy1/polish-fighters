@@ -135,3 +135,18 @@ assert(update(s, nil, true, nil, seven) == "fb")
 assert(update(s, nil, true, nil, seven) == "fbc")
 assert(update(s, nil, true, nil, fighter) == "" and s.page == 1)
 print("PASS: seven move families, conditional targets, extended bindings, transport and fighter page change")
+
+-- The classic TCP offset is unrelated to the replay/room combo reset bit.
+local network = require("base/game/network")
+local local_peer = {host = true, phase = "ready", version = 1, sequence = 0, checksum = 42, frames = 0, received = ""}
+local remote_peer = {host = false, version = 1, sequence = 1, checksum = 42}
+local packets = {network.packet(remote_peer, {[0] = "bq", functions = ""}, 0)}
+engine.network_time = function() return 0 end
+engine.network = function(action, sent)
+    if action == "poll" then return table.remove(packets, 1) or "" end
+    assert(action == "send" and sent:byte(1) % 2 == 1)
+    return true
+end
+local merged = assert(network.exchange(local_peer, {[0] = "fbcq", functions = ""}, 0))
+assert(merged[0] == "cbf" and merged[4] == "b" and merged[1] == "")
+print("PASS: legacy TCP preserves shortcut input without injecting combo resets")

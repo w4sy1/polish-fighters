@@ -130,7 +130,9 @@ function network.packet(state, input, hp)
     for index = 1, 20 do bytes[index] = 1 end
     bytes[21], bytes[22] = 0, 0
     for index = 0, 3 do
-        bytes[(state.host and 0 or 4) + index + 1] = recording.pack_keys(input[index] or "") + 1
+        -- Classic TCP reserves the low bit for its nonzero framing byte.
+        local held = (input[index] or ""):gsub("q", "")
+        bytes[(state.host and 0 or 4) + index + 1] = recording.pack_keys(held) + 1
     end
     bytes[10], bytes[12], bytes[14] = state.sequence, state.version, hp % 100 + 1
     bytes[15], bytes[16] = state.checksum % 256, math.floor(state.checksum / 256)
@@ -174,7 +176,7 @@ function network.exchange(state, input, hp)
     local combined = {functions = "", keys = {}, pointer_x = 0, pointer_y = 0, button = false, network = true}
     for slot = 0, 7 do
         local local_slot = state.host and slot < 4 or not state.host and slot >= 4
-        combined[slot] = recording.unpack_keys((local_slot and own or remote):byte(slot + 1))
+        combined[slot] = recording.unpack_keys((local_slot and own or remote):byte(slot + 1) - 1)
     end
     combined.function_sources = {"", ""}
     for key, field in ipairs(function_bits) do
