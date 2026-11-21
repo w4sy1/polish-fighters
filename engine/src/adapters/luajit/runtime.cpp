@@ -7,9 +7,7 @@
 #include "openlf2/engine/relay_link.hpp"
 #include "openlf2/ports/digest.hpp"
 #include "openlf2/ports/download.hpp"
-#ifdef _WIN32
 #include "openlf2/ports/github_mods.hpp"
-#endif
 #include "openlf2/core/files.hpp"
 #include "openlf2_build_info.hpp"
 #include <algorithm>
