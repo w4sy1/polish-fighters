@@ -66,7 +66,7 @@ function client.request(endpoint,operation,payload,purpose)
  if not ok then return nil,problem end
  if operation=='login' then client.last_login_error=nil end
  if operation=='list-rooms' then client.listed_origin=nil end
- client.pending={operation=operation,endpoint=endpoint,purpose=purpose}
+ client.pending={operation=operation,endpoint=endpoint,purpose=purpose,room=purpose=='quick-join' and payload.room or nil}
  client.notice='Łączenie z serwerem…'
  return true
 end
@@ -88,14 +88,26 @@ function client.tick()
  if raw=='pending' then return end
  local pending=client.pending;client.pending=nil
  if pending.cancelled then return end
+ local function discard_failed_list()
+  if pending.operation=='list-rooms' then client.rooms={};client.relay_available=nil end
+ end
  if not raw then
+  discard_failed_list()
   if pending.operation=='publish-room' then client.cancel_publish=nil end
   -- The host's reason (DNS, TLS, timeout) stays visible, so a screenshot is enough to diagnose.
   client.notice=('Brak połączenia z serwerem kont: '..tostring(problem)):sub(1,150);return
  end
  local result;result,problem=engine.json_decode(raw)
- if type(result)~='table' then client.notice='Nieprawidłowa odpowiedź serwera.';return end
+ if type(result)~='table' then discard_failed_list();client.notice='Nieprawidłowa odpowiedź serwera.';return end
  if result.error then
+  discard_failed_list()
+  if pending.room and (result.error=='Unknown room or relay role' or result.error=='Room expired') then
+   for index,room in ipairs(client.rooms) do
+    if room.id==pending.room then table.remove(client.rooms,index);break end
+   end
+   client.notice='Ten pokój został zamknięty. Wybierz Dołącz, aby odświeżyć listę.'
+   return
+  end
   if pending.operation=='login' then client.last_login_error=result.error end
   if pending.operation=='publish-room' then client.cancel_publish=nil end
   local friendly={['Nick in use']='Ten nick jest teraz zajęty. Wybierz inny.',

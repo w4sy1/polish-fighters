@@ -10,6 +10,8 @@ engine={read_settings=function() return {} end,write_settings=function() return 
   if action=='start' then inflight=operation;requests[#requests+1]=operation;return true end
   local operation=inflight;inflight=nil
   if operation=='login' then return {token=string.rep('x',32),name='Gosc_1'} end
+  if operation=='list-rooms' and server.list_error then return nil,'timeout' end
+  if operation=='relay-ticket' and server.closed then return {error='Unknown room or relay role'} end
   if operation=='list-rooms' then return {relay=server.relay,rooms=server.rooms} end
   if operation=='publish-room' then return {id='room1'} end
   if operation=='relay-ticket' then return {ticket=string.rep('t',20),relay={host='203.0.113.10',port=8766}} end
@@ -41,6 +43,20 @@ for _,row in ipairs(screen.rows(state.hub_online)) do if row[1]:sub(1,5)=='join:
 assert(join,'listed room has no join row')
 screen.activate(state,join,context);run(state,5)
 assert(actions[1]=='network' and client.pending_join.relay and not state.hub_online,'relay join did not start')
+
+-- A closed room is removed promptly. A failed later refresh clears stale listings.
+reset();server.closed=true
+state={};screen.open(state,true)
+screen.activate(state,'find',context);run(state,5)
+screen.activate(state,'join:1',context);run(state,5)
+assert(#actions==0 and #client.rooms==0 and client.notice:find('zamknięty',1,true))
+server.closed=nil
+screen.activate(state,'find',context);run(state,5)
+assert(#client.rooms==1)
+server.list_error=true
+screen.activate(state,'find',context);run(state,5)
+assert(#client.rooms==0 and client.notice:find('timeout',1,true))
+server.list_error=nil
 
 -- Publishing asks the server again, so an earlier list without the relay does not block it.
 reset();server.relay=false
