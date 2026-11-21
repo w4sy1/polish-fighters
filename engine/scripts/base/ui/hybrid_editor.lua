@@ -7,6 +7,7 @@ local catalog = require("base/game/catalog")
 local background = require("base/game/background")
 local object_data = require("base/game/object_data")
 local font = require("base/ui/font")
+local costs = require("base/game/constants").move_cost_encoding
 local editor = {}
 local preview = {left = 13, top = 87, right = 377, bottom = 435}
 local function fighter_key(path) return catalog.profile_id .. ":" .. path end
@@ -16,14 +17,15 @@ function editor.create(values, destination)
     values.hybrid = layout.copy(values.hybrid)
     local fighters, selected = {}, 1
     for _, fighter in ipairs(catalog.load()) do
-        if fighter.name:lower() ~= "template" and catalog.selectable(fighter) then
+        local is_mech = catalog.profile_id == "polish-originals" and fighter.id == 415
+        if fighter.name:lower() ~= "template" and (catalog.selectable(fighter) or is_mech) then
             fighters[#fighters + 1] = fighter
             if fighter.name:lower() == "davis" then selected = #fighters end
         end
     end
     local arena = background.load(catalog.backgrounds()[1].path)
     return {values = values, fighters = fighters, fighter = selected, selected = "stick",
-        arena = arena, arena_view = background.create_state(arena), destination = destination or "options"}
+        arena = arena, arena_view = background.create_state(arena), destination = destination or "options", page = 1}
 end
 
 local function actions(s)
@@ -82,22 +84,76 @@ local function actions(s)
         local key = fighter_key(fighter.path)
         if s.move_fighter ~= fighter then
             s.moves = input_driver.moves(object_data.load(fighter.path))
-            s.move_fighter = fighter
+            s.move_fighter, s.page, s.move_row = fighter, 1, 1
         end
         local moves = s.moves
-        for index, slot in ipairs({"s1", "s2", "s3"}) do
-            local y = 139 + (index - 1) * 79
-            local control = settings.controls[slot]
-            button(601, y, 180, slot:upper() .. (control.enabled and "  Włączony" or "  Wyłączony"),
-                function() control.enabled = not control.enabled end)
-            local active = input_driver.binding(settings, key, moves, slot)
-            button(601, y + 33, 180, active and ("D + " .. active[2] .. "  ›") or "Brak przypisania  ›", function()
-                local position = 0
-                for i, move in ipairs(moves) do if move == active then position = i end end
-                local next_move = moves[(position + 1) % (#moves + 1)]
-                settings.bindings[key] = settings.bindings[key] or {}
-                settings.bindings[key][slot] = next_move and next_move[1] or "none"
-            end)
+        button(601, 415, 180, s.show_moves and "Przypisz skróty" or "Lista ruchów", function()
+            s.show_moves = not s.show_moves
+        end)
+        if s.show_moves then
+            local list = {}
+            for _, move in ipairs(moves) do
+                for _, variant in ipairs(move.variants) do
+                    list[#list + 1] = {move = move, variant = variant}
+                end
+            end
+            local row = list[s.move_row]
+            if row then
+                local v, move = row.variant, row.move
+                local function line(y, label)
+                    rows[#rows + 1] = {x = 601, y = y, w = 180, text = label, small = true}
+                end
+                button(601, 133, 180, ("Ruch %d/%d  >"):format(s.move_row, #list),
+                    function() s.move_row = s.move_row % #list + 1 end)
+                line(174, v.frame.name and v.frame.name ~= "" and v.frame.name or ("Ruch " .. math.abs(v.target)))
+                line(201, "D + " .. move[2])
+                local cost = v.frame.mp or 0
+                local quotient = cost >= 0 and math.floor(cost / costs.hp_radix) or math.ceil(cost / costs.hp_radix)
+                line(229, ("%d MP / %d HP"):format(cost - quotient * costs.hp_radix, quotient * costs.hp_unit))
+                line(257, "Klatka wejścia " .. v.sources[1])
+                if #v.sources > 1 then line(283, ("+ %d stanów wejścia"):format(#v.sources - 1)) end
+                local shortcuts = {}
+                for index = 1, input_driver.pages(moves) * layout.slots_per_page do
+                    local slot = "s" .. index
+                    if input_driver.binding(settings, key, moves, slot) == move then shortcuts[#shortcuts + 1] = slot:upper() end
+                end
+                line(313, #shortcuts > 0 and table.concat(shortcuts, ", ") or "Bez skrótu")
+                local details = input_driver.move_details(catalog.profile_id, fighter, move, v)
+                if details then
+                    local row, y = "", 342
+                    for word in details:gmatch("%S+") do
+                        if #row + #word > 26 and row ~= "" then
+                            line(y, row)
+                            row, y = "", y + 18
+                        end
+                        row = row == "" and word or row .. " " .. word
+                    end
+                    line(y, row)
+                end
+            else
+                rows[#rows + 1] = {x = 601, y = 133, w = 180, text = "Brak kombinacji D"}
+            end
+        else
+            local pages = input_driver.pages(moves)
+            if pages > 1 then
+                button(601, 382, 180, ("Strona %d/%d  >"):format(s.page, pages),
+                    function() s.page = s.page % pages + 1 end)
+            end
+            for index, name in ipairs({"s1", "s2", "s3"}) do
+                local slot = layout.slot(name, s.page)
+                local y = 139 + (index - 1) * 79
+                local control = settings.controls[name]
+                button(601, y, 180, slot:upper() .. (control.enabled and "  Włączony" or "  Wyłączony"),
+                    function() control.enabled = not control.enabled end)
+                local active = input_driver.binding(settings, key, moves, slot)
+                button(601, y + 33, 180, active and ("D + " .. active[2] .. "  ›") or "Brak przypisania  ›", function()
+                    local position = 0
+                    for i, move in ipairs(moves) do if move == active then position = i end end
+                    local next_move = moves[(position + 1) % (#moves + 1)]
+                    settings.bindings[key] = settings.bindings[key] or {}
+                    settings.bindings[key][slot] = next_move and next_move[1] or "none"
+                end)
+            end
         end
     end
     button(13, 476, 214, "Przywróć domyślne", function() s.values.hybrid = layout.copy(); s.selected = "stick" end)
@@ -163,13 +219,13 @@ function editor.draw(s, context)
     context.clip()
     context.fill(391, 87, 196, 348, 30, 28, 42, 255)
     context.fill(601, 87, 180, 348, 30, 28, 42, 255)
-    hud.draw(context, layout.geometry(s.values.hybrid, preview), {text = native}, true, s.selected)
+    hud.draw(context, layout.geometry(s.values.hybrid, preview), {text = native, page = s.page}, true, s.selected)
     text("Przeciągnij element, aby zmienić pozycję", 195, 443, 12)
     for _, row in ipairs(actions(s)) do
         local r, g, b = 50, 43, 68
         if row.primary then r, g, b = 108, 48, 184 end
         if row.run then context.fill(row.x, row.y, row.w, 30, r, g, b, 255) end
-        text(row.text, row.x + math.floor(row.w / 2), row.y + 7, 13)
+        text(row.text, row.x + math.floor(row.w / 2), row.y + 7, row.small and 11 or 13)
     end
     if s.error then text(s.error:sub(1, 100), 397, 518, 13) end
 end

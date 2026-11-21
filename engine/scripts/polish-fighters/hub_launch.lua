@@ -140,6 +140,15 @@ return function(base)
   if state.page~="menu" then return update(state,input,context) end
   if state.hub_classic then
    update(state,input,context)
+   if state.hub_intro_guide and not state.pf_message then
+    state.hub_intro_guide,state.pf_panel,state.pf_root_panel=nil,nil,nil
+    local saved,problem=engine.read_settings()
+    if not problem then
+     saved=type(saved)=='table' and saved or {}
+     saved.controls_guide_seen=true
+     engine.write_settings(saved)
+    end
+   end
    if not state.pf_panel then state.hub_classic=nil end
    return
   end

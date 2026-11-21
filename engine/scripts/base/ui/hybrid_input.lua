@@ -12,19 +12,47 @@ local skills = {
 }
 
 function hybrid.moves(record)
-    local found, result = {}, {}
-    if record then
-        for _, frame in pairs(record.frames) do
-            for _, move in ipairs(skills) do
-                local target = frame.hits[move[1]]
-                if target and target ~= 0 and record.frames[math.abs(target)] then found[move[1]] = true end
+    local result = {}
+    if not record then return result end
+    local frames = record.frames
+    for _, spec in ipairs(skills) do
+        local variants = {}
+        for source, frame in pairs(frames) do
+            local target = frame.hits[spec[1]]
+            if target and target ~= 0 and frames[math.abs(target)] then
+                local variant = variants[target]
+                if not variant then
+                    variant = {frame = frames[math.abs(target)], target = target, sources = {}}
+                    variants[target] = variant
+                end
+                variant.sources[#variant.sources + 1] = source
             end
         end
-    end
-    for _, move in ipairs(skills) do
-        if found[move[1]] then result[#result + 1] = move end
+        if next(variants) then
+            local move = {spec[1], spec[2], spec[3], spec[4], variants = {}}
+            for _, variant in pairs(variants) do
+                table.sort(variant.sources)
+                move.variants[#move.variants + 1] = variant
+            end
+            table.sort(move.variants, function(left, right) return left.target < right.target end)
+            result[#result + 1] = move
+        end
     end
     return result
+end
+
+-- Profiles can extend this function via package.manifest to annotate a parsed
+-- target. The annotation is presentation data and never changes match input.
+function hybrid.move_details(profile, fighter, move, variant)
+    if profile ~= "polish-originals" then return end
+    local known = require("polish-fighters/combo_guide").moves(fighter.id)
+    for _, entry in ipairs(known or {}) do
+        if entry[3] == math.abs(variant.target) then return entry[2] end
+    end
+end
+
+function hybrid.pages(moves)
+    return math.max(1, math.ceil(#moves / layout.slots_per_page))
 end
 
 function hybrid.binding(settings, key, moves, slot)
@@ -41,7 +69,7 @@ end
 
 function hybrid.create(settings)
     return {settings = settings, fingers = {}, counts = {}, queue = {}, direction = "",
-        output = "", clock = 0, knob_x = 0, knob_y = 0, visible = false}
+        output = "", clock = 0, knob_x = 0, knob_y = 0, visible = false, page = 1, pages = 1}
 end
 
 function hybrid.reset(s)
@@ -109,10 +137,7 @@ end
 
 local function shortcut(s, name, fighter, record_key)
     if not fighter then return end
-    if s.record ~= fighter.record then
-        s.record, s.moves = fighter.record, hybrid.moves(fighter.record)
-    end
-    local move = hybrid.binding(s.settings, record_key, s.moves, name)
+    local move = hybrid.binding(s.settings, record_key, s.moves, layout.slot(name, s.page))
     if not move then return end
     local direction = move[3]
     if direction == "forward" then direction = fighter.facing == 0 and "r" or "l" end
@@ -177,12 +202,13 @@ local function event(s, e, paused, fighter, key)
     local name = s.fingers[e.id]
     if e.phase == "d" then
         if name then return end
-        name = layout.hit(s.geometry, e.x, e.y, false, paused)
+        name = layout.hit(s.geometry, e.x, e.y, false, paused, s.pages > 1)
         if not name or (name == "stick" and s.stick) or
-            (s.mode == "selection" and (name == "pause" or name:match("^s%d$"))) then return end
+            (s.mode == "selection" and (name == "pause" or name == "skills" or name:match("^s%d$"))) then return end
         s.fingers[e.id] = name
         if name == "stick" then s.stick = e.id; move_stick(s, e, now)
         elseif name == "pause" then s.pause = true
+        elseif name == "skills" then s.page = s.page % s.pages + 1
         elseif name:match("^s%d$") then shortcut(s, name, fighter, key)
         else button_down(s, name, now) end
     elseif name and e.phase == "m" and name == "stick" then
@@ -223,6 +249,12 @@ function hybrid.update(s, input, mode, fighter, key, consume)
         return "", false
     end
     if mode ~= s.mode then hybrid.reset(s); s.mode = mode end
+    local record = fighter and fighter.record
+    if s.record ~= record or not s.moves then
+        s.record, s.moves = record, hybrid.moves(record)
+        s.pages = hybrid.pages(s.moves)
+        s.page = math.min(s.page, s.pages)
+    end
     s.clock = s.clock + 33
     s.visible = input.touch_active == true or next(s.fingers) ~= nil
     local events = input.contacts

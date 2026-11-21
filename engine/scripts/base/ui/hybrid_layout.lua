@@ -1,14 +1,21 @@
 -- SPDX-License-Identifier: MIT
 local layout = {}
-layout.order = {"stick", "left", "down", "right", "up", "defend", "attack", "jump", "s1", "s2", "s3", "pause"}
+layout.slots_per_page = 3
+layout.max_pages = 3
+function layout.slot(name, page)
+    return "s" .. (tonumber(name:sub(2)) + ((page or 1) - 1) * layout.slots_per_page)
+end
+
+layout.order = {"stick", "left", "down", "right", "up", "defend", "attack", "jump", "s1", "s2", "s3", "skills", "pause"}
 layout.screen = {left = 0, top = 0, right = 794, bottom = 550}
 layout.labels = {stick = "Joystick", left = "←", right = "→", up = "↑", down = "↓",
-    attack = "ATAK", jump = "SKOK", defend = "OBRONA", s1 = "S1", s2 = "S2", s3 = "S3", pause = "II"}
+    attack = "ATAK", jump = "SKOK", defend = "OBRONA", s1 = "S1", s2 = "S2", s3 = "S3", skills = "S+", pause = "II"}
 local defaults = {
     stick = {171, 551, 124, true}, left = {97, 630, 46, false}, down = {205, 630, 46, false},
     right = {315, 630, 46, false}, up = {205, 523, 46, false},
     defend = {873, 595, 56, true}, attack = {1021, 595, 81, true}, jump = {1169, 595, 56, true},
     s1 = {959, 456, 39, true}, s2 = {1061, 456, 39, true}, s3 = {1161, 456, 39, true},
+    skills = {856, 456, 34, true},
     pause = {640, 44, 26, true},
 }
 local arrows = {left = true, right = true, up = true, down = true}
@@ -42,7 +49,8 @@ function layout.copy(value)
         for fighter, slots in pairs(value.bindings) do
             if type(fighter) == "string" and type(slots) == "table" then
                 local checked = {}
-                for _, slot in ipairs({"s1", "s2", "s3"}) do
+                for index = 1, layout.slots_per_page * layout.max_pages do
+                    local slot = "s" .. index
                     local move = slots[slot]
                     if type(move) == "string" then checked[slot] = move end
                 end
@@ -72,11 +80,11 @@ function layout.geometry(settings, screen)
     return result
 end
 
-function layout.hit(geometry, x, y, show_disabled, paused)
+function layout.hit(geometry, x, y, show_disabled, paused, show_skills)
     local chosen, nearest
     for _, name in ipairs(layout.order) do
         local item = geometry[name]
-        if item and (item.enabled or show_disabled) and (not paused or name == "pause") then
+        if item and (name ~= "skills" or show_skills ~= false) and (item.enabled or show_disabled) and (not paused or name == "pause") then
             local dx, dy = math.abs(x - item.x) / item.rx, math.abs(y - item.y) / item.ry
             -- Both shapes use a linear, edge-normalized distance so overlapping buttons compare fairly.
             local distance = item.shape == "rect" and math.max(dx, dy) or math.sqrt(dx * dx + dy * dy)

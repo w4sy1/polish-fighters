@@ -78,7 +78,8 @@ function hud.draw(context, geometry, state, preview, selected)
     for _, name in ipairs(layout.order) do
         local item = geometry[name]
         if (item.enabled or preview and selected == name) and (preview or state.mode ~= "pause" or name == "pause")
-            and (preview or state.mode ~= "selection" or (name ~= "pause" and not name:match("^s%d$"))) then
+            and (preview or state.mode ~= "selection" or (name ~= "pause" and not name:match("^s%d$")))
+            and (preview or name ~= "skills" or (state.pages or 1) > 1) then
             local color = colors[name] or (name:sub(1, 1) == "s" and name ~= "stick" and colors.special or colors.neutral)
             local opacity = item.enabled and item.opacity or 0.22
             if selected == name then
@@ -102,7 +103,8 @@ function hud.draw(context, geometry, state, preview, selected)
                     item.y + (state.knob_y or 0) * item.radius * 0.61, knob, knob, "round", colors.knob, opacity, false)
             else
                 local size = math.max(8, math.floor(math.min(item.ry * 0.66, item.rx * 2.85 / #layout.labels[name])))
-                label(context, layout.labels[name], item.x, item.y, size, state.text)
+                local caption = name:match("^s%d$") and layout.slot(name, state.page):upper() or layout.labels[name]
+                label(context, caption, item.x, item.y, size, state.text)
             end
         end
     end

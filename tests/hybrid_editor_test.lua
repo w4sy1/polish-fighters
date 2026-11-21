@@ -79,3 +79,12 @@ assert(layout.hit(geometry, 6, 0) == "stick")
 -- 0.8 of the stick's radius against 0.7 of the arrow's half-width: the arrow is nearer.
 assert(layout.hit(geometry, 8, 0) == "left")
 print("PASS Hybrid Control editor: drag, mixed shapes, sizes, transparency, binding, save, cancel and reset")
+
+s = editor.create(settings.current())
+tap(700, 423)
+assert(s.show_moves and s.move_row == 1)
+tap(700, 145)
+assert(s.move_row == 2)
+tap(700, 145)
+assert(s.move_row == 1)
+print("PASS: data-driven move list opens and pages through valid targets")

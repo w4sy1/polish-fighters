@@ -61,3 +61,11 @@ assert(base.global_navigation_update(mobile,{keys={},click=true,pointer_x=600,po
 assert(base.create({}).launch.hub_mode=='root','desktop root must remain available')
 assert(#actions==0,'menu return must not exit application')
 print('PASS global menu: all screen types, F4 edge, touch during fight, stalled network, no quit')
+
+local paused=base.create({});paused.active='match';paused.match={view={paused=true}}
+local open_help={functions='',keys={},click=true,pointer_x=120,pointer_y=20}
+assert(base.global_navigation_update(paused,open_help,context) and paused.paused_guide)
+assert(base.global_navigation_update(paused,{functions='',keys={[27]=true}},context) and not paused.paused_guide)
+paused.session={}
+assert(not base.global_navigation_update(paused,open_help,context) and not paused.paused_guide)
+print('PASS: local pause help opens and closes without intercepting multiplayer')

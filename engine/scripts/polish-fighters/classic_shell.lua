@@ -10,9 +10,10 @@ return function(base)
         if s.pf_message then return {{"back","POWROT"}} end
         if s.pf_panel=="combo-guide" then
             local guide=require('polish-fighters/combo_guide')
-            local list={{'guide-basics','JAK ROBIĆ KOMBOSY - PODSTAWY'}}
+            local list={{'guide-basics','STEROWANIE I PORADNIK'}}
             for _,id in ipairs(guide.order) do list[#list+1]={'guide:'..id,guide.names[id]} end
             list[#list+1]={'guide-roster','PRZEGLĄDAJ WSZYSTKIE POSTACIE'}
+            list[#list+1]={'guide-moves','LISTA RUCHÓW'}
             list[#list+1]={'back','POWRÓT'};return list
         end
         if s.pf_panel=="unlock" then
@@ -78,7 +79,7 @@ return function(base)
         local title=require("polish-fighters/hub").title(require("base/game/catalog").profile_id)
         return {{"play","GRAJ W "..title:upper()},{"maps","WYBIERZ MAPE"},{"packs","PAKIETY I POSTACIE"},
             {"connection","POLACZENIA: 2-8 URZADZEN"},{"account","KONTO / GOSC"},{"options","USTAWIENIA"},
-            {"touch","STEROWANIE DOTYKOWE"},{"history","HISTORIA ROZGRYWEK"},{"combo-guide","PORADNIK KOMBOSÓW"},
+            {"touch","STEROWANIE DOTYKOWE"},{"history","HISTORIA ROZGRYWEK"},{"combo-guide","STEROWANIE I PORADNIK"},
             {"unlock","ODBLOKOWANIE POSTACI"},{"close","POWROT DO LF2"}}
     end
     function base.create(value)
@@ -106,6 +107,11 @@ return function(base)
         elseif id=="guest" then s.pf_panel=nil
         elseif id=='guide-basics' then s.pf_message=require('polish-fighters/combo_guide').basics;s.pf_guide_message=true
         elseif id:sub(1,6)=='guide:' then s.pf_message=require('polish-fighters/combo_guide').message(tonumber(id:sub(7)));s.pf_guide_message=true
+        elseif id=='guide-moves' then
+            s.options=require('base/game/options').current()
+            s.hud=require('base/ui/hybrid_editor').create(s.options,'menu')
+            s.hud.show_moves=true
+            s.page='hud'
         elseif id=='guide-roster' then
             local content,problem=model.contents()
             if content then s.pf_contents=content;s.pf_panel='fighters';s.pf_back_to_guide=true
@@ -278,8 +284,8 @@ return function(base)
         else font.draw(c,title,421,183,4,nil,"center") end
         if s.pf_message then
             for i=2,#s.pf_message do
-                if s.pf_guide_message and c.text then c.text(s.pf_message[i],210,255+(i-2)*25,'left',14,0xffffff,nil,nil,true)
-                else font.gdi(c,s.pf_message[i],210,270+(i-2)*28,0xffffff) end
+                if s.pf_guide_message and c.text then c.text(s.pf_message[i],210,255+(i-2)*23,'left',14,0xffffff,nil,nil,true)
+                else font.gdi(c,s.pf_message[i],210,255+(i-2)*23,0xffffff) end
             end
         end
         local list=items(s)

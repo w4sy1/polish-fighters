@@ -108,3 +108,30 @@ assert(not saved.hybrid.controls.s2.enabled and saved.hybrid.bindings["pack:figh
 local parsed = controls.read({sets = {{device = 1}, {device = 1}, {device = 1}, {device = 1}}}, "k m0,0,0 h1 vd1:5:30:50,m1:-2:20:51,u1:-2:20:53,")
 assert(#parsed.contacts == 3 and parsed.contacts[2].x == -2 and parsed.contacts[3].phase == "u")
 print("PASS Hybrid Control: eight directions, holds, fast taps, multitouch, cancel, resize, run, shortcuts, settings and transport")
+
+-- Seven command families share three controls over three pages. Touch shortcuts
+-- still emit ordinary LF2 inputs, including the final-page transform command.
+local seven = {facing = 0, record = {frames = {
+    [0] = hits({Fa = 40, Ua = 40, Da = 40, Fj = 40, Uj = 40, Dj = 40, ja = 40}),
+    [5] = hits({ja = -41}), [40] = hits(), [41] = hits(),
+}}}
+local moves = hybrid.moves(seven.record)
+assert(#moves == 7 and hybrid.pages(moves) == 3)
+assert(#moves[7].variants == 2 and moves[7].variants[1].target == -41)
+assert(moves[7].variants[1].sources[1] == 5)
+local extended = layout.copy({bindings = {["pack:fighter"] = {s1 = "Ua", s4 = "Dj", s7 = "ja"}}})
+assert(extended.bindings["pack:fighter"].s4 == "Dj" and extended.bindings["pack:fighter"].s7 == "ja")
+s = hybrid.create(extended)
+assert(update(s, {contact("d", 20, "skills")}, true, nil, seven, "pack:fighter") == "")
+assert(s.page == 2)
+assert(update(s, {contact("d", 21, "s1")}, true, nil, seven, "pack:fighter") == "f")
+assert(update(s, nil, true, nil, seven) == "fd")
+assert(update(s, nil, true, nil, seven) == "fdb")
+assert(update(s, {contact("u", 20, "skills"), contact("u", 21, "s1")}, true, nil, seven) == "")
+assert(update(s, {contact("d", 22, "skills")}, true, nil, seven, "pack:fighter") == "")
+assert(s.page == 3)
+assert(update(s, {contact("d", 23, "s1")}, true, nil, seven, "pack:fighter") == "f")
+assert(update(s, nil, true, nil, seven) == "fb")
+assert(update(s, nil, true, nil, seven) == "fbc")
+assert(update(s, nil, true, nil, fighter) == "" and s.page == 1)
+print("PASS: seven move families, conditional targets, extended bindings, transport and fighter page change")

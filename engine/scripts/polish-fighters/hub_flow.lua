@@ -7,6 +7,9 @@ return function(base)
  local function button_area(state)
   return 574,6,214,32
  end
+ local function paused_locally(state)
+  return not state.session and state.active=='match' and state.match and state.match.view and state.match.view.paused
+ end
  local function show_button(state)
   if not visible(state) then return false end
   if state.active~='launch' then return true end
@@ -41,6 +44,14 @@ return function(base)
    state.launch.hub_pending_mode=pending;state.launch.hub_mode='players'
    saved.little_fighters_pending_mode=nil;engine.write_settings(saved)
   end
+  if state.launch.hub_enabled and options.profiles_available and not options.profile_start
+   and not saved.controls_guide_seen and state.launch.hub_mode=='root' and state.launch.page=='menu' then
+   state.launch.hub_intro_guide=true
+   state.launch.hub_classic=true
+   state.launch.pf_panel='combo-guide'
+   state.launch.pf_guide_message=true
+   state.launch.pf_message=require('polish-fighters/combo_guide').basics
+  end
   return state
  end
  local function return_to_main(state)
@@ -59,6 +70,18 @@ return function(base)
    return true
   end
   if not visible(state) then return false end
+  if not paused_locally(state) then state.paused_guide=nil end
+  if state.paused_guide then
+   if pressed or (input.keys and input.keys[27]) or (input.click and input.pointer_y and input.pointer_y>=460) then
+    state.paused_guide=nil
+   end
+   return true
+  end
+  if paused_locally(state) and input.click and input.pointer_x and input.pointer_y
+   and input.pointer_x>=10 and input.pointer_x<=240 and input.pointer_y>=6 and input.pointer_y<=38 then
+   state.paused_guide=true
+   return true
+  end
   if pressed and state.active=='launch' and not state.session then
    local launch=state.launch
    if launch.hub_mode=='root' and (launch.page==nil or launch.page=='menu') and
@@ -100,6 +123,25 @@ return function(base)
   end
   context.pf_selection_hint=state.launch and state.launch.hub_enabled and state.active=='characters'
   draw(state,context)
+  if paused_locally(state) then
+   local font=require('base/ui/font')
+   local ascii=require('base/ui/hybrid_hud').ascii
+   local function text(label,x,y,align)
+    if context.text then context.text(label,x,y,align,14,0xffffff,nil,nil,true)
+    else font.draw(context,ascii(label),x,y,1,nil,align) end
+   end
+   if state.paused_guide then
+    context.fill(60,70,674,440,16,27,47,250)
+    for index,line in ipairs(require('polish-fighters/combo_guide').basics) do
+     text(line,80,88+(index-1)*29,'left')
+    end
+    context.fill(300,460,194,35,25,48,80,255)
+    text('POWRÓT',397,468,'center')
+    return
+   end
+   context.fill(10,6,230,32,25,48,80,240)
+   text('STEROWANIE I PORADNIK',125,13,'center')
+  end
   if not show_button(state) then return end
   local x,y,w,h=button_area(state)
   if state.active=='characters' and context.text then
