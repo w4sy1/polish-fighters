@@ -97,3 +97,105 @@ assert(e.frame ~= 300 and e.frame ~= 301 and e.frame ~= 302,
 assert(e.sequences[combo_right_attack] == combo_idle, "directionless D+A left a combo armed instead of idle")
 
 print("PASS: classic D,F,a timing unaffected; touch D+A/D+J chords execute; D+J+A unaffected; directionless D+A still inert")
+
+-- An attack frame that can be cancelled into defense. Jump is available from
+-- that stance via hit_j, as defined by the fighter record.
+frames[character_frames.punch] = make_frame(frame_states.attacking)
+frames[character_frames.defend].hits.j = character_frames.jump
+frames[character_frames.jump] = make_frame(frame_states.jumping, {d = 0})
+
+for _, direction in ipairs({"left", "right"}) do
+    local function attacking()
+        local fighter = item.create(record)
+        press(fighter, {attack = true})
+        assert(fighter.frame == character_frames.punch)
+        return fighter
+    end
+
+    local released = attacking()
+    press(released, {defend = true})
+    assert(released.frame == character_frames.defend)
+    press(released, {[direction] = true, jump = true})
+    assert(released.frame == character_frames.jump, "released attack-cancel BLOCK started a special: " .. direction)
+
+    local staggered = attacking()
+    press(staggered, {defend = true})
+    press(staggered, {[direction] = true})
+    press(staggered, {[direction] = true, jump = true})
+    assert(staggered.frame == character_frames.jump, "released BLOCK survived a direction edge: " .. direction)
+
+    local held = attacking()
+    press(held, {defend = true})
+    press(held, {defend = true, [direction] = true})
+    press(held, {defend = true, [direction] = true, jump = true})
+    assert(held.frame == 310, "held BLOCK did not start its special: " .. direction)
+
+    local chord = attacking()
+    press(chord, {defend = true, [direction] = true, jump = true})
+    assert(chord.frame == 310, "same-tick attack-cancel chord failed: " .. direction)
+
+    local late_chord = item.create(record)
+    press(late_chord, {defend = true})
+    press(late_chord, {[direction] = true, jump = true})
+    assert(late_chord.frame == character_frames.jump, "released neutral BLOCK armed a later chord: " .. direction)
+
+    local classic = item.create(record)
+    press(classic, {defend = true})
+    press(classic, {[direction] = true})
+    press(classic, {jump = true})
+    assert(classic.frame == 310, "classic three-tap jump special failed: " .. direction)
+end
+
+print("PASS: attack-cancel release, held and simultaneous specials, and classic jump specials on both sides")
+
+local hybrid = require("base/ui/hybrid_input")
+local layout = require("base/ui/hybrid_layout")
+local bounds = {left = 0, top = 0, right = 1280, bottom = 720}
+local settings = layout.copy()
+local geometry = layout.geometry(settings, bounds)
+local function contact(phase, id, name, dx)
+    local target = geometry[name]
+    return {phase = phase, id = id, x = target.x + (dx or 0), y = target.y, ms = 1}
+end
+
+for _, side in ipairs({-1, 1}) do
+    for _, release in ipairs({true, false}) do
+        local touch = hybrid.create(settings)
+        local fighter = item.create(record)
+        local function tick(...)
+            local keys = hybrid.update(touch, {contacts = {...}, screen = bounds, touch_active = true},
+                "match", fighter, "test:fighter", true)
+            local held = {}
+            for key, symbol in pairs({attack = "c", defend = "f", jump = "b", left = "l", right = "r"}) do
+                held[key] = keys:find(symbol, 1, true) ~= nil
+            end
+            press(fighter, held)
+        end
+        tick(contact("d", 1, "attack"))
+        tick(contact("u", 1, "attack"))
+        tick(contact("d", 2, "defend"))
+        if release then tick(contact("u", 2, "defend")) end
+        tick(contact("d", 3, "stick", side * 80))
+        tick(contact("d", 4, "jump"))
+        assert(fighter.frame == (release and character_frames.jump or 310), "touch BLOCK release/hold regression")
+    end
+end
+
+local rapid = item.create(record)
+frames[character_frames.defend].hits.a = character_frames.punch
+for _ = 1, 6 do
+    press(rapid, {attack = true})
+    assert(rapid.frame == character_frames.punch, "rapid ATTACK failed")
+    press(rapid, {attack = true, left = true})
+    press(rapid, {attack = true, right = true})
+    assert(rapid.frame == character_frames.punch, "quick reversal during attack triggered a special")
+    press(rapid, {defend = true})
+    assert(rapid.frame == character_frames.defend, "rapid BLOCK failed to enter defense")
+end
+press(rapid, {jump = true, right = true})
+assert(rapid.frame == character_frames.jump, "rapid attack/block sequence left a special armed")
+rapid.y_int = -1
+press(rapid, {jump = true, attack = true})
+assert(rapid.frame == character_frames.jump_attack, "ordinary airborne JUMP+ATTACK regressed")
+
+print("PASS: touch contact streams, rapid attack/block and reversal, and ordinary jump attack")

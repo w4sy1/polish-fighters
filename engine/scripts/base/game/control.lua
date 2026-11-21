@@ -4,6 +4,8 @@
 local constants = require("base/game/constants")
 local combo_jump_attack = constants.combo_indices.jump_attack
 local combo_right_attack = constants.combo_indices.right_attack
+local combo_right_jump = constants.combo_indices.right_jump
+local combo_left_jump = constants.combo_indices.left_jump
 local sequence_defend_pressed = constants.combo_states.defend_pressed
 local sequence_idle = constants.combo_states.idle
 local sequence_second_pressed = constants.combo_states.second_pressed
@@ -107,6 +109,16 @@ end
 local function recognize(match, value, index)
     local spec = sequences[index]
     local state = value.sequences[index]
+    if (index == combo_right_jump or index == combo_left_jump) and not value.keys.defend then
+        -- An attack-cancel block can only start a sideways special while held.
+        -- Outside an attack, keep the classic separate taps, but don't interpret
+        -- a fresh direction and jump together as the remaining two taps.
+        if value.attack_block or (state == sequence_defend_pressed
+            and value[spec[1]] == input_press_frames and value.jump_press == input_press_frames) then
+            value.sequences[index] = sequence_idle
+            return
+        end
+    end
     local advanced = false
     if state == sequence_idle and value.defend_press == input_press_frames then state, advanced = sequence_defend_pressed, true end
     -- A simultaneous defense and action can read the current frame or its defend stance.
@@ -433,6 +445,9 @@ function control.step(match, value)
         if not value.previous_keys[key] and value.keys[key] then
             value[key_press[key]] = input_press_frames
         end
+    end
+    if value.defend_press == input_press_frames then
+        value.attack_block = value.record.frame(value.frame).state == constants.frame_states.attacking
     end
     local attack_frame
     for index = combo_right_attack, combo_jump_attack do
