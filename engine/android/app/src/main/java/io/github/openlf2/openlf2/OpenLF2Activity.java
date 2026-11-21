@@ -40,6 +40,13 @@ public final class OpenLF2Activity extends SDLActivity {
         });
     }
 
+    /** Called by the in-game Information menu. */
+    public void checkGameUpdate() {
+        runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) GitHubUpdates.check(this);
+        });
+    }
+
     private boolean takeAndroidToolsRequest() { return takeRequest(OPEN_ANDROID_TOOLS); }
 
     private boolean takeRequest(String key) {
@@ -91,7 +98,6 @@ public final class OpenLF2Activity extends SDLActivity {
             throw new IllegalStateException("Could not stage Lua modules", error);
         }
         super.onCreate(savedInstanceState);
-        GitHubUpdates.attach(this);
     }
 
     private boolean usesCurrentBundle() throws IOException {
@@ -120,13 +126,15 @@ public final class OpenLF2Activity extends SDLActivity {
     @Override
     protected String[] getArguments() {
         try {
-            if (getIntent().hasExtra("lan_host")) {
-                return GameLaunchArguments.lan(getFilesDir(), getIntent().getBooleanExtra("lan_host", false),
-                    getIntent().getStringExtra("lan_address"), getIntent().getIntExtra("lan_port", 12345), stagedScripts);
-            }
-            return GameLaunchArguments.build(getFilesDir(),
-                getIntent().getStringExtra("bluetooth_role"),
-                getIntent().getIntExtra("bluetooth_port", 0), stagedScripts);
+            String[] launch = getIntent().hasExtra("lan_host")
+                ? GameLaunchArguments.lan(getFilesDir(), getIntent().getBooleanExtra("lan_host", false),
+                    getIntent().getStringExtra("lan_address"), getIntent().getIntExtra("lan_port", 12345), stagedScripts)
+                : GameLaunchArguments.build(getFilesDir(), getIntent().getStringExtra("bluetooth_role"),
+                    getIntent().getIntExtra("bluetooth_port", 0), stagedScripts);
+            String[] withVersion = java.util.Arrays.copyOf(launch, launch.length + 2);
+            withVersion[launch.length] = "--android-version";
+            withVersion[launch.length + 1] = BuildConfig.VERSION_NAME;
+            return withVersion;
         } catch (IOException | org.json.JSONException error) {
             throw new IllegalStateException("Nie można odczytać wybranego modułu gry", error);
         }

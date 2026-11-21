@@ -10,6 +10,10 @@ return function(base)
  local packs=require("polish-fighters/pack_preferences")
  local locale=require('polish-fighters/menu_locale')
  local layout=require('polish-fighters/menu_layout')
+ local function menu_box(state,index,count)
+  if state.hub_mode=='information' and state.hub_android then return 147,293+(index-1)*62,500,26 end
+  return layout.box(index,count)
+ end
  local sounds=require('base/game/sounds')
  local online=require('polish-fighters/online_screen')
  local mods=require('polish-fighters/mod_browser')
@@ -33,6 +37,7 @@ return function(base)
    if catalog.profile_id=='mixed-all' then state.hub_note='Do gry w sieci wybierz samodzielny moduł.'
    else online.open(state,true,true) end
   elseif id=='information' then state.hub_mode=id
+  elseif id=='check_android_update' then context.action(id)
   elseif id=='battle' or id=='settings' or id=='credits' or id=='language' or id=='status' then
    state.hub_mode=id
   elseif id:sub(1,5)=='lang_' then
@@ -168,7 +173,7 @@ return function(base)
   end
   local rows=hub.rows(state);local targets={}
   for index in ipairs(rows) do
-   local x,y,w,h=layout.box(index,#rows);targets[#targets+1]=nav.target(x,y,x+w,y+h)
+   local x,y,w,h=menu_box(state,index,#rows);targets[#targets+1]=nav.target(x,y,x+w,y+h)
   end
   for index=1,2 do
    local x,y,w,h=layout.language(index);targets[#targets+1]=nav.target(x,y,x+w,y+h)
@@ -236,7 +241,7 @@ return function(base)
   end
   local rows=hub.rows(state,catalog.profile_id)
   for index,row in ipairs(rows) do
-   local x,y,w,h=layout.box(index,#rows)
+   local x,y,w,h=menu_box(state,index,#rows)
    if context.fill then
     if index==state.hub_hover then context.fill(x,y,w,h,20,42,82,220) end
     if row[3] then context.fill(x-8,y,4,h,255,211,76,255) end
@@ -250,7 +255,9 @@ return function(base)
   end
   text(context,locale.text('active')..hub.title(catalog.profile_id),16,492,variants.yellow)
   if state.hub_mode=='information' then
-   text(context,'ZAINSTALOWANA WERSJA '..require('polish-fighters/updates').version,397,252,variants.yellow,'center')
+   local version=state.hub_installed_version
+   if not version or version=='' then version=require('polish-fighters/updates').version end
+   text(context,'ZAINSTALOWANA WERSJA '..version,397,252,variants.yellow,'center')
   elseif state.hub_mode=='credits' then
    text(context,locale.text('credit_text'),397,235,variants.white,'center')
    text(context,locale.text('credit_packs'),397,280,variants.white,'center')

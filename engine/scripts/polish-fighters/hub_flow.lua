@@ -21,6 +21,7 @@ return function(base)
   state.launch.hub_enabled=not options.legacy_menu
   state.launch.hub_available=options.profiles_available
   state.launch.hub_android=options.touch_device
+  state.launch.hub_installed_version=options.installed_version
   local saved=engine and engine.read_settings and engine.read_settings() or {}
   if type(saved)~="table" then saved={} end
   local chosen=saved.little_fighters_start_profile

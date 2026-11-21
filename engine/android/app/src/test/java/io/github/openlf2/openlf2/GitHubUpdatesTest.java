@@ -1,5 +1,8 @@
 package io.github.openlf2.openlf2;
+
 import static org.junit.Assert.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -7,49 +10,46 @@ import org.robolectric.annotation.Config;
 
 @RunWith(RobolectricTestRunner.class) @Config(sdk=28)
 public class GitHubUpdatesTest {
-    @org.junit.Before public void reset() { GitHubUpdates.resetForTest(); }
-    private String release(String version,String asset,boolean draft) {
-        return "[{\"name\":\"Polish Fighters "+version+"\",\"draft\":"+draft+
-            ",\"prerelease\":true,\"html_url\":\"https://github.com/w4sy1/polish-fighters/releases/tag/test\",\"assets\":[{\"name\":\""+asset+"\",\"state\":\"uploaded\"}]}]";
+    private static final String REPOSITORY = "https://github.com/w4sy1/polish-fighters/releases/";
+    private static final String[] ARM = {"arm64-v8a"};
+
+    private JSONObject asset(String version, String name) throws Exception {
+        return new JSONObject().put("name", name).put("state", "uploaded")
+            .put("browser_download_url", REPOSITORY + "download/v" + version + "/" + name);
     }
-    @Test public void currentAndOlderDoNotNotify() throws Exception {
-        assertNull(GitHubUpdates.select(release("0.10.0","Android.apk",false),"0.11.0-local"));
-        assertNull(GitHubUpdates.select(release("0.11.0","Android.apk",false),"0.11.0-local"));
+
+    private JSONObject release(String version, String abi, boolean draft, boolean checksum) throws Exception {
+        String name = "PolishFighters-Android-" + abi + ".apk";
+        JSONArray assets = new JSONArray().put(asset(version, name));
+        if (checksum) assets.put(asset(version, name + ".sha256"));
+        return new JSONObject().put("name", "Polish Fighters " + version).put("tag_name", "v" + version)
+            .put("draft", draft).put("html_url", REPOSITORY + "tag/v" + version).put("assets", assets);
     }
-    @Test public void uploadedAndroidPrereleaseNotifies() throws Exception {
-        assertNotNull(GitHubUpdates.select(release("0.12.0","Android.apk",false),"0.11.0-local"));
+
+    @Test public void selectsNewestCompletePackageForPreferredAbi() throws Exception {
+        JSONObject both = release("0.19.0", "arm64-v8a", false, true);
+        both.getJSONArray("assets").put(asset("0.19.0", "PolishFighters-Android-x86_64.apk"))
+            .put(asset("0.19.0", "PolishFighters-Android-x86_64.apk.sha256"));
+        JSONArray releases = new JSONArray().put(release("0.21.0", "arm64-v8a", true, true))
+            .put(release("0.20.0", "arm64-v8a", false, false)).put(both)
+            .put(release("0.18.15", "x86_64", false, true));
+        GitHubUpdates.Candidate candidate = GitHubUpdates.select(releases.toString(), "0.18.14",
+            new String[]{"arm64-v8a", "x86_64"});
+        assertNotNull(candidate);
+        assertEquals("v0.19.0", candidate.version);
+        assertEquals("PolishFighters-Android-arm64-v8a.apk", candidate.name);
+        assertEquals(candidate.apk + ".sha256", candidate.checksum);
     }
-    @Test public void draftsAndWrongAssetsDoNotNotify() throws Exception {
-        assertNull(GitHubUpdates.select(release("0.12.0","Windows.zip",false),"0.11.0"));
-        assertNull(GitHubUpdates.select(release("0.12.0","Android.apk",true),"0.11.0"));
+
+    @Test public void rejectsOlderWrongAbiAndUntrustedAssets() throws Exception {
+        JSONObject untrusted = release("0.22.0", "arm64-v8a", false, true);
+        untrusted.getJSONArray("assets").getJSONObject(0).put("browser_download_url", "https://other.example/game.apk");
+        JSONArray releases = new JSONArray().put(release("0.18.14", "arm64-v8a", false, true))
+            .put(release("0.21.0", "x86_64", false, true)).put(untrusted);
+        assertNull(GitHubUpdates.select(releases.toString(), "0.18.14", ARM));
     }
-    @Test public void untrustedLinkAndEmptyListDoNotNotify() throws Exception {
-        assertNull(GitHubUpdates.select(release("0.12.0","Android.apk",false).replace("github.com/w4sy1/polish-fighters","evil.invalid"),"0.11.0"));
-        assertNull(GitHubUpdates.select("[]","0.11.0"));
-    }
+
     @Test(expected=org.json.JSONException.class) public void malformedResponseIsRejected() throws Exception {
-        GitHubUpdates.select("not json","0.11.0");
-    }
-    @Test public void notificationOpensTrustedReleaseAndOnlyAppearsOnce() throws Exception {
-        try (org.robolectric.android.controller.ActivityController<android.app.Activity> controller=
-                 org.robolectric.Robolectric.buildActivity(android.app.Activity.class).setup()) {
-            android.app.Activity activity=controller.get();
-            GitHubUpdates.source=()->release("99.0.0","Android.apk",false);
-            GitHubUpdates.attach(activity);
-            android.app.AlertDialog dialog=null;
-            for (int i=0;i<100 && dialog==null;i++) {
-                Thread.sleep(10);
-                org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
-                dialog=org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog();
-            }
-            assertNotNull(dialog);
-            assertTrue(dialog.isShowing());
-            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).performClick();
-            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
-            android.content.Intent opened=org.robolectric.Shadows.shadowOf(activity).getNextStartedActivity();
-            assertEquals("https://github.com/w4sy1/polish-fighters/releases/tag/test",opened.getDataString());
-            GitHubUpdates.attach(activity);
-            assertSame(dialog,org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog());
-        }
+        GitHubUpdates.select("not json", "0.18.14", ARM);
     }
 }

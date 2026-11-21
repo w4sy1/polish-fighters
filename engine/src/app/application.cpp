@@ -64,14 +64,14 @@ void wait_milliseconds(std::uint32_t milliseconds) {
 #endif
 }
 #ifdef __ANDROID__
-bool open_android_mods() {
+bool call_android_activity(const char* method) {
     auto* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
     if (env == nullptr) return false;
     auto activity = static_cast<jobject>(SDL_GetAndroidActivity());
     if (activity == nullptr) return false;
     const auto activity_class = env->GetObjectClass(activity);
     if (activity_class != nullptr) {
-        const auto open = env->GetMethodID(activity_class, "showModManager", "()V");
+        const auto open = env->GetMethodID(activity_class, method, "()V");
         if (open != nullptr) env->CallVoidMethod(activity, open);
         env->DeleteLocalRef(activity_class);
     }
@@ -132,6 +132,9 @@ struct Configuration {
     std::optional<std::filesystem::path> config_directory; // --config-dir
     std::string renderer; // --renderer: the SDL renderer to use (testing); empty = the platform's choice
     std::optional<std::filesystem::path> replay; // A recording to open directly at startup.
+#ifdef __ANDROID__
+    std::string android_version;
+#endif
     std::string network_role;
     std::string network_address;
     std::uint16_t network_port = 12345;
@@ -492,6 +495,17 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
             if (++index == arguments.size()) return fail(ErrorCode::format, "--renderer needs a renderer name");
             config.renderer = arguments[index];
         }
+#ifdef __ANDROID__
+        else if (argument == "--android-version") {
+            if (++index == arguments.size()) return fail(ErrorCode::format, "--android-version needs a version name");
+            const auto& version = arguments[index];
+            if (version.empty() || version.size() > 48 ||
+                version.find_first_not_of("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_+") != std::string::npos) {
+                return fail(ErrorCode::format, "invalid Android version name");
+            }
+            config.android_version = version;
+        }
+#endif
         else if (argument == "--installer" || argument == "--scripts" || argument == "--mod"
                  || argument == "--config-dir" || argument == "--replay" || argument == "--capture-frame") {
             if (++index == arguments.size()) return fail(ErrorCode::format, argument + " needs a path");
@@ -1091,7 +1105,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     profiles_available += "}";
     const auto bundle = "local runtime_settings = {menu_seed=" + std::to_string(menu_seed) + profiles_available +
 #ifdef __ANDROID__
-        ", touch_device=true" +
+        ", touch_device=true, installed_version=\"" + config.android_version + "\"" +
 #endif
 #ifdef _WIN32
         ", desktop_controls=true" +
@@ -1454,8 +1468,9 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
                 return {};
             }
 #ifdef __ANDROID__
-            if (action == "open_android_mods") {
-                if (!open_android_mods()) std::cerr << "Could not open the Android Mod Manager\n";
+            if (action == "open_android_mods" || action == "check_android_update") {
+                const char* method = action == "open_android_mods" ? "showModManager" : "checkGameUpdate";
+                if (!call_android_activity(method)) std::cerr << "Could not open Android screen: " << action << '\n';
                 continue;
             }
 #endif
