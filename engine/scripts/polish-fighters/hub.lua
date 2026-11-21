@@ -11,9 +11,21 @@ hub.profiles={
  {id="ntsd",profile="ntsd",title="NTSD / Naruto"},
  {id="bleach",profile="bleach",title="Bleach"},
 }
+hub.optional_profiles={
+ {id="dragon_ball_super", profile="dragon-ball-super", title="Dragon Ball Super"},
+ {id="fighter_hero", profile="fighter-hero", title="Fighter Hero"},
+ {id="gf2", profile="gf2", title="GF2"},
+ {id="lf2_ns", profile="lf2-ns", title="LF2 NS"},
+ {id="sx2", profile="sx2", title="Sx2"},
+ {id="lf2_sv", profile="lf2-sv", title="LF2 SV"},
+ {id="rn_lf2", profile="rn-lf2", title="RN LF2"},
+ {id="lf_seed", profile="lf-seed", title="LF Seed"},
+ {id="wlf2_al", profile="wlf2-al", title="WLF2 AL"},
+}
 function hub.title(profile)
  if profile=='mixed-all' then return 'Polish Fighters: wszystkie mody' end
  for _,entry in ipairs(hub.profiles) do if entry.profile==profile then return entry.title end end
+ for _,entry in ipairs(hub.optional_profiles) do if entry.profile==profile then return entry.title end end
  if type(profile)=='string' and profile:match('^mod%-') then return 'MOD '..profile:sub(5,16) end
  return "Little Fighters"
 end
@@ -74,9 +86,22 @@ function hub.rows(state,active_profile)
   local missing=state.hub_available and state.hub_available[id]==false
   rows[#rows+1]={'profile_'..id,title..(missing and L('missing') or ''),profile==active_profile}
  end
+ local available=not state.hub_android and state.hub_available
+ if mode=='optional_modules' then
+  for _,entry in ipairs(hub.optional_profiles) do
+   if available and available[entry.id] then profile_row(entry.id,entry.title,entry.profile) end
+  end
+  rows[#rows+1]=row('library','back')
+  return rows
+ end
  if state.hub_custom_profile then profile_row('current',hub.title(state.hub_custom_profile),state.hub_custom_profile) end
  for _,entry in ipairs(hub.profiles) do
   profile_row(entry.id,entry.title,entry.profile)
+ end
+ if available then
+  for _,entry in ipairs(hub.optional_profiles) do
+   if available[entry.id] then rows[#rows+1]=row('optional_modules');break end
+  end
  end
  rows[#rows+1]=row('mods');rows[#rows+1]=row('packs');profile_row('mixed',L('mixed'),'mixed-all');rows[#rows+1]=row('status');rows[#rows+1]=row(state.hub_pending_mode and 'battle' or 'root','back')
  return rows

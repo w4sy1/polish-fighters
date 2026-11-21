@@ -70,7 +70,7 @@ return function(base)
    if saved then state.hub_selected=state.hub_pack_edit;state.hub_pack_edit=nil;state.hub_mode="library"
    else state.hub_note=tostring(problem) end
   elseif id=="packs_cancel" then state.hub_pack_edit=nil;state.hub_mode="library"
-  elseif id=="root" or id=="library" then state.hub_mode=id;if id=="root" then state.hub_pending_mode=nil end
+  elseif id=="root" or id=="library" or id=="optional_modules" then state.hub_mode=id;if id=="root" then state.hub_pending_mode=nil end
   elseif id=='profile_current' and state.hub_custom_profile then
    state.hub_preselected=true;state.hub_mode=state.hub_pending_mode and 'players' or 'profile'
   elseif id:sub(1,8)=="profile_" then
@@ -89,7 +89,13 @@ return function(base)
     context.action(id)
     return
    end
-   for _,entry in ipairs(hub.profiles) do
+   local profiles=hub.profiles
+   if not state.hub_android and state.hub_available and state.hub_available[tag] then
+    for _,entry in ipairs(hub.optional_profiles) do
+     if entry.id==tag then profiles={entry};break end
+    end
+   end
+   for _,entry in ipairs(profiles) do
     if entry.id==tag then
      if catalog.profile_id==entry.profile then state.hub_preselected=true;state.hub_mode=state.hub_pending_mode and 'players' or 'profile'
      else
@@ -174,7 +180,7 @@ return function(base)
   if mapped.nav.cancel and state.hub_mode~='root' then
    if state.hub_mode=='packs' then state.hub_pack_edit=nil;state.hub_mode='library'
    elseif state.hub_mode=='status' then state.hub_note=locale.text('audit_note')
-  elseif state.hub_mode=='players' then state.hub_mode='library'
+  elseif state.hub_mode=='players' or state.hub_mode=='optional_modules' then state.hub_mode='library'
    elseif state.hub_mode=='library' and state.hub_pending_mode then state.hub_mode='battle'
    else state.hub_mode='root';state.hub_pending_mode=nil end
    sounds.direct(state,'cancel')

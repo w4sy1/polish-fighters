@@ -3,7 +3,7 @@ return {
  current_mod='BIEŻĄCY MOD: ',
  mods='KATALOG MODÓW',
  status='STAN / ZGODNOŚĆ MODUŁÓW', audit_note='Stan plików przy budowie. Obecność zasobów nie oznacza pełnej zgodności mechanik.', assets='Zasoby: ', missing_files='Brakujące pliki: ',
- battle='BITWA', play_main='GRAJ', modules='MODUŁY', online='GRAJ PRZEZ INTERNET', settings='USTAWIENIA', language='JĘZYK', credits='TWÓRCY', quit='WYJŚCIE',
+ battle='BITWA', play_main='GRAJ', modules='MODUŁY', optional_modules='DODATKOWE MODUŁY', online='GRAJ PRZEZ INTERNET', settings='USTAWIENIA', language='JĘZYK', credits='TWÓRCY', quit='WYJŚCIE',
  back='WSTECZ', controls='STEROWANIE', video='OBRAZ / DŹWIĘK', extras='HISTORIA / ODBLOKOWANIA', recording='USTAWIENIA NAGRAŃ',
  versus='VS Mode', stage='Stage Mode', championship='1 on 1 Championship', team_championship='2 on 2 Championship',
  battle_setup='Battle Mode', demo='Demo', replay='Playback Recording',

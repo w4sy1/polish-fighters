@@ -43,6 +43,20 @@ for _,entry in ipairs(hub.profiles) do state.hub_pack_edit[entry.id]=false end
 click('packs_save');assert(state.hub_mode=='packs' and state.hub_note)
 state.hub_pack_edit.lf_two=true;click('packs_save');assert(state.hub_mode=='library' and document.little_fighters_packs.lf_two)
 assert(#hub.rows(state)==14,'mixed pool settings must not hide standalone modules')
+state.hub_available={dragon_ball_super=true,fighter_hero=true,gf2=true,lf2_ns=true,sx2=true,lf2_sv=true,rn_lf2=true,lf_seed=true,wlf2_al=true}
+assert(#hub.rows(state)==15)
+click("optional_modules");assert(#hub.rows(state)==10)
+for _,entry in ipairs(hub.optional_profiles) do
+ click('profile_'..entry.id);assert(requested=='profile_'..entry.id)
+ assert(hub.title(entry.profile)==entry.title)
+end
+back();assert(state.hub_mode=="library")
+state.hub_android=true;assert(#hub.rows(state)==14)
+state.hub_android=nil
+state.hub_available.gf2=false
+click("optional_modules");assert(#hub.rows(state)==9)
+click("library")
+state.hub_available=nil
 local rows=hub.rows(state,'polish-originals')
 assert(rows[1][1]=='profile_polish_fighters' and rows[1][2]=='Polish Originals' and rows[1][3])
 assert(not rows[2][3] and hub.rows(state,'lf2-classic')[2][3])

@@ -17,6 +17,16 @@ def canonical(value):
  if p.is_absolute() or '..' in p.parts or ':' in value or not re.fullmatch(r'[a-z0-9_./-]+',value):raise ValueError('Unsafe resource path: '+value)
  return p.as_posix()
 
+# Match the original catalogue before resolving known conflicting IDs.
+CATALOG_ID_REPAIRS={
+ 'lf-seed':('77a0f7fb78957e34acb7c802918d9e8720149ece52236bb9787560ac6b0d547b',
+            7,19,'data/strikered.dat'),
+ 'lf2-sv':('7debc748b99a4a2406e735d129cc83c5fc18d9bb4481b2b5f0a9a616c465d11d',
+           150,198,'data/weapon1_broken.dat'),
+ 'rn-lf2':('bd273c4f71f0b5c2a5bc2c57c2330ffec10178e37f083fb71feb3cbc84a48d9f',
+           9,17,'data/dennis.dat'),
+}
+
 def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allow_missing=False,managed_import=False):
  source=Path(source).resolve(strict=True);destination=Path(destination).resolve()
  if destination.exists():raise ValueError('Destination already exists; choose a new directory')
@@ -30,18 +40,25 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
    if relative:
     if relative in files:raise ValueError('Case-colliding resource: '+relative)
     files[relative]=path
- catalog=files['data/data.txt'].read_text(encoding='latin1')
+ catalog_bytes=files['data/data.txt'].read_bytes()
+ catalog=catalog_bytes.decode('latin1').replace('\r\n','\n').replace('\r','\n')
  catalog_sha256=hashlib.sha256(catalog.encode('latin1')).hexdigest()
+ source_hash=hashlib.sha256(catalog_bytes).hexdigest()
+ repair=CATALOG_ID_REPAIRS.get(pack_id)
+ if repair and source_hash!=repair[0]:repair=None
+ strip_seed_notes=repair is not None and pack_id=='lf-seed'
+ id_repair=None
  normalization=None
  normalized_files=[]
  if managed_import:
   from normalize_ntsd_vc80 import import_profile, normalize
-  normalization=import_profile(hashlib.sha256(files['data/data.txt'].read_bytes()).hexdigest(),files)
+  normalization=import_profile(source_hash,files)
  objects=re.search(r'<object>(.*?)<object_end>',catalog,re.S).group(1)
  backgrounds=re.search(r'<background>(.*?)<background_end>',catalog,re.S).group(1)
  records=[];bgs=[];seen=set();markers=[];aliases={};custom_labels=[]
  for raw in objects.splitlines():
   line=raw.split('#',1)[0].strip()
+  if strip_seed_notes:line=line.split('<-',1)[0].rstrip()
   if not line:continue
   if line in catalog_markers:
    markers.append(line);continue
@@ -49,9 +66,12 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
    custom_labels.append(line);line=line.replace('fileb:','file:')
   m=re.fullmatch(r'id:\s*(\d+)\s+type:\s*(\d+)\s+file:\s*(\S+)',line)
   if not m:raise ValueError('Unsupported object catalog line: '+line)
-  id_,kind,path=m.groups();id_=int(id_)
+  id_,kind,path=m.groups();id_=int(id_);path=canonical(path)
+  if repair and id_==repair[1] and path==repair[3]:
+   id_repair={'path':path,'old_id':id_,'new_id':repair[2]}
+   id_=repair[2]
   if id_ in seen:raise ValueError('Duplicate object ID: '+str(id_))
-  seen.add(id_);records.append((id_,int(kind),canonical(path)))
+  seen.add(id_);records.append((id_,int(kind),path))
  for raw in backgrounds.splitlines():
   line=raw.split('#',1)[0].strip()
   if not line:continue
@@ -122,6 +142,9 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   (destination/'assets'/mapping['data/data.txt']).write_text('\n'.join(lines)+'\n')
   converted['data/data.txt']=b''
   manifest=f'id={pack_id}\nversion=1\napi=1\nrequires=base@1\nrequires=polish-fighters@1\nextend=base/game/catalog|catalog.lua\nextend=base/game/sounds|sounds.lua\n'
+  if pack_id=='sx2':
+   manifest+='extend=base/game/constants|constants.lua\n'
+   (destination/'constants.lua').write_text('return function(base)\n base.frame_limit=999\n return base\nend\n')
   manifest+=''.join(f'asset={register(p)}|assets/{mapping[p]}\n' for p in sorted(converted))
   if len(manifest.encode())>262144:raise ValueError('Package manifest exceeds engine limit')
   (destination/'package.manifest').write_text(manifest)
@@ -146,6 +169,9 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   sound_paths={p:register(p) for p in converted if p.endswith('.wav')}
   (destination/'sounds.lua').write_text('return function(base)\n local paths={\n'+''.join(' ["'+k+'"]="'+v+'",\n' for k,v in sorted(sound_paths.items()))+' }\n for k,v in pairs(base.fixed_files) do base.fixed_files[k]=paths[v] or v end\n for k,v in pairs(base.menu) do base.menu[k]=paths[v] or v end\n return base\nend\n')
   report={'pack_id':pack_id,'fighters':fighters,'objects':len(records),'backgrounds':len(bgs),'assets':len(converted),'source_catalog_sha256':catalog_sha256,'mode':'isolated, original IDs retained','executable_patches_emulated':False,'gameplay_verified':False,'png_aliases':aliases,'catalog_markers_not_emulated':markers,'custom_catalog_labels':custom_labels,'missing_resources':sorted(missing),'experimental':True}
+  if id_repair:
+   report['mode']='isolated, one conflicting object ID reassigned'
+   report['catalog_id_repair']=id_repair
   if normalized_files:
    report['dat_normalization']={
     'edition':normalization[0], 'method':'VC80 x86 sscanf %d',

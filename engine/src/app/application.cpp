@@ -137,7 +137,13 @@ constexpr std::array profile_definitions{
     ProfileDefinition{"profile_lf_four_turbo", "lf4-turbo"}, ProfileDefinition{"profile_dbz", "dbz"},
     ProfileDefinition{"profile_one_piece", "one-piece"}, ProfileDefinition{"profile_kate", "kate"},
     ProfileDefinition{"profile_reinforced", "reinforced"}, ProfileDefinition{"profile_ntsd", "ntsd"},
-    ProfileDefinition{"profile_bleach", "bleach"}, ProfileDefinition{"profile_mixed", "mixed-all"}};
+    ProfileDefinition{"profile_bleach", "bleach"}, ProfileDefinition{"profile_mixed", "mixed-all"},
+    ProfileDefinition{"profile_dragon_ball_super", "dragon-ball-super"},
+    ProfileDefinition{"profile_fighter_hero", "fighter-hero"},
+    ProfileDefinition{"profile_gf2", "gf2"}, ProfileDefinition{"profile_lf2_ns", "lf2-ns"},
+    ProfileDefinition{"profile_sx2", "sx2"}, ProfileDefinition{"profile_lf2_sv", "lf2-sv"},
+    ProfileDefinition{"profile_rn_lf2", "rn-lf2"}, ProfileDefinition{"profile_lf_seed", "lf-seed"},
+    ProfileDefinition{"profile_wlf2_al", "wlf2-al"}};
 struct ProfileRequest { std::string directory; std::vector<std::string> remaining_trace; };
 std::filesystem::path content_directory(const Configuration& config) {
     // Android stages fresh Lua modules in files/scripts while the unpacked game
@@ -581,8 +587,9 @@ public:
             if (!parsed) return std::unexpected(parsed.error());
             return stage_data::to_script_value(*parsed);
         }
-        // Isolated DBZ format extension; other profiles retain the original 400-frame validation.
-        const auto capacity = (path.starts_with("mods/dbz/") || path.starts_with("mods/mixed-all/2/"))
+        // These packages contain authored animation frames above 399.
+        const auto capacity = (path.starts_with("mods/dbz/") || path.starts_with("mods/mixed-all/2/") ||
+                               path.starts_with("mods/sx2/"))
             ? object_data::extended_frame_count : object_data::frame_count;
         auto parsed = object_data::load(resources_, path, capacity);
         if (!parsed) return std::unexpected(parsed.error());
