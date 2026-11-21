@@ -19,16 +19,19 @@ import org.libsdl.app.SDLActivity;
 public final class OpenLF2Activity extends SDLActivity {
     private static final String TAG = "OpenLF2";
     private static final String OPEN_ANDROID_TOOLS = "little_fighters_open_android_tools";
+    private static final String OPEN_BLUETOOTH = "little_fighters_open_bluetooth";
     private LanWifiMode lanWifi;
     private File stagedScripts;
     private volatile boolean openAndroidTools;
+    private volatile boolean openBluetooth;
     private static final int MOD_MANAGER = 7302;
     private volatile String modManagerResult;
     @Override protected void main() {
         GameDiagnostics.write(this, "launch-last.txt", "Native engine launch\n" + android.os.Build.VERSION.RELEASE);
-        takeAndroidToolsRequest(); // Discard requests left behind by an interrupted game.
+        takeAndroidToolsRequest(); takeBluetoothRequest(); // Discard requests left behind by an interrupted game.
         int result = SDLActivity.nativeRunMain(getMainSharedObject(), getMainFunction(), getArguments());
         openAndroidTools = result == 0 && takeAndroidToolsRequest();
+        openBluetooth = result == 0 && takeBluetoothRequest();
         if (result != 0) GameDiagnostics.write(this, "native-return.txt", "Native engine exit code: " + result);
     }
 
@@ -62,6 +65,7 @@ public final class OpenLF2Activity extends SDLActivity {
     }
 
     private boolean takeAndroidToolsRequest() { return takeRequest(OPEN_ANDROID_TOOLS); }
+    private boolean takeBluetoothRequest() { return takeRequest(OPEN_BLUETOOTH); }
 
     private boolean takeRequest(String key) {
         try {
@@ -160,6 +164,9 @@ public final class OpenLF2Activity extends SDLActivity {
         super.onDestroy();
         if (isFinishing() && openAndroidTools) {
             startActivity(new Intent(this, BluetoothLobbyActivity.class));
+        }
+        if (isFinishing() && openBluetooth) {
+            startActivity(new Intent(this, BluetoothPairingActivity.class));
         }
     }
     /**
