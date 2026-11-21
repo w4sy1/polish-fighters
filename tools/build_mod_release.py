@@ -37,6 +37,17 @@ PACKS = {
 }
 
 
+DEFAULT_PACKS = tuple(PACKS)
+for pack_id, title in (
+    ('dragon-ball-super', 'Dragon Ball Super'), ('fighter-hero', 'Fighter Hero'),
+    ('gf2', 'GF2'), ('lf2-ns', 'LF2 NS'), ('sx2', 'Sx2'), ('lf2-sv', 'LF2 SV'),
+    ('rn-lf2', 'RN LF2'), ('lf-seed', 'LF Seed'), ('wlf2-al', 'WLF2 AL'),
+    ('ce-lf2', 'CE LF2'), ('ntsd-community', 'NTSD Community'), ('ntsd-ce-setup', 'NTSD CE'),
+    ('killer-lf2', 'Killer LF2'),
+):
+    PACKS[pack_id] = (title, pack_id.replace('-', '_'), title)
+
+
 def canonical(document):
     return json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(',', ':'),
                       allow_nan=False).encode('utf-8')
@@ -85,12 +96,12 @@ def stored(archive, name, data):
     archive.writestr(info, data)
 
 
-def build(pack_ids, output, key, version, revision, engine):
+def build(pack_ids, output, key, version, revision, engine, packs_root=ROOT / 'content-packs'):
     output.mkdir(parents=True, exist_ok=True)
     entries = []
     for pack_id in pack_ids:
         name, profile, description = PACKS[pack_id]
-        pack = ROOT / 'content-packs' / pack_id
+        pack = packs_root / pack_id
         manifest_id = next(line[3:] for line in (pack / 'package.manifest').read_text(encoding='utf-8').splitlines()
                            if line.startswith('id='))
         if manifest_id != pack_id:
@@ -157,7 +168,8 @@ def main():
     parser.add_argument('--engine', default='0.1.0', help='Minimum engine version written to manifests')
     parser.add_argument('--catalogue-only', action='store_true',
                         help='Re-sign mods/catalog.json from envelopes already in --output')
-    parser.add_argument('packs', nargs='*', default=list(PACKS))
+    parser.add_argument('--content-packs', type=Path, default=ROOT / 'content-packs')
+    parser.add_argument('packs', nargs='*', choices=tuple(PACKS), default=list(DEFAULT_PACKS))
     args = parser.parse_args()
     if ROOT in args.key.resolve().parents:
         parser.error('The private key must stay outside the repository')
@@ -182,7 +194,7 @@ def main():
                           'unpacked_size_bytes': manifest['unpacked_size_bytes'], 'platforms': ['windows', 'android']})
             entries.append(entry)
     else:
-        entries = build(args.packs, args.output, key, args.version, args.revision, args.engine)
+        entries = build(args.packs, args.output, key, args.version, args.revision, args.engine, args.content_packs)
     write_catalogue(entries, args.revision, args.catalogue, key)
     print(f'Katalog: {len(entries)} paczek -> {args.catalogue}')
 
