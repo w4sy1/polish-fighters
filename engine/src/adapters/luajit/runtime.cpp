@@ -465,7 +465,7 @@ Result<ScriptFrame> decode_frame(lua_State* state, int table, int count) {
                 break;
             case FrameOpcode::action: {
                 const auto name = reader.text();
-                if (name.empty() || name.find_first_not_of("abcdefghijklmnopqrstuvwxyz_") != std::string_view::npos)
+                if (name.empty() || name.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_") != std::string_view::npos)
                     throw std::runtime_error("invalid frame action");
                 frame.actions.emplace_back(name);
                 break;
