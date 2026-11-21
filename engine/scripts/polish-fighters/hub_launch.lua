@@ -46,6 +46,7 @@ return function(base)
   elseif id:sub(1,7)=='status_' then
    local item=require('polish-fighters/module_inventory')[id:sub(8)]
    state.hub_note=locale.text('assets')..item.assets..' / '..locale.text('missing_files')..item.missing
+  elseif id=='campaign_unavailable' then state.hub_note=locale.text('campaign_unavailable')
   elseif id=='resume_campaign' then
    local saved,problem=require('base/game/campaign_save').options(catalog.profile_id)
    if saved then context.action(id) else state.hub_note=tostring(problem) end
@@ -78,7 +79,7 @@ return function(base)
    if saved then state.hub_selected=state.hub_pack_edit;state.hub_pack_edit=nil;state.hub_mode="library"
    else state.hub_note=tostring(problem) end
   elseif id=="packs_cancel" then state.hub_pack_edit=nil;state.hub_mode="library"
-  elseif id=="root" or id=="library" then state.hub_mode=id;if id=="root" then state.hub_pending_mode=nil end
+  elseif id=="root" or id=="library" or id=="optional_modules" then state.hub_mode=id;if id=="root" then state.hub_pending_mode=nil end
   elseif id=='profile_current' and state.hub_custom_profile then
    state.hub_preselected=true;state.hub_mode=state.hub_pending_mode and 'players' or 'profile'
   elseif id:sub(1,8)=="profile_" then
@@ -97,8 +98,17 @@ return function(base)
     context.action(id)
     return
    end
-   for _,entry in ipairs(hub.profiles) do
+   local profiles=hub.profiles
+   if state.hub_available and state.hub_available[tag] then
+    for _,entry in ipairs(hub.optional_profiles) do
+     if entry.id==tag then profiles={entry};break end
+    end
+   end
+   for _,entry in ipairs(profiles) do
     if entry.id==tag then
+     if entry.campaign==false and state.hub_pending_mode=='stage' then
+      state.hub_note=locale.text('campaign_unavailable');return
+     end
      if catalog.profile_id==entry.profile then state.hub_preselected=true;state.hub_mode=state.hub_pending_mode and 'players' or 'profile'
      else
       local doc,problem=engine.read_settings()
@@ -162,6 +172,13 @@ return function(base)
    end
    return
   end
+  if state.hub_pending_touch_profile then
+   if input.button or (input.touches and #input.touches>0) then return end
+   local choice=state.hub_pending_touch_profile
+   state.hub_pending_touch_profile=nil
+   activate(state,choice,context)
+   return
+  end
   if state.hub_edit then return input_settings.update(state,input) end
   if state.hub_online then return online.update(state,input,context) end
   if state.hub_mods then return mods.update(state,input,context) end
@@ -184,7 +201,10 @@ return function(base)
    if mapped.pointer_x>=box.left and mapped.pointer_x<=box.right and mapped.pointer_y>=box.top and mapped.pointer_y<=box.bottom then
     state.hub_hover=index
     if mapped.click then
-     activate(state,rows[index] and rows[index][1] or (index==#rows+1 and 'lang_pl' or 'lang_en'),context)
+     local choice=rows[index] and rows[index][1] or (index==#rows+1 and 'lang_pl' or 'lang_en')
+     if state.hub_android and state.hub_mode=='optional_modules' and choice:sub(1,8)=='profile_' and input.button then
+      state.hub_pending_touch_profile=choice
+     else activate(state,choice,context) end
      sounds.direct(state,'ok');break
     end
    end
@@ -194,7 +214,7 @@ return function(base)
    if state.hub_mode=='information' then state.hub_mode='settings'
    elseif state.hub_mode=='packs' then state.hub_pack_edit=nil;state.hub_mode='library'
    elseif state.hub_mode=='status' then state.hub_note=locale.text('audit_note')
-  elseif state.hub_mode=='players' then state.hub_mode='library'
+  elseif state.hub_mode=='players' or state.hub_mode=='optional_modules' then state.hub_mode='library'
    elseif state.hub_mode=='library' and state.hub_pending_mode then state.hub_mode='battle'
    else state.hub_mode='root';state.hub_pending_mode=nil end
    sounds.direct(state,'cancel')

@@ -24,6 +24,12 @@ return function(base)
   state.launch.hub_installed_version=options.installed_version
   local saved=engine and engine.read_settings and engine.read_settings() or {}
   if type(saved)~="table" then saved={} end
+  if options.profile_load_failed then
+   saved.little_fighters_pending_mode=nil
+   if options.touch_device then saved.little_fighters_start_profile='lf_two' end
+   engine.write_settings(saved)
+   state.launch.hub_note=require('polish-fighters/menu_locale').text('profile_load_failed')
+  end
   local chosen=saved.little_fighters_start_profile
   local single_mobile=options.touch_device and chosen and chosen~='all' and chosen~='custom'
   local active_profile=require('base/game/catalog').profile_id
