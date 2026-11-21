@@ -79,3 +79,24 @@ for _,row in ipairs(hub.rows({hub_mode='battle'},'battle')) do
 end
 assert(require('polish-fighters/menu_locale').text('play_main')=='GRAJ LOKALNIE')
 print('PASS: GRAJ LOKALNIE has no network row, label pinned')
+
+-- Etap 1.14 / Etap 3: GRAJ ZDALNIE replaces SIECI (online), gates BLUETOOTH by availability.
+do
+ local root=hub.rows({hub_mode='root'})
+ local remote_id
+ for _,row in ipairs(root) do if row[1]=='remote' then remote_id=row end if row[1]=='online' then error('online row must be removed') end end
+ assert(remote_id and remote_id[2]=='GRAJ ZDALNIE','root must expose remote with GRAJ ZDALNIE label')
+
+ local android=hub.rows({hub_mode='remote',hub_android=true,hub_bluetooth_available=true})
+ assert(#android==5,'android remote menu must have SERWER/BLUETOOTH/WIFI/HOTSPOT/WSTECZ')
+ local ids={} for i,row in ipairs(android) do ids[row[1]]=i end
+ assert(ids.remote_server and ids.remote_bluetooth and ids.remote_wifi and ids.remote_hotspot and ids.root)
+
+ local desktop=hub.rows({hub_mode='remote',hub_android=false,hub_bluetooth_available=false})
+ assert(#desktop==4,'desktop without bluetooth must have SERWER/WIFI/HOTSPOT/WSTECZ only')
+ for _,row in ipairs(desktop) do assert(row[1]~='remote_bluetooth','no bluetooth row without availability') end
+
+ -- settings no longer exposes the old standalone LAN row
+ for _,row in ipairs(hub.rows({hub_mode='settings'})) do assert(row[1]~='lan','settings must not duplicate WIFI/HOTSPOT via lan row') end
+end
+print('PASS: GRAJ ZDALNIE menu replaces SIECI, gates BLUETOOTH by availability, settings drop duplicate lan row')

@@ -81,8 +81,9 @@ click('profile_polish_fighters');assert(requested=='profile_polish_fighters')
 click('mods');assert(state.hub_mods,'catalogue did not open from library')
 require('polish-fighters/mod_browser').activate(state,'back',context);assert(not state.hub_mods)
 click('packs');click('toggle_lf_two');back();assert(state.hub_selected.lf_two,'cancel modified saved modules')
-state.hub_mode='root';click('online')
-assert(state.hub_online and state.hub_online.simple and state.hub_mode=='root','online must open directly')
+state.hub_mode='root';click('remote');assert(state.hub_mode=='remote','remote must open from root')
+click('remote_server')
+assert(state.hub_online and state.hub_online.simple and state.hub_mode=='remote','remote_server must open directly')
 local online=require('polish-fighters/online_screen')
 local actions={}
 for _,row in ipairs(online.rows(state.hub_online)) do actions[row[1]]=true end
@@ -90,9 +91,10 @@ assert(actions.publish and actions.find and not actions.refresh and not actions.
 assert(not actions['local'],'LAN must be separate from Internet rooms')
 online.activate(state,'back',context);assert(not state.hub_online)
 state.hub_mode='root';click('credits');back();assert(state.hub_mode=='root')
-state.hub_mode='root';click('settings');click('lan')
+state.hub_mode='remote';click('remote_wifi')
 assert(state.hub_online.lan)
 online.activate(state,'back',context)
+state.hub_mode='settings'
 click('information');assert(state.hub_mode=='information')
 back();assert(state.hub_mode=='settings')
 state.hub_mode='library';state.hub_selected=nil;click('profile_dbz')
@@ -111,7 +113,7 @@ shell.update(fresh.launch,{keys={},gamepad={},pointer_x=397,pointer_y=369,click=
 assert(not fresh.launch.hub_current_controls and document.current_controls_seen)
 assert(not flow.create({profiles_available=true}).launch.hub_current_controls)
 -- Every target stays inside the fixed viewport and contains no overlapping button.
-for _,mode in ipairs({'root','battle','library','packs','players','settings','online','language','credits','status'}) do
+for _,mode in ipairs({'root','battle','library','packs','players','settings','remote','language','credits','status'}) do
  state.hub_mode=mode;state.hub_pack_edit={};local rows=hub.rows(state)
  for i=1,#rows do local x,y,w,h=layout.box(i,#rows);assert(x>=0 and x+w<=794 and y>=0 and y+h<=490) end
 end

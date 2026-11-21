@@ -125,4 +125,38 @@ assert(#actions==0 and client.notice:find('IPv4',1,true))
 state.hub_online.address='192.168.1.5:12346';screen.activate(state,'find',context)
 local lan=client.pending_join
 assert(actions[1]=='network' and lan.address=='192.168.1.5' and lan.port==12346 and lan.internet==false)
+
+-- Zadanie 3.3: hosting over WIFI/HOTSPOT hands off to the network screen on
+-- the very same activate() call -- no extra stop, no server round trip.
+-- base/ui/network.lua already shows the host's own IPv4 (tests/lan_menu_test.lua).
+reset()
+state={};screen.open(state,true,true)
+screen.activate(state,'publish',context)
+assert(actions[1]=='network' and #requests==0,'hosting over LAN must not touch the relay server')
+assert(client.pending_join.host==true and client.pending_join.internet==false)
 print('PASS simple online: guest join, fresh relay check before publishing, LAN address')
+
+-- Etap 1.14 / Etap 3.2: kind selects only the WIFI/HOTSPOT header + instructions, same simple_rows.
+reset()
+state={};screen.open(state,true,true,'hotspot')
+assert(state.hub_online.kind=='hotspot')
+local wifi_state={};screen.open(wifi_state,true,true,'wifi')
+assert(wifi_state.hub_online.kind=='wifi')
+local drawn={}
+local draw_context={viewport=function() end,image=function() end,fill=function() end,
+ text=function(value,...) drawn[#drawn+1]=value end}
+screen.draw(state,draw_context)
+assert(drawn[1]:find('HOTSPOT',1,true),'hotspot heading must mention HOTSPOT')
+drawn={}
+screen.draw(wifi_state,draw_context)
+assert(drawn[1]:find('SIECI LOKALNEJ',1,true),'wifi heading must read like the existing LAN screen')
+-- same button set regardless of kind
+local function ids(s) local list={} for _,row in ipairs(screen.rows(s.hub_online)) do list[row[1]]=true end return list end
+local hotspot_ids,wifi_ids=ids(state),ids(wifi_state)
+for id in pairs(hotspot_ids) do assert(wifi_ids[id],'hotspot/wifi button sets must match: '..id) end
+for id in pairs(wifi_ids) do assert(hotspot_ids[id],'hotspot/wifi button sets must match: '..id) end
+-- missing-mod path is unaffected by kind
+state.hub_online.missing_mod={room={},entry={title='x'}}
+local mod_rows={} for _,row in ipairs(screen.rows(state.hub_online)) do mod_rows[row[1]]=true end
+assert(mod_rows.mod_yes and mod_rows.mod_no,'missing-mod prompt must survive regardless of kind')
+print('PASS: WIFI/HOTSPOT share one screen, differ only by heading')

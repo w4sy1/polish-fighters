@@ -30,12 +30,21 @@ return function(base)
  end
  local function activate(state,id,context)
   state.hub_note=nil;state.message=nil
-  if id=='online' then
+  if id=='remote' then state.hub_mode='remote'
+  elseif id=='remote_server' or id=='remote_wifi' or id=='remote_hotspot' then
    if catalog.profile_id=='mixed-all' then state.hub_note='Do gry w sieci wybierz samodzielny moduł.'
-   else online.open(state,true) end
-  elseif id=='lan' then
-   if catalog.profile_id=='mixed-all' then state.hub_note='Do gry w sieci wybierz samodzielny moduł.'
-   else online.open(state,true,true) end
+   elseif id=='remote_server' then online.open(state,true)
+   elseif id=='remote_wifi' then online.open(state,true,true,'wifi')
+   else online.open(state,true,true,'hotspot') end
+  elseif id=='remote_bluetooth' then
+   local opened,problem=hub.open_android_bluetooth and hub.open_android_bluetooth(context)
+   if not opened then state.hub_note=locale.text('save_error')..tostring(problem) end
+  elseif id=='capacity' then
+   local model=require('polish-fighters/dashboard_model')
+   local value=model.current().room_capacity%8+1
+   if value<2 then value=2 end
+   local ok,problem=model.save({room_capacity=value})
+   if not ok then state.hub_note=tostring(problem) end
   elseif id=='information' then state.hub_mode=id
   elseif id=='check_android_update' then context.action(id)
   elseif id=='battle' or id=='settings' or id=='credits' or id=='language' or id=='status' then

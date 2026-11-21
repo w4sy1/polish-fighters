@@ -40,7 +40,7 @@ return function(base)
   if state.launch.hub_android and not options.profile_start then state.launch.hub_mode="root" end
   state.launch.hub_wait_release=options.profile_start==true
   local menu=saved.little_fighters_start_menu
-  if menu=='battle' or menu=='settings' or menu=='online' or menu=='controls' or menu=='options' then
+  if menu=='battle' or menu=='settings' or menu=='remote' or menu=='controls' or menu=='options' then
    state.launch.hub_mode=menu;saved.little_fighters_start_menu=nil;engine.write_settings(saved)
    if menu=='controls' then state.launch.hub_mode='settings';require('polish-fighters/input_settings').open(state.launch)
    elseif menu=='options' then state.launch.hub_mode='settings';state.launch.page='options';state.launch.options=require('base/game/options').current();state.launch.options_focus=1 end

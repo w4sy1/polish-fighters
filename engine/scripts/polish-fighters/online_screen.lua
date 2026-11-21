@@ -5,11 +5,11 @@ local navigation=require('base/ui/navigation')
 local screen={}
 -- The project's own account and relay server; any other server can still be typed in.
 screen.default_server='https://www.projektocalenie.pl/projekty/polish-fighters/api'
-function screen.open(state,simple,lan)
+function screen.open(state,simple,lan,kind)
  local doc=engine.read_settings() or {}
  state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server:match('%S') and doc.account_server or screen.default_server),
   name='',password='',room='Pokój Polish Fighters',nick=type(doc.online_nick)=='string' and doc.online_nick:sub(1,24) or '',host='127.0.0.1',port='12345',
-  page=1,nav=navigation.create(),previous={},simple=simple,lan=lan==true,address=''}
+  page=1,nav=navigation.create(),previous={},simple=simple,lan=lan==true,kind=kind,address=''}
  if simple then client.notice='' end
 end
 
@@ -379,7 +379,13 @@ function screen.draw(state,context)
  context.viewport(794,550,8,13,27);context.image('pe/menu_back1',0,0,true)
  context.fill(0,0,794,550,8,13,27,185)
  local s=state.hub_online
- context.text(s.simple and (s.lan and 'GRA W SIECI LOKALNEJ' or 'GRAJ PRZEZ INTERNET') or 'POLISH FIGHTERS / KONTO I POKOJE',397,25,'center',25,0xf0f5ff,nil,nil,true)
+ local heading='POLISH FIGHTERS / KONTO I POKOJE'
+ if s.simple then
+  if s.kind=='hotspot' then heading='GRA PRZEZ HOTSPOT'
+  elseif s.lan then heading='GRA W SIECI LOKALNEJ'
+  else heading='GRAJ PRZEZ INTERNET' end
+ end
+ context.text(heading,397,25,'center',25,0xf0f5ff,nil,nil,true)
  if not s.simple then
  context.text((client.token or state.hub_online.accounts) and 'HTTPS dla serwera zdalnego. Hasło i sesja nie są zapisywane na dysku.'
   or 'Wpisz nick i kliknij GRAJ. Bez hasła i bez zakładania konta.',397,68,'center',13,0xadc3df,nil,nil,true)

@@ -51,7 +51,7 @@ function hub.rows(state,active_profile)
  local mode=state.hub_mode
  local function row(id,key) return {id,(L(key or id))} end
  if mode=='root' or mode==nil then
-  return {row('library','modules'),row('battle','play_main'),row('online'),row('settings'),row('guide'),row('language'),row('credits'),row('quit')}
+  return {row('library','modules'),row('battle','play_main'),row('remote'),row('settings'),row('guide'),row('language'),row('credits'),row('quit')}
  elseif mode=='profile' or mode=='battle' then
   local rows={}
   local campaign=(mode=='battle' and not state.hub_preselected) or require('base/game/catalog').stage_path~=false
@@ -70,7 +70,7 @@ function hub.rows(state,active_profile)
   rows[#rows+1]={'unavailable',L('absent_turbo')};rows[#rows+1]=row('library','back');return rows
  elseif mode=='settings' then
   local rows={row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'}}
-  rows[#rows+1]={'lan','GRA W SIECI LOKALNEJ'}
+  rows[#rows+1]={'capacity','LIMIT POKOJU / ROOM CAPACITY: '..require('polish-fighters/dashboard_model').current().room_capacity}
   rows[#rows+1]={'information','INFORMACJE'}
   if state.hub_android then rows[#rows+1]={'android_tools','ANDROID / BLUETOOTH'} end
   rows[#rows+1]=row('root','back')
@@ -81,8 +81,15 @@ function hub.rows(state,active_profile)
  elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
  elseif mode=='credits' then return {row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}
- elseif mode=='online' then
-  return {row('account','quick'),row('network','host'),row('network','join'),row('account','rooms'),row('unavailable','friends'),row('root','back')}
+ elseif mode=='remote' then
+  -- Windows Bluetooth (Etap 4B) does not exist yet; state.hub_bluetooth_available lets a
+  -- future native bridge override this per platform without touching this file again.
+  local bluetooth=state.hub_bluetooth_available
+  if bluetooth==nil then bluetooth=state.hub_android end
+  local rows={row('remote_server')}
+  if bluetooth then rows[#rows+1]=row('remote_bluetooth') end
+  rows[#rows+1]=row('remote_wifi');rows[#rows+1]=row('remote_hotspot');rows[#rows+1]=row('root','back')
+  return rows
  elseif mode=='packs' then
   local rows={}
   for _,entry in ipairs(hub.profiles) do
