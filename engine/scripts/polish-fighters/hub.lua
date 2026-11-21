@@ -21,6 +21,9 @@ hub.optional_profiles={
  {id="rn_lf2", profile="rn-lf2", title="RN LF2"},
  {id="lf_seed", profile="lf-seed", title="LF Seed"},
  {id="wlf2_al", profile="wlf2-al", title="WLF2 AL"},
+ {id="ce_lf2", profile="ce-lf2", title="CE LF2"},
+ {id="ntsd_community", profile="ntsd-community", title="NTSD Community"},
+ {id="ntsd_ce_setup", profile="ntsd-ce-setup", title="NTSD CE"},
 }
 function hub.title(profile)
  if profile=='mixed-all' then return 'Polish Fighters: wszystkie mody' end

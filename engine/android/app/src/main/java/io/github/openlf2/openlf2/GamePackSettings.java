@@ -53,6 +53,9 @@ final class GamePackSettings {
             case "rn_lf2": return "RN LF2";
             case "lf_seed": return "LF Seed";
             case "wlf2_al": return "WLF2 AL";
+            case "ce_lf2": return "CE LF2";
+            case "ntsd_community": return "NTSD Community";
+            case "ntsd_ce_setup": return "NTSD CE";
             default: return null;
         }
     }

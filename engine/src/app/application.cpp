@@ -126,6 +126,8 @@ struct Configuration {
     bool default_controller = false;
     bool hub_menu = false; // Explicitly exercise the live first menu in headless UI probes.
     bool profile_start = false;
+    std::string rejected_profile;
+    bool profile_load_failed = false;
     std::optional<std::filesystem::path> capture_frame;
     bool render_trace = false;
     std::vector<std::string> input_trace; // held action letters per frame, headless
@@ -143,7 +145,10 @@ constexpr std::array profile_definitions{
     ProfileDefinition{"profile_gf2", "gf2"}, ProfileDefinition{"profile_lf2_ns", "lf2-ns"},
     ProfileDefinition{"profile_sx2", "sx2"}, ProfileDefinition{"profile_lf2_sv", "lf2-sv"},
     ProfileDefinition{"profile_rn_lf2", "rn-lf2"}, ProfileDefinition{"profile_lf_seed", "lf-seed"},
-    ProfileDefinition{"profile_wlf2_al", "wlf2-al"}};
+    ProfileDefinition{"profile_wlf2_al", "wlf2-al"},
+    ProfileDefinition{"profile_ce_lf2", "ce-lf2"},
+    ProfileDefinition{"profile_ntsd_community", "ntsd-community"},
+    ProfileDefinition{"profile_ntsd_ce_setup", "ntsd-ce-setup"}};
 struct ProfileRequest { std::string directory; std::vector<std::string> remaining_trace; };
 std::filesystem::path content_directory(const Configuration& config) {
     // Android stages fresh Lua modules in files/scripts while the unpacked game
@@ -589,7 +594,8 @@ public:
         }
         // These packages contain authored animation frames above 399.
         const auto capacity = (path.starts_with("mods/dbz/") || path.starts_with("mods/mixed-all/2/") ||
-                               path.starts_with("mods/sx2/"))
+                               path.starts_with("mods/sx2/") || path.starts_with("mods/ntsd-community/") ||
+                               path.starts_with("mods/ntsd-ce-setup/"))
             ? object_data::extended_frame_count : object_data::frame_count;
         auto parsed = object_data::load(resources_, path, capacity);
         if (!parsed) return std::unexpected(parsed.error());
@@ -1069,8 +1075,9 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     std::string profiles_available = ", profiles_available={";
     for (const auto& profile_entry : profile_definitions) {
         std::error_code error;
-        const bool available = profile_entry.directory.empty() || std::filesystem::is_regular_file(
-            content_directory(config) / profile_entry.directory / "package.manifest", error);
+        const bool available = profile_entry.directory.empty() ||
+            (profile_entry.directory != config.rejected_profile && std::filesystem::is_regular_file(
+                content_directory(config) / profile_entry.directory / "package.manifest", error));
         profiles_available += std::string(profile_entry.action.substr(8)) + "=" + (available ? "true," : "false,");
     }
     profiles_available += "}";
@@ -1084,6 +1091,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         (config.network_room ? ", network_room=true" : "") +
         (config.headless ? ", headless=true" : "") +
         (config.profile_start ? ", profile_start=true" : "") +
+        (config.profile_load_failed ? ", profile_load_failed=true" : "") +
         (config.headless && !config.hub_menu ? ", legacy_menu=true" : "") +
         ", recording_version=" + std::to_string(constants->second) + network_options +
 #if defined(__SWITCH__) || defined(__vita__)
@@ -1532,25 +1540,34 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
                          "Only explicitly selected, trusted local mod packages are supported.\n";
             return 0;
         }
+        std::optional<std::vector<std::filesystem::path>> previous_mods;
+        std::string requested_directory;
         while (true) {
             std::optional<ProfileRequest> profile_request;
 #ifdef _WIN32
             set_mod_content_directory(content_directory(*config));
 #endif
             auto result = run(*config, profile_request);
-            if (!result) { std::cerr << result.error().message << '\n'; return 1; }
+            if (!result) {
+                std::cerr << result.error().message << '\n';
+                if (!previous_mods || requested_directory.empty()) return 1;
+                config->mods = std::move(*previous_mods);
+                previous_mods.reset();
+                config->rejected_profile = std::move(requested_directory);
+                config->profile_start = false;
+                config->profile_load_failed = true;
+                if (config->headless) config->input_trace = {""};
+                continue;
+            }
             if (!profile_request) break;
             const auto target = content_directory(*config) / profile_request->directory;
-            if (!profile_request->directory.empty()) {
-                std::error_code error;
-                if (!std::filesystem::is_regular_file(target / "package.manifest", error)) {
-                    std::cerr << "Selected package is not installed: " << profile_request->directory << '\n';return 1;
-                }
-            }
+            previous_mods = std::move(config->mods);
+            requested_directory = profile_request->directory;
             config->mods.clear();
             if (profile_request->directory == "mixed-all") config->mods.push_back(content_directory(*config) / "polish-originals");
             if (!profile_request->directory.empty()) config->mods.push_back(target);
             config->profile_start = true;
+            config->profile_load_failed = false;
             config->input_trace = std::move(profile_request->remaining_trace);
             config->network_role.clear();config->replay.reset();
             std::cout << "Profile loaded: " << (profile_request->directory.empty() ? "lf2-classic" : profile_request->directory) << '\n';

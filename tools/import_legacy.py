@@ -10,6 +10,16 @@ ROOT=Path(__file__).resolve().parents[1]
 def decode(data):
  if len(data)<123:raise ValueError('Truncated encrypted LF2 data')
  return bytes((b-KEY[i%len(KEY)])%256 for i,b in enumerate(data[123:],123)).decode('latin1')
+def decode_ce_lf2(data):
+ # This edition marks a distinct 160-byte header and a repeating 37-byte additive key.
+ marker=b'This data file was locked by RaMMicHaeL for Combined Effort Little Fighter 2 mod by Marshall'
+ if not data.startswith(marker):
+  return decode(data)
+ if len(data)<=160:
+  raise ValueError('Truncated CE LF2 data')
+ key=bytes.fromhex('2f6c6e6161607b2f6d6a2f7d7a612f66612f4b405c2f62606b5b67667c2f7f7d60687d6e62')
+ return bytes((byte-key[i%len(key)])%256 for i,byte in enumerate(data[160:])).decode('latin1')
+
 def encode(text,header):
  return header[:123]+bytes((b+KEY[i%len(KEY)])%256 for i,b in enumerate(text.encode('latin1'),123))
 def canonical(value):
@@ -23,6 +33,8 @@ CATALOG_ID_REPAIRS={
             7,19,'data/strikered.dat'),
  'lf2-sv':('7debc748b99a4a2406e735d129cc83c5fc18d9bb4481b2b5f0a9a616c465d11d',
            150,198,'data/weapon1_broken.dat'),
+ 'ce-lf2':('1558581a2ff137f5f4b5476f862b6b950cd455806f33308cbd88388a5d68c828',
+           199,198,'data/weapon4.dat'),
  'rn-lf2':('bd273c4f71f0b5c2a5bc2c57c2330ffec10178e37f083fb71feb3cbc84a48d9f',
            9,17,'data/dennis.dat'),
 }
@@ -46,6 +58,7 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
  source_hash=hashlib.sha256(catalog_bytes).hexdigest()
  repair=CATALOG_ID_REPAIRS.get(pack_id)
  if repair and source_hash!=repair[0]:repair=None
+ source_decode=decode_ce_lf2 if repair and pack_id=='ce-lf2' else decode
  strip_seed_notes=repair is not None and pack_id=='lf-seed'
  id_repair=None
  normalization=None
@@ -99,7 +112,7 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   if path not in files:missing.add(path);continue
   raw=files[path].read_bytes()
   if path.endswith('.dat'):
-   text=decode(raw)
+   text=source_decode(raw)
    if normalization and path in normalization[1]:
     if hashlib.sha256(raw).hexdigest()!=normalization[1][path]:
      raise ValueError('NTSD source DAT changed during import: '+path)
@@ -129,7 +142,7 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   if kind==0:
    if path not in files:
     fighters.append({'id':id_,'name':'[missing]','path':path});continue
-   text=decode(files[path].read_bytes());name=re.search(r'\bname:\s*(\S+)',text)
+   text=source_decode(files[path].read_bytes());name=re.search(r'\bname:\s*(\S+)',text)
    fighters.append({'id':id_,'name':name[1] if name else '?','path':path})
  # All failures above leave no partially installed destination.
  destination.mkdir(parents=True)
@@ -142,7 +155,7 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   (destination/'assets'/mapping['data/data.txt']).write_text('\n'.join(lines)+'\n')
   converted['data/data.txt']=b''
   manifest=f'id={pack_id}\nversion=1\napi=1\nrequires=base@1\nrequires=polish-fighters@1\nextend=base/game/catalog|catalog.lua\nextend=base/game/sounds|sounds.lua\n'
-  if pack_id=='sx2':
+  if pack_id in {'sx2','ntsd-community','ntsd-ce-setup'}:
    manifest+='extend=base/game/constants|constants.lua\n'
    (destination/'constants.lua').write_text('return function(base)\n base.frame_limit=999\n return base\nend\n')
   manifest+=''.join(f'asset={register(p)}|assets/{mapping[p]}\n' for p in sorted(converted))
@@ -150,12 +163,12 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   (destination/'package.manifest').write_text(manifest)
   campaigns=[]
   if 'data/stage.dat' in files:
-   for block in re.findall(r'<stage_information>(.*?)<stage_information_end>',decode(files['data/stage.dat'].read_bytes()),re.S):
+   for block in re.findall(r'<stage_information>(.*?)<stage_information_end>',source_decode(files['data/stage.dat'].read_bytes()),re.S):
     fields={k:v for k,v in re.findall(r'\b(id|name|file):\s*(\S+)',block)}
     if not all(k in fields for k in ('id','name','file')):continue
     path=canonical(fields['file'])
     if path not in converted:continue
-    text=decode(files[path].read_bytes());start=re.search(r'<stage>\s*id:\s*(\d+)',text)
+    text=source_decode(files[path].read_bytes());start=re.search(r'<stage>\s*id:\s*(\d+)',text)
     bg=re.search(r'\bbg:\s*(\d+)',text)
     row=next((i for i,(id_,_) in enumerate(bgs) if bg and id_==int(bg[1])),None)
     hidden=re.search(r'\bhidden:\s*(-?\d+)',block)

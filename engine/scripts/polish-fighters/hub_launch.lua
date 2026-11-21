@@ -140,6 +140,13 @@ return function(base)
    if input.button or input.keys[13] or pad.a or pad.s then return end
    state.hub_wait_release=nil
   end
+  if state.hub_pending_touch_profile then
+   if input.button or (input.touches and #input.touches>0) then return end
+   local choice=state.hub_pending_touch_profile
+   state.hub_pending_touch_profile=nil
+   activate(state,choice,context)
+   return
+  end
   if state.hub_edit then return input_settings.update(state,input) end
   if state.hub_online then return online.update(state,input,context) end
   if state.hub_mods then return mods.update(state,input,context) end
@@ -171,7 +178,10 @@ return function(base)
    if mapped.pointer_x>=box.left and mapped.pointer_x<=box.right and mapped.pointer_y>=box.top and mapped.pointer_y<=box.bottom then
     state.hub_hover=index
     if mapped.click then
-     activate(state,rows[index] and rows[index][1] or (index==#rows+1 and 'lang_pl' or 'lang_en'),context)
+     local choice=rows[index] and rows[index][1] or (index==#rows+1 and 'lang_pl' or 'lang_en')
+     if state.hub_android and state.hub_mode=='optional_modules' and choice:sub(1,8)=='profile_' and input.button then
+      state.hub_pending_touch_profile=choice
+     else activate(state,choice,context) end
      sounds.direct(state,'ok');break
     end
    end
