@@ -47,7 +47,7 @@ assert(state.pf_map_page==2)
 click(1)
 assert(model.current().map==8,'second page retains original map indices')
 state.pf_panel='extras'
-click(7)
+click(6) -- Etap 1.14 / Zadanie 3.4: 'connection' row removed, touch shifted from 7 to 6
 assert(state.page=='hud' and state.hud.destination=='menu' and state.hud.values.hybrid)
 state.page='menu';state.hud=nil
 state.pf_message=nil;state.pf_panel='unlock'
@@ -78,4 +78,26 @@ assert(state.pf_message[1]=='HISTORIA','empty history must be readable')
 engine.read_stage_data=function() error('invalid campaign') end
 local value,problem=model.contents()
 assert(not value and problem:find('invalid campaign'),'corrupt package must return a readable error')
+
+-- Etap 1.14 / Zadanie 3.4: the old "connection" panel (room/tcp/capacity/
+-- lan/bluetooth) is retired; the separate "account" panel (native-account/
+-- guest, the only other entry point into the full non-simple online
+-- screen) must survive untouched.
+state.pf_message=nil;state.pf_panel='extras';drawn={}
+shell.draw(state,context)
+for _,label in ipairs(drawn) do
+    assert(not label:find('POLACZENIA',1,true),'retired connection row must not be drawn: '..label)
+end
+local saw_account=false
+for _,label in ipairs(drawn) do if label=='KONTO / GOSC' then saw_account=true end end
+assert(saw_account,'account row must survive the connection-panel removal')
+state.pf_panel='account';drawn={}
+shell.draw(state,context)
+assert(drawn[1]=='KONTO / GOŚĆ' and drawn[2]=='ZALOGUJ / UTWÓRZ KONTO' and drawn[3]=='GRAJ BEZ LOGOWANIA',
+    'account panel rows (native-account/guest) must be unaffected')
+local opened_online=false
+package.loaded['polish-fighters/online_screen']={open=function() opened_online=true end}
+click(1) -- native-account
+assert(opened_online and not state.pf_panel,'native-account must still open the full online screen')
 print('PASS: active Naruto, real catalogs, pagination, map indices, touch GUI, package errors')
+print('PASS: connection panel retired, account panel (native-account/guest) preserved')

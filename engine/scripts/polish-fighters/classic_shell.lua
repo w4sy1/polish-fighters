@@ -72,13 +72,10 @@ return function(base)
             if s.pf_content_page>1 then list[#list+1]={"content-prev","< POPRZEDNIE"} end
             if s.pf_content_page<pages then list[#list+1]={"content-next","NASTEPNE >"} end
             list[#list+1]={"back","POWROT"};return list
-        elseif s.pf_panel=="connection" then
-            return {{"room","POKOJ LAN (2-8 URZADZEN)"},{"tcp","STARE POLACZENIE (2 URZADZENIA)"},{"capacity","LIMIT POKOJU: "..model.current().room_capacity..""},
-                {"lan","HOTSPOT / SIEC LOKALNA"},{"bluetooth","BLUETOOTH"},{"back","POWROT"}}
         end
         local title=require("polish-fighters/hub").title(require("base/game/catalog").profile_id)
         return {{"play","GRAJ W "..title:upper()},{"maps","WYBIERZ MAPE"},{"packs","PAKIETY I POSTACIE"},
-            {"connection","POLACZENIA: 2-8 URZADZEN"},{"account","KONTO / GOSC"},{"options","USTAWIENIA"},
+            {"account","KONTO / GOSC"},{"options","USTAWIENIA"},
             {"touch","STEROWANIE DOTYKOWE"},{"history","HISTORIA ROZGRYWEK"},{"combo-guide","STEROWANIE I PORADNIK"},
             {"unlock","ODBLOKOWANIE POSTACI"},{"close","POWROT DO LF2"}}
     end
@@ -181,13 +178,6 @@ return function(base)
             model.pending_map=model.selected_map().row;c.action("versus")
         elseif id=='native-account' then
             s.pf_panel=nil;s.hub_classic=nil;require('polish-fighters/online_screen').open(s)
-        elseif id=="room" then require("base/game/network").next_room=true;s.pf_panel=nil;c.action("network")
-        elseif id=="tcp" then s.pf_panel=nil;c.action("network")
-        elseif id=="capacity" then
-            local value=model.current().room_capacity%8+1
-            if value<2 then value=2 end
-            local ok=model.save({room_capacity=value})
-            if not ok then s.pf_message={"NIE ZAPISANO USTAWIEN","Sprawdz dostep do plikow ustawien."} end
         elseif id=="options" then s.pf_settings_parent=s.pf_panel;s.pf_panel=nil;s.page="options";s.options=options.current();s.options_focus=1
         elseif id=="touch" then
             s.pf_settings_parent=s.pf_panel;s.pf_panel=nil
@@ -204,12 +194,6 @@ return function(base)
             else s.pf_message={pack[1],"Pakiet nie jest zaladowany w tej sesji."} end
         elseif id=="google" or id=="email" then
             s.pf_message={"LOGOWANIE NIEDOSTEPNE","Usluga kont nie jest jeszcze podlaczona.","Mozesz grac offline jako gosc."}
-        elseif id=="bluetooth" then
-            if s.hub_android then
-                local opened,problem=require("polish-fighters/hub").open_android_tools(c)
-                if not opened then s.pf_message={"BLAD ZAPISU",tostring(problem)} end
-            else s.pf_message={"BLUETOOTH: ANDROID","Otwórz ustawienia Android / Bluetooth w grze na telefonie."} end
-        elseif id=="lan" then s.pf_message={"GRA BEZ INTERNETU","Podlacz urzadzenia do wspolnego Wi-Fi lub hotspotu.","Otworz POKOJ LAN i wpisz adres IP gospodarza."}
         else s.pf_panel=id end
     end
     function base.update(s,input,c)
@@ -277,7 +261,7 @@ return function(base)
         end
         c.fill(186,164,470,359,16,27,47,220)
         c.fill(186,164,470,2,224,72,92)
-        local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOŚĆ",connection="POŁĄCZENIA",
+        local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOŚĆ",
             ["pack-content"]="ZAWARTOŚĆ PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA",['combo-guide']='PORADNIK KOMBOSÓW'}
         local title=s.pf_message and s.pf_message[1] or titles[s.pf_panel]
         if c.text then c.text(title,421,181,'center',20,0xf0f5ff,nil,nil,true)
