@@ -35,6 +35,31 @@ for _,page in ipairs({'waiting','lobby'}) do
  state.page=page;drawn={};screen.draw(state,draw_context)
  assert(table.concat(drawn,'|'):find('192.168.1.82, 10.0.0.5',1,true),'host IP missing on '..page)
 end
+local headings={}
+local draw=font.draw
+font.draw=function(_,text) headings[#headings+1]=text end
+state.session.internet=true
+screen.begin(state,true,'127.0.0.1')
+state.session.slot,state.session.peers,state.session.capacity=0,{},2
+for _,page in ipairs({'waiting','lobby','internet_error'}) do
+ state.page=page;drawn={};headings={}
+ state.message='Przekroczono czas oczekiwania na przekaźnik.'
+ screen.draw(state,draw_context)
+ local labels=table.concat(drawn,'|')
+ for _,lan_only in ipairs({'TCP','IP:','wspólną sieć','hotspot'}) do
+  assert(not labels:find(lan_only,1,true),'Internet screen leaked LAN instructions: '..lan_only)
+ end
+ if page=='lobby' then assert(headings[1]:find('INTERNETOWY',1,true)) end
+end
+local action
+screen.update(state,{keys={[27]=true},pointer_x=0,pointer_y=0},{action=function(name) action=name end,sound=function() end})
+assert(action=='launch','Esc must return from an Internet error')
+state.session.relay={address='127.0.0.1',ticket='test-ticket'}
+screen.begin(state,false,'127.0.0.1')
+assert(state.page=='waiting' and not started.host and started.address=='127.0.0.1')
+state.session.relay=nil
+font.draw=draw
+state.session.internet=nil
 font.gdi=gdi
 screen.begin(state,true,'127.0.0.1');assert(not state.host_addresses,'relay host showed LAN addresses')
 engine.network=function(op) if op=='addresses' then return '' end return real_network(op) end

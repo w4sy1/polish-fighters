@@ -33,7 +33,12 @@ return function(base)
  function base.draw(state,context)
   draw(state,context)
   if state.active=='launch' and state.launch and state.launch.hub_enabled and state.launch.page=='menu' and context.text then
-   context.text('Polish Fighters '..updates.version,780,12,'right',12,0xffffff,0x0a1020,nil,true)
+   local launch=state.launch
+   if not launch.hub_android or (launch.hub_mode=='root' and not launch.pf_panel) then
+    local version=launch.hub_installed_version
+    if not version or version=='' then version=updates.version end
+    context.text('Polish Fighters '..version,780,12,'right',12,0xffffff,0x0a1020,nil,true)
+   end
   end
   if state.update_notice then dialog.draw(state.update_notice,context) end
  end

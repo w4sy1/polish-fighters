@@ -33,7 +33,11 @@ assert(state.hub_online==nil,'POWRÓT did not close the online screen')
 assert(typing==false,'the keyboard stayed on after POWRÓT')
 for _=1,5 do frame({}) end
 -- The same with Android Back (Escape) instead of a tap.
-online.open(state);frame({});frame({keys={[27]=true}});frame({})
+online.open(state);frame({})
+frame({click=true,pointer_x=nick[3]+5,pointer_y=nick[4]+5});frame({})
+frame({keys={[27]=true}});frame({})
+assert(state.hub_online and not state.hub_online.focus and not typing,'Back must close the keyboard first')
+frame({keys={[27]=true}});frame({})
 assert(state.hub_online==nil,'Back did not close the online screen')
 for _=1,5 do frame({}) end
 assert(#actions==0,'closing the online screen started an action: '..table.concat(actions,','))

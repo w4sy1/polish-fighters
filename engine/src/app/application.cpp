@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <ctime>
 #include "openlf2/ports/download.hpp"
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
 #include "openlf2/ports/github_mods.hpp"
 #endif
 #include "openlf2/ports/platform.hpp"
@@ -46,6 +46,11 @@
 #include <sstream>
 #include <thread>
 #include <system_error>
+#include <utility>
+#ifdef __ANDROID__
+#include <SDL3/SDL.h>
+#include <jni.h>
+#endif
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -59,6 +64,60 @@ void wait_milliseconds(std::uint32_t milliseconds) {
     precise_delay(milliseconds);
 #endif
 }
+#ifdef __ANDROID__
+bool call_android_activity(const char* method, const char* argument = nullptr) {
+    auto* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
+    if (env == nullptr) return false;
+    auto activity = static_cast<jobject>(SDL_GetAndroidActivity());
+    if (activity == nullptr) return false;
+    const auto activity_class = env->GetObjectClass(activity);
+    if (activity_class != nullptr) {
+        const auto open = env->GetMethodID(activity_class, method, argument ? "(Ljava/lang/String;)V" : "()V");
+        if (open != nullptr && argument) {
+            const auto value = env->NewStringUTF(argument);
+            if (value != nullptr) {
+                env->CallVoidMethod(activity, open, value);
+                env->DeleteLocalRef(value);
+            }
+        } else if (open != nullptr) {
+            env->CallVoidMethod(activity, open);
+        }
+        env->DeleteLocalRef(activity_class);
+    }
+    env->DeleteLocalRef(activity);
+    if (!env->ExceptionCheck()) return activity_class != nullptr;
+    env->ExceptionClear();
+    return false;
+}
+std::optional<std::string> android_mod_manager_result() {
+    auto* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
+    if (env == nullptr) return std::nullopt;
+    auto activity = static_cast<jobject>(SDL_GetAndroidActivity());
+    if (activity == nullptr) return std::nullopt;
+    std::optional<std::string> result;
+    const auto activity_class = env->GetObjectClass(activity);
+    if (activity_class != nullptr) {
+        const auto take = env->GetMethodID(activity_class, "modManagerResult", "()Ljava/lang/String;");
+        if (take != nullptr) {
+            const auto value = static_cast<jstring>(env->CallObjectMethod(activity, take));
+            if (value != nullptr && !env->ExceptionCheck()) {
+                if (const auto chars = env->GetStringUTFChars(value, nullptr)) {
+                    result = chars;
+                    env->ReleaseStringUTFChars(value, chars);
+                }
+                env->DeleteLocalRef(value);
+            }
+        }
+        env->DeleteLocalRef(activity_class);
+    }
+    env->DeleteLocalRef(activity);
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        return std::string{};
+    }
+    return result;
+}
+#endif
 double elapsed_ms(std::chrono::steady_clock::time_point start) {
     return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
 }
@@ -110,6 +169,9 @@ struct Configuration {
     std::optional<std::filesystem::path> config_directory; // --config-dir
     std::string renderer; // --renderer: the SDL renderer to use (testing); empty = the platform's choice
     std::optional<std::filesystem::path> replay; // A recording to open directly at startup.
+#ifdef __ANDROID__
+    std::string android_version;
+#endif
     std::string network_role;
     std::string network_address;
     std::uint16_t network_port = 12345;
@@ -470,6 +532,17 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
             if (++index == arguments.size()) return fail(ErrorCode::format, "--renderer needs a renderer name");
             config.renderer = arguments[index];
         }
+#ifdef __ANDROID__
+        else if (argument == "--android-version") {
+            if (++index == arguments.size()) return fail(ErrorCode::format, "--android-version needs a version name");
+            const auto& version = arguments[index];
+            if (version.empty() || version.size() > 48 ||
+                version.find_first_not_of("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_+") != std::string::npos) {
+                return fail(ErrorCode::format, "invalid Android version name");
+            }
+            config.android_version = version;
+        }
+#endif
         else if (argument == "--installer" || argument == "--scripts" || argument == "--mod"
                  || argument == "--config-dir" || argument == "--replay" || argument == "--capture-frame") {
             if (++index == arguments.size()) return fail(ErrorCode::format, argument + " needs a path");
@@ -1069,7 +1142,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     profiles_available += "}";
     const auto bundle = "local runtime_settings = {menu_seed=" + std::to_string(menu_seed) + profiles_available +
 #ifdef __ANDROID__
-        ", touch_device=true" +
+        ", touch_device=true, installed_version=\"" + config.android_version + "\"" +
 #endif
 #ifdef _WIN32
         ", desktop_controls=true" +
@@ -1224,8 +1297,30 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         auto saved = save_window_placement(*settings, *placement);
         if (!saved) std::cerr << "Window settings: " << saved.error().message << '\n';
     };
+#ifdef __ANDROID__
+    bool mod_manager_open = false;
+#endif
+#ifdef _WIN32
+    bool picking_mod = false;
+#endif
     while (true) {
         const auto input = platform->poll();
+#ifdef __ANDROID__
+        if (mod_manager_open) {
+            if (auto selection = android_mod_manager_result()) {
+                mod_manager_open = false;
+                auto target = requested_profile("profile_" + *selection);
+                if (*selection == "all" || *selection == "custom") target = "mixed-all";
+                if (selection->size() == 28 && selection->starts_with("mod-") &&
+                    selection->find_first_not_of("0123456789abcdef", 4) == std::string::npos) target = *selection;
+                if (target) {
+                    save_window();
+                    profile_request = ProfileRequest{std::move(*target), {}};
+                    return {};
+                }
+            }
+        }
+#endif
         if (input.chosen_file) chosen_file = input.chosen_file;
         if (input.dropped_file && accept_replay_drop && !dropped_file) {
             const auto& name = *input.dropped_file;
@@ -1418,7 +1513,12 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
             if (!applied) return std::unexpected(applied.error());
         }
         if (chosen_file) {
-            recordings.offer(std::filesystem::path(std::u8string(chosen_file->begin(), chosen_file->end())));
+            const auto file = std::filesystem::path(std::u8string(chosen_file->begin(), chosen_file->end()));
+#ifdef _WIN32
+            if (std::exchange(picking_mod,false)) set_local_mod_file(file);
+            else
+#endif
+                recordings.offer(file);
             chosen_file.reset();
         }
         for (const auto& action : frame->actions) {
@@ -1431,6 +1531,27 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
                 save_window();
                 return {};
             }
+#ifdef __ANDROID__
+            if (action == "open_android_mods") {
+                if (!mod_manager_open) {
+                    const auto active_package = config.mods.empty() ? std::string{} : config.mods.back().filename().string();
+                    mod_manager_open = call_android_activity("showModManager", active_package.c_str());
+                }
+                continue;
+            }
+            if (action == "check_android_update") {
+                if (!call_android_activity("checkGameUpdate")) std::cerr << "Could not open Android update screen\n";
+                continue;
+            }
+#endif
+#ifdef _WIN32
+            if (action == "import_local_mod") {
+                const auto shown=platform->choose_file(std::nullopt,
+                    FileDialogText{"Importuj podpisany mod","Podpisana paczka Polish Fighters (*.zip)","Importuj","zip"});
+                picking_mod=shown.has_value();
+                continue;
+            }
+#endif
             if (action == "open_recordings") {
                 if (const auto folder = recording_directory->path()) {
                     auto shown = platform->open_folder(*folder);
@@ -1441,6 +1562,9 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
                 continue;
             }
             if (action == "replay") {
+#ifdef _WIN32
+                picking_mod=false;
+#endif
                 auto shown = platform->choose_file(recording_directory->path(), frame->file_dialog.value_or(FileDialogText{}));
                 if (!shown) std::cerr << "Replay: " << shown.error().message << '\n';
                 continue;
@@ -1527,7 +1651,7 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
         }
         while (true) {
             std::optional<ProfileRequest> profile_request;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
             set_mod_content_directory(content_directory(*config));
 #endif
             auto result = run(*config, profile_request);
@@ -1541,7 +1665,8 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
                 }
             }
             config->mods.clear();
-            if (profile_request->directory == "mixed-all") config->mods.push_back(content_directory(*config) / "polish-originals");
+            if (profile_request->directory == "mixed-all" || profile_request->directory.starts_with("mod-"))
+                config->mods.push_back(content_directory(*config) / "polish-originals");
             if (!profile_request->directory.empty()) config->mods.push_back(target);
             config->profile_start = true;
             config->input_trace = std::move(profile_request->remaining_trace);

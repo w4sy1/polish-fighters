@@ -5,17 +5,28 @@ local navigation=require('base/ui/navigation')
 local screen={}
 -- The project's own account and relay server; any other server can still be typed in.
 screen.default_server='https://www.projektocalenie.pl/projekty/polish-fighters/api'
-function screen.open(state,simple)
+function screen.open(state,simple,lan)
  local doc=engine.read_settings() or {}
  state.hub_online={endpoint=client.origin or (type(doc.account_server)=='string' and doc.account_server:match('%S') and doc.account_server or screen.default_server),
   name='',password='',room='Pokój Polish Fighters',nick=type(doc.online_nick)=='string' and doc.online_nick:sub(1,24) or '',host='127.0.0.1',port='12345',
-  page=1,nav=navigation.create(),previous={},simple=simple,lan=false}
+  page=1,nav=navigation.create(),previous={},simple=simple,lan=lan==true,address=''}
  if simple then client.notice='' end
 end
+
+function screen.resume(state, room)
+ if type(room)~='table' or type(room.id)~='string' or room.profile~=catalog.profile_id then return end
+ screen.open(state,true)
+ client.listed_origin=nil
+ state.hub_online.resume=room
+ state.hub_online.joining=true
+ state.hub_online.intent='list'
+end
 local function simple_rows(s)
+ if s.missing_mod then
+  if s.mod_job then return {{'mod_no','ANULUJ',287,406,220,38}} end
+  return {{'mod_yes','TAK',182,406,181,38},{'mod_no','NIE',431,406,181,38}}
+ end
  local rows={
-  {'internet','INTERNET'..(s.lan and '' or ' [X]'),40,100,340,34},
-  {'local','LAN / HOTSPOT'..(s.lan and ' [X]' or ''),414,100,340,34},
   {'publish','UTWÓRZ POKÓJ',40,153,340,45},
   {'find','DOŁĄCZ',414,153,340,45},
  }
@@ -82,6 +93,53 @@ local function network_action(state,context,join)
  context.action('network')
 end
 
+local function switch_for_room(state,s,context,room,entry)
+ local doc,problem=engine.read_settings()
+ if problem then s.mod_message=tostring(problem);client.notice=s.mod_message;return end
+ doc=type(doc)=='table' and doc or {}
+ doc.little_fighters_room_resume={id=room.id,profile=room.profile}
+ if state.hub_android then doc.little_fighters_start_profile=entry.id end
+ local saved; saved,problem=engine.write_settings(doc)
+ if not saved then s.mod_message=tostring(problem);client.notice=s.mod_message;return end
+ state.hub_online=nil
+ context.action('profile_'..entry.id)
+end
+
+local function poll_mod(state,s,context)
+ local target=s.missing_mod
+ if not s.mod_job then return end
+ local result,problem=engine.mods('poll')
+ if result=='pending' then
+  if s.mod_job=='install' then
+   local received,total,phase,files=engine.mods('progress')
+   if phase==3 then s.mod_message='Instaluję pliki: '..tostring(files or 0)
+   elseif phase==2 then s.mod_message='Sprawdzam podpis i SHA-256…'
+   elseif total and total>0 then s.mod_message='Pobieranie: '..math.floor(100*(received or 0)/total)..'%' end
+  end
+  return
+ end
+ local job=s.mod_job;s.mod_job=nil
+ if s.mod_cancelled then
+  s.missing_mod,s.mod_cancelled,s.mod_message=nil,nil,nil
+  client.notice='Anulowano dołączanie.';s.refresh_at=0
+  return
+ end
+ if not result then s.mod_message='Błąd: '..client.utf8_prefix(problem or 'Instalacja przerwana.',76);return end
+ if job=='catalogue' then
+  for _,entry in ipairs(type(result.packages)=='table' and result.packages or {}) do
+   if entry.id==target.room.profile then
+    local ok;ok,problem=engine.mods('install',entry.id)
+    if ok then s.mod_job='install';s.mod_message='Pobieram '..entry.name..'…'
+    else s.mod_message='Błąd: '..client.utf8_prefix(problem,76) end
+    return
+   end
+  end
+  s.mod_message='Brak zgodnej paczki w podpisanym katalogu.'
+ else
+  switch_for_room(state,s,context,target.room,target.entry)
+ end
+end
+
 local function cancel_simple(s)
  local pending=client.pending
  if pending and pending.purpose=='quick-join' then pending.cancelled=true end
@@ -90,7 +148,15 @@ local function cancel_simple(s)
 end
 
 local function tick_simple(state,s,context)
+ if s.missing_mod then poll_mod(state,s,context);return end
  if s.lan or client.pending then return end
+ if s.resume and client.listed_origin==s.endpoint then
+  local target=s.resume;s.resume=nil;s.intent=nil
+  for _,room in ipairs(client.rooms) do
+   if room.id==target.id and room.profile==target.profile then s.intent=room;break end
+  end
+  if not s.intent then client.notice='Pokój został zamknięty lub jest pełny.';s.refresh_at=(engine.network_time() or 0)+5000;return end
+ end
  if s.login_requested then
   s.login_requested=nil
   if not client.token then
@@ -156,11 +222,18 @@ local function activate_simple(state,s,id,context)
  if id=='back' then
   if context.text_input then context.text_input(false) end
   cancel_simple(s);state.hub_online=nil
- elseif id=='local' or id=='internet' then
-  if s.lan~=(id=='local') then
-   cancel_simple(s)
-   s.lan=id=='local';s.address=s.address or '';s.page=1;client.notice=''
+ elseif id=='mod_yes' then
+  if not s.mod_job and s.missing_mod then
+   local ok,problem=engine.mods('catalogue')
+   if ok then s.mod_job='catalogue';s.mod_message='Pobieram podpisany katalog…'
+   elseif problem=='Mods handled by platform' then s.mod_message='Pobierz tę paczkę w Mod Managerze i wróć na listę.'
+   else s.mod_message='Błąd: '..client.utf8_prefix(problem,76) end
   end
+ elseif id=='mod_no' then
+  if s.mod_job then
+   s.mod_cancelled=true;s.mod_message='Anulowanie…'
+   if s.mod_job=='install' then engine.mods('cancel') end
+  else s.missing_mod,s.mod_message=nil,nil;s.refresh_at=0 end
  elseif id=='prev' or id=='next' then
   s.page=math.max(1,s.page+(id=='next' and 1 or -1))
  elseif id=='field:address' then s.focus='address'
@@ -181,9 +254,18 @@ local function activate_simple(state,s,id,context)
   tick_simple(state,s,context)
  elseif id:sub(1,5)=='join:' then
   local room=client.rooms[tonumber(id:sub(6))]
-  if not room then return end
-  if room.profile~=catalog.profile_id then client.notice='Najpierw wybierz moduł '..room.profile..'.';return end
-  if client.pending and client.pending.operation~='list-rooms' then return end
+  if not room or client.pending and client.pending.operation~='list-rooms' then return end
+  if room.profile~=catalog.profile_id then
+   for _,entry in ipairs(require('polish-fighters/hub').profiles) do
+    if entry.profile==room.profile then
+     if state.hub_available and state.hub_available[entry.id]==true then
+      switch_for_room(state,s,context,room,entry)
+     else s.missing_mod={room=room,entry=entry};s.mod_message=nil end
+     return
+    end
+   end
+   client.notice='Brak zgodnego modułu: '..client.utf8_prefix(room.profile,45);return
+  end
   s.intent=room
   tick_simple(state,s,context)
  end
@@ -277,29 +359,44 @@ function screen.update(state,input,context)
  s.previous={};for code,value in pairs(input.keys) do s.previous[code]=value end
  local rows=screen.rows(s);local targets={}
  for _,row in ipairs(rows) do targets[#targets+1]=navigation.target(row[3],row[4],row[3]+row[5],row[4]+row[6]) end
- local mapped=navigation.apply(s.nav,input,{page='online:'..tostring(client.token~=nil),targets=targets,default=1})
+ local mapped=navigation.apply(s.nav,input,{page=s.missing_mod and 'online:mod' or 'online:list',
+  targets=targets,default=1,autofocus=s.missing_mod~=nil,remember=true,locked=s.focus~=nil})
+ s.focused=mapped.focused
  for index,box in ipairs(targets) do
   if mapped.click and mapped.pointer_x>=box.left and mapped.pointer_x<=box.right and mapped.pointer_y>=box.top and mapped.pointer_y<=box.bottom then
    -- POWRÓT and LAN close the screen; a cancel in the same frame must not act on it again.
    screen.activate(state,rows[index][1],context);return
   end
  end
- if mapped.nav.cancel and state.hub_online then screen.activate(state,'back',context) end
+ if mapped.nav.cancel and state.hub_online then
+  if s.focus then
+   s.focus=nil
+   if context.text_input then context.text_input(false) end
+  else screen.activate(state,s.missing_mod and 'mod_no' or 'back',context) end
+ end
 end
 function screen.draw(state,context)
  context.viewport(794,550,8,13,27);context.image('pe/menu_back1',0,0,true)
  context.fill(0,0,794,550,8,13,27,185)
  local s=state.hub_online
- context.text(s.simple and 'GRAJ PRZEZ INTERNET' or 'POLISH FIGHTERS / KONTO I POKOJE',397,25,'center',25,0xf0f5ff,nil,nil,true)
+ context.text(s.simple and (s.lan and 'GRA W SIECI LOKALNEJ' or 'GRAJ PRZEZ INTERNET') or 'POLISH FIGHTERS / KONTO I POKOJE',397,25,'center',25,0xf0f5ff,nil,nil,true)
  if not s.simple then
  context.text((client.token or state.hub_online.accounts) and 'HTTPS dla serwera zdalnego. Hasło i sesja nie są zapisywane na dysku.'
   or 'Wpisz nick i kliknij GRAJ. Bez hasła i bez zakładania konta.',397,68,'center',13,0xadc3df,nil,nil,true)
  end
- for _,row in ipairs(screen.rows(state.hub_online)) do
-  local active=row[1]=='field:'..tostring(state.hub_online.focus)
+ if s.missing_mod then
+  context.fill(133,251,528,209,98,181,239,255)
+  context.fill(135,253,524,205,17,25,69,255)
+  context.text('POBRAĆ BRAKUJĄCY MOD?',397,278,'center',23,0xf0f5ff,nil,nil,true)
+  context.text(s.missing_mod.entry.title,397,320,'center',17,0xffdc82,nil,nil,true)
+  context.text(s.mod_message or 'Po instalacji gra spróbuje dołączyć do pokoju.',397,359,'center',14,0xf0f5ff,nil,nil,true)
+ end
+ for index,row in ipairs(screen.rows(s)) do
+  local active=row[1]=='field:'..tostring(s.focus) or index==s.focused
   context.fill(row[3],row[4],row[5],row[6],active and 42 or 22,active and 80 or 42,active and 120 or 68,230)
   context.text(s.simple and client.utf8_prefix(row[2],95) or row[2]:sub(-95),row[3]+10,row[4]+7,'left',13,0xf0f5ff,nil,nil,true)
  end
+ if s.missing_mod then return end
  context.text(client.notice,397,s.simple and 214 or (client.token and 276 or 315),'center',12,0xffdc82,nil,nil,true)
  if s.simple and s.joining and not s.lan and #client.rooms==0 and client.listed_origin==s.endpoint then
   context.text('Brak otwartych pokoi. Lista aktualizuje się automatycznie.',397,260,'center',14,0xadc3df,nil,nil,true)

@@ -20,7 +20,6 @@ import org.robolectric.shadows.ShadowToast;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
 public class GamePackDialogTest {
-    @org.junit.Before public void disableUpdateNetwork() { GitHubUpdates.resetForTest(); }
     private Button moduleButton(View root) {
         if (root instanceof Button && root.getId()==R.id.pf_module) return (Button)root;
         if (root instanceof ViewGroup) {

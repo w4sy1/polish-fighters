@@ -10,14 +10,23 @@ return function(legacy)
  local checksum_interval=30
  local tick_window=64
  local function fail(s,message)
-  if tostring(message)=='simulation desynchronized' then
+  local reason=tostring(message):lower()
+  if reason=='simulation desynchronized' then
    message='Rozbieżny stan gry (simulation desynchronized). Sesja została bezpiecznie przerwana.'
-  elseif tostring(message):lower():find('desynchronized',1,true) then
+  elseif reason:find('desynchronized',1,true) then
    message='Rozłączono: utrata połączenia, limit czasu lub różny stan gry (simulation desynchronized).'
-  elseif tostring(message):lower():find('profile',1,true) then
-   message='Niezgodny silnik, moduł lub dane gry. Użyj tej samej paczki testowej na obu urządzeniach.'
-  elseif tostring(message):lower():find('timed out',1,true) then
-   message='Brak odpowiedzi pokoju. Sprawdź IP, port TCP '..s.port..', wspólną sieć i zaporę gospodarza.'
+  elseif reason:find('profile',1,true) or reason:find('protocol version mismatch',1,true) then
+   message='Niezgodny silnik, moduł lub dane gry. Użyj tej samej wersji na obu urządzeniach.'
+  elseif reason:find('timed out',1,true) then
+   if s.internet then message='Przekroczono czas oczekiwania na pokój lub przekaźnik.'
+   else message='Brak odpowiedzi pokoju. Sprawdź IP, port TCP '..s.port..', wspólną sieć i zaporę gospodarza.' end
+  elseif s.internet then
+   if reason=='room full' then message='Pokój jest pełny.'
+   elseif reason:find('relay refused',1,true) or reason:find('network connect:',1,true) then
+    message='Przekaźnik jest niedostępny lub gospodarz zamknął pokój.'
+   elseif reason:find('disconnected',1,true) or reason:find('connection closed',1,true) then
+    message='Utracono połączenie z pokojem.'
+   elseif reason:find('room already started',1,true) then message='W tym pokoju rozpoczęto już grę.' end
   end
   engine.network("close");s.phase,s.error="failed",message;return nil,message
  end
@@ -36,10 +45,10 @@ return function(legacy)
    capacity=require("polish-fighters/dashboard_model").current().room_capacity,
    received="",frames=0,sequence=0,version=options.recording_version,
    input_delay=options.network_delay or (options.network_internet and internet_delay or lan_delay),
-   relay=options.network_relay}
+   internet=options.network_internet,relay=options.network_relay}
  end
  function room.start(s,host,address)
-  room.close(s);s.host=host;s.error=nil;s.names=nil;s.peers={};s.slot=nil;s.frames=0;s.sequence=0;s.sent_checksum=nil
+  room.close(s);s.host=host;s.error=nil;s.notice=nil;s.ping=nil;s.names=nil;s.peers={};s.slot=nil;s.frames=0;s.sequence=0;s.sent_checksum=nil
   s.sent_frame=0;s.ticks={};s.delay=0
   local value=host and (s.capacity..":"..s.profile..":"..address) or address
   local operation=host and "room_host" or "join"

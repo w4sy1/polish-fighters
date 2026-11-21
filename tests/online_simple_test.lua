@@ -10,6 +10,8 @@ engine={read_settings=function() return {} end,write_settings=function() return 
   if action=='start' then inflight=operation;requests[#requests+1]=operation;return true end
   local operation=inflight;inflight=nil
   if operation=='login' then return {token=string.rep('x',32),name='Gosc_1'} end
+  if operation=='list-rooms' and server.list_error then return nil,'timeout' end
+  if operation=='relay-ticket' and server.closed then return {error='Unknown room or relay role'} end
   if operation=='list-rooms' then return {relay=server.relay,rooms=server.rooms} end
   if operation=='publish-room' then return {id='room1'} end
   if operation=='relay-ticket' then return {ticket=string.rep('t',20),relay={host='203.0.113.10',port=8766}} end
@@ -42,6 +44,66 @@ assert(join,'listed room has no join row')
 screen.activate(state,join,context);run(state,5)
 assert(actions[1]=='network' and client.pending_join.relay and not state.hub_online,'relay join did not start')
 
+-- A closed room is removed promptly. A failed later refresh clears stale listings.
+reset();server.closed=true
+state={};screen.open(state,true)
+screen.activate(state,'find',context);run(state,5)
+screen.activate(state,'join:1',context);run(state,5)
+assert(#actions==0 and #client.rooms==0 and client.notice:find('zamknięty',1,true))
+server.closed=nil
+screen.activate(state,'find',context);run(state,5)
+assert(#client.rooms==1)
+server.list_error=true
+screen.activate(state,'find',context);run(state,5)
+assert(#client.rooms==0 and client.notice:find('timeout',1,true))
+server.list_error=nil
+
+-- An installed mod switches first, then rejoins by stable room ID after rebuilding Lua.
+local other=require('polish-fighters/hub').profiles[1]
+if other.profile==catalog.profile_id then other=require('polish-fighters/hub').profiles[2] end
+local target={id='different',host='',port=12345,relay=true,profile=other.profile,name='Inny moduł'}
+local decoy={id='decoy',host='',port=12345,relay=true,profile=other.profile,name='Nie ten pokój'}
+local doc={}
+engine.read_settings=function() return doc end
+engine.write_settings=function(value) doc=value;return true end
+reset();server.rooms={target}
+state={hub_available={[other.id]=true}};screen.open(state,true)
+screen.activate(state,'find',context);run(state,5)
+screen.activate(state,'join:1',context)
+assert(actions[1]=='profile_'..other.id and doc.little_fighters_room_resume.id==target.id)
+local previous_profile=catalog.profile_id;catalog.profile_id=other.profile
+local selected
+local original_account=engine.account
+engine.account=function(action,endpoint,operation,payload)
+ if action=='start' and operation=='relay-ticket' then selected=payload.room end
+ return original_account(action,endpoint,operation,payload)
+end
+server.rooms={decoy,target};state={}
+screen.resume(state,doc.little_fighters_room_resume);run(state)
+assert(actions[2]=='network' and selected==target.id)
+catalog.profile_id=previous_profile
+
+-- A missing mod asks before any download. No restores the list; Yes uses the
+-- matching ID from the signed catalogue and commits to the same selected room.
+reset();server.rooms={target}
+state={hub_available={}};screen.open(state,true)
+screen.activate(state,'find',context);run(state,5)
+screen.activate(state,'join:1',context)
+assert(state.hub_online.missing_mod.room.id==target.id)
+screen.activate(state,'mod_no',context)
+assert(not state.hub_online.missing_mod and #actions==0)
+screen.activate(state,'join:1',context)
+local operation, installed
+engine.mods=function(action,id)
+ if action=='catalogue' or action=='install' then operation=action;installed=id or installed;return true end
+ if action=='poll' and operation=='catalogue' then return {packages={{id=target.profile,name='Test'}}} end
+ if action=='poll' and operation=='install' then return target.profile end
+end
+screen.activate(state,'mod_yes',context);run(state,5)
+assert(installed==target.profile and actions[1]=='profile_'..other.id)
+assert(doc.little_fighters_room_resume.id==target.id)
+engine.account=original_account
+
 -- Publishing asks the server again, so an earlier list without the relay does not block it.
 reset();server.relay=false
 state={};screen.open(state,true);screen.activate(state,'publish',context);run(state)
@@ -57,7 +119,7 @@ assert(#actions==0 and client.notice:find('Przekaźnik niedostępny',1,true),'pu
 
 -- LAN: loopback is refused, IPv4:port joins directly without the internet input delay.
 reset()
-state={};screen.open(state,true);screen.activate(state,'local',context)
+state={};screen.open(state,true,true)
 state.hub_online.address='127.0.0.1';screen.activate(state,'find',context)
 assert(#actions==0 and client.notice:find('IPv4',1,true))
 state.hub_online.address='192.168.1.5:12346';screen.activate(state,'find',context)

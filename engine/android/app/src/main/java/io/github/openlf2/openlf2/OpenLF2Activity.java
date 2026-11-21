@@ -19,19 +19,46 @@ import org.libsdl.app.SDLActivity;
 public final class OpenLF2Activity extends SDLActivity {
     private static final String TAG = "OpenLF2";
     private static final String OPEN_ANDROID_TOOLS = "little_fighters_open_android_tools";
-    private static final String OPEN_ANDROID_MODS = "little_fighters_open_android_mods";
     private LanWifiMode lanWifi;
     private File stagedScripts;
     private volatile boolean openAndroidTools;
-    private volatile boolean openAndroidMods;
+    private static final int MOD_MANAGER = 7302;
+    private volatile String modManagerResult;
     @Override protected void main() {
         GameDiagnostics.write(this, "launch-last.txt", "Native engine launch\n" + android.os.Build.VERSION.RELEASE);
         takeAndroidToolsRequest(); // Discard requests left behind by an interrupted game.
-        takeRequest(OPEN_ANDROID_MODS);
         int result = SDLActivity.nativeRunMain(getMainSharedObject(), getMainFunction(), getArguments());
         openAndroidTools = result == 0 && takeAndroidToolsRequest();
-        openAndroidMods = result == 0 && takeRequest(OPEN_ANDROID_MODS);
         if (result != 0) GameDiagnostics.write(this, "native-return.txt", "Native engine exit code: " + result);
+    }
+
+    /** Called by the SDL main thread while the game's menu is active. */
+    public void showModManager(String activePackage) {
+        modManagerResult = null;
+        runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                startActivityForResult(new Intent(this, AndroidModsActivity.class)
+                    .putExtra(AndroidModsActivity.FROM_RUNNING_GAME, true)
+                    .putExtra(AndroidModsActivity.ACTIVE_PACKAGE, activePackage), MOD_MANAGER);
+            }
+        });
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != MOD_MANAGER) return;
+        String profile = resultCode == RESULT_OK && data != null
+            ? data.getStringExtra(AndroidModsActivity.SELECTED_PROFILE) : null;
+        modManagerResult = profile == null ? "" : profile;
+    }
+
+    public String modManagerResult() { return modManagerResult; }
+
+    /** Called by the in-game Information menu. */
+    public void checkGameUpdate() {
+        runOnUiThread(() -> {
+            if (!isFinishing() && !isDestroyed()) GitHubUpdates.check(this);
+        });
     }
 
     private boolean takeAndroidToolsRequest() { return takeRequest(OPEN_ANDROID_TOOLS); }
@@ -85,7 +112,6 @@ public final class OpenLF2Activity extends SDLActivity {
             throw new IllegalStateException("Could not stage Lua modules", error);
         }
         super.onCreate(savedInstanceState);
-        GitHubUpdates.attach(this);
     }
 
     private boolean usesCurrentBundle() throws IOException {
@@ -114,13 +140,15 @@ public final class OpenLF2Activity extends SDLActivity {
     @Override
     protected String[] getArguments() {
         try {
-            if (getIntent().hasExtra("lan_host")) {
-                return GameLaunchArguments.lan(getFilesDir(), getIntent().getBooleanExtra("lan_host", false),
-                    getIntent().getStringExtra("lan_address"), getIntent().getIntExtra("lan_port", 12345), stagedScripts);
-            }
-            return GameLaunchArguments.build(getFilesDir(),
-                getIntent().getStringExtra("bluetooth_role"),
-                getIntent().getIntExtra("bluetooth_port", 0), stagedScripts);
+            String[] launch = getIntent().hasExtra("lan_host")
+                ? GameLaunchArguments.lan(getFilesDir(), getIntent().getBooleanExtra("lan_host", false),
+                    getIntent().getStringExtra("lan_address"), getIntent().getIntExtra("lan_port", 12345), stagedScripts)
+                : GameLaunchArguments.build(getFilesDir(), getIntent().getStringExtra("bluetooth_role"),
+                    getIntent().getIntExtra("bluetooth_port", 0), stagedScripts);
+            String[] withVersion = java.util.Arrays.copyOf(launch, launch.length + 2);
+            withVersion[launch.length] = "--android-version";
+            withVersion[launch.length + 1] = BuildConfig.VERSION_NAME;
+            return withVersion;
         } catch (IOException | org.json.JSONException error) {
             throw new IllegalStateException("Nie można odczytać wybranego modułu gry", error);
         }
@@ -132,8 +160,6 @@ public final class OpenLF2Activity extends SDLActivity {
         super.onDestroy();
         if (isFinishing() && openAndroidTools) {
             startActivity(new Intent(this, BluetoothLobbyActivity.class));
-        } else if (isFinishing() && openAndroidMods) {
-            startActivity(new Intent(this, AndroidModsActivity.class).putExtra(AndroidModsActivity.RETURN_TO_GAME, true));
         }
     }
     /**

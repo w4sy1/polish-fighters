@@ -19,7 +19,6 @@ import org.robolectric.shadows.ShadowAlertDialog;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
 public class MobileSettingsDialogTest {
-    @org.junit.Before public void disableUpdateNetwork() { GitHubUpdates.resetForTest(); }
     private View find(View root, Class<?> type, String text) {
         if (type.isInstance(root) && (text == null
                 || (root instanceof Button && text.equals(((Button)root).getText().toString())))) return root;

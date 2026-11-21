@@ -46,6 +46,8 @@ class Service:
         columns = {row[1] for row in self.db.execute('PRAGMA table_info(rooms)')}
         if 'private' not in columns:
             self.db.execute('ALTER TABLE rooms ADD COLUMN private INTEGER NOT NULL DEFAULT 0')
+        if 'relay_ready_until' not in columns:
+            self.db.execute('ALTER TABLE rooms ADD COLUMN relay_ready_until REAL NOT NULL DEFAULT 0')
         self.db.commit()
 
     NICK_SALT = b'nick'
@@ -91,12 +93,18 @@ class Service:
             self.db.execute('DELETE FROM sessions WHERE expires <= ?', (now,))
             self.db.execute('DELETE FROM rooms WHERE expires <= ?', (now,))
             self.db.execute('DELETE FROM invites WHERE expires <= ?', (now,))
-            if operation == 'consume-relay-ticket':
+            if operation in ('consume-relay-ticket', 'relay-readiness'):
                 # Called by a standalone relay, never by players: authenticated by its key.
                 key = (self.relay or {}).get('key')
                 supplied = data.get('key')
                 if not key or not isinstance(supplied, str) or not hmac.compare_digest(supplied.encode(), key.encode()):
                     raise PermissionError('Relay key required')
+                if operation == 'relay-readiness':
+                    room, ready = data.get('room'), data.get('ready')
+                    if not isinstance(room, str) or type(ready) is not bool:
+                        raise ValueError('Invalid relay readiness')
+                    self.set_relay_readiness(room, ready)
+                    return {'ok': True}
                 room, role, capacity = self.consume_relay_ticket(data.get('ticket'))
                 return {'room': room, 'role': role, 'capacity': capacity}
             if operation == 'recover':
@@ -242,10 +250,12 @@ class Service:
                 if not isinstance(name, str) or not 1 <= len(name.strip()) <= 48 or any(ord(c) < 32 for c in name):
                     raise ValueError('Invalid room name')
                 old = self.db.execute('SELECT id FROM rooms WHERE owner=?', (user_id,)).fetchone()
-                room_id = old[0] if old else secrets.token_urlsafe(12)
+                room_id = old[0] if old and not relayed else secrets.token_urlsafe(12)
                 private = data.get('private', False)
                 if type(private) is not bool:
                     raise ValueError('private must be boolean')
+                if old and relayed:
+                    self.db.execute('DELETE FROM rooms WHERE id=?', (old[0],))
                 self.db.execute('INSERT INTO rooms(id,owner,name,host,port,profile,capacity,expires,private) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET '
                                 'name=excluded.name,host=excluded.host,port=excluded.port,profile=excluded.profile,'
                                 'capacity=excluded.capacity,expires=excluded.expires,private=excluded.private',
@@ -254,14 +264,22 @@ class Service:
             if operation == 'list-rooms':
                 rows = self.db.execute('SELECT rooms.id,rooms.name,rooms.host,rooms.port,rooms.profile,rooms.capacity,users.name '
                                        'FROM rooms LEFT JOIN users ON users.id=rooms.owner '
-                                       'WHERE rooms.private=0 OR rooms.owner=? ORDER BY rooms.name LIMIT 200', (user_id,)).fetchall()
+                                       'WHERE (rooms.private=0 OR rooms.owner=?) '
+                                       "AND (rooms.host<>'' OR rooms.relay_ready_until>?) "
+                                       'ORDER BY rooms.name LIMIT 200', (user_id, now)).fetchall()
                 keys = ('id', 'name', 'host', 'port', 'profile', 'capacity', 'owner')
                 rooms = [dict(zip(keys, row)) for row in rows]
                 for room in rooms:
                     room['relay'] = room['host'] == ''
                 return {'rooms': rooms, 'relay': bool(self.relay),
-                        'scope': 'Advertisements only; availability, player count and connection are not verified'}
+                        'scope': 'Relay rooms require a waiting host channel; direct rooms are advertisements'}
             raise ValueError('Unknown operation')
+
+    def set_relay_readiness(self, room, ready):
+        deadline = self.clock() + 15 if ready else 0
+        with self.lock:
+            self.db.execute("UPDATE rooms SET relay_ready_until=? WHERE id=? AND host=''", (deadline, room))
+            self.db.commit()
 
     def invited_room(self, code, now):
         if not isinstance(code, str) or len(code) > 128:

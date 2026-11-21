@@ -30,7 +30,7 @@ local function open_android_screen(context,key)
 end
 function hub.open_android_tools(context) return open_android_screen(context,'little_fighters_open_android_tools') end
 -- Android: the native Mods screen downloads and installs signed mods from Polish Fighters - GitHub.
-function hub.open_android_mods(context) return open_android_screen(context,'little_fighters_open_android_mods') end
+function hub.open_android_mods(context) context.action('open_android_mods') end
 function hub.rows(state,active_profile)
  local mode=state.hub_mode
  local function row(id,key) return {id,(L(key or id))} end
@@ -51,9 +51,14 @@ function hub.rows(state,active_profile)
   rows[#rows+1]={'unavailable',L('absent_turbo')};rows[#rows+1]=row('library','back');return rows
  elseif mode=='settings' then
   local rows={row('controls'),row('options','video'),row('recording'),row('extras'),{'diagnostics','DIAGNOSTYKA / DIAGNOSTICS'}}
+  rows[#rows+1]={'lan','GRA W SIECI LOKALNEJ'}
+  rows[#rows+1]={'information','INFORMACJE'}
   if state.hub_android then rows[#rows+1]={'android_tools','ANDROID / BLUETOOTH'} end
   rows[#rows+1]=row('root','back')
   return rows
+ elseif mode=='information' then
+  if state.hub_android then return {{'check_android_update','AKTUALIZUJ GRĘ'},row('settings','back')} end
+  return {row('settings','back')}
  elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
  elseif mode=='credits' then return {row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}

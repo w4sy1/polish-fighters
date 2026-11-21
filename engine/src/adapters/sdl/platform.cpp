@@ -244,7 +244,8 @@ public:
 #else
         // SDL uses the filter and its name until the dialog closes.
         dialog_filter_name_ = labels.filter.empty() ? "LF2 recording files (*.lfr)" : labels.filter;
-        dialog_filter_ = {dialog_filter_name_.c_str(), "lfr"};
+        dialog_filter_extension_ = labels.extension;
+        dialog_filter_ = {dialog_filter_name_.c_str(), dialog_filter_extension_.c_str()};
         std::string location;
         if (directory) {
             std::error_code error;
@@ -1254,6 +1255,7 @@ private:
     Texture frame_target_;
 #ifndef __EMSCRIPTEN__
     std::string dialog_filter_name_; // the dialog filter and its name are kept while the dialog is open
+    std::string dialog_filter_extension_;
     SDL_DialogFileFilter dialog_filter_{};
 #endif
     TextRenderer text_; // its textures belong to renderer_, so it is declared after it

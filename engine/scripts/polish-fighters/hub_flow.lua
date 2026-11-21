@@ -21,6 +21,7 @@ return function(base)
   state.launch.hub_enabled=not options.legacy_menu
   state.launch.hub_available=options.profiles_available
   state.launch.hub_android=options.touch_device
+  state.launch.hub_installed_version=options.installed_version
   local saved=engine and engine.read_settings and engine.read_settings() or {}
   if type(saved)~="table" then saved={} end
   local chosen=saved.little_fighters_start_profile
@@ -44,13 +45,14 @@ return function(base)
    state.launch.hub_pending_mode=pending;state.launch.hub_mode='players'
    saved.little_fighters_pending_mode=nil;engine.write_settings(saved)
   end
-  if state.launch.hub_enabled and options.profiles_available and not options.profile_start
-   and not saved.controls_guide_seen and state.launch.hub_mode=='root' and state.launch.page=='menu' then
-   state.launch.hub_intro_guide=true
-   state.launch.hub_classic=true
-   state.launch.pf_panel='combo-guide'
-   state.launch.pf_guide_message=true
-   state.launch.pf_message=require('polish-fighters/combo_guide').basics
+  if saved.little_fighters_room_resume~=nil then
+   local room=saved.little_fighters_room_resume
+   saved.little_fighters_room_resume=nil
+   if engine.write_settings(saved) then require('polish-fighters/online_screen').resume(state.launch,room) end
+  end
+  if state.launch.hub_enabled and not state.launch.hub_online and options.profiles_available and not options.profile_start
+   and not saved.current_controls_seen and state.launch.hub_mode=='root' and state.launch.page=='menu' then
+   state.launch.hub_current_controls=true
   end
   return state
  end
@@ -96,7 +98,7 @@ return function(base)
   local back=escape and not state.hub_escape_held
   state.hub_escape_held=escape
   if back and not state.session and (state.active=='characters' or state.active=='battle' or state.active=='championship') then
-   state.active='launch';state.launch.page='menu';state.launch.hub_mode='players';state.wait_release=true
+   state.active='launch';state.launch.page='menu';state.launch.hub_mode='battle';state.wait_release=true
    return true
   end
   local x,y,w,h=button_area(state)

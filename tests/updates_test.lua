@@ -23,6 +23,13 @@ state.launch={hub_enabled=true,page='menu'}
 local label
 flow.draw(state,{text=function(value) label=value end})
 assert(label=='Polish Fighters '..updates.version,'launch menu must show the packaged version')
+state.launch.hub_android=true
+state.launch.hub_mode='root'
+state.launch.hub_installed_version='0.18.16'
+flow.draw(state,{text=function(value) label=value end})
+assert(label=='Polish Fighters 0.18.16','Android must show the installed APK version')
+state.launch.hub_mode='battle'
+flow.draw(state,{text=function() error('Android version must not overlap the battle help button') end})
 flow.overlay_update(state,{},{});assert(calls[2]=='poll' and not state.update_pending)
 state.available_update=release('0.13.0');local action
 assert(flow.overlay_update(state,{},{action=function(a) action=a end}))
