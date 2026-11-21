@@ -54,6 +54,10 @@ end
 local action
 screen.update(state,{keys={[27]=true},pointer_x=0,pointer_y=0},{action=function(name) action=name end,sound=function() end})
 assert(action=='launch','Esc must return from an Internet error')
+state.session.relay={address='127.0.0.1',ticket='test-ticket'}
+screen.begin(state,false,'127.0.0.1')
+assert(state.page=='waiting' and not started.host and started.address=='127.0.0.1')
+state.session.relay=nil
 font.draw=draw
 state.session.internet=nil
 font.gdi=gdi

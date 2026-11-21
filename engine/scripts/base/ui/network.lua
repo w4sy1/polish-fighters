@@ -35,7 +35,7 @@ function screen.begin(state, host, address)
         end
         local a,b,c,d=address:match('^(%d+)%.(%d+)%.(%d+)%.(%d+)$')
         if not a or tonumber(a)>255 or tonumber(b)>255 or tonumber(c)>255 or tonumber(d)>255
-            or (tonumber(a)==127 and not state.allow_loopback) or address=='0.0.0.0' then
+            or (tonumber(a)==127 and not state.allow_loopback and not state.session.relay) or address=='0.0.0.0' then
             state.message='Wpisz IPv4 gospodarza (np. 192.168.1.82), opcjonalnie :12345.';return
         end
     end
