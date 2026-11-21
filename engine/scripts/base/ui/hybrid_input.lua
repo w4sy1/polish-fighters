@@ -51,6 +51,43 @@ function hybrid.move_details(profile, fighter, move, variant)
     end
 end
 
+-- Alternate targets share an input chord but use their own animation windows.
+-- Require the original frame names so only matching Tiger data receives these shortcuts.
+local tiger_variants = {
+    {216, "tiger_genkidama", "Genkidama", "Po zwykłym ryku (S5)."},
+    {320, "roar5", "Dalszy ryk", "Po dodatkowym bloku podczas ryku."},
+}
+
+function hybrid.shortcuts(record)
+    local moves = hybrid.moves(record)
+    for _, move in ipairs(moves) do
+        if move[1] == "Uj" then
+            for _, spec in ipairs(tiger_variants) do
+                for _, variant in ipairs(move.variants) do
+                    if variant.target == spec[1] and variant.frame.name == spec[2] then
+                        variant.caption, variant.condition = spec[3], spec[4]
+                        moves[#moves + 1] = {move[1] .. ":" .. variant.target,
+                            variant.caption, move[3], move[4], variant = variant}
+                    end
+                end
+            end
+            break
+        end
+    end
+    return moves
+end
+
+function hybrid.describe(record)
+    local moves = hybrid.shortcuts(record)
+    local rows = {}
+    for _, move in ipairs(moves) do
+        for _, variant in ipairs(move.variants or {}) do
+            rows[#rows + 1] = {move = move, variant = variant}
+        end
+    end
+    return moves, rows
+end
+
 function hybrid.pages(moves)
     return math.max(1, math.ceil(#moves / layout.slots_per_page))
 end
@@ -76,7 +113,7 @@ function hybrid.reset(s)
     s.fingers, s.counts, s.queue = {}, {}, {}
     s.stick, s.guard, s.strong, s.pause, s.trace = nil, nil, nil, false, nil
     s.direction, s.output, s.knob_x, s.knob_y = "", "", 0, 0
-    s.jump_at, s.attack_at = nil, nil
+    s.jump_at, s.attack_at, s.follow_up = nil, nil, nil
 end
 
 local function contains(value, letter) return value:find(letter, 1, true) ~= nil end
@@ -143,6 +180,22 @@ local function shortcut(s, name, fighter, record_key)
     if direction == "forward" then direction = fighter.facing == 0 and "r" or "l" end
     -- Feed the ordinary LF2 recognizer and the ordinary recorded/networked input stream.
     -- The fighter's frame selects the target and control.enter_frame enforces its cost.
+    if move.variant then
+        -- Arm only from a frame whose ordinary animation leads to the move.
+        local frame, frames, seen = fighter.frame, fighter.record.frames, {}
+        while frames[frame] and not seen[frame] do
+            if frames[frame].hits.Uj == move.variant.target then
+                s.follow_up = {record = fighter.record, frame = frame, path = seen}
+                return
+            end
+            -- Do not wait through a return to neutral or an unrelated looping animation.
+            seen[frame] = true
+            frame = frames[frame].next
+            if not frame or frame <= 0 or frame >= 999 then break end
+        end
+        return
+    end
+    s.follow_up = nil
     local base = held(s)
     enqueue(s, "")
     enqueue(s, "f")
@@ -251,7 +304,7 @@ function hybrid.update(s, input, mode, fighter, key, consume)
     if mode ~= s.mode then hybrid.reset(s); s.mode = mode end
     local record = fighter and fighter.record
     if s.record ~= record or not s.moves then
-        s.record, s.moves = record, hybrid.moves(record)
+        s.record, s.moves = record, hybrid.shortcuts(record)
         s.pages = hybrid.pages(s.moves)
         s.page = math.min(s.page, s.pages)
     end
@@ -274,6 +327,20 @@ function hybrid.update(s, input, mode, fighter, key, consume)
     end
     for _, contact in ipairs(events) do event(s, contact, mode == "pause", fighter, key) end
     if not consume then return s.output, false end
+    local follow = s.follow_up
+    if follow then
+        local frame = record == follow.record and record.frames[fighter.frame]
+        if not frame or (fighter.frame ~= follow.frame and not follow.path[fighter.frame]) then
+            s.follow_up = nil
+        elseif fighter.frame == follow.frame then
+            s.follow_up = nil
+            if not contains(s.output, "f") then
+                s.output = "fub"
+                s.guard = nil
+                return s.output, false
+            end
+        end
+    end
     s.output = table.remove(s.queue, 1) or held(s)
     local pause = s.pause
     s.pause = false

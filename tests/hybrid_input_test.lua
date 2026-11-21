@@ -150,3 +150,25 @@ end
 local merged = assert(network.exchange(local_peer, {[0] = "fbcq", functions = ""}, 0))
 assert(merged[0] == "cbf" and merged[4] == "b" and merged[1] == "")
 print("PASS: legacy TCP preserves shortcut input without injecting combo resets")
+
+local tiger_frames = {
+    [0] = hits({Fa=10, Ua=10, Da=10, Fj=10, Uj=243, Dj=10, ja=10}),
+    [10] = hits(), [243] = {hits={}, next=250},
+    [250] = hits({Uj=216}), [195] = hits({Uj=320}),
+    [216] = {hits={}, name="tiger_genkidama"}, [320] = {hits={}, name="roar5"},
+}
+local tiger = {facing=0, frame=0, record={frames=tiger_frames}}
+local tiger_moves = hybrid.shortcuts(tiger.record)
+assert(#tiger_moves == 9 and tiger_moves[8][1] == "Uj:216" and tiger_moves[9][1] == "Uj:320")
+s = hybrid.create(config)
+assert(update(s, {contact("d", 30, "skills"),contact("d", 31, "skills")}, true, nil, tiger) == "")
+assert(s.page == 3)
+assert(update(s, {contact("d", 32, "s2")}, true, nil, tiger) == "", "Genkidama is unavailable from neutral")
+tiger.frame = 243
+assert(update(s, {contact("d", 33, "s2")}, true, nil, tiger) == "")
+tiger.frame = 250
+assert(update(s, nil, true, nil, tiger) == "fub", "S8 must feed the original chord at Genkidama's source frame")
+assert(update(s, nil, true, nil, tiger) == "")
+tiger.frame = 195
+assert(update(s, {contact("d", 34, "s3")}, true, nil, tiger) == "fub", "S9 must work in the follow-up roar")
+print("PASS: Tiger S8/S9 use their original animation windows and standard input")

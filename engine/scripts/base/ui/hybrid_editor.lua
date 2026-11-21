@@ -83,7 +83,7 @@ local function actions(s)
     if fighter then
         local key = fighter_key(fighter.path)
         if s.move_fighter ~= fighter then
-            s.moves = input_driver.moves(object_data.load(fighter.path))
+            s.moves, s.move_list = input_driver.describe(object_data.load(fighter.path))
             s.move_fighter, s.page, s.move_row = fighter, 1, 1
         end
         local moves = s.moves
@@ -91,12 +91,7 @@ local function actions(s)
             s.show_moves = not s.show_moves
         end)
         if s.show_moves then
-            local list = {}
-            for _, move in ipairs(moves) do
-                for _, variant in ipairs(move.variants) do
-                    list[#list + 1] = {move = move, variant = variant}
-                end
-            end
+            local list = s.move_list
             local row = list[s.move_row]
             if row then
                 local v, move = row.variant, row.move
@@ -105,7 +100,7 @@ local function actions(s)
                 end
                 button(601, 133, 180, ("Ruch %d/%d  >"):format(s.move_row, #list),
                     function() s.move_row = s.move_row % #list + 1 end)
-                line(174, v.frame.name and v.frame.name ~= "" and v.frame.name or ("Ruch " .. math.abs(v.target)))
+                line(174, v.caption or (v.frame.name and v.frame.name ~= "" and v.frame.name or ("Ruch " .. math.abs(v.target))))
                 line(201, "D + " .. move[2])
                 local cost = v.frame.mp or 0
                 local quotient = cost >= 0 and math.floor(cost / costs.hp_radix) or math.ceil(cost / costs.hp_radix)
@@ -115,10 +110,13 @@ local function actions(s)
                 local shortcuts = {}
                 for index = 1, input_driver.pages(moves) * layout.slots_per_page do
                     local slot = "s" .. index
-                    if input_driver.binding(settings, key, moves, slot) == move then shortcuts[#shortcuts + 1] = slot:upper() end
+                    local bound = input_driver.binding(settings, key, moves, slot)
+                    if bound == move and not v.caption or bound and bound.variant == v then
+                        shortcuts[#shortcuts + 1] = slot:upper()
+                    end
                 end
                 line(313, #shortcuts > 0 and table.concat(shortcuts, ", ") or "Bez skrótu")
-                local details = input_driver.move_details(catalog.profile_id, fighter, move, v)
+                local details = v.condition or input_driver.move_details(catalog.profile_id, fighter, move, v)
                 if details then
                     local row, y = "", 342
                     for word in details:gmatch("%S+") do
@@ -146,7 +144,7 @@ local function actions(s)
                 button(601, y, 180, slot:upper() .. (control.enabled and "  Włączony" or "  Wyłączony"),
                     function() control.enabled = not control.enabled end)
                 local active = input_driver.binding(settings, key, moves, slot)
-                button(601, y + 33, 180, active and ("D + " .. active[2] .. "  ›") or "Brak przypisania  ›", function()
+                button(601, y + 33, 180, active and ((active.variant and "" or "D + ") .. active[2] .. "  ›") or "Brak przypisania  ›", function()
                     local position = 0
                     for i, move in ipairs(moves) do if move == active then position = i end end
                     local next_move = moves[(position + 1) % (#moves + 1)]
