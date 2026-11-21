@@ -5,7 +5,7 @@ return function(base)
   client.tick()
   local result=update(state,...)
   local session=state.network and state.network.session
-  if session and session.host and (session.phase=='lobby' or session.phase=='greeting' or session.phase=='connecting') then
+  if session and session.host and session.phase=='lobby' then
    client.maintain_relay(session)
   end
   -- Leaving the lobby (POWRÓT/F4 drops state.network) or a closed/failed session ends

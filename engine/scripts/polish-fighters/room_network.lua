@@ -16,6 +16,8 @@ return function(legacy)
    message='Rozłączono: utrata połączenia, limit czasu lub różny stan gry (simulation desynchronized).'
   elseif tostring(message):lower():find('profile',1,true) then
    message='Niezgodny silnik, moduł lub dane gry. Użyj tej samej paczki testowej na obu urządzeniach.'
+  elseif tostring(message):lower():find('timed out',1,true) and s.internet then
+   message='Brak odpowiedzi pokoju lub przekaźnika. Wróć do listy pokoi i spróbuj ponownie.'
   elseif tostring(message):lower():find('timed out',1,true) then
    message='Brak odpowiedzi pokoju. Sprawdź IP, port TCP '..s.port..', wspólną sieć i zaporę gospodarza.'
   end
@@ -36,7 +38,7 @@ return function(legacy)
    capacity=require("polish-fighters/dashboard_model").current().room_capacity,
    received="",frames=0,sequence=0,version=options.recording_version,
    input_delay=options.network_delay or (options.network_internet and internet_delay or lan_delay),
-   relay=options.network_relay}
+   internet=options.network_internet,relay=options.network_relay}
  end
  function room.start(s,host,address)
   room.close(s);s.host=host;s.error=nil;s.names=nil;s.peers={};s.slot=nil;s.frames=0;s.sequence=0;s.sent_checksum=nil

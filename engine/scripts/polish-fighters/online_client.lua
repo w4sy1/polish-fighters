@@ -151,7 +151,7 @@ function client.tick()
   -- Relay rooms accept players only through the relay, so the host listens on loopback.
   client.pending_join={host=true,address=client.publish_relay and '127.0.0.1' or '0.0.0.0',port=client.publish_port}
   client.hosting_relay=client.publish_relay
-  client.navigate=true;client.notice='Pokój opublikowany. Uruchamianie gospodarza…'
+  client.navigate=true;client.notice='Uruchamianie gospodarza…'
  elseif operation=='logout' then client.notice='Wylogowano.'
  elseif operation=='delete-room' then client.room=nil;client.notice='Usunięto ogłoszenie pokoju.'
  elseif operation=='heartbeat-room' then client.notice='Ogłoszenie pokoju odświeżone.'

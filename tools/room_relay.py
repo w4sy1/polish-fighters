@@ -70,8 +70,15 @@ class RelayServer(socketserver.ThreadingTCPServer):
         self.condition = threading.Condition()
         self.waiting = {}
         self.active = {}
+        self.readiness_locks = [threading.Lock() for _ in range(64)]
         self.slots = threading.BoundedSemaphore(64)
         super().__init__(address, RelayHandler)
+
+    def report_readiness(self, room):
+        with self.readiness_locks[hash(room) % len(self.readiness_locks)]:
+            with self.condition:
+                ready = bool(self.waiting.get(room))
+            self.service.set_relay_readiness(room, ready)
 
     def process_request(self, request, address):
         if not self.slots.acquire(blocking=False):
@@ -118,12 +125,25 @@ class RelayHandler(socketserver.BaseRequestHandler):
                         raise ValueError('Host channel limit reached')
                     waiting.append(waiter)
                     server.condition.notify_all()
-                    if not server.condition.wait_for(lambda: waiter['peer'] is not None, timeout=60):
-                        raise TimeoutError('No joining player')
+                deadline = time.monotonic() + 60
+                while True:
+                    with server.condition:
+                        if waiter['peer'] is not None:
+                            break
+                        # Hosts do not send game data before pairing.
+                        readable, _, _ = select.select([connection], [], [], 0)
+                        if readable or time.monotonic() >= deadline:
+                            waiting.remove(waiter)
+                            raise ConnectionError('Waiting host disconnected or timed out')
+                    server.report_readiness(room)
+                    with server.condition:
+                        if server.condition.wait_for(lambda: waiter['peer'] is not None, timeout=5):
+                            break
                 peer = waiter['peer']
                 try:
                     connection.sendall(b'{"status":"paired"}\n')
                     peer.sendall(b'{"status":"paired"}\n')
+                    server.report_readiness(room)
                     pump(connection, peer)
                 finally:
                     with server.condition:
@@ -152,9 +172,10 @@ class RelayHandler(socketserver.BaseRequestHandler):
                         pending.remove(waiter)
                     if not pending:
                         server.waiting.pop(room, None)
-                # Always release join thread even if handshake send failed.
+                # Always release the join thread even if a handshake send failed.
                 if waiter.get('socket') is connection:
                     waiter['done'].set()
+                    server.report_readiness(room)
 
 
 class RemoteTickets:
@@ -169,31 +190,45 @@ class RemoteTickets:
         parts = urllib.parse.urlsplit(api)
         if parts.scheme != 'https' and parts.hostname not in ('127.0.0.1', 'localhost'):
             raise ValueError('Account API must use HTTPS')
-        self.endpoint = api.rstrip('/') + '/v1/consume-relay-ticket'
+        self.endpoint = api.rstrip('/') + '/v1/'
         self.key = key
         self.timeout = timeout
 
     def consume_relay_ticket(self, ticket):
+        if not isinstance(ticket, str) or not 16 <= len(ticket) <= 128:
+            raise PermissionError('Invalid relay ticket')
+        value = self.request('consume-relay-ticket', {'ticket': ticket})
+        room, role, capacity = value.get('room'), value.get('role'), value.get('capacity')
+        if not isinstance(room, str) or role not in ('host', 'join') or type(capacity) is not int or not 2 <= capacity <= 8:
+            raise PermissionError('Invalid ticket response')
+        return room, role, capacity
+
+    def set_relay_readiness(self, room, ready):
+        try:
+            self.request('relay-readiness', {'room': room, 'ready': ready}, timeout=2)
+        except PermissionError:
+            # Older APIs still pair ticket holders. Without the callback the
+            # new directory lets the readiness lease expire.
+            pass
+
+    def request(self, operation, payload, timeout=None):
         import ssl
         import urllib.error
         import urllib.request
-        if not isinstance(ticket, str) or not 16 <= len(ticket) <= 128:
-            raise PermissionError('Invalid relay ticket')
-        body = json.dumps({'ticket': ticket, 'key': self.key}).encode()
-        request = urllib.request.Request(self.endpoint, data=body, method='POST',
+        body = json.dumps(dict(payload, key=self.key)).encode()
+        request = urllib.request.Request(self.endpoint + operation, data=body, method='POST',
                                          headers={'Content-Type': 'application/json', 'Accept': 'application/json',
                                                   'User-Agent': 'pf-room-relay'})
         try:
-            with urllib.request.urlopen(request, timeout=self.timeout, context=ssl.create_default_context()) as response:
+            with urllib.request.urlopen(request, timeout=timeout or self.timeout, context=ssl.create_default_context()) as response:
                 value = json.loads(response.read(4096))
         except urllib.error.HTTPError as error:
             raise PermissionError('Ticket rejected (HTTP %d)' % error.code) from None
         except (OSError, ValueError):
             raise PermissionError('Account API unavailable') from None
-        room, role, capacity = value.get('room'), value.get('role'), value.get('capacity')
-        if not isinstance(room, str) or role not in ('host', 'join') or type(capacity) is not int or not 2 <= capacity <= 8:
-            raise PermissionError('Invalid ticket response')
-        return room, role, capacity
+        if not isinstance(value, dict):
+            raise PermissionError('Invalid account API response')
+        return value
 
 
 def main(argv=None):

@@ -1,6 +1,8 @@
 """Relay rooms in the account service and the standalone relay's remote ticket check."""
 import importlib.util
 import json
+import socket
+import time
 import sys
 import threading
 import unittest
@@ -36,7 +38,17 @@ class RelayRoomsTest(unittest.TestCase):
         room = self.publish()
         listed = self.service.request('list-rooms', {}, self.guest)
         self.assertTrue(listed['relay'])
+        self.assertEqual(listed['rooms'], [])
+        ticket = self.service.request('relay-ticket', {'room': room, 'role': 'host'}, self.host)
+        self.service.request('consume-relay-ticket', {'ticket': ticket['ticket'], 'key': KEY})
+        self.assertEqual(self.service.request('list-rooms', {}, self.guest)['rooms'], [])
+        with self.assertRaises(PermissionError):
+            self.service.request('relay-readiness', {'room': room, 'ready': True}, self.host)
+        self.service.request('relay-readiness', {'room': room, 'ready': True, 'key': KEY})
+        listed = self.service.request('list-rooms', {}, self.guest)
         self.assertEqual([(r['id'], r['host'], r['relay']) for r in listed['rooms']], [(room, '', True)])
+        self.now += 15
+        self.assertEqual(self.service.request('list-rooms', {}, self.guest)['rooms'], [])
 
     def test_ticket_carries_relay_address_and_is_single_use(self):
         room = self.publish()
@@ -88,6 +100,40 @@ class RelayRoomsTest(unittest.TestCase):
         finally:
             server.shutdown()
             server.server_close()
+
+    def test_remote_relay_lists_waiting_host_and_withdraws_on_pairing(self):
+        api = ThreadingHTTPServer(('127.0.0.1', 0), accounts.handler(self.service))
+        threading.Thread(target=api.serve_forever, daemon=True).start()
+        remote = room_relay.RemoteTickets('http://127.0.0.1:%d' % api.server_port, KEY)
+        relay = room_relay.RelayServer(('127.0.0.1', 0), remote)
+        threading.Thread(target=relay.serve_forever, daemon=True).start()
+
+        def listed():
+            return [entry['id'] for entry in self.service.request('list-rooms', {}, self.guest)['rooms']]
+
+        def expect_listing(expected):
+            deadline = time.monotonic() + 4
+            while listed() != expected and time.monotonic() < deadline:
+                time.sleep(0.01)
+            self.assertEqual(listed(), expected)
+
+        try:
+            room = self.publish()
+            host = self.service.request('relay-ticket', {'room': room, 'role': 'host'}, self.host)
+            expect_listing([])
+            with socket.create_connection(relay.server_address, timeout=4) as owner:
+                owner.sendall(json.dumps({'ticket': host['ticket']}).encode() + b'\n')
+                expect_listing([room])
+                guest = self.service.request('relay-ticket', {'room': room, 'role': 'join'}, self.guest)
+                with socket.create_connection(relay.server_address, timeout=4) as player:
+                    room_relay.handshake(player, {'ticket': guest['ticket']})
+                    self.assertEqual(owner.makefile('rb').readline(), b'{"status":"paired"}\n')
+                    expect_listing([])
+        finally:
+            relay.shutdown()
+            relay.server_close()
+            api.shutdown()
+            api.server_close()
 
     def test_passenger_status_page_for_browsers(self):
         import io
