@@ -22,6 +22,8 @@ public final class OpenLF2Activity extends SDLActivity {
     private LanWifiMode lanWifi;
     private File stagedScripts;
     private volatile boolean openAndroidTools;
+    private static final int MOD_MANAGER = 7302;
+    private volatile String modManagerResult;
     @Override protected void main() {
         GameDiagnostics.write(this, "launch-last.txt", "Native engine launch\n" + android.os.Build.VERSION.RELEASE);
         takeAndroidToolsRequest(); // Discard requests left behind by an interrupted game.
@@ -31,14 +33,26 @@ public final class OpenLF2Activity extends SDLActivity {
     }
 
     /** Called by the SDL main thread while the game's menu is active. */
-    public void showModManager() {
+    public void showModManager(String activePackage) {
+        modManagerResult = null;
         runOnUiThread(() -> {
             if (!isFinishing() && !isDestroyed()) {
-                startActivity(new Intent(this, AndroidModsActivity.class)
-                    .putExtra(AndroidModsActivity.FROM_RUNNING_GAME, true));
+                startActivityForResult(new Intent(this, AndroidModsActivity.class)
+                    .putExtra(AndroidModsActivity.FROM_RUNNING_GAME, true)
+                    .putExtra(AndroidModsActivity.ACTIVE_PACKAGE, activePackage), MOD_MANAGER);
             }
         });
     }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != MOD_MANAGER) return;
+        String profile = resultCode == RESULT_OK && data != null
+            ? data.getStringExtra(AndroidModsActivity.SELECTED_PROFILE) : null;
+        modManagerResult = profile == null ? "" : profile;
+    }
+
+    public String modManagerResult() { return modManagerResult; }
 
     /** Called by the in-game Information menu. */
     public void checkGameUpdate() {

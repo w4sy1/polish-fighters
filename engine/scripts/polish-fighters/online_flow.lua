@@ -3,7 +3,13 @@ return function(base)
  local client=require('polish-fighters/online_client')
  function base.update(state,...)
   client.tick()
+  local previous=state.active=='network' and state.network
   local result=update(state,...)
+  if previous and previous.session.internet and state.active=='launch' and not state.launch.hub_online then
+   require('polish-fighters/online_screen').open(state.launch,true)
+   state.launch.hub_online.joining=true
+   client.auto_refresh=client.token~=nil
+  end
   local session=state.network and state.network.session
   if session and session.host and session.phase=='lobby' then
    client.maintain_relay(session)

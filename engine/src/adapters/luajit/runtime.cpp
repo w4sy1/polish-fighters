@@ -605,6 +605,17 @@ int mods_operation(lua_State* state) {
     }
     if(bridge->mods_future.valid()){lua_pushnil(state);lua_pushliteral(state,"Mod request already pending");return 2;}
     try {
+#ifdef _WIN32
+        if(std::strcmp(action,"import")==0){
+            auto file=take_local_mod_file();
+            if(!file){lua_pushboolean(state,0);return 1;}
+            bridge->mods_action="import";
+            bridge->mods_progress.cancelled=false;
+            bridge->mods_future=std::async(std::launch::async,[bridge,file=std::move(*file)]{
+                return import_signed_mod(file,bridge->mods_progress);});
+            lua_pushboolean(state,1);return 1;
+        }
+#endif
         if(std::strcmp(action,"catalogue")==0){
             bridge->mods_action="catalogue";
             bridge->mods_future=std::async(std::launch::async,[]{return github_mod_catalogue();});

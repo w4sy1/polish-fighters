@@ -21,6 +21,8 @@ import java.util.concurrent.Executors;
 /** LF2-styled source browser and file-picker importer for converted packages. */
 public final class AndroidModsActivity extends Activity {
     static final String FROM_RUNNING_GAME="from_running_game";
+    static final String SELECTED_PROFILE="selected_profile";
+    static final String ACTIVE_PACKAGE="active_package";
     static final String FIRST_SETUP="first_setup";
     private static final int PICK_PACKAGE=7301;
     private static final int NAVY=0xff040a41, BLUE=0xff7a9dff, RED=0xffff5262, TEXT=0xfff4f5ff, MUTED=0xffb6c5d9;
@@ -31,6 +33,7 @@ public final class AndroidModsActivity extends Activity {
     private TextView status;
     private ProgressBar progress;
     private boolean importing;
+    private boolean fetchingCatalogue;
     private final int[] baseChoices = {1, 2, 0};
     private final boolean[] setupSelection = new boolean[GamePackSettings.IDS.length];
     private int setupBase = 1;
@@ -44,7 +47,7 @@ public final class AndroidModsActivity extends Activity {
         FrameLayout root=new FrameLayout(this);root.setBackgroundColor(NAVY);
         ImageView art=new ImageView(this);art.setImageResource(R.drawable.pf_loading_art_landscape);art.setScaleType(ImageView.ScaleType.CENTER_CROP);
         art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);root.addView(art,new FrameLayout.LayoutParams(-1,-1));
-        View scrim=new View(this);scrim.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,new int[]{0xf5040a41,0xd9040a41,0x99040a41}));
+        View scrim=new View(this);scrim.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,new int[]{0x7f111e61,0xe5111e61,0xf2111e61}));
         root.addView(scrim,new FrameLayout.LayoutParams(-1,-1));
 
         LinearLayout page=new LinearLayout(this);page.setOrientation(LinearLayout.HORIZONTAL);root.addView(page,new FrameLayout.LayoutParams(-1,-1));
@@ -58,11 +61,7 @@ public final class AndroidModsActivity extends Activity {
 
         LinearLayout side=new LinearLayout(this);side.setOrientation(LinearLayout.VERTICAL);
         page.addView(side,new LinearLayout.LayoutParams(0,-1,0.92f));
-        TextView kicker=label("POLISH FIGHTERS",11,RED,true);side.addView(kicker,wrap());
-        TextView title=label("MODY I MODUŁY",24,TEXT,true);side.addView(title,wrap());
-        View rule=new View(this);rule.setBackgroundColor(RED);LinearLayout.LayoutParams ruleParams=new LinearLayout.LayoutParams(dp(56),dp(3));ruleParams.topMargin=dp(6);ruleParams.bottomMargin=dp(10);side.addView(rule,ruleParams);
-        TextView note=label("Pobieraj podpisane paczki z katalogu Polish Fighters na GitHubie.",12,MUTED,false);
-        note.setLineSpacing(dp(2),1f);side.addView(note,wrap());
+        TextView title=label("MOD MANAGER",24,TEXT,true);side.addView(title,wrap());
         LinearLayout statusCard=new LinearLayout(this);statusCard.setOrientation(LinearLayout.VERTICAL);statusCard.setBackgroundResource(R.drawable.pf_loading_surface);statusCard.setPadding(dp(12),dp(9),dp(12),dp(9));
         status=label("Wybierz źródło albo zaimportuj paczkę LF2.",12,TEXT,false);status.setContentDescription("Status importu");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         statusCard.addView(status,wrap());
@@ -81,6 +80,7 @@ public final class AndroidModsActivity extends Activity {
         rows=new LinearLayout(this);rows.setOrientation(LinearLayout.VERTICAL);scroll.addView(rows);list.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         setContentView(root);
         if (getIntent().getBooleanExtra(FIRST_SETUP,false)) showSetup();
+        else if (fromGame()) showGitHub();
         else showSources();
     }
 
@@ -237,34 +237,90 @@ public final class AndroidModsActivity extends Activity {
         try(java.io.InputStream key=getAssets().open(SignedModPackage.KEY_ASSET)){return SignedModPackage.read(key,32);}
     }
     private void showGitHub() {
-        if(importing)return;setBusy(true,"Pobieram podpisany katalog: "+AndroidModSources.GITHUB_NAME);
+        if (importing) return;
+        fetchingCatalogue=true;
+        setBusy(true,"Pobieram podpisany katalog: "+AndroidModSources.GITHUB_NAME);
         worker.submit(()->{
             try {
                 List<AndroidModSources.Package> found=AndroidModSources.fetchGitHubCatalogue(trustedKey());
-                runOnUiThread(()->showPackages(found,scroll.getScrollY()));
+                runOnUiThread(()->{
+                    if (isFinishing() || isDestroyed()) return;
+                    fetchingCatalogue=false;
+                    showPackages(found,scroll.getScrollY(),scroll.getScrollY());
+                });
             }
-            catch(Exception error) { runOnUiThread(()->setBusy(false,"Nie udało się pobrać katalogu. "+safe(error.getMessage()))); }
+            catch(Exception error) { runOnUiThread(()->{
+                if (isFinishing() || isDestroyed()) return;
+                fetchingCatalogue=false;
+                if (rows.getChildCount()==0) {
+                    if (fromGame()) showPackages(java.util.Collections.emptyList(),0,0);
+                    else showSources();
+                }
+                setBusy(false,"Nie udało się pobrać katalogu. "+safe(error.getMessage()));
+            }); }
         });
     }
-    private void showPackages(List<AndroidModSources.Package> found,int sourceOffset) {
-        previousScreen = () -> { showSources(); restoreScroll(sourceOffset); };
-        scroll.scrollTo(0,0);
+    private boolean fromGame() {
+        return getIntent().getBooleanExtra(FROM_RUNNING_GAME, false);
+    }
+
+    private void showPackages(List<AndroidModSources.Package> found,int sourceOffset,int catalogueOffset) {
+        previousScreen = fromGame() ? null : () -> { showSources(); restoreScroll(sourceOffset); };
         rows.removeAllViews();
-        for(AndroidModSources.Package item:found) {
-            String state = packageState(item);
-            ClassicButton button=action(item.name+" "+item.version+" - "+item.sizeLabel(),
-                    ()->showPackage(item,found,sourceOffset,scroll.getScrollY()));
-            button.setContentDescription(item.name+", "+item.version+", "+item.sizeLabel()+", "+state);
-            LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(button,params);
-            rows.addView(label(state,12,MUTED,false),wrap());
+        String activePackage = getIntent().getStringExtra(ACTIVE_PACKAGE);
+        if (fromGame()) {
+            rows.addView(action("LF2 CLASSIC · " + ("".equals(activePackage) ? "AKTYWNY" : "WYBIERZ"),
+                () -> selectProfile("lf_two", "")),wrap());
+            GamePackSettings settings = new GamePackSettings(getFilesDir());
+            for (int i=0; i<GamePackSettings.IDS.length; i++) {
+                String id=GamePackSettings.PACKS[i], profile=GamePackSettings.IDS[i];
+                if (id.isEmpty() || containsPackage(found,id) || !settings.hasPack(id)) continue;
+                String operation=id.equals(activePackage) ? "AKTYWNY" : "WYBIERZ";
+                rows.addView(action(GamePackSettings.TITLES[i]+" · "+operation, () -> selectProfile(profile,id)),wrap());
+            }
+            for (String id : settings.imported()) {
+                rows.addView(action("MOD " + id.substring(4,12) + " · " + (id.equals(activePackage) ? "AKTYWNY" : "WYBIERZ"),
+                    () -> selectProfile(id,id)),wrap());
+            }
         }
-        ClassicButton back=action("WRÓĆ DO MODÓW",this::goBack);
-        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(back,params);
+        for (AndroidModSources.Package item : found) {
+            String receipt = installedReceipt(item);
+            boolean current = item.receipt().equals(receipt);
+            boolean active = item.id.equals(activePackage);
+            String operation = receipt == null ? "POBIERZ" : !current ? "AKTUALIZUJ"
+                : active ? "AKTYWNY" : item.profile.isEmpty() ? "ZAINSTALOWANO" : "WYBIERZ";
+            ClassicButton button = action(item.name+" "+item.version+" · "+operation, () -> {
+                if (importing) return;
+                if (!current) install(item,found,sourceOffset,scroll.getScrollY());
+                else if (!active && !item.profile.isEmpty()) selectProfile(item.profile,item.id);
+            });
+            button.setContentDescription(item.name+", "+item.version+", "+item.sizeLabel()+", "+operation);
+            rows.addView(button,wrap());
+        }
+        rows.addView(action("ODŚWIEŻ KATALOG", this::showGitHub),wrap());
+        restoreScroll(catalogueOffset);
+        String activeLabel = activePackage == null ? "" : " · Aktywny: " + (activePackage.isEmpty() ? "LF2 Classic" : activePackage);
+        setBusy(false,"Podpis katalogu poprawny."+activeLabel);
+    }
+
+    private static boolean containsPackage(List<AndroidModSources.Package> packages, String id) {
+        for (AndroidModSources.Package item : packages) if (id.equals(item.id)) return true;
+        return false;
+    }
+
+    private void selectProfile(String profile, String packageId) {
+        if (importing || (fromGame() && packageId.equals(getIntent().getStringExtra(ACTIVE_PACKAGE)))) return;
         try {
-            String active = new GamePackSettings(getFilesDir()).mode();
-            setBusy(false,"Wybrany moduł: "+active+" · Podpis katalogu poprawny.");
-        } catch (Exception ignored) {
-            setBusy(false,"Podpis katalogu poprawny.");
+            GamePackSettings settings = new GamePackSettings(getFilesDir());
+            settings.save(profile,settings.selection(),settings.hideDuplicates());
+            if (fromGame()) {
+                setResult(RESULT_OK,new Intent().putExtra(SELECTED_PROFILE,profile));
+                finish();
+            } else {
+                setBusy(false,"Moduł wybrany do gry.");
+            }
+        } catch (Exception error) {
+            setBusy(false,"Nie zapisano wyboru: "+safe(error.getMessage()));
         }
     }
     private java.io.File packageFolder(AndroidModSources.Package item) {
@@ -277,58 +333,25 @@ public final class AndroidModsActivity extends Activity {
             return new String(SignedModPackage.read(input,128),java.nio.charset.StandardCharsets.US_ASCII);
         } catch (java.io.IOException error) { return ""; }
     }
-    private String packageState(AndroidModSources.Package item) {
-        String receipt = installedReceipt(item);
-        if (receipt == null) return "Do pobrania";
-        if (receipt.equals(item.receipt())) return "Zainstalowano "+item.version;
-        return receipt.isEmpty() ? "Zainstalowano — wersja nieznana" : "Dostępna aktualizacja";
-    }
-    private void showPackage(AndroidModSources.Package item,List<AndroidModSources.Package> catalogue,
-            int sourceOffset,int catalogueOffset) {
-        previousScreen = () -> { showPackages(catalogue,sourceOffset); restoreScroll(catalogueOffset); };
-        scroll.scrollTo(0,0);
-        rows.removeAllViews();
-        rows.addView(label(item.name+" "+item.version,18,TEXT,true),wrap());
-        rows.addView(label(item.description,14,TEXT,false),wrap());
-        rows.addView(label("Pobieranie: "+item.sizeLabel()+" · "+packageState(item),12,MUTED,false),wrap());
-        String receipt = installedReceipt(item);
-        if (!item.receipt().equals(receipt)) {
-            rows.addView(action(receipt == null ? "POBIERZ" : "AKTUALIZUJ",
-                    ()->install(item,catalogue,sourceOffset,catalogueOffset)),wrap());
-        } else if (!item.profile.isEmpty()) {
-            rows.addView(action("WYBIERZ", () -> {
-                try {
-                    GamePackSettings settings=new GamePackSettings(getFilesDir());
-                    settings.save(item.profile,settings.selection(),settings.hideDuplicates());
-                    setBusy(false,item.name+"."+selectionMessage());
-                } catch (Exception error) {
-                    setBusy(false,"Nie zapisano wyboru: "+safe(error.getMessage()));
-                }
-            }),wrap());
-        }
-        rows.addView(action("WRÓĆ DO KATALOGU",this::goBack),wrap());
-    }
     private void install(AndroidModSources.Package item,List<AndroidModSources.Package> catalogue,
             int sourceOffset,int catalogueOffset) {
-        if(importing)return;
-        if(item.receipt().equals(installedReceipt(item)))return;
+        if (importing || item.receipt().equals(installedReceipt(item))) return;
+        cancellationRequested=false;
+        downloading=true;
         setBusy(true,"Przygotowuję pobieranie…");
         worker.submit(()->{
             try {
                 transferAndInstall(item);
-                String message="Zainstalowano "+item.name+" "+item.version+".";
-                try {
-                    GamePackSettings settings=new GamePackSettings(getFilesDir());
-                    if(!item.profile.isEmpty()){settings.save(item.profile,settings.selection(),settings.hideDuplicates());message+=selectionMessage();}
-                } catch(Exception saveError) { message+=" Wybierz go w menu Moduły."; }
-                final String done=message;
-                runOnUiThread(()->{setBusy(false,done);showPackage(item,catalogue,sourceOffset,catalogueOffset);});
-            } catch(Exception error) {
+                downloading=false;
+                runOnUiThread(()->{
+                    showPackages(catalogue,sourceOffset,catalogueOffset);
+                    status.setText("Zainstalowano "+item.name+" "+item.version+".");
+                });
+            } catch (Exception error) {
+                downloading=false;
                 android.util.Log.w("OpenLF2","GitHub mod install failed",error);
                 runOnUiThread(()->setBusy(false,cancellationRequested
                     ? "Anulowano pobieranie." : "Instalacja przerwana: "+safe(error.getMessage())));
-            } finally {
-                downloading=false;
             }
         });
     }
@@ -379,20 +402,20 @@ public final class AndroidModsActivity extends Activity {
         worker.submit(()->{
             try {
                 String id=AndroidModPackageImporter.importPackage(getContentResolver(),selected,getFilesDir(),getAssets(),entries->runOnUiThread(()->status.setText("Sprawdzono plików: "+entries)));
-                try { GamePackSettings settings=new GamePackSettings(getFilesDir());settings.save(id,settings.selection(),settings.hideDuplicates());runOnUiThread(()->setBusy(false,"Zaimportowano "+id+"."+selectionMessage()+" Zgodność gry nie jest potwierdzona.")); }
-                catch(Exception saveError) { runOnUiThread(()->setBusy(false,"Paczka "+id+" jest zainstalowana, ale nie zapisano jej wyboru: "+safe(saveError.getMessage()))); }
+                runOnUiThread(()->{
+                    setBusy(false,"Zaimportowano "+id+".");
+                    if (!fromGame()) selectProfile(id,id);
+                    rows.addView(action("WYBIERZ MOD "+id.substring(4,12),()->selectProfile(id,id)),wrap());
+                    scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));
+                });
             } catch(Exception error) { runOnUiThread(()->setBusy(false,"Import przerwany: "+safe(error.getMessage()))); }
         });
-    }
-    private String selectionMessage() {
-        return getIntent().getBooleanExtra(FROM_RUNNING_GAME, false)
-            ? " Wybór zapisany na następne uruchomienie gry."
-            : " Moduł wybrany do gry.";
     }
     private void leave() { finish(); }
     private void restoreScroll(int offset) { scroll.post(() -> scroll.scrollTo(0,offset)); }
     private void goBack() {
         if (importing) {
+            if (fetchingCatalogue && fromGame()) { leave(); return; }
             if (downloading) {
                 cancellationRequested=true;
                 status.setText("Anulowanie pobierania…");
@@ -401,6 +424,11 @@ public final class AndroidModsActivity extends Activity {
         }
         if (previousScreen == null) leave();
         else previousScreen.run();
+    }
+    @Override public boolean onKeyUp(int keyCode, android.view.KeyEvent event) {
+        if (keyCode != android.view.KeyEvent.KEYCODE_ESCAPE) return super.onKeyUp(keyCode,event);
+        goBack();
+        return true;
     }
     @Override public void onBackPressed() { goBack(); }
     private void setBusy(boolean busy,String message) { importing=busy;status.setText(message);if(!busy)progress.setIndeterminate(true);progress.setVisibility(busy?View.VISIBLE:View.GONE); }

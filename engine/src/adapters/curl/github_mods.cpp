@@ -23,6 +23,7 @@
 #include <optional>
 #include <random>
 #include <set>
+#include <utility>
 #include <vector>
 #include <curl/curl.h>
 #include <openssl/evp.h>
@@ -44,6 +45,7 @@ constexpr std::size_t file_limit = 20000;
 
 std::mutex directory_lock;
 fs::path content_directory_value;
+std::optional<fs::path> local_mod_file;
 
 struct Session {
     CURLcode status = curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -362,12 +364,15 @@ std::string lowercase(std::string value) {
     return value;
 }
 
-Result<std::string> install_envelope(const fs::path& envelope, const fs::path& packs, std::string_view id,
+Result<std::string> install_envelope(const fs::path& envelope, const fs::path& packs, std::string_view expected_id,
                                      std::string_view expected_version, std::string_view receipt,
                                      ModInstallProgress& progress) {
     std::ifstream file(envelope, std::ios::binary);
     if (!file) return fail(ErrorCode::io, "Cannot open the downloaded package");
-    const auto length = fs::file_size(envelope);
+    std::error_code error;
+    const auto length = fs::file_size(envelope,error);
+    if (error || length == 0 || length > envelope_limit)
+        return fail(ErrorCode::format, "Invalid signed package size");
     auto entries = zip_entries(file, 0, length);
     if (!entries) return std::unexpected(entries.error());
     const std::array<std::string_view, 5> order{"catalog.json", "catalog.sig", "manifest.json", "manifest.sig", "package.zip"};
@@ -384,6 +389,7 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
     auto catalogue = parse_json(*index);
     auto manifest = parse_json(*manifest_text);
     if (!catalogue || !manifest) return fail(ErrorCode::format, "Invalid signed metadata");
+    const auto declared_id = text(*manifest, "id");
     const auto version = text(*manifest, "version");
     const auto type = text(*manifest, "package_type");
     const auto size = number(*manifest, "size_bytes");
@@ -391,12 +397,14 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
     const auto sha = text(*manifest, "sha256");
     const auto* installation = field(*manifest, "installation");
     const auto* pins = field(*catalogue, "manifests");
-    if (text(*manifest, "id") != std::string(id) || !version || *version != expected_version ||
+    if (!declared_id || !valid_id(*declared_id) || !version ||
+        (!expected_id.empty() && (*declared_id != expected_id || *version != expected_version)) ||
         type != std::string("content-pack") || !size || !unpacked ||
         !sha || !installation || text(*installation, "method") != std::string("content-pack-zip") || !pins ||
         text(*catalogue, "channel") != std::string("stable") ||
-        text(*pins, std::string(id) + "@" + *version) != sha256_text(*manifest_text))
+        text(*pins, *declared_id + "@" + *version) != sha256_text(*manifest_text))
         return fail(ErrorCode::format, "Signed manifest does not describe this content pack");
+    const auto& id = *declared_id;
     const auto& payload = (*entries)[4];
     if (payload.size != *size || *unpacked > unpacked_limit) return fail(ErrorCode::format, "Package size differs from manifest");
     auto payload_offset = data_offset(file, 0, length, payload);
@@ -427,7 +435,6 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
         files.push_back(&item);
     }
     if (total != *unpacked || !names.contains("package.manifest")) return fail(ErrorCode::format, "Content pack is incomplete");
-    std::error_code error;
     const auto space = fs::space(packs, error);
     if (!error && space.available < total + reserve) return fail(ErrorCode::limit, "Not enough free disk space");
     std::mt19937_64 random(std::random_device{}());
@@ -456,6 +463,31 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
             declared = declared || line == "id=" + std::string(id);
         }
         if (!declared) { cleanup(staging); return fail(ErrorCode::format, "package.manifest declares a different ID"); }
+    }
+    std::string local_receipt;
+    if (receipt.empty()) {
+        std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> digest(EVP_MD_CTX_new(), EVP_MD_CTX_free);
+        if (!digest || EVP_DigestInit_ex(digest.get(), EVP_sha256(), nullptr) != 1) {
+            cleanup(staging); return fail(ErrorCode::dependency, "SHA-256 unavailable");
+        }
+        std::array<char,65536> buffer{};
+        file.clear();
+        file.seekg(0);
+        auto remaining = length;
+        while (remaining > 0 && !progress.cancelled) {
+            const auto count = static_cast<std::streamsize>(std::min<std::uint64_t>(remaining,buffer.size()));
+            if (!file.read(buffer.data(),count) || EVP_DigestUpdate(digest.get(),buffer.data(),static_cast<std::size_t>(count)) != 1) {
+                cleanup(staging); return fail(ErrorCode::io, "Cannot read the local signed package");
+            }
+            remaining -= static_cast<std::uint64_t>(count);
+        }
+        std::array<unsigned char,32> hash{};
+        unsigned produced = 0;
+        if (progress.cancelled || EVP_DigestFinal_ex(digest.get(),hash.data(),&produced) != 1) {
+            cleanup(staging); return fail(ErrorCode::io, "Local installation interrupted");
+        }
+        local_receipt = *version + " " + hex(hash.data(),produced);
+        receipt = local_receipt;
     }
     {
         std::ofstream installed(staging / ".github-install", std::ios::binary);
@@ -489,6 +521,25 @@ void set_mod_content_directory(const fs::path& directory) {
 fs::path mod_content_directory() {
     std::scoped_lock lock(directory_lock);
     return content_directory_value;
+}
+void set_local_mod_file(const fs::path& file) {
+    std::scoped_lock lock(directory_lock);
+    local_mod_file = file;
+}
+std::optional<fs::path> take_local_mod_file() {
+    std::scoped_lock lock(directory_lock);
+    return std::exchange(local_mod_file,std::nullopt);
+}
+Result<std::string> import_signed_mod(const fs::path& file, ModInstallProgress& progress) {
+    const auto packs = mod_content_directory();
+    if (packs.empty()) return fail(ErrorCode::platform, "Content-pack folder is unknown");
+    std::error_code error;
+    fs::create_directories(packs,error);
+    if (error) return fail(ErrorCode::io, "Cannot create the content-pack folder");
+    progress.received=0; progress.total=0; progress.files=0; progress.phase=2;
+    auto result = install_envelope(file,packs,{},{},{},progress);
+    progress.phase=0;
+    return result;
 }
 bool github_mods_supported() noexcept { return true; }
 

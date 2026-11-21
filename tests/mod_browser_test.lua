@@ -15,7 +15,7 @@ assert(#screen.rows(state.hub_mods)==1)
 screen.activate(state,'back',context);assert(not state.hub_mods.detail)
 state.hub_mods.query='no-such-mod';state.hub_mods.page=999;screen.rows(state.hub_mods)
 assert(state.hub_mods.page==1)
-local ctx={viewport=function() end,image=function() end,fill=function() end,text=function(value) assert(type(value)=='string') end}
+local ctx={sprite=function() end,viewport=function() end,image=function() end,fill=function() end,text=function(value) assert(type(value)=='string') end}
 screen.draw(state,ctx)
 screen.activate(state,'search',context)
 screen.update(state,{keys={},text='Naruto'},context)
@@ -31,7 +31,10 @@ local responses={catalogue={packages={{id='lf4-turbo',name='LF4 Turbo',profile='
 local pending=1
 engine.mods=function(action,value)
  calls[#calls+1]=action..(value and (':'..value) or '')
- if action=='catalogue' or action=='install' then return true end
+ if action=='catalogue' or action=='install' or (action=='import' and responses.importing) then
+  responses.importing=nil
+  return true
+ end
  if action=='receipt' and value=='lf4-turbo' and responses.installed then return '1.0.0 '..sha end
  if action=='progress' then return 50,100,1,0 end
  if action=='poll' then
@@ -47,19 +50,30 @@ assert(s2.hub_mods.github.busy=='catalogue')
 screen.update(s2,{keys={}},context);assert(s2.hub_mods.github.busy=='catalogue')
 screen.update(s2,{keys={}},context)
 assert(not s2.hub_mods.github.busy and #s2.hub_mods.github.packages==2)
-local rows=screen.rows(s2.hub_mods);assert(rows[1][1]=='gh:dbz' and rows[2][1]=='gh:lf4-turbo')
+local rows=screen.rows(s2.hub_mods)
+assert(rows[1][1]=='gh_classic' and rows[2][1]=='gh:dbz' and rows[3][1]=='gh:lf4-turbo')
+assert(rows[3][2]:find('POBIERZ',1,true) or rows[3][2]:find('DOWNLOAD',1,true))
 screen.draw(s2,ctx)
 pending=1;responses.installing=true
-screen.activate(s2,'gh:lf4-turbo',context);assert(s2.hub_mods.github.detail.id=='lf4-turbo')
-screen.activate(s2,'gh_install',context);assert(s2.hub_mods.github.busy=='install')
+screen.activate(s2,'gh:lf4-turbo',context);assert(s2.hub_mods.github.busy=='install')
+screen.activate(s2,'gh_cancel',context);assert(calls[#calls]=='cancel')
 screen.update(s2,{keys={}},context);assert(s2.hub_mods.github.fraction==0.5)
 screen.draw(s2,ctx)
 screen.update(s2,{keys={}},context)
-assert(not s2.hub_mods.github.busy and s2.hub_mods.github.detail.receipt=='1.0.0 '..sha)
-local installed_rows=screen.rows(s2.hub_mods)
-assert(#installed_rows==2 and installed_rows[2][1]=='gh_select','an installed package offers selection')
+assert(not s2.hub_mods.github.busy and s2.hub_mods.github.packages[2].receipt=='1.0.0 '..sha)
+local installed=screen.rows(s2.hub_mods)[3][2]
+assert(installed:find('WYBIERZ',1,true) or installed:find('SELECT',1,true))
 assert(s2.hub_available.lf_four_turbo==true)
-screen.activate(s2,'back',context);assert(s2.hub_mods.github and not s2.hub_mods.github.detail)
+local selected
+screen.activate(s2,'gh:lf4-turbo',{action=function(action) selected=action end})
+assert(selected=='profile_lf_four_turbo')
+screen.activate(s2,'gh_import',{action=function(action) selected=action end})
+assert(selected=='import_local_mod')
+responses.importing=true
+screen.update(s2,{keys={}},context)
+assert(s2.hub_mods.github.busy=='install' and not s2.hub_mods.github.target)
+screen.update(s2,{keys={}},context)
+assert(not s2.hub_mods.github.busy and s2.hub_mods.github.target=='lf4-turbo')
 screen.activate(s2,'back',context);assert(s2.hub_mods and not s2.hub_mods.github)
 -- Without the native installer (Android), the screen explains where to install.
 engine.mods=function() return nil,'Mods handled by platform' end

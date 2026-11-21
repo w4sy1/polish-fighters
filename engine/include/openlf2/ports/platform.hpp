@@ -194,6 +194,7 @@ public:
 // The texts of the open-file dialog (see Platform::choose_file).
 struct FileDialogText {
     std::string title, filter, accept;
+    std::string extension = "lfr";
 };
 class Platform {
 public:
