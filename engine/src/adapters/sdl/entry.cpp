@@ -2,6 +2,7 @@
 // Copyright (c) 2026 OpenLF2 contributors
 
 #include "openlf2/engine/application.hpp"
+#include "openlf2/engine/crash_reporter.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <cstdio>
@@ -125,6 +126,10 @@ static int run_main(int count, char** values) {
 #ifdef OPENLF2_GUI_SUBSYSTEM
     WindowsOutput windows_output;
 #endif
+    // Before anything else: catch native crashes from here on, and offer to report whatever the
+    // *previous* run left behind (never from inside a crash itself -- see crash_reporter.hpp).
+    openlf2::install_crash_handlers();
+    openlf2::report_previous_crash_if_any();
     try {
 #ifdef __SWITCH__
         // The NRO embeds scripts in RomFS and stores settings/installer on SD.
@@ -188,6 +193,8 @@ static int run_main(int count, char** values) {
         const std::filesystem::path base(reinterpret_cast<const char8_t*>(base_cstr));
 #endif
         const int result = openlf2::run_application(owned, base);
+        // run_application returned normally -- whatever its exit code, this was not a crash.
+        openlf2::mark_clean_shutdown();
 #ifdef OPENLF2_GUI_SUBSYSTEM
         if (result != 0 && !windows_output.has_error_output()) {
             show_startup_error("OpenLF2 could not start. Run openlf2.exe from a terminal for details.");
@@ -196,6 +203,8 @@ static int run_main(int count, char** values) {
         return result;
     } catch (const std::exception& error) {
         std::cerr << "Startup failure: " << error.what() << '\n';
+        // A caught, already-reported startup error, not a silent crash -- don't ask about it.
+        openlf2::mark_clean_shutdown();
 #ifdef OPENLF2_GUI_SUBSYSTEM
         if (!windows_output.has_error_output()) {
             show_startup_error(std::string("Startup failure: ") + error.what());

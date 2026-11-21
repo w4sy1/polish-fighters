@@ -16,7 +16,8 @@ $cases = @(
     @{ Name = 'network-compat-test'; Sources = @('tests/network_compat_test.cpp', 'engine/src/adapters/network/transport.cpp'); Args = @(); Libraries = @('/link', 'ws2_32.lib', 'iphlpapi.lib') },
     @{ Name = 'object-blocks-test'; Sources = @('tests/object_blocks_test.cpp', 'engine/src/resources/object_data.cpp', 'engine/src/resources/data_file.cpp'); Args = @(); Libraries = @() },
     @{ Name = 'package-smoke'; Sources = @('tests/package_smoke.cpp', 'engine/src/engine/packages.cpp', 'engine/src/core/files.cpp'); Args = @("$projectRoot/engine/scripts"); Libraries = @() },
-    @{ Name = 'package-assets-test'; Sources = @('tests/package_assets_test.cpp', 'engine/src/engine/packages.cpp', 'engine/src/core/files.cpp'); Args = @(); Libraries = @() }
+    @{ Name = 'package-assets-test'; Sources = @('tests/package_assets_test.cpp', 'engine/src/engine/packages.cpp', 'engine/src/core/files.cpp'); Args = @(); Libraries = @() },
+    @{ Name = 'crash-report-test'; Sources = @('tests/crash_report_test.cpp', 'engine/src/core/crash_report.cpp'); Args = @(); Libraries = @() }
 )
 if ($TigerData) {
     $cases[2].Args = @((Resolve-Path -LiteralPath $TigerData).Path)

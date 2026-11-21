@@ -74,6 +74,11 @@ android {
         minSdk 21
         buildConfigField 'String', 'MOD_ENGINE_VERSION', '"' + engineVersion + '"'
         buildConfigField 'boolean', 'MOD_GOOGLE_PLAY', (project.findProperty('openlf2GooglePlay') == 'true').toString()
+        // Crash reports (CrashReporter.java) go to this Discord webhook; empty disables the
+        // feature. Set it with -PopenlfDiscordWebhookUrl=... or, better, a line in your own
+        // (not committed) ~/.gradle/gradle.properties -- never in this file or in gradle.properties
+        // here. See docs/CRASH-REPORTER-1.1-2026-11-22.md.
+        buildConfigField 'String', 'DISCORD_WEBHOOK_URL', '"' + (project.findProperty('openlf2DiscordWebhookUrl') ?: '') + '"'
         targetSdk 35
         versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 10018
         versionName project.findProperty('openlf2VersionName') ?: '0.18.15'
