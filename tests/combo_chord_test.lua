@@ -148,6 +148,44 @@ end
 
 print("PASS: attack-cancel release, held and simultaneous specials, and classic jump specials on both sides")
 
+local function press_letters(fighter, keys)
+    local held = {}
+    for key, symbol in pairs({attack = "c", defend = "f", jump = "b", left = "l", right = "r"}) do
+        held[key] = keys:find(symbol, 1, true) ~= nil
+    end
+    press(fighter, held)
+end
+
+local controls = require("base/ui/controls")
+local keyboard = {device = constants.input_devices.keyboard, keys = {87, 83, 65, 68, 103, 105, 104}}
+local pad = {device = constants.input_devices.controller_one, buttons = {0, 1, 2}}
+local mapping = {sets = {keyboard, pad, keyboard, keyboard}}
+for _, input in ipairs({
+    {slot = 0, attack = "k103", block = "k104", left = "k65,105", right = "k68,105",
+        chord_left = "k65,104,105", chord_right = "k68,104,105"},
+    {slot = 1, attack = "k m0,0,0 j:1", block = "k m0,0,0 j:4",
+        left = "k m0,0,0 jl:2", right = "k m0,0,0 jr:2",
+        chord_left = "k m0,0,0 jl:6", chord_right = "k m0,0,0 jr:6"},
+}) do
+    local function tick(fighter, raw)
+        press_letters(fighter, controls.read(mapping, raw)[input.slot])
+    end
+    for _, direction in ipairs({"left", "right"}) do
+        local released = item.create(record)
+        tick(released, input.attack)
+        tick(released, input.block)
+        assert(released.frame == character_frames.defend)
+        tick(released, input[direction])
+        assert(released.frame == character_frames.jump, "released BLOCK through host input parser")
+
+        local chord = item.create(record)
+        tick(chord, input.attack)
+        assert(chord.frame == character_frames.punch)
+        tick(chord, input["chord_" .. direction])
+        assert(chord.frame == 310, "intentional chord through host input parser")
+    end
+end
+
 local hybrid = require("base/ui/hybrid_input")
 local layout = require("base/ui/hybrid_layout")
 local bounds = {left = 0, top = 0, right = 1280, bottom = 720}
@@ -165,11 +203,7 @@ for _, side in ipairs({-1, 1}) do
         local function tick(...)
             local keys = hybrid.update(touch, {contacts = {...}, screen = bounds, touch_active = true},
                 "match", fighter, "test:fighter", true)
-            local held = {}
-            for key, symbol in pairs({attack = "c", defend = "f", jump = "b", left = "l", right = "r"}) do
-                held[key] = keys:find(symbol, 1, true) ~= nil
-            end
-            press(fighter, held)
+            press_letters(fighter, keys)
         end
         tick(contact("d", 1, "attack"))
         tick(contact("u", 1, "attack"))
@@ -198,4 +232,4 @@ rapid.y_int = -1
 press(rapid, {jump = true, attack = true})
 assert(rapid.frame == character_frames.jump_attack, "ordinary airborne JUMP+ATTACK regressed")
 
-print("PASS: touch contact streams, rapid attack/block and reversal, and ordinary jump attack")
+print("PASS: host keyboard/gamepad frames, touch contact streams, rapid attack/block and reversal, and ordinary jump attack")
