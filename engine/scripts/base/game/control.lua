@@ -109,10 +109,13 @@ end
 local function recognize(match, value, index)
     local spec = sequences[index]
     local state = value.sequences[index]
-    if (index == combo_right_jump or index == combo_left_jump) and not value.keys.defend then
+    if (index == combo_right_jump or index == combo_left_jump) and not value.keys.defend
+        and state ~= completed_sequence then
         -- An attack-cancel block can only start a sideways special while held.
         -- Outside an attack, keep the classic separate taps, but don't interpret
         -- a fresh direction and jump together as the remaining two taps.
+        -- A completed sequence is left alone: players only complete it through the
+        -- checks below, while the AI (ai.lua) completes it directly without input.
         if value.attack_block or (state == sequence_defend_pressed
             and value[spec[1]] == input_press_frames and value.jump_press == input_press_frames) then
             value.sequences[index] = sequence_idle
