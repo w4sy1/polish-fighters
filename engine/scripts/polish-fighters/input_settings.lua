@@ -121,6 +121,12 @@ function screen.activate(state,id)
  elseif id=="hybrid_hud" then
   -- Clear hub_edit so the next frame falls through to the wrapped launch.lua base's
   -- own state.page=='hud' dispatch (hub_launch.base.update checks hub_edit first).
+  -- Stash it rather than dropping it: unsaved key/pad rebinds would otherwise be
+  -- silently lost while the player is in the HUD editor (Final review finding 1).
+  -- hub_launch.lua restores it once the HUD editor hands state.page back to 'menu',
+  -- which re-enters this screen (hub_edit non-nil) so SAVE/CANCEL stays the player's
+  -- own explicit choice.
+  state.hub_hybrid_pending_edit=state.hub_edit
   state.hub_edit=nil
   state.hud=require('base/ui/hybrid_editor').create(require('base/game/options').current(),'menu')
   state.page='hud'

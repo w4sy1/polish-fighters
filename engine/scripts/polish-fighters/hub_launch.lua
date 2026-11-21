@@ -191,7 +191,18 @@ return function(base)
   if state.hub_edit then return input_settings.update(state,input) end
   if state.hub_online then return online.update(state,input,context) end
   if state.hub_mods then return mods.update(state,input,context) end
-  if state.page~="menu" then return update(state,input,context) end
+  if state.page~="menu" then
+   update(state,input,context)
+   -- Etap 1.14 / Etap 5 final review: input_settings.lua's "hybrid_hud" row stashes
+   -- an in-progress key/pad rebind here instead of dropping it while the HUD editor
+   -- (state.page=='hud') is open. Once that delegated update hands state.page back
+   -- to "menu", restore it so the player re-enters STEROWANIE with their edits
+   -- intact, rather than it being silently lost.
+   if state.page=="menu" and state.hub_hybrid_pending_edit then
+    state.hub_edit=state.hub_hybrid_pending_edit;state.hub_hybrid_pending_edit=nil
+   end
+   return
+  end
   if state.hub_classic then
    update(state,input,context)
    if not state.pf_panel then state.hub_classic=nil end

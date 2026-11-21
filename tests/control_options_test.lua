@@ -59,9 +59,10 @@ assert(saved_document and saved_document.options.hybrid.controls.stick.enabled==
  'save must persist the staged hybrid mode into options.hybrid.controls')
 assert(saved_document.options.hybrid.controls.left.enabled==(android.hub_hybrid_mode=='arrows'))
 
--- hybrid_hud opens the HUD editor on the shared state.page dispatch and drops hub_edit,
--- so hub_launch's own update() falls through to the wrapped base's 'hud' page instead of
--- staying routed into input_settings.update.
+-- hybrid_hud opens the HUD editor on the shared state.page dispatch and releases
+-- hub_edit (stashed, not dropped -- see below), so hub_launch's own update() falls
+-- through to the wrapped base's 'hud' page instead of staying routed into
+-- input_settings.update.
 local hud_state={hub_android=true}
 input_settings.open(hud_state)
 input_settings.activate(hud_state,'hybrid_hud')
@@ -69,3 +70,31 @@ assert(hud_state.page=='hud' and hud_state.hud and not hud_state.hub_edit,
  'hybrid_hud must open the editor and release hub_edit')
 assert(hud_state.hud.destination=='menu','HUD editor must return to the hub menu, not the options page default')
 print('PASS: Android hybrid control toggle + HUD editor rows, staged until save')
+
+-- Final review finding 1: unsaved key/pad rebinds must not be silently lost while the
+-- HUD editor is open. hub_launch.lua stashes hub_edit in hub_hybrid_pending_edit and
+-- restores it once the delegated base hands state.page back to 'menu', re-entering
+-- STEROWANIE (hub_edit non-nil routes straight back into input_settings.update).
+local hub=require('polish-fighters/hub')
+local shell=dofile(root..'/engine/scripts/polish-fighters/hub_launch.lua')({
+ create=function() return {page='menu'} end,
+ update=function(state) if state.page=='hud' and state.hud_finish then state.page='menu' end end,
+ draw=function() end,describe=function() return '' end})
+local round_state=shell.create({});round_state.hub_enabled=true;round_state.hub_mode='settings'
+round_state.hub_android=true
+local round_context={action=function() end,sound=function() end}
+input_settings.open(round_state)
+round_state.hub_edit.names[1]='CustomUnsavedName'
+input_settings.activate(round_state,'hybrid_hud')
+assert(not round_state.hub_edit and round_state.hub_hybrid_pending_edit
+ and round_state.hub_hybrid_pending_edit.names[1]=='CustomUnsavedName',
+ 'unsaved edit must be stashed, not dropped, while the HUD editor is open')
+shell.update(round_state,{keys={},gamepad={},pointer_x=0,pointer_y=0},round_context)
+assert(round_state.page=='hud' and not round_state.hub_edit,
+ 'edit must stay stashed while the HUD editor is still open')
+round_state.hud_finish=true
+shell.update(round_state,{keys={},gamepad={},pointer_x=0,pointer_y=0},round_context)
+assert(round_state.page=='menu' and round_state.hub_edit
+ and round_state.hub_edit.names[1]=='CustomUnsavedName' and not round_state.hub_hybrid_pending_edit,
+ 'closing the HUD editor must restore the stashed edit, not lose it')
+print('PASS: unsaved key/pad rebinds survive a trip through the HUD editor')
