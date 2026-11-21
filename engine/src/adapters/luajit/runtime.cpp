@@ -85,7 +85,7 @@ struct ResourceBridge {
     std::optional<Result<std::string>> account_result;
     std::future<Result<std::string>> updates_future;
     std::optional<Result<std::string>> updates_result;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
     // Declared before mods_future: the worker writes progress until the future is destroyed.
     ModInstallProgress mods_progress;
 #endif
@@ -567,11 +567,15 @@ int updates_operation(lua_State* state) {
 #endif
 }
 int mods_operation(lua_State* state) {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__ANDROID__)
     lua_pushnil(state);lua_pushliteral(state,"Mods handled by platform");return 2;
 #else
     auto* bridge=resource_bridge(state);
     const auto* action=luaL_checkstring(state,1);
+    if(std::strcmp(action,"cancel")==0){
+        bridge->mods_progress.cancelled=true;
+        lua_pushboolean(state,1);return 1;
+    }
     if(std::strcmp(action,"receipt")==0){
         const auto id=luaL_checkstring(state,2);
         const auto receipt=github_mod_receipt(id);
@@ -611,6 +615,7 @@ int mods_operation(lua_State* state) {
             const auto* id=luaL_checklstring(state,2,&size);
             if(bridge->mods_catalogue.empty()){lua_pushnil(state);lua_pushliteral(state,"Load the catalogue first");return 2;}
             bridge->mods_action="install";
+            bridge->mods_progress.cancelled=false;
             bridge->mods_future=std::async(std::launch::async,[bridge,value=std::string(id,size),catalogue=bridge->mods_catalogue]{
                 return github_mod_install(catalogue,value,bridge->mods_progress);});
         } else {lua_pushnil(state);lua_pushliteral(state,"Unknown mod action");return 2;}

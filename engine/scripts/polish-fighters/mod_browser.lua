@@ -88,8 +88,16 @@ function screen.rows(s)
   local g=s.github
   if g.detail then
    local rows={{'back',w.back,534,445,230,32}}
+   local pl=locale.id()=='pl'
+   if g.busy=='install' then
+    rows[#rows+1]={'gh_cancel',pl and 'ANULUJ' or 'CANCEL',30,445,300,32}
+    return rows
+   end
    if g.detail.receipt~=github_receipt(g.detail) then
-    rows[#rows+1]={'gh_install',locale.id()=='pl' and 'POBIERZ PACZKĘ' or 'DOWNLOAD PACKAGE',30,445,300,32}
+    local action=g.detail.receipt and (pl and 'AKTUALIZUJ' or 'UPDATE') or (pl and 'POBIERZ' or 'DOWNLOAD')
+    rows[#rows+1]={'gh_install',action,30,445,300,32}
+   elseif profile_tags[g.detail.profile] then
+    rows[#rows+1]={'gh_select',pl and 'WYBIERZ' or 'SELECT',30,445,300,32}
    end
    return rows
   end
@@ -119,22 +127,27 @@ function screen.activate(state,id,context)
  local s=state.hub_mods
  if id=='back' then
   if s.edit then s.edit=false elseif s.detail then s.detail=nil
-  elseif s.github and s.github.busy then return
+  elseif s.github and s.github.busy then
+   if s.github.busy=='install' then mods_api()('cancel') end
+   return
   elseif s.github and s.github.detail then s.github.detail=nil
   elseif s.github and not s.direct then s.github=nil else state.hub_mods=nil end
  elseif id=='github' or id=='gh_refresh' then
-  if not (s.github and s.github.busy) then github_start(s) end
-  -- Android opens its native Mods screen over the game.
-  if s.github and s.github.status==strings().gh_android and state.hub_android and context.action then
+  if state.hub_android and context.action then
    require('polish-fighters/hub').open_android_mods(context)
    s.github=nil
    if s.direct then state.hub_mods=nil end
-  end
+  elseif not (s.github and s.github.busy) then github_start(s) end
  elseif id:sub(1,3)=='gh:' then
   for _,entry in ipairs(s.github.packages) do
    if entry.id==id:sub(4) and not s.github.busy then s.github.detail=entry;break end
   end
  elseif id=='gh_install' then github_install(s,s.github.detail.id)
+ elseif id=='gh_cancel' then mods_api()('cancel')
+ elseif id=='gh_select' and s.github and not s.github.busy and context.action then
+  local entry=s.github.detail
+  local tag=entry and profile_tags[entry.profile]
+  if tag and entry.receipt==github_receipt(entry) then context.action('profile_'..tag) end
  elseif id=='gh_prev' then s.github.page=s.github.page-1
  elseif id=='gh_next' then s.github.page=s.github.page+1
  elseif id=='search' then s.edit=not s.edit
@@ -184,6 +197,8 @@ function screen.draw(state,context)
  text(s.github and w.gh_title or w.title,397,24,24,nil,'center')
  if s.github then
   text(s.github.status or '',397,62,13,0xffdc82,'center')
+  local current=require('base/game/catalog').profile_id
+  text(locale.id()=='pl' and 'Aktywny: '..current or 'Active: '..current,397,81,12,0x62b5ef,'center')
   if s.github.detail then
    local entry=s.github.detail
    text(tostring(entry.name),30,105,20)

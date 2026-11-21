@@ -209,6 +209,8 @@ public final class AndroidModsActivity extends Activity {
     private void downloadSetup(List<AndroidModSources.Package> items,boolean mixed,long required) {
         if (importing) return;
         if (getFilesDir().getFreeSpace()<required) { setBusy(false,"Za mało wolnego miejsca: "+formatMiB(required));return; }
+        cancellationRequested=false;
+        downloading=true;
         setBusy(true,"Przygotowuję pobieranie…");
         worker.submit(()->{
             try {
@@ -258,7 +260,12 @@ public final class AndroidModsActivity extends Activity {
         }
         ClassicButton back=action("WRÓĆ DO MODÓW",this::goBack);
         LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(back,params);
-        setBusy(false,"Podpis katalogu poprawny. Mody: "+found.size()+". Wybierz, aby pobrać i zainstalować.");
+        try {
+            String active = new GamePackSettings(getFilesDir()).mode();
+            setBusy(false,"Wybrany moduł: "+active+" · Podpis katalogu poprawny.");
+        } catch (Exception ignored) {
+            setBusy(false,"Podpis katalogu poprawny.");
+        }
     }
     private java.io.File packageFolder(AndroidModSources.Package item) {
         return new java.io.File(getFilesDir(),"game/content-packs/"+item.id);
@@ -286,8 +293,18 @@ public final class AndroidModsActivity extends Activity {
         rows.addView(label("Pobieranie: "+item.sizeLabel()+" · "+packageState(item),12,MUTED,false),wrap());
         String receipt = installedReceipt(item);
         if (!item.receipt().equals(receipt)) {
-            rows.addView(action(receipt == null ? "POBIERZ" : "POBIERZ WERSJĘ Z KATALOGU",
+            rows.addView(action(receipt == null ? "POBIERZ" : "AKTUALIZUJ",
                     ()->install(item,catalogue,sourceOffset,catalogueOffset)),wrap());
+        } else if (!item.profile.isEmpty()) {
+            rows.addView(action("WYBIERZ", () -> {
+                try {
+                    GamePackSettings settings=new GamePackSettings(getFilesDir());
+                    settings.save(item.profile,settings.selection(),settings.hideDuplicates());
+                    setBusy(false,item.name+"."+selectionMessage());
+                } catch (Exception error) {
+                    setBusy(false,"Nie zapisano wyboru: "+safe(error.getMessage()));
+                }
+            }),wrap());
         }
         rows.addView(action("WRÓĆ DO KATALOGU",this::goBack),wrap());
     }
@@ -308,10 +325,15 @@ public final class AndroidModsActivity extends Activity {
                 runOnUiThread(()->{setBusy(false,done);showPackage(item,catalogue,sourceOffset,catalogueOffset);});
             } catch(Exception error) {
                 android.util.Log.w("OpenLF2","GitHub mod install failed",error);
-                runOnUiThread(()->setBusy(false,"Instalacja przerwana: "+safe(error.getMessage())));
+                runOnUiThread(()->setBusy(false,cancellationRequested
+                    ? "Anulowano pobieranie." : "Instalacja przerwana: "+safe(error.getMessage())));
+            } finally {
+                downloading=false;
             }
         });
     }
+    private volatile boolean downloading;
+    private volatile boolean cancellationRequested;
     private void transferAndInstall(AndroidModSources.Package item) throws java.io.IOException {
         java.io.File folder=new java.io.File(getCacheDir(),"mods");
         if (!folder.isDirectory()&&!folder.mkdirs()) throw new java.io.IOException("Nie można przygotować katalogu pobierania.");
@@ -334,8 +356,10 @@ public final class AndroidModsActivity extends Activity {
                         status.setText("Pobieram "+item.name+": "+formatMiB(received)+" / "+formatMiB(total)+" ("+permille/10+"%)");
                     });
                 }
-                return !worker.isShutdown();
+                return !cancellationRequested && !worker.isShutdown();
             });
+            downloading=false;
+            if (cancellationRequested) throw new java.io.IOException("Anulowano pobieranie.");
             runOnUiThread(()->{progress.setIndeterminate(true);status.setText("Sprawdzam podpis i instaluję "+item.name+"…");});
             String id=AndroidModPackageImporter.importDownloaded(envelope,getFilesDir(),getAssets(),item,
                     files->runOnUiThread(()->status.setText("Instaluję "+item.name+": plików "+files)));
@@ -368,7 +392,13 @@ public final class AndroidModsActivity extends Activity {
     private void leave() { finish(); }
     private void restoreScroll(int offset) { scroll.post(() -> scroll.scrollTo(0,offset)); }
     private void goBack() {
-        if (importing) return;
+        if (importing) {
+            if (downloading) {
+                cancellationRequested=true;
+                status.setText("Anulowanie pobierania…");
+            }
+            return;
+        }
         if (previousScreen == null) leave();
         else previousScreen.run();
     }

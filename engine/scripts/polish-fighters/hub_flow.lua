@@ -45,7 +45,12 @@ return function(base)
    state.launch.hub_pending_mode=pending;state.launch.hub_mode='players'
    saved.little_fighters_pending_mode=nil;engine.write_settings(saved)
   end
-  if state.launch.hub_enabled and options.profiles_available and not options.profile_start
+  if saved.little_fighters_room_resume~=nil then
+   local room=saved.little_fighters_room_resume
+   saved.little_fighters_room_resume=nil
+   if engine.write_settings(saved) then require('polish-fighters/online_screen').resume(state.launch,room) end
+  end
+  if state.launch.hub_enabled and not state.launch.hub_online and options.profiles_available and not options.profile_start
    and not saved.current_controls_seen and state.launch.hub_mode=='root' and state.launch.page=='menu' then
    state.launch.hub_current_controls=true
   end

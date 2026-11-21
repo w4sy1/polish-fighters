@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <ctime>
 #include "openlf2/ports/download.hpp"
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
 #include "openlf2/ports/github_mods.hpp"
 #endif
 #include "openlf2/ports/platform.hpp"
@@ -1570,7 +1570,7 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
         }
         while (true) {
             std::optional<ProfileRequest> profile_request;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__ANDROID__)
             set_mod_content_directory(content_directory(*config));
 #endif
             auto result = run(*config, profile_request);

@@ -58,6 +58,52 @@ screen.activate(state,'find',context);run(state,5)
 assert(#client.rooms==0 and client.notice:find('timeout',1,true))
 server.list_error=nil
 
+-- An installed mod switches first, then rejoins by stable room ID after rebuilding Lua.
+local other=require('polish-fighters/hub').profiles[1]
+if other.profile==catalog.profile_id then other=require('polish-fighters/hub').profiles[2] end
+local target={id='different',host='',port=12345,relay=true,profile=other.profile,name='Inny moduł'}
+local decoy={id='decoy',host='',port=12345,relay=true,profile=other.profile,name='Nie ten pokój'}
+local doc={}
+engine.read_settings=function() return doc end
+engine.write_settings=function(value) doc=value;return true end
+reset();server.rooms={target}
+state={hub_available={[other.id]=true}};screen.open(state,true)
+screen.activate(state,'find',context);run(state,5)
+screen.activate(state,'join:1',context)
+assert(actions[1]=='profile_'..other.id and doc.little_fighters_room_resume.id==target.id)
+local previous_profile=catalog.profile_id;catalog.profile_id=other.profile
+local selected
+local original_account=engine.account
+engine.account=function(action,endpoint,operation,payload)
+ if action=='start' and operation=='relay-ticket' then selected=payload.room end
+ return original_account(action,endpoint,operation,payload)
+end
+server.rooms={decoy,target};state={}
+screen.resume(state,doc.little_fighters_room_resume);run(state)
+assert(actions[2]=='network' and selected==target.id)
+catalog.profile_id=previous_profile
+
+-- A missing mod asks before any download. No restores the list; Yes uses the
+-- matching ID from the signed catalogue and commits to the same selected room.
+reset();server.rooms={target}
+state={hub_available={}};screen.open(state,true)
+screen.activate(state,'find',context);run(state,5)
+screen.activate(state,'join:1',context)
+assert(state.hub_online.missing_mod.room.id==target.id)
+screen.activate(state,'mod_no',context)
+assert(not state.hub_online.missing_mod and #actions==0)
+screen.activate(state,'join:1',context)
+local operation, installed
+engine.mods=function(action,id)
+ if action=='catalogue' or action=='install' then operation=action;installed=id or installed;return true end
+ if action=='poll' and operation=='catalogue' then return {packages={{id=target.profile,name='Test'}}} end
+ if action=='poll' and operation=='install' then return target.profile end
+end
+screen.activate(state,'mod_yes',context);run(state,5)
+assert(installed==target.profile and actions[1]=='profile_'..other.id)
+assert(doc.little_fighters_room_resume.id==target.id)
+engine.account=original_account
+
 -- Publishing asks the server again, so an earlier list without the relay does not block it.
 reset();server.relay=false
 state={};screen.open(state,true);screen.activate(state,'publish',context);run(state)

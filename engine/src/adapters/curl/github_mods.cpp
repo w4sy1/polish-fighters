@@ -8,6 +8,9 @@
 #define NOMINMAX // curl.h pulls in windows.h; keep std::min/std::max usable.
 #endif
 #include "openlf2/ports/github_mods.hpp"
+#ifdef __ANDROID__
+#include "openlf2/ports/download.hpp"
+#endif
 #include "openlf2/core/json.hpp"
 #include <algorithm>
 #include <array>
@@ -101,10 +104,25 @@ Result<void> transfer(std::string_view address, Sink& sink, long timeout, std::u
     curl_easy_setopt(handle.get(), CURLOPT_NOSIGNAL, 1L);
     curl_easy_setopt(handle.get(), CURLOPT_WRITEFUNCTION, receive);
     curl_easy_setopt(handle.get(), CURLOPT_WRITEDATA, &sink);
+    if (sink.progress != nullptr) {
+        curl_easy_setopt(handle.get(), CURLOPT_NOPROGRESS, 0L);
+        curl_easy_setopt(handle.get(), CURLOPT_XFERINFOFUNCTION,
+            +[](void* data, curl_off_t, curl_off_t, curl_off_t, curl_off_t) -> int {
+                return static_cast<ModInstallProgress*>(data)->cancelled ? 1 : 0;
+            });
+        curl_easy_setopt(handle.get(), CURLOPT_XFERINFODATA, sink.progress);
+    }
+#ifdef __ANDROID__
+    static const auto ca_bundle = android_system_ca_bundle();
+    if (!ca_bundle) return std::unexpected(ca_bundle.error());
+    curl_blob certificates{const_cast<char*>(ca_bundle->data()), ca_bundle->size(), CURL_BLOB_NOCOPY};
+    curl_easy_setopt(handle.get(), CURLOPT_CAINFO_BLOB, &certificates);
+#endif
 #if (defined(_WIN32) || defined(__APPLE__)) && defined(CURLSSLOPT_NATIVE_CA)
     curl_easy_setopt(handle.get(), CURLOPT_SSL_OPTIONS, static_cast<long>(CURLSSLOPT_NATIVE_CA));
 #endif
     const auto code = curl_easy_perform(handle.get());
+    if (sink.progress && sink.progress->cancelled) return fail(ErrorCode::io, "Download cancelled");
     curl_easy_getinfo(handle.get(), CURLINFO_RESPONSE_CODE, &sink.status);
     char* effective = nullptr;
     curl_easy_getinfo(handle.get(), CURLINFO_EFFECTIVE_URL, &effective);
@@ -258,7 +276,7 @@ Result<std::uint64_t> data_offset(std::ifstream& file, std::uint64_t base, std::
 
 // Streams one entry to `output` (or only hashes it when `output` is null); checks size and CRC.
 Result<void> extract(std::ifstream& file, std::uint64_t offset, const ZipItem& item, std::ofstream* output,
-                     EVP_MD_CTX* digest) {
+                     EVP_MD_CTX* digest, const ModInstallProgress& progress) {
     if (item.flags & 1) return fail(ErrorCode::unsupported, "Encrypted ZIP entries are unsupported");
     if (item.method != 0 && item.method != 8) return fail(ErrorCode::unsupported, "Unsupported ZIP compression");
     file.clear();
@@ -279,6 +297,7 @@ Result<void> extract(std::ifstream& file, std::uint64_t offset, const ZipItem& i
     std::unique_ptr<z_stream, void (*)(z_stream*)> guard(deflated ? &stream : nullptr, [](z_stream* s) { inflateEnd(s); });
     int status = Z_OK;
     while (remaining > 0) {
+        if (progress.cancelled) return fail(ErrorCode::io, "Installation cancelled");
         const auto chunk = static_cast<std::size_t>(std::min<std::uint64_t>(remaining, input.size()));
         if (!file.read(input.data(), static_cast<std::streamsize>(chunk))) return fail(ErrorCode::io, "Cannot read ZIP data");
         remaining -= chunk;
@@ -387,7 +406,7 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
     {
         std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> digest(EVP_MD_CTX_new(), EVP_MD_CTX_free);
         if (!digest || EVP_DigestInit_ex(digest.get(), EVP_sha256(), nullptr) != 1) return fail(ErrorCode::dependency, "SHA-256 unavailable");
-        auto checked = extract(file, *payload_offset, payload, nullptr, digest.get());
+        auto checked = extract(file, *payload_offset, payload, nullptr, digest.get(), progress);
         if (!checked) return std::unexpected(checked.error());
         std::array<unsigned char, 32> value{};
         unsigned produced = 0;
@@ -423,7 +442,7 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
         if (!offset) { cleanup(staging); return std::unexpected(offset.error()); }
         std::ofstream output(target, std::ios::binary | std::ios::trunc);
         if (!output) { cleanup(staging); return fail(ErrorCode::io, "Cannot write content-pack file"); }
-        auto copied = extract(file, *offset, *item, &output, nullptr);
+        auto copied = extract(file, *offset, *item, &output, nullptr, progress);
         output.close();
         if (!copied || !output) { cleanup(staging); return copied ? fail(ErrorCode::io, "Cannot write content-pack file") : std::unexpected(copied.error()); }
         ++progress.files;
@@ -444,6 +463,7 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
         installed.close();
         if (!installed) { cleanup(staging); return fail(ErrorCode::io, "Cannot save the installed mod version"); }
     }
+    if (progress.cancelled) { cleanup(staging); return fail(ErrorCode::io, "Installation cancelled"); }
     const auto target = packs / std::string(id);
     const auto previous = packs / (".previous-" + std::string(id) + "-" + std::to_string(random() & 0xffffffff));
     const bool replace = fs::exists(target, error);
