@@ -45,6 +45,10 @@ local function open_android_screen(context,key)
  return true
 end
 function hub.open_android_tools(context) return open_android_screen(context,'little_fighters_open_android_tools') end
+-- Android: BLUETOOTH is restart-wrapped, same quit+relaunch pattern as android_tools above;
+-- OpenLF2Activity reads little_fighters_open_bluetooth on the next launch and opens
+-- BluetoothPairingActivity (Etap 1.14 / Etap 4A).
+function hub.open_android_bluetooth(context) return open_android_screen(context,'little_fighters_open_bluetooth') end
 -- Android: the native Mods screen downloads and installs signed mods from Polish Fighters - GitHub.
 function hub.open_android_mods(context) context.action('open_android_mods') end
 function hub.rows(state,active_profile)

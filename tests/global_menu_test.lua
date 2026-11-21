@@ -100,3 +100,19 @@ do
  for _,row in ipairs(hub.rows({hub_mode='settings'})) do assert(row[1]~='lan','settings must not duplicate WIFI/HOTSPOT via lan row') end
 end
 print('PASS: GRAJ ZDALNIE menu replaces SIECI, gates BLUETOOTH by availability, settings drop duplicate lan row')
+
+-- Etap 1.14 / Zadanie 4A.1: BLUETOOTH on Android routes through the same
+-- quit+relaunch pattern as the existing android_tools restart flow.
+do
+ local bt_settings={}
+ engine.read_settings=function() return bt_settings end
+ engine.write_settings=function(document)
+  assert(document==bt_settings and document.little_fighters_open_bluetooth==true)
+  return true
+ end
+ local bt_actions={}
+ local bt_context={action=function(a) bt_actions[#bt_actions+1]=a end}
+ assert(hub.open_android_bluetooth(bt_context) and bt_actions[1]=='quit',
+  'remote_bluetooth must write the restart flag and quit, like open_android_tools')
+end
+print('PASS: BLUETOOTH routes through the quit+relaunch restart pattern')
