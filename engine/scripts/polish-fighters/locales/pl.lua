@@ -1,5 +1,5 @@
 return {
- guide='PORADNIK KOMBOSÓW',
+ guide='LISTA RUCHÓW',
  current_mod='BIEŻĄCY MOD: ',
  mods='KATALOG MODÓW',
  status='STAN / ZGODNOŚĆ MODUŁÓW', audit_note='Stan plików przy budowie. Obecność zasobów nie oznacza pełnej zgodności mechanik.', assets='Zasoby: ', missing_files='Brakujące pliki: ',
@@ -16,6 +16,7 @@ return {
  compatibility='Sieć wymaga tego samego modułu i zasobów. Wspólna pula: testy lokalne.',
  absent_turbo='LF2 Turbo: brak osobnego pakietu', navigation='STRZAŁKI / D-PAD: WYBÓR   ENTER / A: OK   ESC / B: WSTECZ',
  credits_info='TWÓRCY I INFORMACJE O PROJEKCIE',
+ credit_author='Twórca moda Polish Fighters: w4sy1 - github.com/w4sy1',
  credit_text='Silnik: OpenLF2. Oryginalna gra: Marti Wong i Starsky Wong.',
  credit_packs='Autorzy modułów i licencje: dokumentacja dołączonych pakietów (content-packs/).',
  credit_authors='Twórcy i współtwórcy Polish Fighters: github.com/w4sy1/polish-fighters/graphs/contributors',

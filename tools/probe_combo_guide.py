@@ -1,4 +1,4 @@
-"""Open every guide page via real native menu clicks; optionally capture the UI."""
+"""Open every move-list page via real native menu clicks; optionally capture the UI."""
 import argparse
 import os
 import subprocess
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     (fixture / 'package.manifest').write_text('id=qa-combo-guide\nversion=1\napi=1\nrequires=base@1\n'
         'requires=polish-fighters@1\nextend=base/ui/flow|flow.lua\n')
     (fixture / 'flow.lua').write_text(FLOW)
-    for row, name in enumerate(['basics', 'wasyl', 'sz', 'jas', 'tata', 'remonoko', 'mech'], 1):
+    for row, name in enumerate(['wasyl', 'sz', 'jas', 'tata', 'remonoko', 'mech'], 1):
         trace = '@400_430,!,@420_425,!,@420_' + str(225 + (row - 1) * 25) + ',!,*3'
         command = [str(stage / 'LittleFighters.exe'), '--installer', str(stage / 'LF2_v2.0a.exe'),
                    '--scripts', str(stage / 'scripts'), '--mod', str(stage / 'content-packs/polish-originals'),

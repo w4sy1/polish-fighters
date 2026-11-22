@@ -56,10 +56,12 @@ local notes={
  [414]={'Przemiana kosztuje 200 MP; mech nie ma limitu czasu.', 'W powietrzu: J, potem jeszcze J - dodatkowe skoki.'},
  [415]={'Kombo doskok + A + A: łącznie 150 MP.', 'Mech to forma Remonoko, nie osobna postać.'}}
 function guide.moves(id) return moves[id] end
+-- Named moves only, no input combos: the move list says what a character
+-- can do, not how to perform it. Players work the inputs out themselves.
 function guide.message(id)
  if not moves[id] then return nil end
- local result={guide.names[id]..' - KOMBOSY'}
- for _,move in ipairs(moves[id]) do result[#result+1]=move[1]..' - '..move[2] end
+ local result={guide.names[id]..' - LISTA RUCHOW'}
+ for _,move in ipairs(moves[id]) do result[#result+1]=move[2] end
  for _,line in ipairs(notes[id]) do result[#result+1]=line end
  return result
 end

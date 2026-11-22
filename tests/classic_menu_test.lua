@@ -138,7 +138,7 @@ i18n.host(true);i18n.use('default',true)
 local labels={}
 shell.draw(state,{viewport=function() end,image=function(path) assert(path~='pe/lf2_cursor') end,
  fill=function() end,sprite=function() end,text=function(label) labels[label]=true end})
-assert(labels['MODUŁY'] and labels['PORADNIK KOMBOSÓW'],'UTF-8 labels require TrueType even in default mode')
+assert(labels['MODUŁY'] and labels['LISTA RUCHÓW'],'UTF-8 labels require TrueType even in default mode')
 local edit=controls.copy(controls.current());edit.sets[1].device=1;edit.sets[1].directions={'r','d','l','u'}
 assert(controls.save(edit));controls.load();assert(controls.current().sets[1].directions[1]=='r')
 local held=controls.read(controls.current(),'$1r');assert(held[0]:find('u') and not held[0]:find('r'))

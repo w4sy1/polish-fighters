@@ -10,10 +10,8 @@ return function(base)
         if s.pf_message then return {{"back","POWROT"}} end
         if s.pf_panel=="combo-guide" then
             local guide=require('polish-fighters/combo_guide')
-            local list={{'guide-basics','STEROWANIE I PORADNIK'}}
+            local list={}
             for _,id in ipairs(guide.order) do list[#list+1]={'guide:'..id,guide.names[id]} end
-            list[#list+1]={'guide-roster','PRZEGLĄDAJ WSZYSTKIE POSTACIE'}
-            list[#list+1]={'guide-moves','LISTA RUCHÓW'}
             list[#list+1]={'back','POWRÓT'};return list
         end
         if s.pf_panel=="unlock" then
@@ -96,23 +94,12 @@ return function(base)
             if s.pf_message then s.pf_message=nil;s.pf_guide_message=nil
             elseif s.pf_panel=="extras" or s.pf_panel==s.pf_root_panel then
                 s.pf_panel,s.pf_root_panel=nil,nil
-            elseif s.pf_panel=='fighters' and s.pf_back_to_guide then s.pf_panel='combo-guide';s.pf_back_to_guide=nil
             elseif s.pf_panel=="fighters" or s.pf_panel=="campaigns" then s.pf_panel="pack-content"
             elseif s.pf_panel=="pack-content" then s.pf_panel="packs"
             elseif s.pf_panel=="maps" then s.pf_panel=s.pf_maps_parent or "extras"
             else s.pf_panel="extras" end
         elseif id=="guest" then s.pf_panel=nil
-        elseif id=='guide-basics' then s.pf_message=require('polish-fighters/combo_guide').basics;s.pf_guide_message=true
         elseif id:sub(1,6)=='guide:' then s.pf_message=require('polish-fighters/combo_guide').message(tonumber(id:sub(7)));s.pf_guide_message=true
-        elseif id=='guide-moves' then
-            s.options=require('base/game/options').current()
-            s.hud=require('base/ui/hybrid_editor').create(s.options,'menu')
-            s.hud.show_moves=true
-            s.page='hud'
-        elseif id=='guide-roster' then
-            local content,problem=model.contents()
-            if content then s.pf_contents=content;s.pf_panel='fighters';s.pf_back_to_guide=true
-            else s.pf_message={'BŁĄD KATALOGU',tostring(problem)} end
         elseif id=="unlock-input" then
             s.pf_code="";s.pf_typing=true
             if c.text_input then c.text_input(true) end
@@ -160,7 +147,7 @@ return function(base)
         elseif id=="content-prev" then s.pf_content_page=math.max(1,(s.pf_content_page or 1)-1)
         elseif id=="content-next" then s.pf_content_page=(s.pf_content_page or 1)+1
         elseif id=="fighters" or id=="campaigns" then
-            s.pf_panel=id;s.pf_back_to_guide=nil
+            s.pf_panel=id
         elseif id=="maps" then s.pf_maps_parent=s.pf_panel;s.pf_panel=id
         elseif id:sub(1,7)=="detail:" then
             local entry=s.pf_contents[s.pf_panel][tonumber(id:sub(8))]
@@ -262,7 +249,7 @@ return function(base)
         c.fill(186,164,470,359,16,27,47,220)
         c.fill(186,164,470,2,224,72,92)
         local titles={extras="POLISH FIGHTERS",maps="MAPY",packs="PAKIETY",account="KONTO / GOŚĆ",
-            ["pack-content"]="ZAWARTOŚĆ PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA",['combo-guide']='PORADNIK KOMBOSÓW'}
+            ["pack-content"]="ZAWARTOŚĆ PAKIETU",fighters="POSTACIE",campaigns="KAMPANIE",history="KRONIKA ROZGRYWEK",unlock="KOD ODBLOKOWANIA",['combo-guide']='LISTA RUCHÓW'}
         local title=s.pf_message and s.pf_message[1] or titles[s.pf_panel]
         if c.text then c.text(title,421,181,'center',20,0xf0f5ff,nil,nil,true)
         else font.draw(c,title,421,183,4,nil,"center") end

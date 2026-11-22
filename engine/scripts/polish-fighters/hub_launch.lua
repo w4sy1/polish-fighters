@@ -306,11 +306,12 @@ return function(base)
    if not version or version=='' then version=require('polish-fighters/updates').version end
    text(context,'ZAINSTALOWANA WERSJA '..version,397,252,variants.yellow,'center')
   elseif state.hub_mode=='credits_info' then
-   -- Rows (Twórcy i informacje / Wstecz) occupy y=207..234 (layout.box, 2 rows); the credits
-   -- text sits below them so the two don't overlap.
-   text(context,locale.text('credit_text'),397,280,variants.white,'center')
-   text(context,locale.text('credit_packs'),397,310,variants.white,'center')
-   text(context,locale.text('credit_authors'),397,340,variants.white,'center')
+   -- Row (Wstecz) occupies y=207..230 (layout.box, 1 row); the credits text sits
+   -- well below it so the two don't overlap.
+   text(context,locale.text('credit_author'),397,280,variants.white,'center')
+   text(context,locale.text('credit_text'),397,306,variants.white,'center')
+   text(context,locale.text('credit_packs'),397,332,variants.white,'center')
+   text(context,locale.text('credit_authors'),397,358,variants.white,'center')
   elseif state.hub_mode=='online' then text(context,locale.text('offline'),397,416,variants.yellow,'center')
   elseif state.hub_mode=='library' then text(context,locale.text('absent_turbo'),397,479,variants.yellow,'center')
   elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,variants.yellow,'center')

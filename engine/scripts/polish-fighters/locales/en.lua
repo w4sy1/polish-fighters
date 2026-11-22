@@ -1,5 +1,5 @@
 return {
- guide='COMBO GUIDE',
+ guide='MOVE LIST',
  current_mod='CURRENT MOD: ',
  mods='MOD CATALOGUE',
  status='MODULE STATUS / COMPATIBILITY', audit_note='File audit at build time. Present assets do not prove complete mechanics compatibility.', assets='Assets: ', missing_files='Missing files: ',
@@ -16,6 +16,7 @@ return {
  compatibility='Network peers need the same module and assets. Mixed pool: local testing.',
  absent_turbo='LF2 Turbo: no separate package installed', navigation='ARROWS / D-PAD: SELECT   ENTER / A: OK   ESC / B: BACK',
  credits_info='CREATORS & PROJECT INFO',
+ credit_author='Polish Fighters mod creator: w4sy1 - github.com/w4sy1',
  credit_text='Engine: OpenLF2. Original game: Marti Wong and Starsky Wong.',
  credit_packs='Module authors and licences: see the bundled package documentation (content-packs/).',
  credit_authors='Polish Fighters creators and contributors: github.com/w4sy1/polish-fighters/graphs/contributors',

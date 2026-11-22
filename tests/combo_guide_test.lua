@@ -20,13 +20,9 @@ local context={action=function() end}
 local function click(index)
  screen.update(s,{keys={},nav={},click=true,pointer_x=420,pointer_y=219+(index-1)*25},context)
 end
-click(1);assert(s.pf_message[1]=='STEROWANIE I PORADNIK' and s.pf_guide_message)
-click(1);assert(not s.pf_message)
-for row=2,7 do
- click(row);assert(s.pf_message[1]==guide.message(guide.order[row-1])[1]);click(1)
+for row=1,6 do
+ click(row);assert(s.pf_message[1]==guide.message(guide.order[row])[1] and s.pf_guide_message,'move list entry must open that hero\'s moves')
+ click(1);assert(not s.pf_message)
 end
-click(8);assert(s.pf_panel=='fighters','original full roster browser was removed')
-click(1);assert(s.pf_guide_message and s.pf_message[1]:find('Wasyl'))
-click(1);click(2);assert(s.pf_panel=='combo-guide','back from roster must return to the guide')
-click(10);assert(not s.pf_panel)
-print('PASS: five heroes and mech, real frame mappings, basics, visible detail length and preserved roster/back navigation')
+click(7);assert(not s.pf_panel,'back must close the move list, no combo-guide filler screens left')
+print('PASS: six heroes and mech, real frame mappings, plain move list with no combo-guide tutorial/roster filler')
