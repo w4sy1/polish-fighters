@@ -6,8 +6,8 @@ local controls=require('base/ui/controls')
 local screen={}
 local categories={'all','classic','naruto','dragon-ball','bleach','one-piece','anime','gameplay'}
 local words={
- pl={title='KATALOG MODÓW',search='SZUKAJ: ',category='KATEGORIA: ',all='Wszystkie',classic='Klasyczne LF',naruto='Naruto',['dragon-ball']='Dragon Ball',bleach='Bleach',['one-piece']='One Piece',anime='Inne anime',gameplay='Mechanika',prev='POPRZEDNIE',next='NASTĘPNE',back='WSTECZ',unknown='Niepotwierdzone',note='Rejestr nazw. Linki, dostępność i zgodność nie zostały jeszcze sprawdzone.',status='Zgodność: nieprzetestowany',empty='Brak wyników',author='Autor: ',version='Wersja: ',source='Źródło: ',actions='Gotowe, podpisane mody pobierzesz w: POLISH FIGHTERS - GITHUB.',search_hint='Szukaj po nazwie, autorze lub postaci. Enter kończy wpisywanie.',github='POLISH FIGHTERS - GITHUB',refresh='ODŚWIEŻ KATALOG',gh_title='POLISH FIGHTERS - GITHUB',gh_loading='Pobieram podpisany katalog...',gh_ready='Podpis katalogu poprawny.',gh_download='Pobieranie: ',gh_verify='Sprawdzam podpis i SHA-256...',gh_unpack='Instaluję pliki: ',gh_done='Zainstalowano: ',gh_failed='Błąd: ',gh_android='Na Androidzie mody z GitHuba instaluje ekran Mody w menu głównym.',gh_installed=' [zainstalowany]',gh_restart='Wybierz go w menu modułów.'},
- en={title='MOD CATALOGUE',search='SEARCH: ',category='CATEGORY: ',all='All',classic='Classic LF',naruto='Naruto',['dragon-ball']='Dragon Ball',bleach='Bleach',['one-piece']='One Piece',anime='Other anime',gameplay='Gameplay',prev='PREVIOUS',next='NEXT',back='BACK',unknown='Unverified',note='Name registry. Links, availability and compatibility have not been verified yet.',status='Compatibility: not tested',empty='No results',author='Author: ',version='Version: ',source='Source: ',actions='Ready, signed mods are in: POLISH FIGHTERS - GITHUB.',search_hint='Search name, author or character. Enter finishes editing.',github='POLISH FIGHTERS - GITHUB',refresh='REFRESH CATALOGUE',gh_title='POLISH FIGHTERS - GITHUB',gh_loading='Downloading the signed catalogue...',gh_ready='Catalogue signature verified.',gh_download='Downloading: ',gh_verify='Checking signature and SHA-256...',gh_unpack='Installing files: ',gh_done='Installed: ',gh_failed='Error: ',gh_android='On Android, GitHub mods are installed from the Mods screen in the main menu.',gh_installed=' [installed]',gh_restart='Select it in the module menu.'}
+ pl={title='KATALOG MODÓW',search='SZUKAJ: ',category='KATEGORIA: ',all='Wszystkie',classic='Klasyczne LF',naruto='Naruto',['dragon-ball']='Dragon Ball',bleach='Bleach',['one-piece']='One Piece',anime='Inne anime',gameplay='Mechanika',prev='POPRZEDNIE',next='NASTĘPNE',back='WSTECZ',unknown='Niepotwierdzone',note='Rejestr nazw. Linki, dostępność i zgodność nie zostały jeszcze sprawdzone.',status='Zgodność: nieprzetestowany',empty='Brak wyników',author='Autor: ',version='Wersja: ',source='Źródło: ',actions='Gotowe, podpisane mody pobierzesz w: POLISH FIGHTERS - GITHUB.',search_hint='Szukaj po nazwie, autorze lub postaci. Enter kończy wpisywanie.',github='POLISH FIGHTERS - GITHUB',refresh='ODŚWIEŻ KATALOG',gh_title='POLISH FIGHTERS - GITHUB',gh_loading='Pobieram podpisany katalog...',gh_ready='Podpis katalogu poprawny.',gh_download='Pobieranie: ',gh_verify='Sprawdzam podpis i SHA-256...',gh_unpack='Instaluję pliki: ',gh_done='Zainstalowano: ',gh_failed='Błąd: ',gh_android='Na Androidzie mody z GitHuba instaluje ekran Mody w menu głównym.',gh_installed=' [zainstalowany]',gh_restart='Wybierz go w menu modułów.',multi_on='ZAZNACZ WIELE',multi_off='WYBÓR POJEDYNCZY',queue_run='POBIERZ ZAZNACZONE (',queue_empty='ZAZNACZ PACZKI DO POBRANIA',queue_done='Pobrano wszystkie zaznaczone paczki.',queue_hint='Zaznaczanie wielu: kliknij paczkę, aby dodać do kolejki, potem POBIERZ ZAZNACZONE.'},
+ en={title='MOD CATALOGUE',search='SEARCH: ',category='CATEGORY: ',all='All',classic='Classic LF',naruto='Naruto',['dragon-ball']='Dragon Ball',bleach='Bleach',['one-piece']='One Piece',anime='Other anime',gameplay='Gameplay',prev='PREVIOUS',next='NEXT',back='BACK',unknown='Unverified',note='Name registry. Links, availability and compatibility have not been verified yet.',status='Compatibility: not tested',empty='No results',author='Author: ',version='Version: ',source='Source: ',actions='Ready, signed mods are in: POLISH FIGHTERS - GITHUB.',search_hint='Search name, author or character. Enter finishes editing.',github='POLISH FIGHTERS - GITHUB',refresh='REFRESH CATALOGUE',gh_title='POLISH FIGHTERS - GITHUB',gh_loading='Downloading the signed catalogue...',gh_ready='Catalogue signature verified.',gh_download='Downloading: ',gh_verify='Checking signature and SHA-256...',gh_unpack='Installing files: ',gh_done='Installed: ',gh_failed='Error: ',gh_android='On Android, GitHub mods are installed from the Mods screen in the main menu.',gh_installed=' [installed]',gh_restart='Select it in the module menu.',multi_on='SELECT MULTIPLE',multi_off='SINGLE SELECT',queue_run='DOWNLOAD SELECTED (',queue_empty='SELECT PACKAGES TO FETCH',queue_done='All selected packages are installed.',queue_hint='Multi-select: click a package to queue it, then DOWNLOAD SELECTED.'}
 }
 local function strings() return words[locale.id()] end
 -- Polish Fighters — GitHub: signed catalogue and installer provided by the engine (engine.mods).
@@ -60,6 +60,51 @@ local function github_install(s,id)
  if ok==true then g.fraction=0;g.busy='install';g.target=id;g.status=strings().gh_download..'0%' else g.status=strings().gh_failed..tostring(err or '') end
 end
 local function size_label(bytes) return string.format('%.1f MB',(tonumber(bytes) or 0)/1048576) end
+-- Punkt 4: multi-select batch download queue. Persisted (engine settings) so that a network
+-- interruption or app restart mid-batch resumes - reopening this screen skips any queued ID
+-- whose receipt already matches the signed catalogue, and continues with the rest.
+local function load_queue()
+ local doc=engine.read_settings()
+ local saved=type(doc)=='table' and doc.little_fighters_prefetch
+ local list={}
+ if type(saved)=='table' then
+  for id,on in pairs(saved) do if on then list[#list+1]=id end end
+  table.sort(list)
+ end
+ return list
+end
+local function save_queue(queue)
+ local doc=engine.read_settings()
+ if type(doc)~='table' then doc={} end
+ local packed={}
+ for _,id in ipairs(queue) do packed[id]=true end
+ doc.little_fighters_prefetch=packed
+ engine.write_settings(doc)
+end
+local function queue_has(queue,id) for _,v in ipairs(queue) do if v==id then return true end end return false end
+local function queue_toggle(g,id)
+ g.queue=g.queue or load_queue()
+ local removed=false
+ for i=#g.queue,1,-1 do if g.queue[i]==id then table.remove(g.queue,i);removed=true end end
+ if not removed then g.queue[#g.queue+1]=id end
+ save_queue(g.queue)
+end
+-- Starts the next not-yet-installed queued package, or reports completion. Called once to
+-- kick off a batch, and again by github_poll after each item finishes, so the whole queue
+-- downloads+installs one item at a time with a single initial confirmation.
+local function queue_run(s)
+ local g=s.github;if not g or g.busy then return false end
+ g.queue=g.queue or load_queue()
+ for _,id in ipairs(g.queue) do
+  for _,entry in ipairs(g.packages) do
+   if entry.id==id and not entry.local_only and entry.receipt~=github_receipt(entry) then
+    github_install(s,id);return true
+   end
+  end
+ end
+ if #g.queue>0 then g.status=strings().queue_done end
+ return false
+end
 local function github_poll(state)
  local s=state.hub_mods;local g=s and s.github;local api=mods_api()
  if not g or not api then return end
@@ -99,6 +144,9 @@ local function github_poll(state)
    if tag and state.hub_available then state.hub_available[tag]=true end
   end end
   g.status=w.gh_done..tostring(name)..'. '..w.gh_restart
+  if g.multi and g.queue and queue_has(g.queue,g.target) and queue_run(s) then
+   g.status=g.status..' '..w.queue_run..'...'
+  end
  end
 end
 screen.github_poll=github_poll
@@ -132,9 +180,19 @@ function screen.rows(s)
    rows[#rows+1]={'gh_classic','LF2 CLASSIC  ·  '..(current=='lf2-classic' and (pl and 'AKTYWNY' or 'ACTIVE') or (pl and 'WYBIERZ' or 'SELECT')),302,242,446,30}
    for i=first,math.min(first+4,#g.packages) do
     local entry=g.packages[i]
-    rows[#rows+1]={'gh:'..entry.id,entry.name..'  ·  '..github_action(entry),302,275+(i-first)*31,446,30}
+    local label=entry.name..'  ·  '..github_action(entry)
+    if g.multi and not entry.local_only and entry.receipt~=github_receipt(entry) then
+     label=(g.queue and queue_has(g.queue,entry.id) and '[X] ' or '[ ] ')..label
+    end
+    rows[#rows+1]={'gh:'..entry.id,label,302,275+(i-first)*31,446,30}
    end
-   rows[#rows+1]={'gh_import',pl and 'IMPORTUJ ZIP' or 'IMPORT ZIP',302,430,446,28}
+   rows[#rows+1]={'gh_multi',g.multi and w.multi_off or w.multi_on,302,430,220,28}
+   if g.multi then
+    local count=0;for _,id in ipairs(g.queue or {}) do count=count+1 end
+    rows[#rows+1]={'gh_queue_run',count>0 and (w.queue_run..count..')') or w.queue_empty,528,430,220,28}
+   else
+    rows[#rows+1]={'gh_import',pl and 'IMPORTUJ ZIP' or 'IMPORT ZIP',528,430,220,28}
+   end
    rows[#rows+1]={'gh_refresh',w.refresh,302,458,220,28}
    rows[#rows+1]={'back',w.back,528,458,220,28}
    if g.page>1 then rows[#rows+1]={'gh_prev',w.prev,302,491,220,28} end
@@ -169,13 +227,19 @@ function screen.activate(state,id,context)
   elseif not (s.github and s.github.busy) then github_start(s) end
  elseif id=='gh_import' and context.action then
   context.action('import_local_mod')
+ elseif id=='gh_multi' then
+  s.github.multi=not s.github.multi
+  if s.github.multi then s.github.queue=s.github.queue or load_queue() end
+ elseif id=='gh_queue_run' then queue_run(s)
  elseif id=='gh_classic' and context.action then
   if require('base/game/catalog').profile_id~='lf2-classic' then context.action('profile_lf_two') end
  elseif id:sub(1,3)=='gh:' and not s.github.busy then
   for _,entry in ipairs(s.github.packages) do
    if entry.id==id:sub(4) then
     local tag=profile_tags[entry.profile]
-    if not entry.local_only and entry.receipt~=github_receipt(entry) then github_install(s,entry.id)
+    local downloadable=not entry.local_only and entry.receipt~=github_receipt(entry)
+    if s.github.multi and downloadable then queue_toggle(s.github,entry.id)
+    elseif downloadable then github_install(s,entry.id)
     elseif tag and context.action and entry.id~=require('base/game/catalog').profile_id then context.action('profile_'..tag) end
     break
    end
@@ -236,7 +300,9 @@ function screen.draw(state,context)
   local current=require('base/game/catalog').profile_id
   local title=require('polish-fighters/hub').title(current)
   text((locale.id()=='pl' and 'Aktywny: ' or 'Active: ')..title,525,226,14,0x62b5ef,'center')
-  text(s.github.status or '',397,532,13,0xffdc82,'center')
+  local status=s.github.status or ''
+  if s.github.multi and not s.github.busy then status=status..' '..w.queue_hint end
+  text(status,397,532,13,0xffdc82,'center')
   if s.github.busy=='install' then
    context.fill(302,424,446,12,122,157,255)
    context.fill(304,426,math.floor(442*math.min(1,s.github.fraction or 0)),8,255,220,130)

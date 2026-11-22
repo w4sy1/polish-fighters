@@ -38,6 +38,7 @@ public final class AndroidModsActivity extends Activity {
     private final boolean[] setupSelection = new boolean[GamePackSettings.IDS.length];
     private int setupBase = 1;
     private List<AndroidModSources.Package> setupCatalogue = java.util.Collections.emptyList();
+    private int queueIndex, queueTotal;
 
     @Override protected void attachBaseContext(android.content.Context base) { super.attachBaseContext(ClassicMenuData.localized(base)); }
 
@@ -131,6 +132,9 @@ public final class AndroidModsActivity extends Activity {
         rows.removeAllViews();
         scroll.scrollTo(0,0);
         rows.addView(label("KONFIGURACJA GRY",18,TEXT,true),wrap());
+        if (getIntent().getBooleanExtra(FIRST_SETUP,false)) {
+            rows.addView(action("POMIŃ POBIERANIE - GRAJ OD RAZU",this::skipSetupDownloads),wrap());
+        }
         for (int index : baseChoices) {
             rows.addView(action((setupBase==index ? "[X] " : "[ ] ")+GamePackSettings.TITLES[index],()->{
                 if (importing) return;
@@ -178,6 +182,103 @@ public final class AndroidModsActivity extends Activity {
             rows.addView(action("POBIERZ I URUCHOM GRĘ",()->downloadSetup(download,mixed,freeRequired)),wrap());
             setBusy(false,"Brakujące paczki: "+android.text.TextUtils.join(", ",missing)+".");
         }
+        addPrefetchSection();
+    }
+    // Punkt 4: multi-select batch download. Independent of the base-pack/mixed-pool logic
+    // above - this just lets the first-run screen fetch several catalogue packages in one
+    // confirmation, with per-item progress, so the player can pick between them later in the
+    // normal single-profile selector instead of waiting through one download at a time.
+    private void addPrefetchSection() {
+        rows.addView(label("POBIERZ NA ZAPAS (KILKA NARAZ)",14,TEXT,true),wrap());
+        if (setupCatalogue.isEmpty()) {
+            rows.addView(action("SPRAWDŹ KATALOG, ABY WYBRAĆ KILKA PACZEK",this::loadSetupCatalogue),wrap());
+            return;
+        }
+        java.util.Set<String> queued;
+        try { queued = new GamePackSettings(getFilesDir()).prefetchQueue(); }
+        catch (Exception error) { queued = java.util.Collections.emptySet(); }
+        int pending = 0;
+        for (AndroidModSources.Package item : setupCatalogue) {
+            boolean installed = item.receipt().equals(installedReceipt(item));
+            boolean checked = queued.contains(item.id);
+            if (checked && !installed) pending++;
+            final String id = item.id;
+            String mark = installed ? "[OK] " : checked ? "[X] " : "[ ] ";
+            rows.addView(action(mark+item.name+" "+item.version+" ("+item.sizeLabel()+")",()->{
+                if (importing) return;
+                toggleQueued(id);
+            }),wrap());
+        }
+        if (pending > 0) {
+            final int count = pending;
+            rows.addView(action("POBIERZ ZAZNACZONE PACZKI ("+count+")",this::runPrefetchQueue),wrap());
+        }
+    }
+    private void toggleQueued(String id) {
+        int offset = scroll.getScrollY();
+        try {
+            GamePackSettings settings = new GamePackSettings(getFilesDir());
+            java.util.LinkedHashSet<String> next = new java.util.LinkedHashSet<>(settings.prefetchQueue());
+            if (!next.remove(id)) next.add(id);
+            settings.savePrefetchQueue(next);
+        } catch (Exception error) { setBusy(false,"Nie można zapisać wyboru: "+safe(error.getMessage()));return; }
+        showSetup();
+        restoreScroll(offset);
+    }
+    private void skipSetupDownloads() {
+        if (importing) return;
+        setupBase = 1; // LF2 Classic - no content pack required, nothing to download.
+        java.util.Arrays.fill(setupSelection,false);
+        saveSetup(false);
+    }
+    /**
+     * Downloads+installs every queued-but-not-yet-installed catalogue entry, one at a time,
+     * reporting "item i of n". The queue itself is already persisted (toggleQueued), so if the
+     * process dies or the network drops mid-batch, reopening setup and pressing this again
+     * naturally skips whatever already matches its installed receipt - no separate resume state.
+     */
+    private void runPrefetchQueue() {
+        if (importing) return;
+        GamePackSettings settings = new GamePackSettings(getFilesDir());
+        java.util.Set<String> queued;
+        try { queued = settings.prefetchQueue(); }
+        catch (Exception error) { setBusy(false,"Nie można odczytać listy pobierań: "+safe(error.getMessage())); return; }
+        List<AndroidModSources.Package> pending = new java.util.ArrayList<>();
+        for (AndroidModSources.Package item : setupCatalogue)
+            if (queued.contains(item.id) && !item.receipt().equals(installedReceipt(item))) pending.add(item);
+        if (pending.isEmpty()) { showSetup(); return; }
+        long bytes = 0; for (AndroidModSources.Package item : pending) bytes += item.size;
+        long required = 2*bytes + 64L*1024*1024;
+        if (getFilesDir().getFreeSpace() < required) { setBusy(false,"Za mało wolnego miejsca: "+formatMiB(required)); return; }
+        cancellationRequested = false;
+        downloading = true;
+        queueTotal = pending.size(); queueIndex = 0;
+        setBusy(true,"Przygotowuję pobieranie "+queueTotal+" paczek…");
+        worker.submit(() -> {
+            for (AndroidModSources.Package item : pending) {
+                if (cancellationRequested) break;
+                queueIndex++;
+                final int current = queueIndex, total = queueTotal;
+                final String name = item.name;
+                runOnUiThread(() -> status.setText("Pozycja "+current+" z "+total+": "+name));
+                try {
+                    transferAndInstall(item);
+                } catch (Exception error) {
+                    downloading = false;
+                    android.util.Log.w("OpenLF2","Prefetch queue item failed: "+item.id,error);
+                    boolean cancelled = cancellationRequested;
+                    runOnUiThread(() -> {
+                        showSetup();
+                        setBusy(false, cancelled
+                            ? "Pobieranie wstrzymane. Zaznaczone pozycje czekają - wybierz \"POBIERZ ZAZNACZONE PACZKI\" ponownie, aby wznowić."
+                            : "Nie udało się pobrać "+name+": "+safe(error.getMessage())+". Pozostałe pozycje czekają w kolejce.");
+                    });
+                    return;
+                }
+            }
+            downloading = false;
+            runOnUiThread(() -> { showSetup(); setBusy(false,"Pobrano zaznaczone paczki."); });
+        });
     }
     private boolean usesMixedPool() {
         for (int i=3;i<setupSelection.length;i++) if (setupSelection[i]) return true;

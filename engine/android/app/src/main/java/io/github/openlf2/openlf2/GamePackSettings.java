@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -98,6 +99,33 @@ final class GamePackSettings {
 
     boolean hideDuplicates() throws IOException, JSONException {
         return store.read().optBoolean("little_fighters_hide_duplicates", true);
+    }
+
+    /**
+     * IDs the user asked the first-run screen to fetch in one batch (point 4: multi-select
+     * download). Persisted before the queue starts, so killing the app or losing the network
+     * mid-batch and reopening setup resumes with already-installed IDs skipped, not re-asked.
+     */
+    java.util.LinkedHashSet<String> prefetchQueue() throws IOException, JSONException {
+        JSONObject saved = store.read().optJSONObject("little_fighters_prefetch");
+        java.util.LinkedHashSet<String> result = new java.util.LinkedHashSet<>();
+        if (saved != null) {
+            JSONArray keys = saved.names();
+            for (int i = 0; keys != null && i < keys.length(); i++) {
+                String id = keys.optString(i, null);
+                if (id != null && saved.optBoolean(id, false)) result.add(id);
+            }
+        }
+        return result;
+    }
+
+    void savePrefetchQueue(java.util.Set<String> ids) throws IOException, JSONException {
+        JSONObject document = store.read();
+        JSONObject packed = new JSONObject();
+        for (String id : ids) packed.put(id, true);
+        document.put("little_fighters_prefetch", packed);
+        if (!document.has("version")) document.put("version", 1);
+        store.write(document);
     }
 
     void save(String mode, boolean[] selected, boolean hideDuplicates) throws IOException, JSONException {

@@ -85,3 +85,49 @@ local android={hub_android=true}
 screen.open(android)
 screen.activate(android,'github',{text_input=function() end,action=function(name) actions[#actions+1]=name end})
 assert(next(saved)==nil and actions[1]=='open_android_mods' and android.hub_mods and not android.hub_mods.github)
+
+-- Punkt 4: multi-select batch download - toggle queue, persist it, download item by item,
+-- and auto-continue to the next queued package once each install finishes.
+local saved3
+engine.read_settings=function() return type(saved3)=='table' and saved3 or {} end
+engine.write_settings=function(value) saved3=value;return true end
+local sha2=string.rep('b',64)
+local installedSet,pollLeft={},0
+engine.mods=function(action,value)
+ if action=='catalogue' then pollLeft=1;return true end
+ if action=='install' then installedSet[value]='pending';pollLeft=1;return true end
+ if action=='receipt' then return installedSet[value]=='done' and ('1.0.0 '..sha2) or nil end
+ if action=='progress' then return 1,1,1,0 end
+ if action=='poll' then
+  if pollLeft>0 then pollLeft=pollLeft-1;return 'pending' end
+  for id,st in pairs(installedSet) do if st=='pending' then installedSet[id]='done';return id end end
+  return {packages={{id='lf4-turbo',name='LF4 Turbo',profile='lf_four_turbo',size_bytes=1,version='1.0.0',sha256=sha2},
+   {id='dbz',name='Dragon Ball Z',profile='dbz',size_bytes=1,version='1.0.0',sha256=sha2}}}
+ end
+end
+local s3={}
+screen.open(s3)
+screen.activate(s3,'github',context)
+screen.update(s3,{keys={}},context)
+screen.update(s3,{keys={}},context)
+assert(#s3.hub_mods.github.packages==2,'catalogue should resolve to two packages')
+screen.activate(s3,'gh_multi',context)
+assert(s3.hub_mods.github.multi==true)
+local idx={};for i,row in ipairs(screen.rows(s3.hub_mods)) do idx[row[1]]=i end
+screen.activate(s3,'gh:lf4-turbo',context)
+screen.activate(s3,'gh:dbz',context)
+assert(#s3.hub_mods.github.queue==2,'both packages should be queued, not downloaded immediately')
+assert(saved3.little_fighters_prefetch['lf4-turbo']==true and saved3.little_fighters_prefetch['dbz']==true,
+ 'queue must be persisted so a killed app/lost network resumes with completed items skipped')
+local checkedLabel=screen.rows(s3.hub_mods)[idx['gh:dbz']][2]
+assert(checkedLabel:find('%[X%]'),'queued package should show a checked box')
+screen.activate(s3,'gh_queue_run',context)
+assert(s3.hub_mods.github.busy=='install','confirming the batch should start the first item')
+screen.update(s3,{keys={}},context)
+screen.update(s3,{keys={}},context)
+assert(s3.hub_mods.github.busy=='install','finishing one item should auto-continue to the next queued one')
+screen.update(s3,{keys={}},context)
+screen.update(s3,{keys={}},context)
+assert(not s3.hub_mods.github.busy,'the queue should stop once every item is installed')
+assert(installedSet['lf4-turbo']=='done' and installedSet['dbz']=='done')
+print('PASS multi-select batch queue: toggle, persistence, per-item progress and auto-continue')
