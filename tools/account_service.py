@@ -94,7 +94,10 @@ def send_discord_webhook(content):
     if not re.fullmatch(r'https://(discord|discordapp)\.com/api/webhooks/\d+/[\w-]+', url):
         raise RuntimeError('Brak konfiguracji webhooka Discord (OPENLF2_DISCORD_WEBHOOK_URL) po stronie serwera')
     body = json.dumps({'content': content}).encode('utf-8')
-    request = urllib.request.Request(url, data=body, headers={'Content-Type': 'application/json'}, method='POST')
+    # Discord's edge (Cloudflare) returns 403 Forbidden for requests carrying urllib's default
+    # User-Agent ("Python-urllib/3.x"); a normal-looking UA avoids that false-positive block.
+    headers = {'Content-Type': 'application/json', 'User-Agent': 'OpenLF2-PolishFighters-BugReport/1.0'}
+    request = urllib.request.Request(url, data=body, headers=headers, method='POST')
     try:
         with urllib.request.urlopen(request, timeout=10) as response:
             if response.status not in (200, 204):
