@@ -80,8 +80,8 @@ android {
         // here. See docs/CRASH-REPORTER-1.1-2026-11-22.md.
         buildConfigField 'String', 'DISCORD_WEBHOOK_URL', '"' + (project.findProperty('openlf2DiscordWebhookUrl') ?: '') + '"'
         targetSdk 35
-        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 10018
-        versionName project.findProperty('openlf2VersionName') ?: '0.18.15'
+        versionCode project.findProperty('openlf2VersionCode')?.toInteger() ?: 10023
+        versionName project.findProperty('openlf2VersionName') ?: '0.18.20'
     }
 
     // A fixed key, so each build is signed the same and installs over the previous one; the

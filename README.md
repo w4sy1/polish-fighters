@@ -6,7 +6,7 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Pobranie
 
-**[Pobierz Polish Fighters 0.18.14](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.14).** Otwórz wydanie, aby pobrać instalator Windows, APK Android i sumy SHA-256.
+**[Pobierz najnowsze stabilne wydanie Polish Fighters](https://github.com/w4sy1/polish-fighters/releases/latest).** Dla telefonów z procesorem ARM64, w tym Raptora, wybierz APK `arm64-v8a`. APK `x86_64` jest przeznaczone dla urządzeń i emulatorów z tą architekturą. W wydaniu znajdziesz również instalator Windows i sumy SHA-256.
 
 ## Aktualności
 
