@@ -3,14 +3,15 @@ package io.github.openlf2.openlf2;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.regex.Pattern;
 import org.json.JSONObject;
 
@@ -70,8 +71,12 @@ final class CrashReporter {
     }
 
     private static JSONObject loadState(Context context) {
-        try {
-            return new JSONObject(new String(Files.readAllBytes(stateFile(context).toPath()), StandardCharsets.UTF_8));
+        try (InputStream input = new FileInputStream(stateFile(context))) {
+            ByteArrayOutputStream state = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = input.read(buffer)) != -1) state.write(buffer, 0, read);
+            return new JSONObject(new String(state.toByteArray(), StandardCharsets.UTF_8));
         } catch (Exception ignored) {
             return new JSONObject();
         }
@@ -85,7 +90,9 @@ final class CrashReporter {
             File file = stateFile(context);
             File directory = file.getParentFile();
             if (directory != null) directory.mkdirs();
-            Files.write(file.toPath(), state.toString().getBytes(StandardCharsets.UTF_8));
+            try (OutputStream output = new FileOutputStream(file)) {
+                output.write(state.toString().getBytes(StandardCharsets.UTF_8));
+            }
         } catch (Exception ignored) { /* best-effort; a failed save only means asking again later */ }
     }
 
