@@ -2,6 +2,7 @@
 // Copyright (c) 2026 OpenLF2 contributors
 
 #include "openlf2/ports/discord_webhook.hpp"
+#include "openlf2/ports/download.hpp"
 #include "openlf2/core/json.hpp"
 #include "letsencrypt_roots.hpp"
 #include <curl/curl.h>
