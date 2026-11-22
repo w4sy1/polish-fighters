@@ -8,20 +8,111 @@ import hashlib
 import hmac
 import ipaddress
 import json
+import os
 import re
 import secrets
 import sqlite3
 import threading
 import time
+import urllib.error
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+# The 14 bug-report categories from the project's bug-report spec. The client (bug_report_screen.lua,
+# BUG_REPORT_CATEGORIES) must offer exactly this list, in this order -- keep the two in sync by hand,
+# there is no shared source file between Lua and Python in this repo.
+BUG_REPORT_CATEGORIES = (
+    'Awaria gry / crash', 'Błąd graficzny', 'Sterowanie', 'Postacie i umiejętności', 'Kombosy',
+    'Rozgrywka', 'Kampania', 'Multiplayer i połączenia sieciowe', 'Moduły gry', 'Dźwięk i muzyka',
+    'Interfejs użytkownika', 'Wydajność', 'Profile i zapisy gry', 'Inne',
+)
+BUG_REPORT_PLATFORMS = ('android', 'windows', 'linux', 'macos', 'unknown')
+# Per-IP throttle for bug reports specifically; tighter than the generic 120/min API bucket
+# above (see Handler.do_POST / AccountApplication.handle), on top of it rather than instead of it.
+BUG_REPORT_WINDOW_SECONDS = 600
+BUG_REPORT_WINDOW_LIMIT = 5
+
+
+def _redact_bug_report_text(text):
+    """Strips the same categories of secret the native crash reporter redacts
+    (engine/include/openlf2/core/crash_report.hpp) from player-typed free text before it is ever
+    assembled into a Discord message: credential-shaped key/value pairs, bearer tokens and bare
+    URLs (which can carry a token in their query string)."""
+    text = re.sub(r'(?im)\b(token|password|secret|authorization)\b\s*[:=]\s*.+$', r'\1: [REDACTED]', text)
+    text = re.sub(r'(?i)bearer\s+\S+', 'Bearer [REDACTED]', text)
+    text = re.sub(r'https?://\S+', '[URL]', text)
+    # Defuse mass/role/user mentions a player could otherwise type into the report
+    # (@everyone, @here, <@id>, <@&id>) with a zero-width space, keeping the text readable.
+    text = text.replace('@everyone', '@​everyone').replace('@here', '@​here')
+    text = text.replace('<@', '<​@')
+    return text
+
+
+def _format_bug_report_message(number, category, player, title, description, steps, logs,
+                                platform, version, module_name, resolution, created):
+    import datetime
+    stamp = datetime.datetime.fromtimestamp(created, datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+    lines = [
+        'POLISH FIGHTERS | NOWE ZGŁOSZENIE BŁĘDU',
+        f'Numer zgłoszenia: {number}',
+        f'Kategoria: {category}',
+        f'Tytuł: {title}',
+        f'Gracz: {player or "(anonimowy)"}',
+        f'Platforma: {platform}',
+        f'Wersja gry: {version or "nieznana"}',
+    ]
+    if module_name:
+        lines.append(f'Moduł: {module_name}')
+    if resolution:
+        lines.append(f'Rozdzielczość: {resolution}')
+    lines.append(f'Data: {stamp}')
+    lines.append('')
+    lines.append('Opis problemu:')
+    lines.append(description)
+    if steps:
+        lines.append('')
+        lines.append('Kroki odtworzenia:')
+        lines.append(steps)
+    if logs:
+        lines.append('')
+        lines.append('Logi diagnostyczne (fragment):')
+        lines.append(logs)
+    content = _redact_bug_report_text('\n'.join(lines))
+    if len(content) > 1990:
+        # No file-attachment upload in this version (see docs) -- a long report is trimmed to
+        # Discord's 2000-character content limit rather than rejected.
+        content = content[:1950] + '\n… (zgłoszenie przycięte, zobacz pełny opis w grze)'
+    return content
+
+
+def send_discord_webhook(content):
+    """Posts one chat message to the project's Discord bug-report channel. The webhook URL is a
+    server-only secret (OPENLF2_DISCORD_WEBHOOK_URL in this process's environment) -- the game
+    client never sees it; it only ever reaches this through the 'bug-report' operation below.
+    Raises on failure so the caller can decide whether to tell the player or roll back."""
+    url = os.environ.get('OPENLF2_DISCORD_WEBHOOK_URL', '')
+    if not re.fullmatch(r'https://(discord|discordapp)\.com/api/webhooks/\d+/[\w-]+', url):
+        raise RuntimeError('Brak konfiguracji webhooka Discord (OPENLF2_DISCORD_WEBHOOK_URL) po stronie serwera')
+    body = json.dumps({'content': content}).encode('utf-8')
+    request = urllib.request.Request(url, data=body, headers={'Content-Type': 'application/json'}, method='POST')
+    try:
+        with urllib.request.urlopen(request, timeout=10) as response:
+            if response.status not in (200, 204):
+                raise RuntimeError(f'Discord webhook returned HTTP {response.status}')
+    except urllib.error.HTTPError as error:
+        raise RuntimeError(f'Discord webhook returned HTTP {error.code}') from error
+    except urllib.error.URLError as error:
+        raise RuntimeError(f'Discord webhook unreachable: {error.reason}') from error
 
 
 class Service:
-    def __init__(self, database, clock=time.time, relay=None):
+    def __init__(self, database, clock=time.time, relay=None, send_discord=send_discord_webhook):
         """relay: optional {'host': numeric IPv4, 'port': int, 'key': shared secret} of a
-        standalone room_relay.py that validates tickets through consume-relay-ticket."""
+        standalone room_relay.py that validates tickets through consume-relay-ticket.
+        send_discord: injectable for tests; defaults to the real webhook POST above."""
         self.clock = clock
         self.relay = relay if relay and relay.get('host') and relay.get('port') else None
+        self.send_discord = send_discord
         self.lock = threading.RLock()
         self.db = sqlite3.connect(database, check_same_thread=False)
         self.db.execute('PRAGMA foreign_keys=ON')
@@ -42,6 +133,10 @@ class Service:
             CREATE TABLE IF NOT EXISTS invites(
                 code TEXT PRIMARY KEY, room TEXT REFERENCES rooms(id) ON DELETE CASCADE,
                 expires REAL NOT NULL);
+            CREATE TABLE IF NOT EXISTS bug_reports(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, client_ref TEXT UNIQUE NOT NULL,
+                created REAL NOT NULL, remote_addr TEXT NOT NULL, category TEXT NOT NULL,
+                sent INTEGER NOT NULL DEFAULT 0);
         ''')
         columns = {row[1] for row in self.db.execute('PRAGMA table_info(rooms)')}
         if 'private' not in columns:
@@ -87,12 +182,15 @@ class Service:
                         (hashlib.sha256(value.encode()).hexdigest(), user_id, now + self.NICK_SESSION))
         return {'token': value, 'expires_in': self.NICK_SESSION, 'name': name, 'nick_key': new_key}
 
-    def request(self, operation, data, token=''):
+    def request(self, operation, data, token='', remote_addr=''):
         with self.lock, self.db:
             now = self.clock()
             self.db.execute('DELETE FROM sessions WHERE expires <= ?', (now,))
             self.db.execute('DELETE FROM rooms WHERE expires <= ?', (now,))
             self.db.execute('DELETE FROM invites WHERE expires <= ?', (now,))
+            if operation == 'bug-report':
+                # No account required (spec: a player reports a bug without signing in).
+                return self._submit_bug_report(data, now, remote_addr)
             if operation in ('consume-relay-ticket', 'relay-readiness'):
                 # Called by a standalone relay, never by players: authenticated by its key.
                 key = (self.relay or {}).get('key')
@@ -275,6 +373,57 @@ class Service:
                         'scope': 'Relay rooms require a waiting host channel; direct rooms are advertisements'}
             raise ValueError('Unknown operation')
 
+    def _submit_bug_report(self, data, now, remote_addr):
+        """Validates and relays a player-submitted bug report to Discord, server-side only --
+        see send_discord_webhook above. Called with self.lock/self.db already held by request().
+        Section 7/8 of the bug-report spec: no account required, generated report number unique
+        under concurrent submissions (SQLite autoincrement under self.lock), idempotent retries
+        (client_ref), and a dedicated per-IP rate limit on top of the generic API one."""
+        category, title, description = data.get('category'), data.get('title'), data.get('description')
+        player, steps, logs = data.get('player', ''), data.get('steps', ''), data.get('logs', '')
+        platform, version = data.get('platform', 'unknown'), data.get('version', '')
+        module_name, resolution = data.get('module', ''), data.get('resolution', '')
+        client_ref = data.get('client_ref')
+        if category not in BUG_REPORT_CATEGORIES:
+            raise ValueError('Invalid bug report category')
+        if not isinstance(title, str) or not 1 <= len(title.strip()) <= 120:
+            raise ValueError('title: 1-120 characters')
+        if not isinstance(description, str) or not 1 <= len(description.strip()) <= 1800:
+            raise ValueError('description: 1-1800 characters')
+        # Field limits are sized to stay well under the client's 8192-byte JSON body cap
+        # (openlf2_report_bug/account_post; see engine/src/adapters/luajit/runtime.cpp) once the
+        # JSON keys and quoting overhead are added, so a within-limit client request is never
+        # rejected here purely for being too long once encoded.
+        for name, value, limit in (('player', player, 24), ('steps', steps, 1200), ('logs', logs, 3000),
+                                   ('version', version, 32), ('module', module_name, 40), ('resolution', resolution, 24)):
+            if not isinstance(value, str) or len(value) > limit or any(ord(c) < 32 and c not in '\n\r\t' for c in value):
+                raise ValueError(f'{name}: invalid or exceeds {limit} characters')
+        if platform not in BUG_REPORT_PLATFORMS:
+            raise ValueError('Invalid platform')
+        if not isinstance(client_ref, str) or not 8 <= len(client_ref) <= 64:
+            raise ValueError('client_ref: 8-64 characters required (idempotency key)')
+        existing = self.db.execute('SELECT id,sent FROM bug_reports WHERE client_ref=?', (client_ref,)).fetchone()
+        if existing:
+            report_id, sent = existing
+            number = f'PF-BUG-{report_id:06d}'
+            if sent:
+                return {'ok': True, 'report': number, 'duplicate': True}
+        else:
+            window_start = now - BUG_REPORT_WINDOW_SECONDS
+            recent = self.db.execute('SELECT COUNT(*) FROM bug_reports WHERE remote_addr=? AND created>?',
+                                     (remote_addr, window_start)).fetchone()[0]
+            if recent >= BUG_REPORT_WINDOW_LIMIT:
+                raise ValueError('Too many bug reports from this address; try again later')
+            report_id = self.db.execute(
+                'INSERT INTO bug_reports(client_ref,created,remote_addr,category,sent) VALUES(?,?,?,?,0)',
+                (client_ref, now, remote_addr, category)).lastrowid
+            number = f'PF-BUG-{report_id:06d}'
+        message = _format_bug_report_message(number, category, player.strip(), title.strip(), description.strip(),
+                                             steps.strip(), logs.strip(), platform, version, module_name, resolution, now)
+        self.send_discord(message)
+        self.db.execute('UPDATE bug_reports SET sent=1 WHERE id=?', (report_id,))
+        return {'ok': True, 'report': number}
+
     def set_relay_readiness(self, room, ready):
         deadline = self.clock() + 15 if ready else 0
         with self.lock:
@@ -338,7 +487,7 @@ def handler(service):
                         return
                     self.attempts[key] = (start, count+1)
                 token = self.headers.get('Authorization', '').removeprefix('Bearer ')
-                self.reply(200, service.request(operation, data, token))
+                self.reply(200, service.request(operation, data, token, self.client_address[0]))
             except PermissionError as error:
                 self.reply(401, {'error': str(error)})
             except (ValueError, UnicodeError) as error:

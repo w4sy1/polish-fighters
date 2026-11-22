@@ -169,5 +169,92 @@ class AccountsTest(unittest.TestCase):
             worker.join(timeout=3)
 
 
+class BugReportTest(unittest.TestCase):
+    """The player's manual "ZGŁOŚ BŁĄD (DISCORD)" report (bug_report_screen.lua) now reaches
+    Discord only through this server-side operation -- see docs/BUG-REPORT-MENU-2.0-2026-11-22.md.
+    The real webhook POST is stubbed here (sent list) so these tests never touch the network."""
+    def setUp(self):
+        self.now = 1000
+        self.sent = []
+        self.service = module.Service(':memory:', lambda: self.now, send_discord=self.sent.append)
+
+    def tearDown(self):
+        self.service.db.close()
+
+    def report(self, **overrides):
+        payload = {'category': 'Sterowanie', 'title': 'Kombos nie działa', 'description': 'Opis błędu.',
+                   'player': 'Gracz1', 'platform': 'android', 'version': '1.2.3', 'client_ref': 'ref-' + secrets_token()}
+        payload.update(overrides)
+        return self.service.request('bug-report', payload, remote_addr='203.0.113.5')
+
+    def test_accepts_without_account_and_numbers_reports(self):
+        first = self.report()
+        self.assertRegex(first['report'], r'^PF-BUG-\d{6}$')
+        second = self.report(client_ref='ref-' + secrets_token())
+        self.assertNotEqual(first['report'], second['report'])
+        self.assertIn(first['report'], str(self.sent[0]))
+
+    def test_retry_with_same_client_ref_is_idempotent(self):
+        first = self.report(client_ref='same-ref-aaaaaaaa')
+        second = self.report(client_ref='same-ref-aaaaaaaa')
+        self.assertEqual(first['report'], second['report'])
+        self.assertTrue(second.get('duplicate'))
+        self.assertEqual(len(self.sent), 1, 'a retried report must not be posted to Discord twice')
+
+    def test_rejects_unknown_category(self):
+        with self.assertRaises(ValueError):
+            self.report(category='Nie istnieje')
+
+    def test_rejects_oversized_fields(self):
+        with self.assertRaises(ValueError):
+            self.report(title='x' * 121)
+        with self.assertRaises(ValueError):
+            self.report(description='x' * 1801)
+
+    def test_rate_limited_per_address(self):
+        for index in range(5):
+            self.report(client_ref='burst-ref-%d' % index)
+        with self.assertRaises(ValueError):
+            self.report(client_ref='burst-overflow')
+        # A different address is unaffected by the first one's limit.
+        other = self.service.request('bug-report',
+            {'category': 'Inne', 'title': 't', 'description': 'd', 'client_ref': 'other-addr-ref'},
+            remote_addr='198.51.100.9')
+        self.assertTrue(other['ok'])
+
+    def test_mass_mentions_are_defused_before_sending(self):
+        self.report(description='Uwaga @everyone i <@123456789012345678> oraz @here!',
+                    client_ref='mention-ref-1')
+        self.assertNotIn('@everyone', self.sent[-1])
+        self.assertNotIn('@here', self.sent[-1])
+        self.assertIn('@​everyone', self.sent[-1])
+
+    def test_secrets_are_redacted_from_free_text(self):
+        self.report(description='token: abc123secret', steps='Authorization: Bearer xyz987',
+                    logs='see https://example.com/leak?token=abc', client_ref='secret-ref-1')
+        message = self.sent[-1]
+        self.assertNotIn('abc123secret', message)
+        self.assertNotIn('xyz987', message)
+        self.assertNotIn('example.com', message)
+
+    def test_webhook_not_configured_raises_with_real_sender(self):
+        service = module.Service(':memory:', lambda: self.now)
+        os_environ_backup = module.os.environ.pop('OPENLF2_DISCORD_WEBHOOK_URL', None)
+        try:
+            with self.assertRaises(RuntimeError):
+                service.request('bug-report',
+                    {'category': 'Inne', 'title': 't', 'description': 'd', 'client_ref': 'no-webhook-ref'},
+                    remote_addr='203.0.113.5')
+        finally:
+            if os_environ_backup is not None:
+                module.os.environ['OPENLF2_DISCORD_WEBHOOK_URL'] = os_environ_backup
+            service.db.close()
+
+
+def secrets_token():
+    import secrets
+    return secrets.token_hex(6)
+
+
 if __name__ == '__main__':
     unittest.main()

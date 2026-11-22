@@ -111,7 +111,7 @@ class AccountApplication:
                         return 429, {"error": "Try again later"}
                 self.attempts[key] = (start, count + 1)
             token = environ.get("HTTP_AUTHORIZATION", "").removeprefix("Bearer ")
-            return 200, self.service.request(operation, data, token)
+            return 200, self.service.request(operation, data, token, environ.get("REMOTE_ADDR", ""))
         except PermissionError as error:
             return 401, {"error": str(error)}
         except (ValueError, UnicodeError) as error:

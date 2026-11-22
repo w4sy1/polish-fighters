@@ -943,3 +943,21 @@ Pełny zakres użytkownika pozostaje częściowy: wspólna pula, finalne animacj
 braki Bleach/DBZ, całe kampanie, logowanie w kliencie, publiczne pokoje i Bluetooth nieukończone.
 Publiczny ZIP to rdzeń bez danych modów; raport: `validation/pack-ai-2026-10-31/REPORT.md`.
 <!-- pack-ai:end -->
+<!-- bug-report-menu-2.0:start -->
+## 2026-11-22 — przebudowa menu kontaktowego i formularza zgłaszania błędów
+
+Menu "TWÓRCY" ma teraz 5 wierszy (podmenu "TWÓRCY I INFORMACJE O PROJEKCIE" osobno od
+Discorda/e-maila/zgłoszenia), a "ZGŁOŚ BŁĄD (DISCORD)" to pełny formularz (kategoria z 14,
+nick, tytuł, opis, kroki) bez wymogu konta. Webhook Discorda przeniesiony z klienta na serwer:
+nowa operacja `bug-report` w `tools/account_service.py`/`server/passenger_wsgi.py` (numeracja
+PF-BUG-NNNNNN, idempotentny retry, rate-limit per IP, redakcja sekretów, neutralizacja
+@everyone/@here) -- klient już nie zna i nie wysyła URL-a webhooka (usunięto
+`engine/include/openlf2/engine/bug_report.hpp` i `engine/src/engine/bug_report.cpp`;
+`account_post` dostał nową dozwoloną operację). Zrzut ekranu i
+realne logi diagnostyczne NIE są jeszcze dołączane (świadomie odłożone). Lua 132/132,
+`test_account_service.py` 18/18 (nowe `BugReportTest`, bez realnej sieci), assety menu
+zregenerowane i przetestowane. C++ nie skompilowano w tym środowisku (brak `DEPS/` z
+LuaJIT/SDL3/curl) -- do zweryfikowania przed wydaniem. Szczegóły:
+`docs/BUG-REPORT-MENU-2.0-2026-11-22.md`. Webhook do skonfigurowania przez administratora po
+stronie serwera (sekcja "Konfiguracja webhooka" w tym dokumencie) -- nic do zmiany w kliencie.
+<!-- bug-report-menu-2.0:end -->

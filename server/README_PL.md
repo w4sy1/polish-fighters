@@ -44,3 +44,13 @@ być osiągalny dla drugiego komputera. Istniejący eksperymentalny relay
 `tools/room_relay.py` ma osobne testy, ale nie jest podłączony do nowego GUI gry.
 Nie deklarujemy jeszcze działania przez NAT, publiczny Internet ani Bluetooth.
 Mieszana pula modów jest na razie ograniczona w GUI do gry lokalnej.
+
+## Zgłoszenia błędów na Discorda (operacja `bug-report`)
+
+Ten sam serwis obsługuje teraz zgłoszenia błędów wysyłane z menu kontaktowego gry
+("ZGŁOŚ BŁĄD (DISCORD)"). Webhook Discorda jest sekretem **tylko tego procesu** -- ustaw
+zmienną środowiskową `OPENLF2_DISCORD_WEBHOOK_URL` (adres `https://discord.com/api/webhooks/...`)
+w środowisku, w którym uruchamiasz `account_service.py`/`passenger_wsgi.py`, nigdy w pliku
+w repozytorium. Bez niej zgłoszenia są przyjmowane i walidowane, ale wysyłka na Discord kończy się
+błędem zwróconym do gry. Szczegóły i uzasadnienie architektury:
+`docs/BUG-REPORT-MENU-2.0-2026-11-22.md`.

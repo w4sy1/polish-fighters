@@ -51,7 +51,7 @@ return function(base)
   elseif id=='report_bug' then context.action('report_bug')
   elseif id=='report_bug_discord' then bug_report.open(state)
   elseif id=='check_android_update' then context.action(id)
-  elseif id=='battle' or id=='settings' or id=='credits' or id=='language' or id=='status' then
+  elseif id=='battle' or id=='settings' or id=='credits' or id=='credits_info' or id=='language' or id=='status' then
    state.hub_mode=id
   elseif id:sub(1,5)=='lang_' then
    local saved,problem=locale.select(id:sub(6))
@@ -237,6 +237,7 @@ return function(base)
   -- No sound on hover: data/m_pass.wav is LF2's stage-clear jingle, and packs map it to music.
   if mapped.nav.cancel and state.hub_mode~='root' then
    if state.hub_mode=='information' then state.hub_mode='settings'
+   elseif state.hub_mode=='credits_info' then state.hub_mode='credits'
    elseif state.hub_mode=='packs' then state.hub_pack_edit=nil;state.hub_mode='library'
    elseif state.hub_mode=='status' then state.hub_note=locale.text('audit_note')
   elseif state.hub_mode=='players' or state.hub_mode=='optional_modules' then state.hub_mode='library'
@@ -304,11 +305,12 @@ return function(base)
    local version=state.hub_installed_version
    if not version or version=='' then version=require('polish-fighters/updates').version end
    text(context,'ZAINSTALOWANA WERSJA '..version,397,252,variants.yellow,'center')
-  elseif state.hub_mode=='credits' then
-   -- Rows (Discord / Zgłoś błąd / Wstecz) occupy y=207..286 (layout.box, 3 rows); the credits
+  elseif state.hub_mode=='credits_info' then
+   -- Rows (Twórcy i informacje / Wstecz) occupy y=207..234 (layout.box, 2 rows); the credits
    -- text sits below them so the two don't overlap.
-   text(context,locale.text('credit_text'),397,300,variants.white,'center')
-   text(context,locale.text('credit_packs'),397,330,variants.white,'center')
+   text(context,locale.text('credit_text'),397,280,variants.white,'center')
+   text(context,locale.text('credit_packs'),397,310,variants.white,'center')
+   text(context,locale.text('credit_authors'),397,340,variants.white,'center')
   elseif state.hub_mode=='online' then text(context,locale.text('offline'),397,416,variants.yellow,'center')
   elseif state.hub_mode=='library' then text(context,locale.text('absent_turbo'),397,479,variants.yellow,'center')
   elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,variants.yellow,'center')

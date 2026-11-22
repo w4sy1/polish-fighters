@@ -31,7 +31,7 @@ Result<std::string> account_post(std::string_view base,std::string_view operatio
         return fail(ErrorCode::limit,"Account request exceeds limit");
     if(operation!="login" && operation!="register" && operation!="logout" &&
        operation!="list-rooms" && operation!="publish-room" && operation!="delete-room" && operation!="heartbeat-room" &&
-       operation!="relay-ticket")
+       operation!="relay-ticket" && operation!="bug-report")
         return fail(ErrorCode::format,"Unknown account operation");
     const auto address=std::string(base);
     std::unique_ptr<CURLU,decltype(&curl_url_cleanup)> url(curl_url(),curl_url_cleanup);

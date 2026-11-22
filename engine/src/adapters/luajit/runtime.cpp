@@ -8,7 +8,6 @@
 #include "openlf2/ports/digest.hpp"
 #include "openlf2/ports/download.hpp"
 #include "openlf2/ports/github_mods.hpp"
-#include "openlf2/engine/bug_report.hpp"
 #include "openlf2/core/files.hpp"
 #include "openlf2_build_info.hpp"
 #include <algorithm>
@@ -84,10 +83,12 @@ struct ResourceBridge {
     std::optional<Result<std::string>> account_result;
     std::future<Result<std::string>> updates_future;
     std::optional<Result<std::string>> updates_result;
-    // Manual bug report typed into the credits menu (bug_report_screen.lua), sent to the same
-    // Discord webhook as the automatic crash reporter -- see openlf2/engine/bug_report.hpp.
-    std::future<Result<void>> report_bug_future;
-    std::optional<Result<void>> report_bug_result;
+    // Manual, structured bug report typed into the contact menu (bug_report_screen.lua). Sent
+    // through the account server's 'bug-report' operation (same HTTP channel as account_future
+    // above, via account_post) rather than straight to Discord -- the webhook URL/secret lives
+    // only on that server now, never in this client. See docs/BUG-REPORT-MENU-2.0-2026-11-22.md.
+    std::future<Result<std::string>> report_bug_future;
+    std::optional<Result<std::string>> report_bug_result;
 #if defined(_WIN32) || defined(__ANDROID__)
     // Declared before mods_future: the worker writes progress until the future is destroyed.
     ModInstallProgress mods_progress;
@@ -569,11 +570,21 @@ int updates_operation(lua_State* state) {
     lua_pushboolean(state,1);return 1;
 #endif
 }
-// Lua: engine.report_bug('start', text) kicks off the send in the background and returns true
-// (or nil+message if one is already pending); engine.report_bug('poll') returns true once sent,
-// "pending" while in flight, or nil+message on failure (network/validation/no webhook
-// configured). Mirrors account_operation's start/poll shape.
+// Lua: engine.report_bug('start', endpoint, json_body) kicks off the send in the background and
+// returns true (or nil+message if one is already pending); engine.report_bug('poll') returns the
+// raw JSON response string once the server has answered (the caller decodes it with
+// engine.json_decode to read result.report, the PF-BUG-NNNNNN number), "pending" while in
+// flight, or nil+message on failure (network, or the server rejecting it). Mirrors
+// account_operation's start/poll shape, and in fact reuses the same account_post HTTP channel
+// with a fixed "bug-report" operation and no bearer token -- no account is required to report a
+// bug. There is no webhook URL or secret anywhere in this client any more: see
+// docs/BUG-REPORT-MENU-2.0-2026-11-22.md for why (the player-written-text path used to call
+// submit_bug_report() straight into Discord; the automatic crash reporter is unrelated and still
+// does that -- see engine/src/adapters/sdl/crash_reporter.cpp / openlf2/core/crash_report.hpp).
 int report_bug_operation(lua_State* state) {
+#ifdef __EMSCRIPTEN__
+    lua_pushnil(state);lua_pushliteral(state,"Bug reports unavailable in this browser build");return 2;
+#else
     auto* bridge = resource_bridge(state);
     const auto* action = luaL_checkstring(state, 1);
     if (std::strcmp(action, "poll") == 0) {
@@ -592,7 +603,7 @@ int report_bug_operation(lua_State* state) {
             lua_pushstring(state, bridge->report_bug_result->error().message.c_str());
             return 2;
         }
-        lua_pushboolean(state, 1);
+        lua_pushlstring(state, bridge->report_bug_result->value().data(), bridge->report_bug_result->value().size());
         return 1;
     }
     if (std::strcmp(action, "start") != 0 || bridge->report_bug_future.valid()) {
@@ -600,16 +611,19 @@ int report_bug_operation(lua_State* state) {
         lua_pushliteral(state, "Bug report already pending");
         return 2;
     }
-    std::size_t text_size = 0;
-    const auto* text = luaL_checklstring(state, 2, &text_size);
-    if (text_size == 0 || text_size > 4096) {
+    std::size_t base_size = 0, body_size = 0;
+    const auto* base = luaL_checklstring(state, 2, &base_size);
+    const auto* body = luaL_checklstring(state, 3, &body_size);
+    if (base_size == 0 || base_size > 512 || body_size == 0 || body_size > 8192) {
         lua_pushnil(state);
-        lua_pushliteral(state, "Bug report text exceeds limit");
+        lua_pushliteral(state, "Bug report request exceeds limit");
         return 2;
     }
     try {
         bridge->report_bug_future = std::async(std::launch::async,
-            [body = std::string(text, text_size)] { return submit_bug_report(body); });
+            [endpoint = std::string(base, base_size), payload = std::string(body, body_size)] {
+                return account_post(endpoint, "bug-report", payload, "");
+            });
     } catch (...) {
         lua_pushnil(state);
         lua_pushliteral(state, "Cannot start bug report request");
@@ -617,6 +631,7 @@ int report_bug_operation(lua_State* state) {
     }
     lua_pushboolean(state, 1);
     return 1;
+#endif
 }
 int mods_operation(lua_State* state) {
 #if !defined(_WIN32) && !defined(__ANDROID__)
