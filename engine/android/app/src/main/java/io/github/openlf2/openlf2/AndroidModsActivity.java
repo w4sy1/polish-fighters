@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -25,13 +26,14 @@ public final class AndroidModsActivity extends Activity {
     static final String ACTIVE_PACKAGE="active_package";
     static final String FIRST_SETUP="first_setup";
     private static final int PICK_PACKAGE=7301;
-    private static final int NAVY=0xff040a41, BLUE=0xff7a9dff, RED=0xffff5262, TEXT=0xfff4f5ff, MUTED=0xffb6c5d9;
+    private static final int NAVY=0xff101f6c, BLUE=0xff81baf0, TEXT=0xfff4f5ff, MUTED=0xffc6d5f4, GOLD=0xffffdc82;
     private final ExecutorService worker=Executors.newSingleThreadExecutor();
     private LinearLayout rows;
     private ScrollView scroll;
     private Runnable previousScreen;
-    private TextView status;
+    private TextView title, status;
     private ProgressBar progress;
+    private ClassicButton prefetchAction;
     private boolean importing;
     private boolean fetchingCatalogue;
     private final int[] baseChoices = {1, 2, 0};
@@ -44,41 +46,66 @@ public final class AndroidModsActivity extends Activity {
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
-        // Same look as the start screen: the game art, darkened towards the text, with rounded cards.
-        FrameLayout root=new FrameLayout(this);root.setBackgroundColor(NAVY);
-        ImageView art=new ImageView(this);art.setImageResource(R.drawable.pf_loading_art_landscape);art.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);root.addView(art,new FrameLayout.LayoutParams(-1,-1));
-        View scrim=new View(this);scrim.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,new int[]{0x7f111e61,0xe5111e61,0xf2111e61}));
-        root.addView(scrim,new FrameLayout.LayoutParams(-1,-1));
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(NAVY);
+        ImageView art = new ImageView(this);
+        art.setImageResource(R.drawable.pf_loading_art_landscape);
+        art.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        root.addView(art, new FrameLayout.LayoutParams(-1, -1));
+        View tint = new View(this);
+        tint.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+            new int[]{0xc0101f6c, 0xee101f6c, NAVY}));
+        root.addView(tint, new FrameLayout.LayoutParams(-1, -1));
 
-        LinearLayout page=new LinearLayout(this);page.setOrientation(LinearLayout.HORIZONTAL);root.addView(page,new FrameLayout.LayoutParams(-1,-1));
-        // Keep the title and buttons clear of the status bar, the camera cut-out and the navigation bar.
-        root.setOnApplyWindowInsetsListener((view,insets)->{
-            page.setPadding(insets.getSystemWindowInsetLeft()+dp(20),insets.getSystemWindowInsetTop()+dp(14),
-                insets.getSystemWindowInsetRight()+dp(20),insets.getSystemWindowInsetBottom()+dp(12));
+        LinearLayout screen = new LinearLayout(this);
+        screen.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.addView(screen, new FrameLayout.LayoutParams(-1, -1));
+        screen.setPadding(dp(12), dp(6), dp(12), dp(4));
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            screen.setPadding(insets.getSystemWindowInsetLeft() + dp(12),
+                insets.getSystemWindowInsetTop() + dp(6),
+                insets.getSystemWindowInsetRight() + dp(12),
+                insets.getSystemWindowInsetBottom() + dp(4));
             return insets;
         });
-        page.setPadding(dp(20),dp(14),dp(20),dp(12));
 
-        LinearLayout side=new LinearLayout(this);side.setOrientation(LinearLayout.VERTICAL);
-        page.addView(side,new LinearLayout.LayoutParams(0,-1,0.92f));
-        TextView title=label("MOD MANAGER",24,TEXT,true);side.addView(title,wrap());
-        LinearLayout statusCard=new LinearLayout(this);statusCard.setOrientation(LinearLayout.VERTICAL);statusCard.setBackgroundResource(R.drawable.pf_loading_surface);statusCard.setPadding(dp(12),dp(9),dp(12),dp(9));
-        status=label("Wybierz źródło albo zaimportuj paczkę LF2.",12,TEXT,false);status.setContentDescription("Status importu");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        statusCard.addView(status,wrap());
-        progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);progress.setVisibility(View.GONE);
-        LinearLayout.LayoutParams progressParams=new LinearLayout.LayoutParams(-1,dp(6));progressParams.topMargin=dp(6);statusCard.addView(progress,progressParams);
-        LinearLayout.LayoutParams statusParams=wrap();statusParams.topMargin=dp(12);side.addView(statusCard,statusParams);
-        side.addView(new View(this),new LinearLayout.LayoutParams(1,0,1));
-        ClassicButton install=action("IMPORTUJ PACZKĘ ZIP",this::pickPackage);side.addView(install,new LinearLayout.LayoutParams(-1,dp(46)));
-        ClassicButton back=action("< WSTECZ",this::goBack);LinearLayout.LayoutParams backParams=new LinearLayout.LayoutParams(-1,dp(46));backParams.topMargin=dp(8);side.addView(back,backParams);
+        LinearLayout menu = new LinearLayout(this);
+        menu.setOrientation(LinearLayout.VERTICAL);
+        menu.setGravity(Gravity.CENTER_HORIZONTAL);
+        int width = Math.min(540, getResources().getConfiguration().screenWidthDp - 24);
+        screen.addView(menu, new LinearLayout.LayoutParams(width > 0 ? dp(width) : -1, -1));
+        title = label("KATALOG MODÓW", 20, TEXT, false);
+        title.setPadding(0, dp(3), 0, dp(5));
+        menu.addView(title, wrap());
 
-        LinearLayout list=new LinearLayout(this);list.setOrientation(LinearLayout.VERTICAL);list.setBackgroundResource(R.drawable.pf_loading_surface);list.setPadding(dp(12),dp(10),dp(12),dp(6));
-        LinearLayout.LayoutParams listParams=new LinearLayout.LayoutParams(0,-1,1.08f);listParams.leftMargin=dp(18);page.addView(list,listParams);
-        TextView sources=label("KATALOG MODÓW",12,BLUE,true);sources.setPadding(dp(2),0,0,dp(8));list.addView(sources,wrap());
-        // Rows scroll inside the card and fade at its edges instead of being cut off mid-line.
-        scroll=new ScrollView(this);scroll.setFillViewport(false);scroll.setVerticalFadingEdgeEnabled(true);scroll.setFadingEdgeLength(dp(18));scroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        rows=new LinearLayout(this);rows.setOrientation(LinearLayout.VERTICAL);scroll.addView(rows);list.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+        scroll = new ScrollView(this);
+        scroll.setVerticalFadingEdgeEnabled(true);
+        scroll.setFadingEdgeLength(dp(8));
+        scroll.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        rows = new LinearLayout(this);
+        rows.setOrientation(LinearLayout.VERTICAL);
+        scroll.addView(rows);
+        menu.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+
+        status = label("", 12, GOLD, false);
+        status.setMaxLines(3);
+        status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        menu.addView(status, wrap());
+        progress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        progress.setIndeterminate(true);
+        progress.setVisibility(View.GONE);
+        progress.setProgressTintList(android.content.res.ColorStateList.valueOf(GOLD));
+        menu.addView(progress, new LinearLayout.LayoutParams(-1, dp(6)));
+
+        prefetchAction = action("", this::runPrefetchQueue);
+        prefetchAction.setActivated(true);
+        prefetchAction.setVisibility(View.GONE);
+        menu.addView(prefetchAction, wrap());
+        LinearLayout footer = new LinearLayout(this);
+        footer.addView(action("IMPORTUJ ZIP", this::pickPackage), new LinearLayout.LayoutParams(0, -2, 1));
+        footer.addView(action("WSTECZ", this::goBack), new LinearLayout.LayoutParams(0, -2, 1));
+        menu.addView(footer, wrap());
         setContentView(root);
         if (getIntent().getBooleanExtra(FIRST_SETUP,false)) showSetup();
         else if (fromGame()) showGitHub();
@@ -88,18 +115,20 @@ public final class AndroidModsActivity extends Activity {
     private LinearLayout.LayoutParams wrap() { return new LinearLayout.LayoutParams(-1,ViewGroup.LayoutParams.WRAP_CONTENT); }
     private TextView label(String value,int size,int color,boolean bold) {
         TextView view=new TextView(this);view.setText(value);view.setTextColor(color);view.setTextSize(size);
-        view.setTypeface(Typeface.MONOSPACE,bold?Typeface.BOLD:Typeface.NORMAL);return view;
+        view.setTypeface(Typeface.SANS_SERIF,bold?Typeface.BOLD:Typeface.NORMAL);view.setGravity(Gravity.CENTER);return view;
     }
     private ClassicButton action(String label,Runnable click) {
         // The pixel font has no dashes or ellipsis; they would be drawn as "?".
-        ClassicButton button=new ClassicButton(this);button.setText(label.replace("—","-").replace("–","-").replace("…","..."));button.setContentDescription(label);button.setAllCaps(false);button.setMinHeight(dp(44));button.setPadding(dp(8),dp(5),dp(8),dp(5));button.setBackgroundResource(R.drawable.pf_button);button.setBackgroundTintList(null);button.setOnClickListener(v->click.run());return button;
+        ClassicButton button=new ClassicButton(this);button.setText(label.replace("—","-").replace("–","-").replace("…","..."));button.setContentDescription(label);button.setAllCaps(false);button.setMinHeight(dp(44));button.setMenuRowStyle();button.setOnClickListener(v->click.run());return button;
     }
     private int dp(int value) { return Math.round(value*getResources().getDisplayMetrics().density); }
 
     private void showSources() {
+        title.setText("KATALOG MODÓW");
         previousScreen = null;
         scroll.scrollTo(0,0);
         rows.removeAllViews();
+        prefetchAction.setVisibility(View.GONE);
         ClassicButton github=action("POBIERZ: "+AndroidModSources.GITHUB_NAME,this::showGitHub);
         LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,dp(44));params.bottomMargin=dp(4);rows.addView(github,params);
         rows.addView(action("KONFIGURACJA GRY",this::openSetup),wrap());
@@ -130,26 +159,31 @@ public final class AndroidModsActivity extends Activity {
     private void showSetup() {
         previousScreen = getIntent().getBooleanExtra(FIRST_SETUP,false) ? null : this::showSources;
         rows.removeAllViews();
+        prefetchAction.setVisibility(View.GONE);
         scroll.scrollTo(0,0);
-        rows.addView(label("KONFIGURACJA GRY",18,TEXT,true),wrap());
+        title.setText("KONFIGURACJA GRY");
         if (getIntent().getBooleanExtra(FIRST_SETUP,false)) {
             rows.addView(action("POMIŃ POBIERANIE - GRAJ OD RAZU",this::skipSetupDownloads),wrap());
         }
         for (int index : baseChoices) {
-            rows.addView(action((setupBase==index ? "[X] " : "[ ] ")+GamePackSettings.TITLES[index],()->{
+            ClassicButton row = action((setupBase==index ? "[X] " : "[ ] ")+GamePackSettings.TITLES[index],()->{
                 if (importing) return;
                 int offset=scroll.getScrollY();
                 setupBase=index;showSetup();restoreScroll(offset);
-            }),wrap());
+            });
+            row.setActivated(setupBase == index);
+            rows.addView(row,wrap());
         }
         rows.addView(label("DODATKI DO WSPÓLNEJ PULI",14,TEXT,true),wrap());
         for (int i=3;i<setupSelection.length;i++) {
             final int index=i;
-            rows.addView(action((setupSelection[index] ? "[X] " : "[ ] ")+GamePackSettings.TITLES[index],()->{
+            ClassicButton row = action((setupSelection[index] ? "[X] " : "[ ] ")+GamePackSettings.TITLES[index],()->{
                 if (importing) return;
                 int offset=scroll.getScrollY();
                 setupSelection[index]=!setupSelection[index];showSetup();restoreScroll(offset);
-            }),wrap());
+            });
+            row.setActivated(setupSelection[index]);
+            rows.addView(row,wrap());
         }
         boolean mixed=usesMixedPool();
         GamePackSettings settings = new GamePackSettings(getFilesDir());
@@ -190,7 +224,7 @@ public final class AndroidModsActivity extends Activity {
     // confirmation, with per-item progress, so the player can pick between them later in the
     // normal single-profile selector instead of waiting through one download at a time.
     private void addPrefetchSection() {
-        rows.addView(label("POBIERZ NA ZAPAS (KILKA NARAZ)",14,TEXT,true),wrap());
+        rows.addView(label("POBIERZ NA ZAPAS",14,TEXT,true),wrap());
         if (setupCatalogue.isEmpty()) {
             rows.addView(action("SPRAWDŹ KATALOG, ABY WYBRAĆ KILKA PACZEK",this::loadSetupCatalogue),wrap());
             return;
@@ -205,14 +239,17 @@ public final class AndroidModsActivity extends Activity {
             if (checked && !installed) pending++;
             final String id = item.id;
             String mark = installed ? "[OK] " : checked ? "[X] " : "[ ] ";
-            rows.addView(action(mark+item.name+" "+item.version+" - "+item.sizeLabel(),()->{
+            ClassicButton row = action(mark+item.name+" "+item.version+" - "+item.sizeLabel(),()->{
                 if (importing) return;
                 toggleQueued(id);
-            }),wrap());
+            });
+            row.setActivated(checked || installed);
+            rows.addView(row,wrap());
         }
         if (pending > 0) {
-            final int count = pending;
-            rows.addView(action("POBIERZ ZAZNACZONE PACZKI ["+count+"]",this::runPrefetchQueue),wrap());
+            prefetchAction.setText("POBIERZ ZAZNACZONE PACZKI ["+pending+"]");
+            prefetchAction.setContentDescription(prefetchAction.getText());
+            prefetchAction.setVisibility(View.VISIBLE);
         }
     }
     private void toggleQueued(String id) {
@@ -367,8 +404,10 @@ public final class AndroidModsActivity extends Activity {
     }
 
     private void showPackages(List<AndroidModSources.Package> found,int sourceOffset,int catalogueOffset) {
+        title.setText("KATALOG MODÓW");
         previousScreen = fromGame() ? null : () -> { showSources(); restoreScroll(sourceOffset); };
         rows.removeAllViews();
+        prefetchAction.setVisibility(View.GONE);
         String activePackage = getIntent().getStringExtra(ACTIVE_PACKAGE);
         if (fromGame()) {
             rows.addView(action("LF2 CLASSIC · " + ("".equals(activePackage) ? "AKTYWNY" : "WYBIERZ"),
@@ -533,7 +572,7 @@ public final class AndroidModsActivity extends Activity {
         return true;
     }
     @Override public void onBackPressed() { goBack(); }
-    private void setBusy(boolean busy,String message) { importing=busy;status.setText(message);if(!busy)progress.setIndeterminate(true);progress.setVisibility(busy?View.VISIBLE:View.GONE); }
+    private void setBusy(boolean busy,String message) { importing=busy;prefetchAction.setEnabled(!busy);status.setText(message);if(!busy)progress.setIndeterminate(true);progress.setVisibility(busy?View.VISIBLE:View.GONE); }
     private static String safe(String value) { if(value==null)return "nieznany błąd";String text=value.replaceAll("[\\r\\n\\p{Cntrl}]"," ");return text.substring(0,Math.min(text.length(),240)); }
     @Override protected void onDestroy() { worker.shutdownNow();super.onDestroy(); }
 }

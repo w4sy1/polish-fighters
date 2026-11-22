@@ -14,8 +14,18 @@ public final class ClassicButton extends Button {
     private static final JSONArray MIDDLE_DOT = new JSONArray().put(0).put(0).put(0).put(4);
     private static final JSONArray LEFT_CHEVRON = new JSONArray().put(0).put(2).put(4).put(8).put(4).put(2);
     private final Paint paint = new Paint();
+    private boolean menuRow;
     public ClassicButton(Context context) { this(context,null); }
     public ClassicButton(Context context, AttributeSet attrs) { super(context, attrs); }
+    void setMenuRowStyle() {
+        menuRow = true;
+        setBackgroundTintList(null);
+        android.graphics.drawable.StateListDrawable background = new android.graphics.drawable.StateListDrawable();
+        background.addState(new int[]{android.R.attr.state_pressed}, new android.graphics.drawable.ColorDrawable(0xff2a4786));
+        background.addState(new int[]{android.R.attr.state_focused}, new android.graphics.drawable.ColorDrawable(0xff20396e));
+        background.addState(new int[]{}, new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        setBackground(background);
+    }
     @Override public boolean onKeyDown(int keyCode,android.view.KeyEvent event) {
         if(keyCode==android.view.KeyEvent.KEYCODE_BUTTON_A && isEnabled()) {setPressed(true);return true;}
         return super.onKeyDown(keyCode,event);
@@ -30,11 +40,16 @@ public final class ClassicButton extends Button {
         JSONObject glyphs = data.optJSONObject("glyphs"), accents = data.optJSONObject("accents");
         if (glyphs == null || accents == null) { super.onDraw(canvas); return; }
         float density = getResources().getDisplayMetrics().density;
-        float scale = Math.min(2 * density,
+        float scale = Math.min((menuRow ? 1.35f : 2f) * density,
             Math.min((getWidth() - 24 * density) / Math.max(1, value.length() * 6 - 1), (getHeight() - 12f) / 11f));
         float x = (getWidth() - (value.length() * 6 - 1) * scale) / 2;
         float y = (getHeight() - 7 * scale) / 2;
-        paint.setAntiAlias(false); paint.setColor(isEnabled() ? 0xfff4f5ff : 0xff7b8cbd);
+        int color = 0xfff4f5ff;
+        if (!isEnabled()) color = 0xff7b8cbd;
+        else if (menuRow && isActivated()) color = 0xffffdc82;
+        else if (menuRow && !isPressed() && !isFocused()) color = 0xff81baf0;
+        paint.setAntiAlias(false);
+        paint.setColor(color);
         for (int i = 0; i < value.length(); i++) {
             String key = value.substring(i, i + 1);
             JSONArray rows = glyphs.optJSONArray(accents.optString(key, key));
