@@ -246,9 +246,9 @@ void report_previous_crash_if_any() {
     const auto message = format_discord_message(event);
     if (message.has_attachment) {
         const DiscordAttachment attachment{message.attachment_name, message.attachment_text};
-        send_discord_webhook(webhook_url, message.content, attachment);
+        (void)send_discord_webhook(webhook_url, message.content, attachment);
     } else {
-        send_discord_webhook(webhook_url, message.content, std::nullopt);
+        (void)send_discord_webhook(webhook_url, message.content, std::nullopt);
     }
 }
 
