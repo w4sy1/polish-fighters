@@ -17,7 +17,7 @@ return {
  absent_turbo='LF2 Turbo: brak osobnego pakietu', navigation='STRZAŁKI / D-PAD: WYBÓR   ENTER / A: OK   ESC / B: WSTECZ',
  credit_text='Silnik: OpenLF2. Oryginalna gra: Marti Wong i Starsky Wong.',
  credit_packs='Autorzy modułów i licencje: dokumentacja dołączonych pakietów.',
- discord_link='DISCORD', report_bug='ZGŁOŚ BŁĄD (E-MAIL)',
+ discord_link='DISCORD', report_bug='ZGŁOŚ BŁĄD (E-MAIL)', report_bug_discord='ZGŁOŚ BŁĄD (DISCORD)',
  local_players='Do 4 profili lokalnych; pokój sieciowy do 8 urządzeń. Boty i drużyny na ekranie postaci.',
  save_error='Nie zapisano ustawień: ',
 }

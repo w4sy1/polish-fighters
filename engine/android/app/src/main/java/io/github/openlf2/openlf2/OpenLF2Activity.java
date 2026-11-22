@@ -29,10 +29,27 @@ public final class OpenLF2Activity extends SDLActivity {
     @Override protected void main() {
         GameDiagnostics.write(this, "launch-last.txt", "Native engine launch\n" + android.os.Build.VERSION.RELEASE);
         takeAndroidToolsRequest(); takeBluetoothRequest(); // Discard requests left behind by an interrupted game.
+        exportDiscordWebhookUrl();
         int result = SDLActivity.nativeRunMain(getMainSharedObject(), getMainFunction(), getArguments());
         openAndroidTools = result == 0 && takeAndroidToolsRequest();
         openBluetooth = result == 0 && takeBluetoothRequest();
         if (result != 0) GameDiagnostics.write(this, "native-return.txt", "Native engine exit code: " + result);
+    }
+
+    // Lets the shared native engine (engine/src/adapters/luajit/runtime.cpp -- the same code
+    // path used on desktop) read the Discord webhook URL with a plain std::getenv call, same as
+    // the automatic crash reporter already does on Windows/Linux. The URL itself still never
+    // ships in source: it comes from BuildConfig.DISCORD_WEBHOOK_URL, generated at build time
+    // from the (uncommitted) openlf2DiscordWebhookUrl Gradle property -- see build.gradle and
+    // docs/CRASH-REPORTER-1.1-2026-11-22.md.
+    private void exportDiscordWebhookUrl() {
+        final String url = BuildConfig.DISCORD_WEBHOOK_URL;
+        if (url == null || url.isEmpty()) return;
+        try {
+            android.system.Os.setenv("OPENLF2_DISCORD_WEBHOOK_URL", url, true);
+        } catch (android.system.ErrnoException error) {
+            Log.w(TAG, "Could not export Discord webhook URL: " + error.getMessage());
+        }
     }
 
     /** Called by the SDL main thread while the game's menu is active. */

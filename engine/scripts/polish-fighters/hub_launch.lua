@@ -17,6 +17,7 @@ return function(base)
  local sounds=require('base/game/sounds')
  local online=require('polish-fighters/online_screen')
  local mods=require('polish-fighters/mod_browser')
+ local bug_report=require('polish-fighters/bug_report_screen')
  function base.create(value)
   local state=create(value);state.hub_navigation=nav.create()
   local selected,problem=packs.read(hub.profiles)
@@ -48,6 +49,7 @@ return function(base)
   elseif id=='information' then state.hub_mode=id
   elseif id=='discord' then context.action('open_discord')
   elseif id=='report_bug' then context.action('report_bug')
+  elseif id=='report_bug_discord' then bug_report.open(state)
   elseif id=='check_android_update' then context.action(id)
   elseif id=='battle' or id=='settings' or id=='credits' or id=='language' or id=='status' then
    state.hub_mode=id
@@ -192,6 +194,7 @@ return function(base)
   end
   if state.hub_edit then return input_settings.update(state,input) end
   if state.hub_online then return online.update(state,input,context) end
+  if state.hub_bug_report then return bug_report.update(state,input,context) end
   if state.hub_mods then return mods.update(state,input,context) end
   if state.page~="menu" then
    update(state,input,context)
@@ -253,6 +256,7 @@ return function(base)
   if state.hub_enabled and state.hub_mods then return mods.draw(state,context) end
   if not state.hub_enabled or state.page~="menu" or state.hub_classic then return draw(state,context) end
   if state.hub_online then return online.draw(state,context) end
+  if state.hub_bug_report then return bug_report.draw(state,context) end
   -- Use the same scenic backdrop, logo art, and bitmap font as LF2's own
   -- launch menu. Keep the artwork bright; the old blue wash and modern cards
   -- obscured the original interface.
@@ -340,7 +344,7 @@ return function(base)
  function base.describe(state)
   return describe(state).." hub="..tostring(state.hub_enabled==true)..":"..tostring(state.hub_mode)..
     " input_settings="..tostring(state.hub_edit~=nil).." input_capture="..tostring(state.hub_capture and state.hub_capture.row or 0)..
-    " online="..tostring(state.hub_online~=nil)
+    " online="..tostring(state.hub_online~=nil).." bug_report="..tostring(state.hub_bug_report~=nil)
  end
  return base
 end

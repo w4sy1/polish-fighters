@@ -170,7 +170,7 @@ function(openlf2_target target)
     endif()
 endfunction()
 
-add_library(openlf2_core STATIC src/core/files.cpp src/core/json.cpp src/core/settings.cpp src/core/crash_report.cpp)
+add_library(openlf2_core STATIC src/core/files.cpp src/core/json.cpp src/core/settings.cpp src/core/crash_report.cpp src/engine/bug_report.cpp)
 openlf2_target(openlf2_core)
 
 add_library(openlf2_adapter_compression STATIC src/adapters/compression/decompressor.cpp)

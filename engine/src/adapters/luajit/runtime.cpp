@@ -8,6 +8,7 @@
 #include "openlf2/ports/digest.hpp"
 #include "openlf2/ports/download.hpp"
 #include "openlf2/ports/github_mods.hpp"
+#include "openlf2/engine/bug_report.hpp"
 #include "openlf2/core/files.hpp"
 #include "openlf2_build_info.hpp"
 #include <algorithm>
@@ -83,6 +84,10 @@ struct ResourceBridge {
     std::optional<Result<std::string>> account_result;
     std::future<Result<std::string>> updates_future;
     std::optional<Result<std::string>> updates_result;
+    // Manual bug report typed into the credits menu (bug_report_screen.lua), sent to the same
+    // Discord webhook as the automatic crash reporter -- see openlf2/engine/bug_report.hpp.
+    std::future<Result<void>> report_bug_future;
+    std::optional<Result<void>> report_bug_result;
 #if defined(_WIN32) || defined(__ANDROID__)
     // Declared before mods_future: the worker writes progress until the future is destroyed.
     ModInstallProgress mods_progress;
@@ -564,6 +569,55 @@ int updates_operation(lua_State* state) {
     lua_pushboolean(state,1);return 1;
 #endif
 }
+// Lua: engine.report_bug('start', text) kicks off the send in the background and returns true
+// (or nil+message if one is already pending); engine.report_bug('poll') returns true once sent,
+// "pending" while in flight, or nil+message on failure (network/validation/no webhook
+// configured). Mirrors account_operation's start/poll shape.
+int report_bug_operation(lua_State* state) {
+    auto* bridge = resource_bridge(state);
+    const auto* action = luaL_checkstring(state, 1);
+    if (std::strcmp(action, "poll") == 0) {
+        if (!bridge->report_bug_future.valid()
+            || bridge->report_bug_future.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+            lua_pushliteral(state, "pending");
+            return 1;
+        }
+        try {
+            bridge->report_bug_result = bridge->report_bug_future.get();
+        } catch (...) {
+            bridge->report_bug_result = fail(ErrorCode::io, "Report bug worker failed");
+        }
+        if (!bridge->report_bug_result->has_value()) {
+            lua_pushnil(state);
+            lua_pushstring(state, bridge->report_bug_result->error().message.c_str());
+            return 2;
+        }
+        lua_pushboolean(state, 1);
+        return 1;
+    }
+    if (std::strcmp(action, "start") != 0 || bridge->report_bug_future.valid()) {
+        lua_pushnil(state);
+        lua_pushliteral(state, "Bug report already pending");
+        return 2;
+    }
+    std::size_t text_size = 0;
+    const auto* text = luaL_checklstring(state, 2, &text_size);
+    if (text_size == 0 || text_size > 4096) {
+        lua_pushnil(state);
+        lua_pushliteral(state, "Bug report text exceeds limit");
+        return 2;
+    }
+    try {
+        bridge->report_bug_future = std::async(std::launch::async,
+            [body = std::string(text, text_size)] { return submit_bug_report(body); });
+    } catch (...) {
+        lua_pushnil(state);
+        lua_pushliteral(state, "Cannot start bug report request");
+        return 2;
+    }
+    lua_pushboolean(state, 1);
+    return 1;
+}
 int mods_operation(lua_State* state) {
 #if !defined(_WIN32) && !defined(__ANDROID__)
     lua_pushnil(state);lua_pushliteral(state,"Mods handled by platform");return 2;
@@ -969,6 +1023,7 @@ int open_libraries(lua_State* state) {
         {"openlf2_network", network_operation}, {"openlf2_network_time", network_time},
         {"openlf2_account", account_operation},
         {"openlf2_updates", updates_operation}, {"openlf2_mods", mods_operation},
+        {"openlf2_report_bug", report_bug_operation},
         {"openlf2_random_state", random_state}, {"openlf2_set_random_state", set_random_state},
         {"openlf2_reset_random_sequence", reset_random_sequence}, {"openlf2_save_recording", save_recording},
         {"openlf2_take_recording", take_recording}, {"openlf2_local_time", local_time}};

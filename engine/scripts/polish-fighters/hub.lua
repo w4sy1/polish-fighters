@@ -83,7 +83,7 @@ function hub.rows(state,active_profile)
   if state.hub_android then return {{'check_android_update','AKTUALIZUJ GRĘ'},row('settings','back')} end
   return {row('settings','back')}
  elseif mode=='language' then return {{'lang_pl','POLSKI'},{'lang_en','ENGLISH'},row('root','back')}
- elseif mode=='credits' then return {row('discord','discord_link'),row('report_bug'),row('root','back')}
+ elseif mode=='credits' then return {row('discord','discord_link'),row('report_bug'),row('report_bug_discord'),row('root','back')}
  elseif mode=='players' then return {row('controls'),row('start_mode','start'),row('library','back')}
  elseif mode=='remote' then
   -- Windows Bluetooth (Etap 4B) does not exist yet; state.hub_bluetooth_available lets a

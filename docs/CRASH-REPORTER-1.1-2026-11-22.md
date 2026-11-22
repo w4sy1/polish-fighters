@@ -135,3 +135,43 @@ which needs the Android NDK and was not run here):
 - An actual end-to-end send: set `OPENLF2_DISCORD_WEBHOOK_URL` (or the Gradle property), force a
   crash (e.g. a debug-only "crash now" trigger, or just `kill -SEGV` the running process), relaunch,
   and confirm the message (and, for a long one, the attachment) arrives in the Discord channel.
+
+## Addendum: manual "ZGŁOŚ BŁĄD (DISCORD)" report in the credits menu
+
+The credits ("TWÓRCY") menu already had two unrelated, pre-existing actions, both handled in
+`engine/src/app/application.cpp`: **DISCORD** opens the community server invite
+(`https://discord.gg/ypuFkbuyj`) in a browser, and **ZGŁOŚ BŁĄD (E-MAIL)** opens a `mailto:` link
+to the team's inbox. Neither conflicted with the automatic crash reporter above -- different
+files, different trigger (browser link / crash), different transport (`mailto:` / HTTPS webhook)
+-- so there was nothing to merge in the git sense. Per the project owner's choice, a third,
+connected action was added instead: **ZGŁOŚ BŁĄD (DISCORD)**, a small in-game text box
+(`engine/scripts/polish-fighters/bug_report_screen.lua`) that sends what the player types
+straight to the same Discord webhook as the automatic crash reporter, as a second option
+alongside the existing e-mail report (neither of the other two actions was changed).
+
+This deliberately reuses the crash reporter's own code rather than duplicating it:
+`openlf2::submit_bug_report` (`engine/include/openlf2/engine/bug_report.hpp`,
+`engine/src/engine/bug_report.cpp`) builds a `CrashEvent` from the player's text and calls the
+*same* `format_discord_message` + `redact_sensitive` (`openlf2/core/crash_report.hpp`) and the
+*same* `send_discord_webhook` (`openlf2/ports/discord_webhook.hpp`) the crash reporter already
+uses -- there is exactly one code path in this engine that talks to Discord. The webhook URL is
+read the same way as on desktop (`OPENLF2_DISCORD_WEBHOOK_URL`, via `std::getenv`); on Android,
+`OpenLF2Activity.exportDiscordWebhookUrl()` exports `BuildConfig.DISCORD_WEBHOOK_URL` into that
+same environment variable (`android.system.Os.setenv`, API 21+) right before the native engine
+starts, so the shared C++ runtime (`engine/src/adapters/luajit/runtime.cpp`, used by both
+desktop and Android) needs only the one lookup. The send itself runs on a background
+`std::async` job polled from Lua (`engine.report_bug('start'/'poll')`), mirroring the existing
+`account_operation`/`updates_operation` pattern in the same file, so the UI thread never blocks
+on the network call. The web/Emscripten build cannot reach Discord at all (it never links the
+curl-based `discord_webhook.cpp`), so `submit_bug_report` reports "unavailable" there instead of
+failing to link.
+
+Verified here: `tests/bug_report_test.cpp`, compiled and run directly with g++ against the real
+`crash_report.cpp`/`json.cpp`/`discord_webhook.cpp` and the real libcurl (no network access
+needed -- both cases covered fail before any HTTP request: no webhook configured, and a
+non-Discord webhook URL rejected by the existing validation). `python3 tools/test_lua_scripts.py`
+is unaffected and still green (131/131). `tools/test_classic_menu_assets.py` passes against the
+regenerated `classic-menu.json` (the only new string is the `report_bug_discord` menu label).
+Not verified here, for the same reason as above (no NDK/Gradle resource pipeline in this
+sandbox): that `OpenLF2Activity.java` actually compiles under the real Gradle/SDL toolchain, and
+an actual end-to-end send from the in-game text box.
