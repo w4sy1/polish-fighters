@@ -1,3 +1,14 @@
+## 2026-11-22 — Poprawka startu po wydaniu 0.18.20: brak deklaracji modułu bug_report_screen
+
+- **Przyczyna obu awarii zgłoszonych dla 0.18.20 (Windows: "OpenLF2 could not start"; Android: wyjście na ekran domowy) jest jedna i ta sama.** Commit `0a54bad` dodał `engine/scripts/polish-fighters/bug_report_screen.lua` i `require('polish-fighters/bug_report_screen')` w `hub_launch.lua:20`, ale nie dopisał tego modułu do `engine/scripts/polish-fighters/package.manifest`. Sandboxowany loader Lua (`runtime/bootstrap.lua`) odrzuca `require` na nieoglaszonym module asercją: `module not declared: polish-fighters/bug_report_screen`. Błąd wychodzi z `hub_flow.lua` → `updates_flow.lua`, czyli przy każdym wejściu do głównego menu (hub) z realnymi danymi LF2 — więc łapie to i czysta instalacja, i aktualizacja, na obu platformach, bo skrypty Lua są wspólne.
+- Na Windows: `run()` łapie błąd Lua jako `Result` z błędem, `run_application` zwraca 1, `entry.cpp` bez konsoli pokazuje ogólny komunikat "OpenLF2 could not start. Run openlf2.exe from a terminal for details." — stąd zero szczegółów bez terminala.
+- Na Androidzie przyczyna jest identyczna (ten sam `runtime/bootstrap.lua`/`hub_launch.lua`); nie zweryfikowano jeszcze na żywym urządzeniu/emulatorze w tej sesji (brak podłączonego telefonu/AVD), ale błąd "module not declared" nie zależy od platformy, tylko od zawartości `package.manifest` wspólnego dla Windows i Androida.
+- **Poprawka:** dodano `module=bug_report_screen|bug_report_screen.lua` do `package.manifest` (przy `module=input_settings`, przed `extend=base/ui/launch|hub_launch.lua`).
+- **Weryfikacja na gotowym, podpisanym pliku `PolishFighters-Windows-x64.exe` z wydania v0.18.20** (pobrany z GitHub Releases, suma SHA-256 zgodna z `.sha256`), na maszynie Windows użytkownika, przez `desktop-commander`:
+  - Czysta instalacja (`/VERYSILENT`, nowy `--config-dir`) + świeży katalog startowy (brak `LF2_v2.0a.exe`): okno startowe się otwiera (błąd wymaga dotarcia do huba z danymi LF2, więc nie zawsze widoczny na pustym profilu bez pobranych danych).
+  - **Scenariusz aktualizacji** (`--config-dir` wskazujący na skopiowany, realny `config.json` + `LF2_v2.0a.exe` użytkownika): przed poprawką `openlf2.exe` kończył się kodem wyjścia 1 z dokładnie tym śladem Lua powyżej. **Po dopisaniu linii do `package.manifest` (wgranej od razu do zainstalowanej kopii) ten sam profil odpala grę normalnie** (okno "Little Fighters", proces odpowiada).
+- Nie zweryfikowano: pełny cykl instalator→nowa paczka z tą poprawką w `package.manifest` wbudowaną od początku (test podmienił plik w już zainstalowanej kopii, nie przebudował instalatora), testy jednostkowe Lua/Python po zmianie, Android (fizyczne ARM64 i emulator x86_64 — brak urządzenia w tej sesji).
+
 ## 2026-11-21 — Wydanie 0.18.14: sterowanie, lista ruchów, Tiger, poprawka AI (Claude)
 
 - Wersja 0.18.14, build 10017 (wyżej niż testowe raptor.4–6 na telefonie, więc instaluje się jako aktualizacja).

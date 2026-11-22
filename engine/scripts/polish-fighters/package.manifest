@@ -17,6 +17,7 @@ module=online_screen|online_screen.lua
 extend=base/ui/network|online_network.lua
 extend=base/ui/flow|online_flow.lua
 module=input_settings|input_settings.lua
+module=bug_report_screen|bug_report_screen.lua
 extend=base/ui/launch|hub_launch.lua
 extend=base/ui/flow|hub_flow.lua
 module=updates|updates.lua
