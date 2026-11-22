@@ -20,6 +20,19 @@ import org.robolectric.shadows.ShadowToast;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 28)
 public class GamePackDialogTest {
+    @Test public void firstSetupOffersPrefetchWithClassicSelected() {
+        android.content.Intent intent = new android.content.Intent()
+            .putExtra(AndroidModsActivity.FIRST_SETUP, true);
+        try (ActivityController<AndroidModsActivity> controller =
+                 Robolectric.buildActivity(AndroidModsActivity.class, intent).setup()) {
+            View root = controller.get().getWindow().getDecorView();
+            java.util.ArrayList<View> matches = new java.util.ArrayList<>();
+            root.findViewsWithText(matches, "SPRAWDŹ KATALOG, ABY WYBRAĆ KILKA PACZEK",
+                View.FIND_VIEWS_WITH_TEXT);
+            assertEquals(1, matches.size());
+        }
+    }
+
     private Button moduleButton(View root) {
         if (root instanceof Button && root.getId()==R.id.pf_module) return (Button)root;
         if (root instanceof ViewGroup) {

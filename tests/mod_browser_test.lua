@@ -130,4 +130,9 @@ screen.update(s3,{keys={}},context)
 screen.update(s3,{keys={}},context)
 assert(not s3.hub_mods.github.busy,'the queue should stop once every item is installed')
 assert(installedSet['lf4-turbo']=='done' and installedSet['dbz']=='done')
+for _,row in ipairs(screen.rows(s3.hub_mods)) do
+ if row[1]=='gh_queue_run' then
+  assert(not row[2]:find('%(%d+%)'),'installed packages should not count as pending downloads')
+ end
+end
 print('PASS multi-select batch queue: toggle, persistence, per-item progress and auto-continue')

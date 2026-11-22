@@ -87,3 +87,11 @@ bitmapowy, te samo hover-highlight co każdy inny wiersz tego ekranu), Android p
    w trakcie serii pobierania i wznowienie.
 3. Kontrola dotykiem i fokusem klawiatury (Punkt 5).
 4. `git diff`, `git status`, sekrety — sprawdzone w tej sesji, czyste.
+
+## Weryfikacja na sprzęcie po kompilacji 0.18.22
+
+Natywny Windows x64 i APK ARM64 z main @ 976ab63 powstały w [CI #45036530941](https://github.com/w4sy1/polish-fighters/actions/runs/45036530941). Na Windows 11 pobrano Bleach i Kate po jednym potwierdzeniu, z zachowaniem zaznaczeń po odświeżeniu podpisanego katalogu. W drugiej serii zainstalowano NTSD, odłączono Wi-Fi podczas transferu Dragon Ball Z i po przywróceniu połączenia wznowiono ręcznie od 14,1 MiB. Znacznik instalacji NTSD zachował datę i paczka nie została pobrana ponownie. Świeży proces ze skorygowanym skryptem poprawnie pokazał pusty licznik oczekujących paczek mimo zapamiętanego wyboru.
+
+Na Raptorze 5G z Androidem 14 (ARM64) potwierdzono, że bazowy APK pomijał sekcję prefetch przy domyślnym LF2 Classic. Po poprawce i lokalnym zbudowaniu APK z natywnymi bibliotekami z tego samego commita sekcja jest widoczna, a dotknięcia zaznaczają paczki bez rozpoczynania transferu. Zainstalowano Polish Fighters, przerwano sieć komórkową podczas pobierania Reinforced i wznowiono tylko Reinforced. Oba moduły uzyskały status [OK]. Przycisk pominięcia otworzył silnik LF2 Classic. Przy braku lokalnych danych LF2 silnik najpierw wyświetla własną prośbę o pobranie podstawowych danych.
+
+Testy lokalne po poprawkach zaliczyły składnię 151 plików Lua i wszystkie 57 skryptów testowych, w tym test kolejki. Testy Python zakończyły się 120 zaliczeniami i 3 pominięciami. Gradle wykonał 77 testów bez błędów i pominął 1. Lint Android zgłosił 0 błędów i 77 ostrzeżeń. Zadanie x86_64 w CI otrzymało HTTP 429 podczas pobierania zależności Robolectric.

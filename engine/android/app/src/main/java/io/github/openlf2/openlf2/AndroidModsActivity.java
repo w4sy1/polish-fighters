@@ -161,6 +161,7 @@ public final class AndroidModsActivity extends Activity {
             setBusy(false,!mixed && setupBase==1
                     ? "Gra użyje lokalnych danych LF2 lub poprosi o ich przygotowanie."
                     : "Wybrane paczki są dostępne lokalnie.");
+            addPrefetchSection();
             return;
         }
         List<AndroidModSources.Package> download = new java.util.ArrayList<>();
@@ -204,14 +205,14 @@ public final class AndroidModsActivity extends Activity {
             if (checked && !installed) pending++;
             final String id = item.id;
             String mark = installed ? "[OK] " : checked ? "[X] " : "[ ] ";
-            rows.addView(action(mark+item.name+" "+item.version+" ("+item.sizeLabel()+")",()->{
+            rows.addView(action(mark+item.name+" "+item.version+" - "+item.sizeLabel(),()->{
                 if (importing) return;
                 toggleQueued(id);
             }),wrap());
         }
         if (pending > 0) {
             final int count = pending;
-            rows.addView(action("POBIERZ ZAZNACZONE PACZKI ("+count+")",this::runPrefetchQueue),wrap());
+            rows.addView(action("POBIERZ ZAZNACZONE PACZKI ["+count+"]",this::runPrefetchQueue),wrap());
         }
     }
     private void toggleQueued(String id) {
