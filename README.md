@@ -10,7 +10,7 @@ HELP US https://discord.gg/ypuFkbuyj
 
 ## Aktualności
 
-**0.18.20 — poprawka startu gry (Windows i Android).** Po wydaniu 0.18.20 gra nie startowała (Windows: komunikat "OpenLF2 could not start"; Android: wyjście na ekran domowy) przy wejściu do głównego menu z danymi LF2 — zarówno na czystej instalacji, jak i po aktualizacji. Przyczyną był brak deklaracji nowego modułu `bug_report_screen` w `package.manifest`. Poprawka zweryfikowana na podpisanym pliku instalatora Windows z wydania 0.18.20. Zawiera zmiany 0.18.15–0.18.19 (opcja zgłaszania błędów przez Discord w menu TWÓRCY, obok istniejącego zgłoszenia e-mailem).
+**0.18.21 — poprawka startu gry (Windows i Android).** Po wydaniu 0.18.20 gra nie startowała (Windows: komunikat "OpenLF2 could not start"; Android: wyjście na ekran domowy) przy wejściu do głównego menu z danymi LF2 — zarówno na czystej instalacji, jak i po aktualizacji. Przyczyną był brak deklaracji nowego modułu `bug_report_screen` w `package.manifest`. Poprawka zweryfikowana na odbudowanym, podpisanym pliku Windows oraz na fizycznym telefonie z Androidem (ARM64). Zawiera zmiany 0.18.15–0.18.20 (opcja zgłaszania błędów przez Discord w menu TWÓRCY, obok istniejącego zgłoszenia e-mailem).
 
 **0.18.13 — płynniejsza gra przez internet.** Mecz sieciowy nie liczy już co klatkę kosztownej sumy kontrolnej, więc telefony nie spowalniają rozgrywki. Gospodarz szybciej przekazuje ruchy przez serwer pośredniczący. Gracz z Androidem może wybrać tryb gry na wspólnym menu (joystick i przyciski). Pokój znika z listy po wyjściu z lobby przez POWRÓT, a lista pokazuje nick gospodarza. Aktualizacja Windows usuwa stare pliki skryptów. Zawiera zmiany 0.18.12.
 
