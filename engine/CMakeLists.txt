@@ -170,7 +170,7 @@ function(openlf2_target target)
     endif()
 endfunction()
 
-add_library(openlf2_core STATIC src/core/files.cpp src/core/json.cpp src/core/settings.cpp src/core/crash_report.cpp src/engine/bug_report.cpp)
+add_library(openlf2_core STATIC src/core/files.cpp src/core/json.cpp src/core/settings.cpp src/core/crash_report.cpp)
 openlf2_target(openlf2_core)
 
 add_library(openlf2_adapter_compression STATIC src/adapters/compression/decompressor.cpp)
@@ -210,7 +210,7 @@ add_library(openlf2_engine STATIC src/engine/packages.cpp src/engine/room.cpp sr
 openlf2_target(openlf2_engine)
 target_link_libraries(openlf2_engine PRIVATE openlf2_core)
 
-add_library(openlf2_adapter_luajit STATIC src/adapters/luajit/runtime.cpp)
+add_library(openlf2_adapter_luajit STATIC src/adapters/luajit/runtime.cpp src/engine/bug_report.cpp)
 openlf2_target(openlf2_adapter_luajit)
 target_link_libraries(openlf2_adapter_luajit PRIVATE openlf2_core openlf2_engine openlf2_adapter_crypto LuaJIT::LuaJIT)
 add_custom_target(openlf2_build_info

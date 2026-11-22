@@ -10,6 +10,7 @@
 #include <string>
 
 namespace openlf2 {
+#ifndef __EMSCRIPTEN__
 namespace {
 // __ANDROID__ must be checked before __linux__: the Android NDK toolchain defines both, and a
 // manual report sent from the Android build should say so rather than reading "linux".
@@ -40,6 +41,7 @@ std::string current_timestamp_utc() {
     return buffer;
 }
 }
+#endif
 
 Result<void> submit_bug_report(std::string_view text) {
 #ifdef __EMSCRIPTEN__
