@@ -61,6 +61,9 @@ jobs:
           fi
           pkg-config --version
       - name: Build Android ${{ matrix.abi }}
+        env:
+          # The JVM tests do not depend on the packaged native ABI.
+          OPENLF2_ANDROID_RUN_UNIT_TESTS: ${{ matrix.abi == 'x86_64' && 'true' || 'false' }}
         run: bash dist/build-android.sh ${{ matrix.abi }}
       - name: Check bundled Polish Fighters scripts and application ID
         run: python3 ../tools/check_apk.py out/PolishFighters-Android-${{ matrix.abi }}.apk

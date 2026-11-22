@@ -57,7 +57,7 @@ android {
     testOptions {
         unitTests.includeAndroidResources = true
         unitTests.all {
-            systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+            testLogging.exceptionFormat = 'full'
         }
     }
     namespace 'io.github.openlf2.openlf2'
