@@ -1,0 +1,345 @@
+{
+  "padded": [],
+  "unresolved": [
+    {
+      "asset": "sprite\\sys\\blood.mkc",
+      "missing": true
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000165.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000220.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000166.bmp",
+      "actual": [
+        399,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000195.bmp",
+      "actual": [
+        178,
+        47
+      ],
+      "required": [
+        1779,
+        328
+      ]
+    },
+    {
+      "asset": "sprite\\Characters\\Sub_Zero\\ice_ball.mkc",
+      "missing": true
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000192.bmp",
+      "actual": [
+        328,
+        166
+      ],
+      "required": [
+        327,
+        497
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000197.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000217.bmp",
+      "actual": [
+        656,
+        415
+      ],
+      "required": [
+        655,
+        497
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000181.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        331
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000322.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000324.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000314.bmp",
+      "actual": [
+        800,
+        250
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000317.bmp",
+      "actual": [
+        800,
+        250
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\fire.mkc",
+      "missing": true
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000189.bmp",
+      "actual": [
+        360,
+        192
+      ],
+      "required": [
+        359,
+        199
+      ]
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\explosion.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\skeleton_fire.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\Scorpion_fatality_Sz.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\Scorpion_0.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\Scorpion_1.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\Scorpion_2.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Scorpion\\spear.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\SHADOWS\\Shadow_0.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\SHADOWS\\Shadow_1.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\SHADOWS\\Shadow_0b.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\SHADOWS\\Shadow_1b.mkc",
+      "missing": true
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000214.bmp",
+      "actual": [
+        392,
+        49
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "sprite\\Characters\\Sub_Zero\\SubZero_ball.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Sub_Zero\\SubZero_2.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Sub_Zero\\Sub_Zero_fatalitys.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Sub_Zero\\SubZero_0.mkc",
+      "missing": true
+    },
+    {
+      "asset": "sprite\\Characters\\Sub_Zero\\SubZero_1.mkc",
+      "missing": true
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000240.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000230.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000224.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000222.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000239.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000226.bmp",
+      "actual": [
+        455,
+        59
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000237.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000236.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000233.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/mortal-kombat/a/000225.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    }
+  ]
+}

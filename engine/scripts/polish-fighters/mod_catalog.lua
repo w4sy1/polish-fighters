@@ -83,7 +83,7 @@ return {
  {id="seed-little-fighter-gundam",name="Seed Little Fighter Gundam",category="anime",compatibility="not_tested",characters=""},
  {id="little-fighter-nintendo-vs-sega",name="Little Fighter Nintendo vs Sega",category="anime",compatibility="not_tested",characters=""},
  {id="rockman-x4-lf2",name="Rockman X4 LF2",category="anime",compatibility="not_tested",characters=""},
- {id="mortal-kombat-lf2",name="Mortal Kombat LF2",category="anime",description="Plik uzytkownika \"MK-LF2 SETUP_LF2COMBO.exe\" nie jest obslugiwanym archiwum (nie Inno Setup, 7z/unrar odmawiaja) - nie da sie statycznie wydobyc danych bez uruchomienia EXE, co jest zablokowane z zasad bezpieczenstwa. Import niemozliwy bez innego pliku zrodlowego.",compatibility="not_tested",characters=""},
+ {id="mortal-kombat-lf2",name="Mortal Kombat LF2",category="anime",description="Zaimportowany jako content-packs/mortal-kombat z zainstalowanej gry (uzytkownik odpalil installer lokalnie na Windows). 55 obiektow, 11 tla, 447 zasobow, brak brakujacych zasobow. Instalator Setup Factory 8.0 pozostaje nieobslugiwany statycznie w tej sesji.",compatibility="experimental",last_verified="2026-11-23",characters=""},
  {id="metal-gear-lf2-v0-45",name="Metal Gear LF2 v0.45",category="anime",compatibility="not_tested",characters=""},
  {id="katekyo-hitman-reborn-x-generation-0-3",name="Katekyo Hitman Reborn X Generation 0.3",category="anime",compatibility="not_tested",characters=""},
  {id="khr-lf2-v1-3",name="KHR LF2 v1.3",category="anime",compatibility="not_tested",characters=""},

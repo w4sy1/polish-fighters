@@ -1800,7 +1800,7 @@
       "category": "anime",
       "version": null,
       "author": null,
-      "description": "Plik uzytkownika \"MK-LF2 SETUP_LF2COMBO.exe\" nie jest obslugiwanym archiwum (nie Inno Setup, 7z/unrar odmawiaja) - nie da sie statycznie wydobyc danych bez uruchomienia EXE, co jest zablokowane z zasad bezpieczenstwa. Import niemozliwy bez innego pliku zrodlowego.",
+      "description": "Zaimportowany jako content-packs/mortal-kombat z zainstalowanej gry (uzytkownik odpalil installer lokalnie na Windows). 55 obiektow, 11 tla, 447 zasobow, brak brakujacych zasobow. Instalator Setup Factory 8.0 pozostaje nieobslugiwany statycznie w tej sesji.",
       "source": null,
       "page_url": null,
       "download_url": null,
@@ -1808,12 +1808,12 @@
       "characters": [],
       "mod_type": null,
       "license": null,
-      "download_status": "downloaded_unusable",
-      "import_status": "not_imported",
-      "test_result": "extraction_failed",
-      "compatibility": "not_tested",
+      "download_status": "downloaded",
+      "import_status": "imported",
+      "test_result": "static_import_ok",
+      "compatibility": "experimental",
       "sha256": null,
-      "last_verified": null
+      "last_verified": "2026-11-23"
     },
     {
       "id": "metal-gear-lf2-v0-45",

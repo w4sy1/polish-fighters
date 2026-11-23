@@ -1,0 +1,96 @@
+{
+  "pack_id": "mortal-kombat",
+  "fighters": [
+    {
+      "id": 52,
+      "name": "Shao-Kanh",
+      "path": "data/julian.dat"
+    },
+    {
+      "id": 50,
+      "name": "Scorpion",
+      "path": "data/scorpion/scorpion.dat"
+    },
+    {
+      "id": 38,
+      "name": "Sub-Zero",
+      "path": "data/sub_zero/sub_zero.dat"
+    },
+    {
+      "id": 39,
+      "name": "Justin",
+      "path": "data/justin.dat"
+    },
+    {
+      "id": 37,
+      "name": "Knight",
+      "path": "data/knight.dat"
+    },
+    {
+      "id": 36,
+      "name": "Jan",
+      "path": "data/jan.dat"
+    },
+    {
+      "id": 35,
+      "name": "Monk",
+      "path": "data/monk.dat"
+    },
+    {
+      "id": 34,
+      "name": "Sorcerer",
+      "path": "data/sorcerer.dat"
+    },
+    {
+      "id": 33,
+      "name": "Jack",
+      "path": "data/jack.dat"
+    },
+    {
+      "id": 32,
+      "name": "Shokan",
+      "path": "data/mark.dat"
+    },
+    {
+      "id": 31,
+      "name": "Shadow",
+      "path": "data/shadows/shadows-brother.dat"
+    },
+    {
+      "id": 30,
+      "name": "Shadow",
+      "path": "data/shadows/shadows.dat"
+    },
+    {
+      "id": 7,
+      "name": "Scorpion",
+      "path": "data/scorpion/scorpion.dat"
+    },
+    {
+      "id": 8,
+      "name": "Sub-Zero",
+      "path": "data/sub_zero/sub_zero.dat"
+    },
+    {
+      "id": 15,
+      "name": "Template",
+      "path": "data/template/template.dat"
+    }
+  ],
+  "objects": 55,
+  "backgrounds": 11,
+  "assets": 447,
+  "source_catalog_sha256": "7734f91bcd21e360c3956d36561820003ba1dce8d40563141df1ec7a438e99a6",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "png_aliases": {},
+  "catalog_markers_not_emulated": [],
+  "custom_catalog_labels": [],
+  "missing_resources": [],
+  "experimental": true,
+  "campaigns": [],
+  "disabled_sound_annotations": [],
+  "sprite_edge_repairs": 0,
+  "unresolved_sprite_sheets": 43
+}
