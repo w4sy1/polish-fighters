@@ -43,7 +43,7 @@ for pack_id, title in (
     ('gf2', 'GF2'), ('lf2-ns', 'LF2 NS'), ('sx2', 'Sx2'), ('lf2-sv', 'LF2 SV'),
     ('rn-lf2', 'RN LF2'), ('lf-seed', 'LF Seed'), ('wlf2-al', 'WLF2 AL'),
     ('ce-lf2', 'CE LF2'), ('ntsd-community', 'NTSD Community'), ('ntsd-ce-setup', 'NTSD CE'),
-    ('killer-lf2', 'Killer LF2'),
+    ('killer-lf2', 'Killer LF2'), ('oplos', 'One Piece: Legends of Sea'),
 ):
     PACKS[pack_id] = (title, pack_id.replace('-', '_'), title)
 
