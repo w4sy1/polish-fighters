@@ -1,3 +1,22 @@
+## 2026-11-23 — Wydanie 0.18.25: poprawka crasha huba z 0.18.24 (Claude)
+
+- **0.18.24 wywalało grę przy każdym wejściu do huba** (zgłoszone jako "wypierdala grę do
+  pulpitu"). Przyczyna: w ramach poprawki selekcji modułów dodano `require('polish-fighters/catalog_watch')`
+  w `hub_launch.lua`, ale nie dopisano `catalog_watch.lua` do `engine/scripts/polish-fighters/package.manifest`.
+  Sandboxowany loader Lua odrzuca `require` na niezadeklarowanym module — identyczny mechanizm jak
+  bug z 0.18.20/`bug_report_screen`. Poprawka: dodano `module=catalog_watch|catalog_watch.lua` do
+  manifestu. Sprawdzono skryptem wszystkie `require('polish-fighters/...')` w katalogu względem
+  manifestu — po poprawce zero niezadeklarowanych modułów.
+- Wersja 0.18.25, build 10027. [Publiczne wydanie v0.18.25](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.25)
+  oznaczone jako najnowsze, commit `ef88c7d`, [build CI](https://github.com/w4sy1/polish-fighters/actions/runs/45217500199)
+  (android x86_64 znowu nawalił na 429 z Maven Central przy Robolectric — drugi raz z rzędu w tej
+  sesji, warto rozważyć retry/cache w workflow — naprawione rerun-failed-jobs). 0.18.24 pozostaje
+  opublikowane jako zepsute wydanie (nie usuwano/nie oznaczano, bo to wymaga uprawnień, których
+  ta sesja Claude nie ma do releasów — do rozważenia oznaczenie go jako "ZEPSUTE" w tytule, jak
+  robiono to wcześniej dla 0.18.7/0.18.8).
+- Nie zweryfikowano realnym uruchomieniem na telefonie/Windowsie z tej sesji (brak toolchainu w
+  środowisku, w którym pracował Claude) — proszę potwierdzić, że hub się już nie wywala.
+
 ## 2026-11-23 — Wydanie 0.18.24: selekcja modułów na Androidzie i płaska lista MODUŁY (Claude)
 
 - `engine/android/.../GamePackSettings.java` miał własną, czwartą (poza C++ `profile_definitions`,
