@@ -1,0 +1,349 @@
+{
+  "pack_id": "lf3",
+  "fighters": [
+    {
+      "id": 0,
+      "name": "Template",
+      "path": "data/template.dat"
+    },
+    {
+      "id": 1,
+      "name": "?",
+      "path": "sprite/template2/ftemplate.txt"
+    },
+    {
+      "id": 2,
+      "name": "LF3_Julian",
+      "path": "data/julian.dat"
+    },
+    {
+      "id": 3,
+      "name": "LF3_Firzen",
+      "path": "data/firzen.dat"
+    },
+    {
+      "id": 4,
+      "name": "LF3_LouisEX",
+      "path": "data/louisex.dat"
+    },
+    {
+      "id": 5,
+      "name": "LF3_Bat",
+      "path": "data/bat.dat"
+    },
+    {
+      "id": 19,
+      "name": "LF3_Justin",
+      "path": "data/justin.dat"
+    },
+    {
+      "id": 7,
+      "name": "LF3_Knight",
+      "path": "data/knight.dat"
+    },
+    {
+      "id": 8,
+      "name": "LF3_Jan",
+      "path": "data/jan.dat"
+    },
+    {
+      "id": 9,
+      "name": "LF3_Monk",
+      "path": "data/monk.dat"
+    },
+    {
+      "id": 10,
+      "name": "LF3_Sorcerer",
+      "path": "data/sorcerer.dat"
+    },
+    {
+      "id": 11,
+      "name": "LF3_Jack",
+      "path": "data/jack.dat"
+    },
+    {
+      "id": 12,
+      "name": "LF3_Mark",
+      "path": "data/mark.dat"
+    },
+    {
+      "id": 13,
+      "name": "LF3_Hunter",
+      "path": "data/hunter.dat"
+    },
+    {
+      "id": 14,
+      "name": "LF3_Bandit",
+      "path": "data/bandit.dat"
+    },
+    {
+      "id": 15,
+      "name": "LF3_Deep",
+      "path": "data/deep.dat"
+    },
+    {
+      "id": 16,
+      "name": "LF3_John",
+      "path": "data/john.dat"
+    },
+    {
+      "id": 17,
+      "name": "LF3_Henry",
+      "path": "data/henry.dat"
+    },
+    {
+      "id": 18,
+      "name": "LF3_Rudolf",
+      "path": "data/rudolf.dat"
+    },
+    {
+      "id": 6,
+      "name": "LF3_Louis",
+      "path": "data/louis.dat"
+    },
+    {
+      "id": 20,
+      "name": "LF3_Firen",
+      "path": "data/firen.dat"
+    },
+    {
+      "id": 21,
+      "name": "LF3_Freeze",
+      "path": "data/freeze.dat"
+    },
+    {
+      "id": 22,
+      "name": "LF3_Aqua_Dennis",
+      "path": "data/dennis.dat"
+    },
+    {
+      "id": 23,
+      "name": "LF3_Woody",
+      "path": "data/woody.dat"
+    },
+    {
+      "id": 24,
+      "name": "LF3_Davis",
+      "path": "data/davis.dat"
+    },
+    {
+      "id": 25,
+      "name": "Clide",
+      "path": "sprite/clide/clide.dat"
+    },
+    {
+      "id": 26,
+      "name": "Maveric",
+      "path": "sprite/maveric/maveric.dat"
+    },
+    {
+      "id": 27,
+      "name": "Julia",
+      "path": "sprite/cutej/cutej.dat"
+    },
+    {
+      "id": 28,
+      "name": "Vegeta_SSJ3",
+      "path": "data/vegetassj3.dat"
+    },
+    {
+      "id": 29,
+      "name": "Zack",
+      "path": "data/zack.dat"
+    },
+    {
+      "id": 40,
+      "name": "Walter",
+      "path": "data/walter.dat"
+    },
+    {
+      "id": 41,
+      "name": "Wizard",
+      "path": "sprite/wizard/wizard.dat"
+    },
+    {
+      "id": 42,
+      "name": "Caesar",
+      "path": "sprite/csr/csr.dat"
+    },
+    {
+      "id": 43,
+      "name": "Crimson",
+      "path": "sprite/crimson/crimson.dat"
+    },
+    {
+      "id": 44,
+      "name": "Javis",
+      "path": "data/javis.dat"
+    },
+    {
+      "id": 45,
+      "name": "Nino",
+      "path": "sprite/nino_ext/nino_ext.dat"
+    },
+    {
+      "id": 46,
+      "name": "Darius",
+      "path": "data/darius.dat"
+    },
+    {
+      "id": 47,
+      "name": "Jason",
+      "path": "jason/jason.dat"
+    },
+    {
+      "id": 48,
+      "name": "Marshall",
+      "path": "sprite/marshall/marshall.dat"
+    },
+    {
+      "id": 49,
+      "name": "Dr.Beorn",
+      "path": "sprite/beorn/beorn.dat"
+    },
+    {
+      "id": 60,
+      "name": "SsjGoku",
+      "path": "data/goku.dat"
+    },
+    {
+      "id": 61,
+      "name": "Leo",
+      "path": "sprite/leo/leo.dat"
+    },
+    {
+      "id": 62,
+      "name": "Julio",
+      "path": "sprite/julio/julio.dat"
+    },
+    {
+      "id": 63,
+      "name": "Curly",
+      "path": "curly/curly.dat"
+    },
+    {
+      "id": 64,
+      "name": "Liso",
+      "path": "data/liso.dat"
+    },
+    {
+      "id": 65,
+      "name": "Volt",
+      "path": "sprite/volt/volt.dat"
+    },
+    {
+      "id": 66,
+      "name": "VoltR",
+      "path": "sprite/volt/repel.dat"
+    },
+    {
+      "id": 67,
+      "name": "Frozen",
+      "path": "frozen/frozen.dat"
+    },
+    {
+      "id": 68,
+      "name": "Broly",
+      "path": "broly/broly.dat"
+    },
+    {
+      "id": 69,
+      "name": "Gad",
+      "path": "data/gad/gad.dat"
+    },
+    {
+      "id": 70,
+      "name": "Mahoro",
+      "path": "data/mahoro.dat"
+    },
+    {
+      "id": 71,
+      "name": "Tao",
+      "path": "data/taotemple/tao.dat"
+    },
+    {
+      "id": 72,
+      "name": "Dao",
+      "path": "data/dao.dat"
+    },
+    {
+      "id": 73,
+      "name": "Lighto",
+      "path": "data/lighto.dat"
+    },
+    {
+      "id": 74,
+      "name": "Aeron",
+      "path": "data/aeron.dat"
+    },
+    {
+      "id": 75,
+      "name": "Gray_Fox",
+      "path": "sprite/grayfox/grayfox.dat"
+    },
+    {
+      "id": 76,
+      "name": "Harlequin",
+      "path": "sprite/harlequin/harlequin.dat"
+    },
+    {
+      "id": 77,
+      "name": "Majin_buu",
+      "path": "data/maijin_buu.dat"
+    },
+    {
+      "id": 78,
+      "name": "Loden",
+      "path": "sprite/loden/loden.dat"
+    },
+    {
+      "id": 79,
+      "name": "Tina",
+      "path": "data/tina.dat"
+    },
+    {
+      "id": 80,
+      "name": "Silva",
+      "path": "data/silva.dat"
+    },
+    {
+      "id": 81,
+      "name": "Tiger",
+      "path": "data/tiger.dat"
+    },
+    {
+      "id": 82,
+      "name": "Cord",
+      "path": "sprite/cord/cord.dat"
+    },
+    {
+      "id": 83,
+      "name": "Earth",
+      "path": "sprite/earth/earth.dat"
+    }
+  ],
+  "objects": 206,
+  "backgrounds": 92,
+  "assets": 2128,
+  "source_catalog_sha256": "ec6b6cb22a64f2e7a7e5d05cb3104fc2da6749c7356d4e04f03e242c49b1bfd7",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "png_aliases": {},
+  "catalog_markers_not_emulated": [],
+  "custom_catalog_labels": [],
+  "missing_resources": [
+    "data/109.wav",
+    "m/base2.bmp",
+    "m/fall_1.bmp",
+    "m/fall_2.bmp",
+    "m/fall_3.bmp",
+    "m/fall_4.bmp",
+    "m/s.bmp"
+  ],
+  "experimental": true,
+  "campaigns": [],
+  "disabled_sound_annotations": [],
+  "sprite_edge_repairs": 1,
+  "unresolved_sprite_sheets": 76
+}

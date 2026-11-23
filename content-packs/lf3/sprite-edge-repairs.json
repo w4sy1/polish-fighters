@@ -1,0 +1,853 @@
+{
+  "padded": [
+    {
+      "asset": "mods/lf3/a/001011.bmp",
+      "before": [
+        200,
+        400
+      ],
+      "after": [
+        200,
+        401
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "asset": "mods/lf3/a/001067.bmp",
+      "actual": [
+        400,
+        200
+      ],
+      "required": [
+        399,
+        299
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001071.bmp",
+      "actual": [
+        1000,
+        600
+      ],
+      "required": [
+        999,
+        799
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001507.bmp",
+      "actual": [
+        800,
+        800
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001786.bmp",
+      "actual": [
+        800,
+        350
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/000968.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001313.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        959
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001306.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        331
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001652.bmp",
+      "actual": [
+        800,
+        240
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001278.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001208.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001722.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001668.bmp",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001281.bmp",
+      "actual": [
+        328,
+        189
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/000969.bmp",
+      "actual": [
+        341,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001680.bmp",
+      "actual": [
+        800,
+        400
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001252.bmp",
+      "actual": [
+        144,
+        100
+      ],
+      "required": [
+        143,
+        149
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001210.bmp",
+      "actual": [
+        312,
+        172
+      ],
+      "required": [
+        319,
+        172
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001701.bmp",
+      "actual": [
+        800,
+        240
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001289.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001283.bmp",
+      "actual": [
+        328,
+        166
+      ],
+      "required": [
+        327,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001574.bmp",
+      "actual": [
+        1390,
+        137
+      ],
+      "required": [
+        1389,
+        407
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001710.bmp",
+      "actual": [
+        800,
+        360
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001291.bmp",
+      "actual": [
+        656,
+        415
+      ],
+      "required": [
+        655,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001244.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        331
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001780.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001782.bmp",
+      "actual": [
+        800,
+        290
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001773.bmp",
+      "actual": [
+        800,
+        250
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001776.bmp",
+      "actual": [
+        800,
+        250
+      ],
+      "required": [
+        799,
+        499
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001115.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        1599,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001118.bmp",
+      "actual": [
+        1300,
+        520
+      ],
+      "required": [
+        1299,
+        1299
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001685.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001792.bmp",
+      "actual": [
+        800,
+        190
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001793.bmp",
+      "actual": [
+        800,
+        270
+      ],
+      "required": [
+        713,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001120.bmp",
+      "actual": [
+        399,
+        399
+      ],
+      "required": [
+        799,
+        399
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001022.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001021.bmp",
+      "actual": [
+        480,
+        160
+      ],
+      "required": [
+        399,
+        239
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001010.bmp",
+      "actual": [
+        1000,
+        600
+      ],
+      "required": [
+        1004,
+        602
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001023.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001287.bmp",
+      "actual": [
+        490,
+        98
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001063.bmp",
+      "actual": [
+        400,
+        100
+      ],
+      "required": [
+        403,
+        100
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001359.bmp",
+      "actual": [
+        88,
+        80
+      ],
+      "required": [
+        879,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/000988.bmp",
+      "actual": [
+        490,
+        294
+      ],
+      "required": [
+        489,
+        587
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001113.bmp",
+      "actual": [
+        328,
+        166
+      ],
+      "required": [
+        327,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001177.bmp",
+      "actual": [
+        1600,
+        960
+      ],
+      "required": [
+        1649,
+        989
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001443.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001364.bmp",
+      "actual": [
+        800,
+        81
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001127.bmp",
+      "actual": [
+        656,
+        415
+      ],
+      "required": [
+        655,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001595.bmp",
+      "actual": [
+        800,
+        400
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001086.bmp",
+      "actual": [
+        681,
+        308
+      ],
+      "required": [
+        675,
+        407
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001332.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001326.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001316.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001315.bmp",
+      "actual": [
+        455,
+        60
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001330.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001322.bmp",
+      "actual": [
+        455,
+        59
+      ],
+      "required": [
+        589,
+        589
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001329.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001328.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001327.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001319.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001660.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001280.bmp",
+      "actual": [
+        328,
+        249
+      ],
+      "required": [
+        327,
+        331
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001606.bmp",
+      "actual": [
+        800,
+        430
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001101.bmp",
+      "actual": [
+        800,
+        100
+      ],
+      "required": [
+        1099,
+        99
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001102.bmp",
+      "actual": [
+        144,
+        122
+      ],
+      "required": [
+        143,
+        365
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001309.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001239.bmp",
+      "actual": [
+        417,
+        169
+      ],
+      "required": [
+        409,
+        409
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001169.bmp",
+      "actual": [
+        490,
+        197
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001642.bmp",
+      "actual": [
+        800,
+        320
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001133.bmp",
+      "actual": [
+        490,
+        196
+      ],
+      "required": [
+        489,
+        342
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/000979.bmp",
+      "actual": [
+        480,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001037.bmp",
+      "actual": [
+        656,
+        415
+      ],
+      "required": [
+        655,
+        497
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001406.bmp",
+      "actual": [
+        306,
+        96
+      ],
+      "required": [
+        1019,
+        95
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001514.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        799,
+        1119
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001149.bmp",
+      "actual": [
+        81,
+        52
+      ],
+      "required": [
+        2726,
+        51
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001317.bmp",
+      "actual": [
+        490,
+        198
+      ],
+      "required": [
+        489,
+        685
+      ]
+    },
+    {
+      "asset": "mods/lf3/a/001487.bmp",
+      "actual": [
+        800,
+        160
+      ],
+      "required": [
+        799,
+        319
+      ]
+    }
+  ]
+}
