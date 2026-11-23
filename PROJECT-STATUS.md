@@ -1,3 +1,21 @@
+## 2026-11-23 — Wydanie 0.18.24: selekcja modułów na Androidzie i płaska lista MODUŁY (Claude)
+
+- `engine/android/.../GamePackSettings.java` miał własną, czwartą (poza C++ `profile_definitions`,
+  `hub.lua`, `mod_browser.lua`) niezależną listę dozwolonych profili. Brak w niej
+  `mortal_kombat`/`lf3`/`oplos` powodował `IllegalArgumentException("Nieznany moduł")` przy próbie
+  wyboru tych paczek po pobraniu z katalogu GitHub na Androidzie — zgłoszone zrzutem ekranu.
+  Dodano `dragon_ball_super`/`ntsd_community`/`mortal_kombat`/`lf3`/`oplos` do `IDS`/`TITLES`/`PACKS`.
+- Wymóg: wszystkie wydane paczki z `mods/catalog.json` widoczne wprost na głównej liście MODUŁY,
+  bez chowania w "DODATKOWE MODUŁY". Przeniesiono tych samych 5 z `hub.optional_profiles` do
+  `hub.profiles` (Lua) i do głównej tablicy `IDS` (Android). Szczegóły obu poprawek:
+  `docs/MOD-CATALOG-SELECTABILITY-2026-11-23.md`.
+- Wersja 0.18.24, build 10026. [Publiczne wydanie v0.18.24](https://github.com/w4sy1/polish-fighters/releases/tag/v0.18.24)
+  oznaczone jako najnowsze, commit `5fc2385`, [build CI](https://github.com/w4sy1/polish-fighters/actions/runs/45209420488)
+  (android x86_64 raz nawalił na tymczasowym 429 z Maven Central przy Robolectric, niezwiązane
+  z kodem — naprawione przez rerun-failed-jobs). Sumy SHA-256 zweryfikowane przed publikacją.
+  Nie zweryfikowano realnym uruchomieniem gry/testów Robolectric lokalnie (brak Android SDK w
+  środowisku, w którym pracował Claude) — proszę potwierdzić na telefonie.
+
 ## 2026-11-22 — Wydanie 0.18.21: poprawka startu po 0.18.20 (brak deklaracji modułu bug_report_screen)
 
 - **Przyczyna obu awarii zgłoszonych dla 0.18.20 (Windows: "OpenLF2 could not start"; Android: wyjście na ekran domowy) jest jedna i ta sama.** Commit `0a54bad` dodał `engine/scripts/polish-fighters/bug_report_screen.lua` i `require('polish-fighters/bug_report_screen')` w `hub_launch.lua:20`, ale nie dopisał tego modułu do `engine/scripts/polish-fighters/package.manifest`. Sandboxowany loader Lua (`runtime/bootstrap.lua`) odrzuca `require` na nieoglaszonym module asercją: `module not declared: polish-fighters/bug_report_screen`. Błąd wychodzi z `hub_flow.lua` → `updates_flow.lua`, czyli przy każdym wejściu do głównego menu (hub) z realnymi danymi LF2 — więc łapie to i czysta instalacja, i aktualizacja, na obu platformach, bo skrypty Lua są wspólne.
