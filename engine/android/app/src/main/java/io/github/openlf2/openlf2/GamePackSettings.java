@@ -8,14 +8,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/** Uses the same package selection as the desktop Lua launcher. */
+/**
+ * Uses the same package selection as the desktop Lua launcher (hub.lua hub.profiles). Keep
+ * these three arrays and hub.profiles in sync by id/title/directory - this is a separate,
+ * hand-maintained copy, not read from the Lua table. 2026-11-23: dragon_ball_super,
+ * ntsd_community, mortal_kombat, lf3 and oplos were released in mods/catalog.json and
+ * downloaded fine (AndroidModsActivity.install), but were missing from IDS/PACKS here, so
+ * save() below rejected them with "Nieznany moduł" the moment the player tapped WYBIERZ -
+ * the pack looked installed but could never actually be selected.
+ */
 final class GamePackSettings {
     static final String[] IDS = {"polish_fighters", "lf_two", "lf_four_turbo", "dbz",
-        "one_piece", "kate", "reinforced", "ntsd", "bleach"};
+        "one_piece", "kate", "reinforced", "ntsd", "bleach",
+        "dragon_ball_super", "ntsd_community", "mortal_kombat", "lf3", "oplos"};
     static final String[] TITLES = {"Polish Fighters", "Little Fighter 2", "LF4 Turbo",
-        "Dragon Ball", "One Piece", "Kate", "Reinforced", "NTSD / Naruto", "Bleach"};
+        "Dragon Ball", "One Piece", "Kate", "Reinforced", "NTSD / Naruto", "Bleach",
+        "Dragon Ball Super", "NTSD Community", "Mortal Kombat LF2", "LF3BYTITASZIBIKAS 2.0b",
+        "One Piece: Legends of Sea"};
     static final String[] PACKS = {"polish-originals", "", "lf4-turbo", "dbz",
-        "one-piece", "kate", "reinforced", "ntsd", "bleach"};
+        "one-piece", "kate", "reinforced", "ntsd", "bleach",
+        "dragon-ball-super", "ntsd-community", "mortal-kombat", "lf3", "oplos"};
     static final String ALL = "all", CUSTOM = "custom";
     private final MobileCodeSettings store;
     private final File filesDirectory;
@@ -43,9 +55,10 @@ final class GamePackSettings {
         return "lf_two";
     }
 
+    // dragon_ball_super and ntsd_community moved into IDS above (2026-11-23); left out of this
+    // switch now that they are first-class entries, not "additional" ones.
     static String optionalTitle(String id) {
         switch (id) {
-            case "dragon_ball_super": return "Dragon Ball Super";
             case "fighter_hero": return "Fighter Hero";
             case "gf2": return "GF2";
             case "lf2_ns": return "LF2 NS";
@@ -55,7 +68,6 @@ final class GamePackSettings {
             case "lf_seed": return "LF Seed";
             case "wlf2_al": return "WLF2 AL";
             case "ce_lf2": return "CE LF2";
-            case "ntsd_community": return "NTSD Community";
             case "ntsd_ce_setup": return "NTSD CE";
             case "killer_lf2": return "Killer LF2";
             default: return null;
