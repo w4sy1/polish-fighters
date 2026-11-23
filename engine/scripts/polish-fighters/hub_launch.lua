@@ -18,6 +18,7 @@ return function(base)
  local online=require('polish-fighters/online_screen')
  local mods=require('polish-fighters/mod_browser')
  local bug_report=require('polish-fighters/bug_report_screen')
+ local catalog_watch=require('polish-fighters/catalog_watch')
  function base.create(value)
   local state=create(value);state.hub_navigation=nav.create()
   local selected,problem=packs.read(hub.profiles)
@@ -70,7 +71,7 @@ return function(base)
   elseif id=='diagnostics' then state.page='diagnostics';state.diagnostics=require('base/ui/diagnostics').create()
   elseif id=='unavailable' then state.hub_note=locale.text('offline')
   elseif id=='account' then online.open(state)
-  elseif id=='mods' then mods.open(state,context)
+  elseif id=='mods' then state.hub_catalog_notice=nil;mods.open(state,context)
   elseif id:sub(1,5)=='mode_' then
    local mode=id:sub(6)
    context.action(mode=='battle_setup' and 'battle' or mode)
@@ -157,6 +158,7 @@ return function(base)
  end
  function base.update(state,input,context)
   if not state.hub_enabled then return update(state,input,context) end
+  catalog_watch.poll(state)
   if state.page=="menu" and not state.hub_android then
    state.hub_pointer_x,state.hub_pointer_y=input.pointer_x,input.pointer_y
   end
@@ -316,7 +318,7 @@ return function(base)
   elseif state.hub_mode=='library' then text(context,locale.text('absent_turbo'),397,479,variants.yellow,'center')
   elseif state.hub_mode=='status' then text(context,locale.text('audit_note'),397,479,variants.yellow,'center')
   elseif state.hub_mode=='players' then text(context,locale.text('local_players'),397,370,variants.white,'center') end
-  local message=state.hub_note or state.message
+  local message=state.hub_note or state.message or (state.hub_mode=='root' and state.hub_catalog_notice)
   local label=tostring(message or locale.text('navigation'))
   local limit=math.min(#label,92)
   while limit<#label and label:byte(limit+1)>=128 and label:byte(limit+1)<192 do limit=limit-1 end

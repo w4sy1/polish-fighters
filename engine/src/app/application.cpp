@@ -211,7 +211,15 @@ constexpr std::array profile_definitions{
     ProfileDefinition{"profile_ce_lf2", "ce-lf2"},
     ProfileDefinition{"profile_ntsd_community", "ntsd-community"},
     ProfileDefinition{"profile_ntsd_ce_setup", "ntsd-ce-setup"},
-    ProfileDefinition{"profile_killer_lf2", "killer-lf2"}};
+    ProfileDefinition{"profile_killer_lf2", "killer-lf2"},
+    // mortal-kombat, lf3 and oplos ship real content-packs/ data (tools/build_mod_release.py,
+    // engine/scripts/polish-fighters/hub.lua optional_profiles, mod_browser.lua profile_tags)
+    // but had no ProfileDefinition here, so profiles_available never carried their tag and
+    // the GitHub-downloaded pack could never be selected as the active profile. See the
+    // matching Lua-side entries added alongside this fix.
+    ProfileDefinition{"profile_mortal_kombat", "mortal-kombat"},
+    ProfileDefinition{"profile_lf3", "lf3"},
+    ProfileDefinition{"profile_oplos", "oplos"}};
 struct ProfileRequest { std::string directory; std::vector<std::string> remaining_trace; };
 std::filesystem::path content_directory(const Configuration& config) {
     // Android stages fresh Lua modules in files/scripts while the unpacked game

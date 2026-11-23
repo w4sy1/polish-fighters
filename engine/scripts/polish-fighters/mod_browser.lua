@@ -11,8 +11,19 @@ local words={
 }
 local function strings() return words[locale.id()] end
 -- Polish Fighters — GitHub: signed catalogue and installer provided by the engine (engine.mods).
+-- Maps a catalogue entry's manifest `profile` field (tools/build_mod_release.py PACKS[id][1])
+-- to the hub.lua profiles/optional_profiles id used to activate it. A pack missing here still
+-- downloads and verifies fine, but github_poll below can never flip state.hub_available[tag]
+-- and mod_browser's own activate() has nothing to pass to context.action('profile_'..tag), so
+-- the pack silently becomes unselectable after a successful install. mortal_kombat/lf3/oplos
+-- were missing this entry (and the matching application.cpp/hub.lua ones) until this fix.
 local profile_tags={lf_four_turbo='lf_four_turbo',dbz='dbz',one_piece='one_piece',kate='kate',reinforced='reinforced',
- ntsd='ntsd',bleach='bleach',polish_fighters='polish_fighters',all='mixed'}
+ ntsd='ntsd',bleach='bleach',polish_fighters='polish_fighters',all='mixed',
+ mortal_kombat='mortal_kombat',lf3='lf3',oplos='oplos',
+ -- Already reachable after a restart via hub.optional_profiles (DODATKOWE MODUŁY), since both
+ -- are in application.cpp's profile_definitions too; adding them here just lets a fresh
+ -- download become selectable from this screen immediately, same as the base packs above.
+ dragon_ball_super='dragon_ball_super',ntsd_community='ntsd_community'}
 local function mods_api() return engine and engine.mods end
 local function github_receipt(entry) return tostring(entry.version)..' '..tostring(entry.sha256) end
 local function local_profiles(g)

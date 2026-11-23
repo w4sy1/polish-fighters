@@ -25,6 +25,12 @@ hub.optional_profiles={
  {id="ntsd_community", profile="ntsd-community", title="NTSD Community"},
  {id="ntsd_ce_setup", profile="ntsd-ce-setup", title="NTSD CE"},
  {id="killer_lf2", profile="killer-lf2", title="Killer LF2", campaign=false},
+ -- Downloadable via the GitHub mod catalogue (tools/build_mod_release.py) but previously had
+ -- no entry here nor in application.cpp's profile_definitions nor mod_browser.lua's
+ -- profile_tags, so a successful download could never be selected as the active profile.
+ {id="mortal_kombat", profile="mortal-kombat", title="Mortal Kombat LF2"},
+ {id="lf3", profile="lf3", title="LF3BYTITASZIBIKAS 2.0b"},
+ {id="oplos", profile="oplos", title="One Piece: Legends of Sea"},
 }
 function hub.title(profile)
  if profile=='mixed-all' then return 'Polish Fighters: wszystkie mody' end
