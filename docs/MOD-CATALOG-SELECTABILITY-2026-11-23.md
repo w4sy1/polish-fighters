@@ -63,3 +63,65 @@ faktycznie uruchomionej grze NAWET po otwarciu KATALOG MODÓW i kliknięciu POBI
 przed pobraniem), to jest to inny, jeszcze nieodtworzony problem - proszę o zrzut ekranu z tego
 konkretnego ekranu (KATALOG MODÓW, status po POBIERZ) albo logi konsoli gry przy starcie, żeby
 to zweryfikować.
+
+## Runda 2 (po zrzutach ekranu z Androida)
+
+Zrzuty ekranu pokazały dwie rzeczy, których runda 1 nie objęła:
+
+1. **"Nie zapisano wyboru: Nieznany moduł" na Androidzie dla `lf3`/`mortal-kombat`.**
+   `AndroidModsActivity.selectProfile()` zapisuje wybór przez
+   `engine/android/.../GamePackSettings.java`, który ma SWOJĄ, czwartą, całkowicie
+   niezależną od C++/Lua listę dozwolonych profili (`IDS`/`TITLES`/`PACKS` + switch
+   `optionalTitle()`). Runda 1 naprawiła `profile_definitions` (C++, desktop), `hub.lua` i
+   `mod_browser.lua` (Lua, desktop/ekran KATALOG MODÓW na desktopie) - ale nie dotknęła tego
+   pliku. `GamePackSettings.save()` odrzucał `mortal_kombat`/`lf3`/`oplos` wyjątkiem
+   `IllegalArgumentException("Nieznany moduł")`, bo nie były ani w `IDS`, ani rozpoznawane
+   przez `optionalTitle()`. Paczka pobierała się i instalowała poprawnie (widać "WYBIERZ" w
+   KATALOG MODÓW), ale zapis wyboru zawsze się wywalał.
+   Naprawiono: dodano `dragon_ball_super`, `ntsd_community`, `mortal_kombat`, `lf3`, `oplos`
+   do `IDS`/`TITLES`/`PACKS` w `GamePackSettings.java` (commit `6091356`).
+
+2. **Wymóg: żadnego podmenu "DODATKOWE MODUŁY" dla wydanych paczek.** Runda 1 wpisała
+   `mortal_kombat`/`lf3`/`oplos` do `hub.optional_profiles`, czyli do osobnego ekranu
+   (`mode=='optional_modules'`, wiersz "DODATKOWE MODUŁY" na głównej liście), zamiast na
+   główną listę - to nie spełniało wymagania "wszystkie mają być na liście". Przeniesiono
+   `dragon_ball_super`/`ntsd_community`/`mortal_kombat`/`lf3`/`oplos` z
+   `hub.optional_profiles` do `hub.profiles` (Lua, desktop) i do głównej tablicy `IDS`
+   (Android) - teraz wszystkich 14 wydanych paczek z `mods/catalog.json` jest widocznych
+   bezpośrednio na głównej liście MODUŁY, z `[BRAK DANYCH]` tam gdzie paczka nie jest jeszcze
+   pobrana lokalnie, tak jak oryginalnych 9. `hub.optional_profiles` zostaje tylko dla paczek,
+   których `tools/build_mod_release.py` PACKS jeszcze nie ma zbudowanych/wydanych
+   (fighter-hero, gf2, lf2-ns, sx2, lf2-sv, rn-lf2, lf-seed, wlf2-al, ce-lf2, ntsd-ce-setup,
+   killer-lf2) - gdy zostaną wydane, trzeba je analogicznie przenieść.
+
+3. **`module_inventory.lua`** (ekran STAN/ZGODNOŚĆ MODUŁÓW) nie miał wpisów dla tych 5 paczek,
+   bo jest generowany z realnych assetów przez `tools/generate_module_registry.py`, których ten
+   checkout nie ma. Dopisano wpisy ręcznie na podstawie opisów z `mod_catalog.lua` i liczby
+   `fighters` z `content-packs/<id>/import-report.json` (obie te dane już były w repo i
+   pochodzą z wcześniejszego importu tych paczek na docelowej maszynie) - **do potwierdzenia
+   ponownym odpaleniem generatora na maszynie z pełnym repo**. To nie blokuje wybierania ani
+   grania paczką (o tym decyduje `state.hub_available`, realna obecność plików), tylko licznik
+   "Brakujące pliki" na jednym ekranie diagnostycznym.
+
+### Co zweryfikowano w rundzie 2, a co nie
+
+- `luac5.4 -p` na `hub.lua` i `module_inventory.lua` - OK.
+- `python3 -m pytest tests/test_github_mods.py` - 6/6 OK (bez zmian w tej logice, uruchomione
+  jako regresja).
+- Próba uruchomienia testów jednostkowych Androida (`./gradlew testDebugUnitTest`) - w tym
+  środowisku NIE DA SIĘ: brak Android SDK (`ANDROID_HOME`/`local.properties`). Zmiana w
+  `GamePackSettings.java` była więc zweryfikowana tylko manualnie: zgodność nawiasów/długości
+  tablic sprawdzona skryptem, logika `IDS`/`PACKS`/`TITLES` sprawdzona pod kątem wszystkich
+  miejsc, które z nich czytają (`GameLaunchArguments.build`, `BluetoothLobbyActivity`,
+  `AndroidModsActivity`) - wszystkie liczą długość dynamicznie (`GamePackSettings.IDS.length`),
+  żadne nie zakłada "9", więc rozszerzenie do 14 nie powinno nic złamać, ale **to nie jest
+  potwierdzone realnym uruchomieniem testów Robolectric na tej maszynie**. Testy
+  `GamePackSettingsTest`/`GamePackDialogTest`/`everySingleModuleLaunchesExactlyThatModule` już
+  istnieją i obejmują ten kod - proszę je przepuścić lokalnie (`./gradlew testDebugUnitTest`)
+  przed wydaniem.
+- Nie sprawdzono, czy jest jeszcze jakiś OSOBNY ekran "MODUŁY" na Androidzie (poza KATALOG
+  MODÓW i BluetoothLobbyActivity) z własną, krótszą listą - przeszukano wszystkie miejsca
+  odwołujące się do `GamePackSettings.IDS`/`TITLES`/`PACKS` i wszystkie trzy znalezione pliki
+  (`AndroidModsActivity.java`, `BluetoothLobbyActivity.java`, `GameLaunchArguments.java`)
+  czytają je dynamicznie, więc osobnej "piątej" listy nie znaleziono - ale proszę dać znać,
+  jeśli po aktualizacji na telefonie nadal gdzieś widać tylko 9 pozycji.
