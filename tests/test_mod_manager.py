@@ -33,7 +33,21 @@ class ModTests(unittest.TestCase):
         self.assertEqual(len({e['id'] for e in rows}), 103)
         self.assertEqual(len(manager.catalog('D.R. LF2 & LF3')), 2)
         self.assertTrue(manager.catalog('NTSD Community Seasons 1–7'))
-        self.assertTrue(all(e['compatibility'] == 'not_tested' for e in rows))
+        # Entries actually imported in this repo (content-packs/<id>) are no longer
+        # 'not_tested': they are 'experimental' (statically imported, not gameplay-verified),
+        # except one-piece-new-world-0-3 whose source archive is incomplete (compatibility=None).
+        imported_experimental = {
+            'lf3bytitaszibikas-2-0b', 'ntsd-community-edition', 'dragonball-super-edition-v1-0',
+            'one-piece-legends-of-sea-2-1x', 'mortal-kombat-lf2',
+        }
+        blocked_archive = {'one-piece-new-world-0-3'}
+        for entry in rows:
+            if entry['id'] in imported_experimental:
+                self.assertEqual(entry['compatibility'], 'experimental', entry['id'])
+            elif entry['id'] in blocked_archive:
+                self.assertIsNone(entry['compatibility'], entry['id'])
+            else:
+                self.assertEqual(entry['compatibility'], 'not_tested', entry['id'])
         # Three entries have been verified against the real lf-empire.de pages
         # (2026-11-19): their download_url is now known and real, the rest are
         # still unverified placeholders.
@@ -48,9 +62,11 @@ class ModTests(unittest.TestCase):
             else:
                 self.assertIsNone(entry['download_url'], entry['id'])
         by_id = {entry['id']: entry for entry in rows}
-        for mod_id in ('dragonball-super-edition-v1-0', 'dragonball-super-edition-v1-1'):
-            self.assertEqual(by_id[mod_id]['download_status'], 'download_access_blocked')
-            self.assertIn('/downloads/', by_id[mod_id]['download_page_url'])
+        # v1-0 was downloaded and imported (content-packs/dragon-ball-super) in this repo;
+        # v1-1 is a different, separate version that was never touched.
+        self.assertEqual(by_id['dragonball-super-edition-v1-0']['download_status'], 'downloaded')
+        self.assertEqual(by_id['dragonball-super-edition-v1-1']['download_status'], 'download_access_blocked')
+        self.assertIn('/downloads/', by_id['dragonball-super-edition-v1-1']['download_page_url'])
         bleach = by_id['bleach-bankai-revolution-2-0']
         self.assertEqual(bleach['version'], '2.0')
         self.assertTrue(bleach['download_page_url'].endswith('/versoes-anteriores/'))
