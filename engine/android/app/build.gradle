@@ -124,4 +124,12 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15to18:1.85'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
+    // Testy uzywaja @Config(sdk=28) i @Config(sdk=34) (Android 9 i 14). Robolectric domyslnie
+    // probuje pobrac te obrazy SDK wlasnym, wewnetrznym fetcherem (omijajac repozytoria/cache
+    // Gradle) - w CI to zawodzi (java.lang.AssertionError: Failed to fetch maven artifact
+    // org.robolectric:android-all-instrumented:...). Deklarujac je tutaj jawnie, Gradle sciaga
+    // i cache'uje te jary normalnym mechanizmem (ten sam cache co reszta zaleznosci), a
+    // Robolectric znajduje je juz lokalnie i nie probuje wlasnego pobierania.
+    testImplementation 'org.robolectric:android-all-instrumented:9-robolectric-4913185-2-i7'
+    testImplementation 'org.robolectric:android-all-instrumented:14-robolectric-10818077-i7'
 }
