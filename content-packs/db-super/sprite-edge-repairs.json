@@ -1,0 +1,335 @@
+{
+  "padded": [],
+  "unresolved": [
+    {
+      "asset": "mods/db-super/a/000442.bmp",
+      "actual": [
+        1029,
+        260
+      ],
+      "required": [
+        3429,
+        909
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000299.bmp",
+      "actual": [
+        605,
+        183
+      ],
+      "required": [
+        603,
+        365
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000330.bmp",
+      "actual": [
+        800,
+        80
+      ],
+      "required": [
+        879,
+        79
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000235.bmp",
+      "actual": [
+        327,
+        105
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000461.bmp",
+      "actual": [
+        1056,
+        92
+      ],
+      "required": [
+        1759,
+        608
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000470.bmp",
+      "actual": [
+        1056,
+        87
+      ],
+      "required": [
+        1759,
+        608
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000451.bmp",
+      "actual": [
+        528,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000350.bmp",
+      "actual": [
+        1029,
+        260
+      ],
+      "required": [
+        3429,
+        909
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000342.bmp",
+      "actual": [
+        800,
+        80
+      ],
+      "required": [
+        879,
+        79
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000476.bmp",
+      "actual": [
+        528,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000483.bmp",
+      "actual": [
+        783,
+        462
+      ],
+      "required": [
+        2609,
+        986
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000501.bmp",
+      "actual": [
+        1056,
+        87
+      ],
+      "required": [
+        1759,
+        608
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000495.bmp",
+      "actual": [
+        1056,
+        92
+      ],
+      "required": [
+        1759,
+        643
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000509.bmp",
+      "actual": [
+        1056,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000535.bmp",
+      "actual": [
+        800,
+        560
+      ],
+      "required": [
+        1599,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000529.bmp",
+      "actual": [
+        1400,
+        80
+      ],
+      "required": [
+        2799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000523.bmp",
+      "actual": [
+        1056,
+        80
+      ],
+      "required": [
+        1759,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000300.bmp",
+      "actual": [
+        29,
+        15
+      ],
+      "required": [
+        799,
+        404
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000303.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000307.bmp",
+      "actual": [
+        1029,
+        167
+      ],
+      "required": [
+        1371,
+        500
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000424.bmp",
+      "actual": [
+        480,
+        524
+      ],
+      "required": [
+        479,
+        9169
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000287.bmp",
+      "actual": [
+        800,
+        480
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000289.bmp",
+      "actual": [
+        10240,
+        720
+      ],
+      "required": [
+        10247,
+        720
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000228.bmp",
+      "actual": [
+        281,
+        152
+      ],
+      "required": [
+        279,
+        289
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000229.bmp",
+      "actual": [
+        341,
+        80
+      ],
+      "required": [
+        799,
+        559
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000238.bmp",
+      "actual": [
+        490,
+        146
+      ],
+      "required": [
+        489,
+        489
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000558.bmp",
+      "actual": [
+        288,
+        142
+      ],
+      "required": [
+        287,
+        212
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000570.bmp",
+      "actual": [
+        327,
+        105
+      ],
+      "required": [
+        435,
+        104
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000571.bmp",
+      "actual": [
+        492,
+        54
+      ],
+      "required": [
+        495,
+        54
+      ]
+    },
+    {
+      "asset": "mods/db-super/a/000555.bmp",
+      "actual": [
+        328,
+        141
+      ],
+      "required": [
+        327,
+        281
+      ]
+    }
+  ]
+}

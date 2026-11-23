@@ -1,0 +1,136 @@
+{
+  "pack_id": "db-super",
+  "fighters": [
+    {
+      "id": 66,
+      "name": "PerfectCell",
+      "path": "char/vegeta/namek/vegeta.dat"
+    },
+    {
+      "id": 15,
+      "name": "Kanba",
+      "path": "sprite/kanba/kanba.dat"
+    },
+    {
+      "id": 67,
+      "name": "Goku",
+      "path": "char/vegeta/android/normal/vegeta.dat"
+    },
+    {
+      "id": 68,
+      "name": "GokuSSJ2",
+      "path": "char/vegeta/android/ss/ssvegeta.dat"
+    },
+    {
+      "id": 69,
+      "name": "GokuSSGSS",
+      "path": "char/vegeta/android/super/supervegeta.dat"
+    },
+    {
+      "id": 70,
+      "name": "Vegeta",
+      "path": "char/vegeta/buu/normal/vegeta.dat"
+    },
+    {
+      "id": 71,
+      "name": "VegetaSSJ",
+      "path": "char/vegeta/buu/ss/ssvegeta.dat"
+    },
+    {
+      "id": 72,
+      "name": "VegetaSSGSS",
+      "path": "char/vegeta/buu/ss2/ss2vegeta.dat"
+    },
+    {
+      "id": 73,
+      "name": "VegetaBeyond",
+      "path": "char/vegeta/buu/majin/majinvegeta.dat"
+    },
+    {
+      "id": 75,
+      "name": "BlackGoku",
+      "path": "char/tab2/tab2/blackgoku/blackgoku.dat"
+    },
+    {
+      "id": 76,
+      "name": "GokuRose",
+      "path": "char/tab2/tab2/rosegoku/rosegoku.dat"
+    },
+    {
+      "id": 77,
+      "name": "LordBeerus",
+      "path": "char/tab2/tab2/beerus/beerus.dat"
+    },
+    {
+      "id": 78,
+      "name": "Zamasu",
+      "path": "char/tab1/tabs/zamasu/zamasu.dat"
+    },
+    {
+      "id": 79,
+      "name": "FriezaGold",
+      "path": "char/tab1/tabs/frieza/frieza.dat"
+    },
+    {
+      "id": 80,
+      "name": "KidBuu",
+      "path": "char/tab1/tabs/buu/buu.dat"
+    },
+    {
+      "id": 81,
+      "name": "Hit",
+      "path": "char/tab1/tabs/hit/hit.dat"
+    },
+    {
+      "id": 23,
+      "name": "Broly",
+      "path": "char/greatwarriors/broly/broly.dat"
+    },
+    {
+      "id": 24,
+      "name": "Jiren",
+      "path": "char/vegito/super/jiren.dat"
+    },
+    {
+      "id": 25,
+      "name": "GokuUltra",
+      "path": "char/vegito/normal/vegito.dat"
+    },
+    {
+      "id": 35,
+      "name": "Announcer",
+      "path": "char/spec.dat"
+    },
+    {
+      "id": 440,
+      "name": "GokuUltra",
+      "path": "char/tab1/tabs/normal/vegito.dat"
+    },
+    {
+      "id": 31,
+      "name": "Hunter",
+      "path": "data/hunter.dat"
+    },
+    {
+      "id": 30,
+      "name": "Bandit",
+      "path": "data/bandit.dat"
+    }
+  ],
+  "objects": 76,
+  "backgrounds": 23,
+  "assets": 786,
+  "source_catalog_sha256": "3372c0992a9dc18fdd1bd84cd555b7c1944436763fe6959f691fb0c413c4e395",
+  "mode": "isolated, original IDs retained",
+  "executable_patches_emulated": false,
+  "gameplay_verified": false,
+  "png_aliases": {},
+  "catalog_markers_not_emulated": [],
+  "custom_catalog_labels": [],
+  "missing_resources": [],
+  "experimental": true,
+  "campaigns": [],
+  "disabled_sound_annotations": [],
+  "sprite_edge_repairs": 0,
+  "unresolved_sprite_sheets": 30
+}
