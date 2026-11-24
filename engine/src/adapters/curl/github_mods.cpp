@@ -24,6 +24,7 @@
 #include <optional>
 #include <random>
 #include <set>
+#include <system_error>
 #include <utility>
 #include <vector>
 #include <curl/curl.h>
@@ -628,7 +629,7 @@ Result<std::string> github_mod_install(std::string_view verified_catalogue, std:
             // an explicit Deny ACE on the folder both ignore elevation).
             const auto code = errno;
             return fail(ErrorCode::io, "Cannot write into the content-pack folder (" +
-                envelope.string() + "): " + std::strerror(code));
+                envelope.string() + "): " + std::error_code(code, std::generic_category()).message());
         }
         Sink sink{nullptr, &output, digest.get(), *size, offset, &progress};
         auto fetched = transfer(*url, sink, 60, offset);
