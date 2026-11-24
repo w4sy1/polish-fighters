@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
@@ -620,7 +621,15 @@ Result<std::string> github_mod_install(std::string_view verified_catalogue, std:
             }
         }
         std::ofstream output(envelope, std::ios::binary | (offset ? std::ios::app : std::ios::trunc));
-        if (!output) return fail(ErrorCode::io, "Cannot write into the content-pack folder");
+        if (!output) {
+            // errno/strerror here diagnoses the real cause (access denied, path too long, locked by
+            // another process, ...) instead of leaving the player and the next person to look at this
+            // guessing; admin rights do not fix every one of these (a Controlled Folder Access block or
+            // an explicit Deny ACE on the folder both ignore elevation).
+            const auto code = errno;
+            return fail(ErrorCode::io, "Cannot write into the content-pack folder (" +
+                envelope.string() + "): " + std::strerror(code));
+        }
         Sink sink{nullptr, &output, digest.get(), *size, offset, &progress};
         auto fetched = transfer(*url, sink, 60, offset);
         output.close();

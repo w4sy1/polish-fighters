@@ -81,6 +81,11 @@ english.ModReinforced=Reinforced
 english.ModDbz=Dragon Ball
 english.ModNtsd=NTSD / Naruto
 english.ModOnePiece=One Piece
+english.ModMortalKombat=Mortal Kombat LF2
+english.ModLf3=LF3BYTITASZIBIKAS 2.0b
+english.ModOplos=One Piece: Legends of Sea
+english.ModDragonBallSuper=Dragon Ball Super
+english.ModNtsdCommunity=NTSD Community
 
 german.GameData=Spieldaten:
 german.DownloadLF2=Den Original-Installer von Little Fighter 2 jetzt herunterladen (ca. 30 MB, zum Spielen nötig; sonst bietet OpenLF2 es beim ersten Start an)
@@ -99,6 +104,11 @@ german.ModReinforced=Reinforced
 german.ModDbz=Dragon Ball
 german.ModNtsd=NTSD / Naruto
 german.ModOnePiece=One Piece
+german.ModMortalKombat=Mortal Kombat LF2
+german.ModLf3=LF3BYTITASZIBIKAS 2.0b
+german.ModOplos=One Piece: Legends of Sea
+german.ModDragonBallSuper=Dragon Ball Super
+german.ModNtsdCommunity=NTSD Community
 
 chinesesimplified.GameData=游戏数据：
 chinesesimplified.DownloadLF2=立即下载原版小朋友齐打交安装程序（约 30 MB，游玩所需；否则 OpenLF2 会在首次启动时提供下载）
@@ -117,6 +127,11 @@ chinesesimplified.ModReinforced=Reinforced
 chinesesimplified.ModDbz=龙珠 Dragon Ball
 chinesesimplified.ModNtsd=NTSD / 火影忍者
 chinesesimplified.ModOnePiece=海贼王 One Piece
+chinesesimplified.ModMortalKombat=Mortal Kombat LF2
+chinesesimplified.ModLf3=LF3BYTITASZIBIKAS 2.0b
+chinesesimplified.ModOplos=海贼王 One Piece: Legends of Sea
+chinesesimplified.ModDragonBallSuper=龙珠超 Dragon Ball Super
+chinesesimplified.ModNtsdCommunity=NTSD Community
 
 chinesetraditional.GameData=遊戲資料：
 chinesetraditional.DownloadLF2=立即下載原版小朋友齊打交安裝程式（約 30 MB，遊玩所需；否則 OpenLF2 會在首次啟動時提供下載）
@@ -135,6 +150,11 @@ chinesetraditional.ModReinforced=Reinforced
 chinesetraditional.ModDbz=七龍珠 Dragon Ball
 chinesetraditional.ModNtsd=NTSD / 火影忍者
 chinesetraditional.ModOnePiece=海賊王 One Piece
+chinesetraditional.ModMortalKombat=Mortal Kombat LF2
+chinesetraditional.ModLf3=LF3BYTITASZIBIKAS 2.0b
+chinesetraditional.ModOplos=海賊王 One Piece: Legends of Sea
+chinesetraditional.ModDragonBallSuper=七龍珠超 Dragon Ball Super
+chinesetraditional.ModNtsdCommunity=NTSD Community
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -147,6 +167,11 @@ Name: "mod_reinforced"; Description: "{cm:ModReinforced}"; GroupDescription: "{c
 Name: "mod_dbz"; Description: "{cm:ModDbz}"; GroupDescription: "{cm:ModsGroup}"
 Name: "mod_ntsd"; Description: "{cm:ModNtsd}"; GroupDescription: "{cm:ModsGroup}"
 Name: "mod_onepiece"; Description: "{cm:ModOnePiece}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_mortalkombat"; Description: "{cm:ModMortalKombat}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_lf3"; Description: "{cm:ModLf3}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_oplos"; Description: "{cm:ModOplos}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_dragonballsuper"; Description: "{cm:ModDragonBallSuper}"; GroupDescription: "{cm:ModsGroup}"
+Name: "mod_ntsdcommunity"; Description: "{cm:ModNtsdCommunity}"; GroupDescription: "{cm:ModsGroup}"
 
 [InstallDelete]
 ; The scripts tree comes only from the installer (mods live in content-packs and the user profile).
@@ -169,6 +194,11 @@ Source: "{#StageDir}\content-packs\reinforced\*"; DestDir: "{app}\content-packs\
 Source: "{#StageDir}\content-packs\dbz\*"; DestDir: "{app}\content-packs\dbz"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_dbz
 Source: "{#StageDir}\content-packs\ntsd\*"; DestDir: "{app}\content-packs\ntsd"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_ntsd
 Source: "{#StageDir}\content-packs\one-piece\*"; DestDir: "{app}\content-packs\one-piece"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_onepiece
+Source: "{#StageDir}\content-packs\mortal-kombat\*"; DestDir: "{app}\content-packs\mortal-kombat"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_mortalkombat
+Source: "{#StageDir}\content-packs\lf3\*"; DestDir: "{app}\content-packs\lf3"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_lf3
+Source: "{#StageDir}\content-packs\oplos\*"; DestDir: "{app}\content-packs\oplos"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_oplos
+Source: "{#StageDir}\content-packs\dragon-ball-super\*"; DestDir: "{app}\content-packs\dragon-ball-super"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_dragonballsuper
+Source: "{#StageDir}\content-packs\ntsd-community\*"; DestDir: "{app}\content-packs\ntsd-community"; Flags: ignoreversion recursesubdirs createallsubdirs; Tasks: mod_ntsdcommunity
 Source: "{#StageDir}\licenses\*"; DestDir: "{app}\licenses"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StageDir}\README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
