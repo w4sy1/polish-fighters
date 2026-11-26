@@ -59,10 +59,10 @@ local function github_action(entry)
  if profile_tags[entry.profile] then return pl and 'WYBIERZ' or 'SELECT' end
  return pl and 'ZAINSTALOWANO' or 'INSTALLED'
 end
-local function github_start(s)
+local function github_start(state,s)
  local w=strings();local api=mods_api();s.github=s.github or {packages={},page=1};s.github.status=w.gh_loading
  if not api then s.github.status=w.gh_android;return end
- local ok,err=api('catalogue')
+ local ok,err=require('polish-fighters/catalog_watch').request(state)
  if ok==true then s.github.busy='catalogue' else s.github.status=w.gh_failed..tostring(err or '') end
  if err=='Mods handled by platform' then s.github.status=w.gh_android end
 end
@@ -242,7 +242,7 @@ function screen.activate(state,id,context)
    require('polish-fighters/hub').open_android_mods(context)
    s.github=nil
    if s.direct then state.hub_mods=nil end
-  elseif not (s.github and s.github.busy) then github_start(s) end
+  elseif not (s.github and s.github.busy) then github_start(state,s) end
  elseif id=='gh_import' and context.action then
   context.action('import_local_mod')
  elseif id=='gh_multi' then

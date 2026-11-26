@@ -8,12 +8,18 @@
 --
 -- engine.mods is a single-slot async request (engine/src/adapters/luajit/runtime.cpp
 -- mods_operation): only one 'catalogue'/'install'/'import' can be in flight at a time, and
--- mod_browser.lua uses the same slot once the player opens KATALOG MODÓW. This module only
--- ever starts a request while that screen is closed (state.hub_mods==nil) and gives up
--- quietly - no error shown to the player - if the slot is already busy or the platform has no
--- engine.mods at all (Linux/macOS builds: see mods_operation's #if !_WIN32 && !__ANDROID__).
+-- The foreground can take over the same fetch if the player opens the mod manager
+-- or joins a room that needs a pack while the background request is in flight.
 local watch={}
 local function api() return engine and engine.mods end
+
+function watch.request(state)
+ if state.hub_catalog_started and not state.hub_catalog_done then
+  state.hub_catalog_done=true
+  return true
+ end
+ return api()('catalogue')
+end
 
 -- Starts one background catalogue fetch per app run. Safe to call every frame: it is a no-op
 -- once state.hub_catalog_started is set, or forever if engine.mods is unavailable.

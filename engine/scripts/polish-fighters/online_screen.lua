@@ -224,7 +224,7 @@ local function activate_simple(state,s,id,context)
   cancel_simple(s);state.hub_online=nil
  elseif id=='mod_yes' then
   if not s.mod_job and s.missing_mod then
-   local ok,problem=engine.mods('catalogue')
+   local ok,problem=require('polish-fighters/catalog_watch').request(state)
    if ok then s.mod_job='catalogue';s.mod_message='Pobieram podpisany katalog…'
    elseif problem=='Mods handled by platform' then s.mod_message='Pobierz tę paczkę w Mod Managerze i wróć na listę.'
    else s.mod_message='Błąd: '..client.utf8_prefix(problem,76) end

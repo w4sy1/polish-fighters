@@ -44,9 +44,14 @@ engine.mods=function(action,value)
  end
 end
 local s2={hub_available={lf_four_turbo=false}}
+local watch=require('polish-fighters/catalog_watch')
+watch.poll(s2)
+assert(s2.hub_catalog_started and calls[#calls]=='catalogue')
 screen.open(s2)
+local request_count=#calls
 screen.activate(s2,'github',context)
-assert(s2.hub_mods.github.busy=='catalogue')
+assert(s2.hub_mods.github.busy=='catalogue' and s2.hub_catalog_done)
+assert(#calls==request_count,'opening Mods must take over the in-flight catalogue rather than start a second request')
 screen.update(s2,{keys={}},context);assert(s2.hub_mods.github.busy=='catalogue')
 screen.update(s2,{keys={}},context)
 assert(not s2.hub_mods.github.busy and #s2.hub_mods.github.packages==2)
