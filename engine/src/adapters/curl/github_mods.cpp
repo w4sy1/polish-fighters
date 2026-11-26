@@ -12,6 +12,7 @@
 #include "openlf2/ports/download.hpp"
 #endif
 #include "openlf2/core/json.hpp"
+#include "openlf2/engine/packages.hpp"
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -457,15 +458,9 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
         if (!copied || !output) { cleanup(staging); return copied ? fail(ErrorCode::io, "Cannot write content-pack file") : std::unexpected(copied.error()); }
         ++progress.files;
     }
-    {
-        std::ifstream manifest_file(staging / "package.manifest", std::ios::binary);
-        std::string line;
-        bool declared = false;
-        while (std::getline(manifest_file, line)) {
-            if (!line.empty() && line.back() == '\r') line.pop_back();
-            declared = declared || line == "id=" + std::string(id);
-        }
-        if (!declared) { cleanup(staging); return fail(ErrorCode::format, "package.manifest declares a different ID"); }
+    if (auto complete = check_package_files(staging, id); !complete) {
+        cleanup(staging);
+        return std::unexpected(complete.error());
     }
     std::string local_receipt;
     if (receipt.empty()) {
@@ -552,11 +547,10 @@ std::optional<std::string> github_mod_receipt(std::string_view id) {
     std::scoped_lock lock(directory_lock);
     if (content_directory_value.empty()) return std::nullopt;
     auto folder = content_directory_value / std::string(id);
-    std::error_code error;
-    if (!fs::is_regular_file(folder / "package.manifest", error)) {
+    if (!check_package_files(folder, id)) {
         if (bundled_directory_value.empty()) return std::nullopt;
         folder = bundled_directory_value / std::string(id);
-        if (!fs::is_regular_file(folder / "package.manifest", error)) return std::nullopt;
+        if (!check_package_files(folder, id)) return std::nullopt;
     }
     std::ifstream file(folder / ".github-install", std::ios::binary);
     std::array<char, 128> buffer{};

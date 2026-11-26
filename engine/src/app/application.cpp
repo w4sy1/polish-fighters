@@ -189,8 +189,8 @@ struct Configuration {
     bool default_controller = false;
     bool hub_menu = false; // Explicitly exercise the live first menu in headless UI probes.
     bool profile_start = false;
-    std::string rejected_profile;
-    bool profile_load_failed = false;
+    std::string failed_profile;
+    std::string profile_failure_reason;
     std::optional<std::filesystem::path> capture_frame;
     bool render_trace = false;
     std::vector<std::string> input_trace; // held action letters per frame, headless
@@ -236,8 +236,7 @@ std::filesystem::path content_directory(const Configuration& config) {
 std::filesystem::path profile_directory(const Configuration& config, std::string_view id) {
     if (!config.downloaded_content_directory.empty()) {
         auto path = config.downloaded_content_directory / id;
-        std::error_code error;
-        if (std::filesystem::is_regular_file(path / "package.manifest", error)) return path;
+        if (check_package_files(path, id)) return path;
     }
     return content_directory(config) / id;
 }
@@ -601,8 +600,7 @@ Result<Configuration> configuration(std::span<const std::string> arguments,
             local_installer = std::move(game_data_installer);
             if (arguments.empty()) {
                 const auto polish = directory / "content-packs" / "polish-originals";
-                std::error_code error;
-                if (std::filesystem::is_regular_file(polish / "package.manifest", error)) {
+                if (check_package_files(polish, "polish-originals")) {
                     config.mods.push_back(polish);
                     config.profile_start = true;
                 }
@@ -1170,11 +1168,12 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         (config.network_role.empty() ? std::string{} : ", network_role=\"" + config.network_role +
             "\", network_address=\"" + config.network_address + "\"");
     std::string profiles_available = ", profiles_available={";
+    bool originals_available = false;
     for (const auto& profile_entry : profile_definitions) {
-        std::error_code error;
         const bool available = profile_entry.directory.empty() ||
-            (profile_entry.directory != config.rejected_profile && std::filesystem::is_regular_file(
-                profile_directory(config, profile_entry.directory) / "package.manifest", error));
+            ((profile_entry.directory != "mixed-all" || originals_available) &&
+                check_package_files(profile_directory(config, profile_entry.directory), profile_entry.directory));
+        if (profile_entry.directory == "polish-originals") originals_available = available;
         profiles_available += std::string(profile_entry.action.substr(8)) + "=" + (available ? "true," : "false,");
     }
     profiles_available += "}";
@@ -1188,7 +1187,8 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         (config.network_room ? ", network_room=true" : "") +
         (config.headless ? ", headless=true" : "") +
         (config.profile_start ? ", profile_start=true" : "") +
-        (config.profile_load_failed ? ", profile_load_failed=true" : "") +
+        (config.failed_profile.empty() ? "" : ", failed_profile=" + lua_quote(config.failed_profile) +
+            ", profile_failure_reason=" + lua_quote(config.profile_failure_reason)) +
         (config.headless && !config.hub_menu ? ", legacy_menu=true" : "") +
         ", recording_version=" + std::to_string(constants->second) + network_options +
 #if defined(__SWITCH__) || defined(__vita__)
@@ -1720,13 +1720,16 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
 #endif
             auto result = run(*config, profile_request, host);
             if (!result) {
+                const auto failed = requested_directory.empty() ? "lf2-classic" : requested_directory;
+                if (previous_mods) std::cerr << "Profile " << failed << ": ";
                 std::cerr << result.error().message << '\n';
-                if (!previous_mods || requested_directory.empty()) return 1;
+                if (!previous_mods) return 1;
                 config->mods = std::move(*previous_mods);
                 previous_mods.reset();
-                config->rejected_profile = std::move(requested_directory);
+                config->failed_profile = failed;
+                config->profile_failure_reason = result.error().message.starts_with("missing package file:")
+                    ? "profile_missing_file" : "profile_load_failed";
                 config->profile_start = false;
-                config->profile_load_failed = true;
                 if (config->headless) config->input_trace = {""};
                 continue;
             }
@@ -1739,7 +1742,7 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
                 config->mods.push_back(profile_directory(*config, "polish-originals"));
             if (!profile_request->directory.empty()) config->mods.push_back(target);
             config->profile_start = true;
-            config->profile_load_failed = false;
+            config->failed_profile.clear();
             config->input_trace = std::move(profile_request->remaining_trace);
             config->network_role.clear();config->replay.reset();
             std::cout << "Profile loaded: " << (profile_request->directory.empty() ? "lf2-classic" : profile_request->directory) << '\n';

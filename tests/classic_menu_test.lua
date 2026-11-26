@@ -76,7 +76,9 @@ assert(not rows[2][3] and hub.rows(state,'lf2-classic')[2][3])
 local seen={}
 for _,row in ipairs(rows) do assert(not seen[row[1]],row[1]);seen[row[1]]=true end
 state.hub_available={polish_fighters=false};requested=nil
-click('profile_polish_fighters');assert(not requested and state.hub_note:find('Brak lokalnego pakietu',1,true))
+click('profile_polish_fighters')
+assert(not requested and state.hub_note:find('Polish Originals',1,true)
+ and state.hub_note:find('Katalog modów',1,true))
 state.hub_available.polish_fighters=true
 click('profile_polish_fighters');assert(requested=='profile_polish_fighters')
 click('mods');assert(state.hub_mods,'catalogue did not open from library')

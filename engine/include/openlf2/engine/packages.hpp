@@ -24,6 +24,8 @@ struct ScriptBundle {
     WindowSize window;
     std::vector<PackageAsset> assets;
 };
+// Check the package ID and the presence of all files declared by its manifest.
+Result<void> check_package_files(const std::filesystem::path& root, std::string_view expected_id);
 // Base must declare the window size; another package may change it, but two packages other
 // than base must not declare different sizes.
 Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots,

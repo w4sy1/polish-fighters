@@ -3,7 +3,7 @@ return {
  current_mod='CURRENT MOD: ',
  mods='MOD CATALOGUE',
  status='MODULE STATUS / COMPATIBILITY', audit_note='File audit at build time. Present assets do not prove complete mechanics compatibility.', assets='Assets: ', missing_files='Missing files: ',
- battle='BATTLE', play_main='PLAY LOCALLY', modules='MODULES', campaign_unavailable='No campaign available', profile_load_failed='Could not load the selected module.', optional_modules='ADDITIONAL MODULES', online='PLAY ONLINE', settings='SETTINGS', language='LANGUAGE', credits='CREDITS', quit='QUIT',
+ battle='BATTLE', play_main='PLAY LOCALLY', modules='MODULES', campaign_unavailable='No campaign available', profile_load_failed='The engine rejected the package. See the log.', profile_missing_file='Files are missing. Download the pack in the Mod Catalogue.', profile_package_unavailable='Full package unavailable. Check the Mod Catalogue.', optional_modules='ADDITIONAL MODULES', online='PLAY ONLINE', settings='SETTINGS', language='LANGUAGE', credits='CREDITS', quit='QUIT',
  back='BACK', controls='CONTROLS', video='VIDEO / SOUND', extras='HISTORY / UNLOCKS', recording='RECORDING SETTINGS',
  versus='VS Mode', stage='Stage Mode', championship='1 on 1 Championship', team_championship='2 on 2 Championship',
  battle_setup='Battle Mode', demo='Demo', replay='Playback Recording',

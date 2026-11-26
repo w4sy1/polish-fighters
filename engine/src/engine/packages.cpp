@@ -103,6 +103,26 @@ Result<Package> parse_package(const std::filesystem::path& root) {
     return package;
 }
 }
+Result<void> check_package_files(const std::filesystem::path& root, std::string_view expected_id) {
+    auto package = parse_package(root);
+    if (!package) return std::unexpected(package.error());
+    if (package->id != expected_id) return fail(ErrorCode::format, "unexpected package ID");
+    const auto check = [&](const std::string& file) -> Result<void> {
+        std::error_code error;
+        if (!std::filesystem::is_regular_file(root / file, error)) {
+            return fail(ErrorCode::io, "missing package file: " + file);
+        }
+        return {};
+    };
+    for (const auto& declaration : package->declarations) {
+        if (auto result = check(declaration.file); !result) return result;
+    }
+    for (const auto& [resource, file] : package->assets) {
+        if (auto result = check(file); !result) return result;
+    }
+    return {};
+}
+
 Result<ScriptBundle> load_packages(std::span<const std::filesystem::path> roots,
                                   const std::function<Result<void>(WindowSize)>& before_assets) {
     if (roots.size() > 64) return fail(ErrorCode::limit, "at most 64 script packages");

@@ -31,6 +31,13 @@ int main() {
     };
     const std::vector<fs::path> roots{base, extra};
     write(base, "base", 2048); write(extra, "extra", 2048);
+    assert(openlf2::check_package_files(extra, "extra"));
+    assert(!openlf2::check_package_files(extra, "other"));
+    fs::remove(extra / "asset.bin");
+    auto incomplete = openlf2::check_package_files(extra, "extra");
+    assert(!incomplete && incomplete.error().message == "missing package file: asset.bin");
+    std::ofstream(extra / "asset.bin") << "restored";
+    assert(openlf2::check_package_files(extra, "extra"));
     auto loaded = openlf2::load_packages(roots);
     assert(loaded && loaded->assets.size() == 4096);
     write(extra, "extra", 2049);

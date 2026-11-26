@@ -101,7 +101,10 @@ return function(base)
    local audit=require('polish-fighters/module_inventory')[tag]
    local available=state.hub_available and state.hub_available[tag]
    if available==false or (available==nil and audit and audit.missing>0) then
-    state.hub_note="Brak lokalnego pakietu. Uruchom pełną paczkę Little Fighters.";return
+    local title=tag=='mixed' and locale.text('mixed') or tag
+    for _,entry in ipairs(hub.profiles) do if entry.id==tag then title=entry.title;break end end
+    state.hub_note=title..' — '..locale.text('profile_package_unavailable')
+    return
    end
    if tag=='mixed' then
     local doc,problem=engine.read_settings()

@@ -21,11 +21,13 @@ return function(base)
   state.launch.hub_installed_version=options.installed_version
   local saved=engine and engine.read_settings and engine.read_settings() or {}
   if type(saved)~="table" then saved={} end
-  if options.profile_load_failed then
+  if options.failed_profile then
    saved.little_fighters_pending_mode=nil
    if options.touch_device then saved.little_fighters_start_profile='lf_two' end
    engine.write_settings(saved)
-   state.launch.hub_note=require('polish-fighters/menu_locale').text('profile_load_failed')
+   local title=require('polish-fighters/hub').title(options.failed_profile)
+   local reason=require('polish-fighters/menu_locale').text(options.profile_failure_reason)
+   state.launch.hub_note=title..' — '..reason
   end
   local chosen=saved.little_fighters_start_profile
   local single_mobile=options.touch_device and chosen and chosen~='all' and chosen~='custom'
