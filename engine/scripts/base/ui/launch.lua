@@ -641,7 +641,9 @@ local function navigation_page(state)
             end
             return {page = "options_list", targets = list, default = current + 1}
         end
-        list[#list+1]=target(layout.panel.x+350,layout.panel.y+14,layout.panel.x+470,layout.panel.y+40)
+        if not state.hub_enabled then
+            list[#list+1]=target(layout.panel.x+350,layout.panel.y+14,layout.panel.x+470,layout.panel.y+40)
+        end
         for _, area in ipairs({layout.ok, layout.cancel}) do
             list[#list + 1] = target(area.x, area.y, area.x + area.width, area.y + area.height)
         end
