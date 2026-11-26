@@ -3,19 +3,6 @@ local guide={}
 guide.order={410,411,412,413,414,415}
 guide.names={[410]='Wasyl',[411]='Szymonoko / SZ',[412]='Mega Ninja Jaś',
  [413]='Skibidi Sigma Tata',[414]='Remonoko / Remek',[415]='Remonoko - Kamienny Mech'}
-guide.basics={
- 'STEROWANIE I PORADNIK',
- 'Kierunek: idź; dwa szybkie naciśnięcia w bok: biegnij.',
- 'W biegu przeciwny kierunek hamuje. Skok z biegu daje odskok.',
- 'J: skok. Kierunek wybiera stronę; A w powietrzu: atak.',
- 'A: atak. Przy przedmiocie: podnieś go; z przedmiotem: użyj.',
- 'D: obrona. D w biegu: przetoczenie.',
- 'D > A: blok, kierunek patrzenia, atak. Góra i dół też działają.',
- 'D, J i A oznaczają akcje. Klawisze i pad sprawdzisz w ustawieniach.',
- 'Na dotyku użyj joysticka lub strzałek. S+ zmienia stronę skrótów.',
- 'Lista ruchów pokazuje skróty, koszty wejścia i kombinacje z danych.',
- 'Przemiany zależą od postaci, jej stanu i warunków ruchu.',
- 'Jeśli ruch nie wychodzi, sprawdź MP i poczekaj na właściwy stan.'}
 local moves={
  [410]={
   {'D > A','Seria trzech pocisków',300}, {'D ^ A','Jeden słabszy klon',310},

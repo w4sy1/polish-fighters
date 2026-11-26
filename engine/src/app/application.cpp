@@ -163,6 +163,7 @@ private:
 };
 
 struct Configuration {
+    std::filesystem::path downloaded_content_directory;
     std::filesystem::path installer;
     std::filesystem::path scripts;
     std::vector<std::filesystem::path> mods;
@@ -231,6 +232,14 @@ std::filesystem::path content_directory(const Configuration& config) {
         if (std::filesystem::is_directory(path, error)) return path;
     }
     return config.scripts.parent_path() / "content-packs";
+}
+std::filesystem::path profile_directory(const Configuration& config, std::string_view id) {
+    if (!config.downloaded_content_directory.empty()) {
+        auto path = config.downloaded_content_directory / id;
+        std::error_code error;
+        if (std::filesystem::is_regular_file(path / "package.manifest", error)) return path;
+    }
+    return content_directory(config) / id;
 }
 std::optional<std::string> requested_profile(std::string_view action) {
     for (const auto& profile : profile_definitions) if (profile.action == action) return std::string(profile.directory);
@@ -646,10 +655,7 @@ private:
 // already exists for the setup screens.
 class LoadedResources final : public ResourceSource {
 public:
-    const ResourceSource& attach(std::unique_ptr<ResourceSource> source) {
-        source_ = std::move(source);
-        return *source_;
-    }
+    void attach(std::unique_ptr<ResourceSource> source) { source_ = std::move(source); }
     Result<Bytes> read(std::string_view path) const override {
         if (!source_) return fail(ErrorCode::io, "game data not loaded yet: " + std::string(path));
         return source_->read(path);
@@ -979,7 +985,22 @@ private:
 #endif
 };
 
-Result<void> run(const Configuration& config, std::optional<ProfileRequest>& profile_request) {
+struct ProfileHost {
+    std::unique_ptr<MusicDecoder> music_decoder = make_music_decoder();
+    std::unique_ptr<Decompressor> decompressor = make_decompressor();
+    std::unique_ptr<InstallerArchive> archive;
+    LoadedResources game_data;
+    std::unique_ptr<Platform> platform;
+};
+
+Result<void> run(const Configuration& config, std::optional<ProfileRequest>& profile_request, ProfileHost& host) {
+    auto& [music_decoder, decompressor, archive, game_data, platform] = host;
+    if (platform) {
+        auto reset = platform->reset_profile();
+        if (!reset) return reset;
+    }
+    game_data.attach(nullptr);
+    archive.reset();
     auto startup_mark = std::chrono::steady_clock::now();
     const auto startup_stage = [&](std::string_view name) {
         const auto now = std::chrono::steady_clock::now();
@@ -1000,12 +1021,6 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         const bool same = std::filesystem::equivalent(mod, bundled, same_error);
         if (!same || same_error) packages.push_back(mod);
     }
-    const auto music_decoder = make_music_decoder();
-    // Declared in lifetime order: the window reads resources, which read the archive, which
-    // uses the decompressor.
-    auto decompressor = make_decompressor();
-    std::unique_ptr<InstallerArchive> archive;
-    LoadedResources game_data;
     // The user configuration: --config-dir, otherwise SDL's per-user directory; headless runs
     // without --config-dir keep it in memory so traces never touch the user's file. On the web,
     // the browser's filesystem (--config-dir /data, an Emscripten MEMFS directory) is temporary,
@@ -1026,9 +1041,8 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     }
 #endif
     // Open the window before installer setup, restoring saved desktop placement if present.
-    std::unique_ptr<Platform> platform;
     const auto open_window = [&](WindowSize size) -> Result<void> {
-        if (config.headless && !config.capture_frame) return {};
+        if (platform || (config.headless && !config.capture_frame)) return {};
         const Viewport window{size.width, size.height, 0, 0, 0};
         auto placement = load_window_placement(*settings);
         if (!placement) std::cerr << "Window settings: " << placement.error().message << '\n';
@@ -1094,7 +1108,8 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
     auto constants = recording_constants(*executable);
     if (!constants) return std::unexpected(constants.error());
     startup_stage("platform-installer");
-    const auto& resources = game_data.attach(std::make_unique<GameResources>(*archive, std::move(*executable), scripts->assets));
+    game_data.attach(std::make_unique<GameResources>(*archive, std::move(*executable), scripts->assets));
+    const ResourceSource& resources = game_data;
     if (show_loading) show_startup(scripts->window);
     auto bootstrap = read_file(config.scripts / "runtime/bootstrap.lua", 1024 * 1024);
     if (!bootstrap) return std::unexpected(bootstrap.error());
@@ -1159,7 +1174,7 @@ Result<void> run(const Configuration& config, std::optional<ProfileRequest>& pro
         std::error_code error;
         const bool available = profile_entry.directory.empty() ||
             (profile_entry.directory != config.rejected_profile && std::filesystem::is_regular_file(
-                content_directory(config) / profile_entry.directory / "package.manifest", error));
+                profile_directory(config, profile_entry.directory) / "package.manifest", error));
         profiles_available += std::string(profile_entry.action.substr(8)) + "=" + (available ? "true," : "false,");
     }
     profiles_available += "}";
@@ -1678,12 +1693,32 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
         }
         std::optional<std::vector<std::filesystem::path>> previous_mods;
         std::string requested_directory;
+#ifdef _WIN32
+        if (config->config_directory) {
+            config->downloaded_content_directory = *config->config_directory / "content-packs";
+        } else if (!config->headless) {
+            if (auto directory = settings_directory()) {
+                config->downloaded_content_directory = *directory / "content-packs";
+            }
+        }
+#endif
+#if defined(_WIN32) || defined(__ANDROID__)
+        ProfileHost host;
+#endif
         while (true) {
             std::optional<ProfileRequest> profile_request;
 #if defined(_WIN32) || defined(__ANDROID__)
-            set_mod_content_directory(content_directory(*config));
+            const auto bundled_content = content_directory(*config);
+            if (config->downloaded_content_directory.empty()) {
+                set_mod_content_directory(bundled_content);
+            } else {
+                set_mod_content_directory(config->downloaded_content_directory, bundled_content);
+            }
 #endif
-            auto result = run(*config, profile_request);
+#if !defined(_WIN32) && !defined(__ANDROID__)
+            ProfileHost host;
+#endif
+            auto result = run(*config, profile_request, host);
             if (!result) {
                 std::cerr << result.error().message << '\n';
                 if (!previous_mods || requested_directory.empty()) return 1;
@@ -1696,12 +1731,12 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
                 continue;
             }
             if (!profile_request) break;
-            const auto target = content_directory(*config) / profile_request->directory;
+            const auto target = profile_directory(*config, profile_request->directory);
             previous_mods = std::move(config->mods);
             requested_directory = profile_request->directory;
             config->mods.clear();
             if (profile_request->directory == "mixed-all" || profile_request->directory.starts_with("mod-"))
-                config->mods.push_back(content_directory(*config) / "polish-originals");
+                config->mods.push_back(profile_directory(*config, "polish-originals"));
             if (!profile_request->directory.empty()) config->mods.push_back(target);
             config->profile_start = true;
             config->profile_load_failed = false;

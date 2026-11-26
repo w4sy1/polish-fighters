@@ -292,7 +292,7 @@ local function options_page(state, input)
     add(state, {"fill", panel.x, panel.y, panel.width, panel.height, 0xa0, 0xa0, 0xc0})
     add(state, {"fill", panel.x + 2, panel.y + 2, panel.width - 4, panel.height - 4, 0x10, 0x20, 0x50})
     bold(state, i18n.tr("Options"), panel.x + 0x1e, panel.y + 0x14, constants.font_variants.blue)
-    if button(state,input,{x=panel.x+350,y=panel.y+14,width=120,height=26},"HYBRID CONTROL",state.option_open) then
+    if not state.hub_enabled and button(state,input,{x=panel.x+350,y=panel.y+14,width=120,height=26},"HYBRID CONTROL",state.option_open) then
         state.hud=require('base/ui/hybrid_editor').create(state.options)
         state.page='hud'
         return

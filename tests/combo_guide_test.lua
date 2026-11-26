@@ -7,7 +7,7 @@ package.loaded['polish-fighters/dashboard_model']={current=function() return {ma
 package.loaded['base/ui/navigation']={create=function() return {} end,
  target=function(l,t,r,b) return {left=l,top=t,right=r,bottom=b} end,apply=function(s,input) return input end}
 local guide=require('polish-fighters/combo_guide')
-assert(#guide.order==6 and #guide.basics==12)
+assert(#guide.order==6 and not guide.basics)
 for _,id in ipairs(guide.order) do
  local moves=guide.moves(id);assert(#moves==7)
  for index,move in ipairs(moves) do assert(move[3]==290+index*10,'guide uses the wrong actual move frame') end

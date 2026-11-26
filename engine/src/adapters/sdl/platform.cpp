@@ -298,6 +298,25 @@ public:
         if (!SDL_OpenURL(url.c_str())) return fail(ErrorCode::platform, std::string("cannot open the URL: ") + SDL_GetError());
         return {};
     }
+    Result<void> reset_profile() override {
+        set_text_input(false);
+        textures_.clear();
+        texture_bytes_ = 0;
+        sprite_effects_.clear();
+        text_.forget_textures();
+        for (const auto& entry : voices_) {
+            if (!SDL_ClearAudioStream(entry.second.stream.get())) return error();
+        }
+        scaled_voices_.clear();
+        scaled_voice_bytes_ = 0;
+        voices_.clear();
+        track_.reset();
+        music_resource_.clear();
+        music_running_ = false;
+        reported_.clear();
+        if (music_stream_ && !SDL_ClearAudioStream(music_stream_.get())) return error();
+        return {};
+    }
     Result<void> music(std::span<const MusicCommand> commands) override {
         if (!audio_) return {};
         for (const auto& command : commands) {

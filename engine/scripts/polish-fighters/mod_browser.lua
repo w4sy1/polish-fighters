@@ -3,6 +3,7 @@ local entries=require('polish-fighters/mod_catalog')
 local locale=require('polish-fighters/menu_locale')
 local navigation=require('base/ui/navigation')
 local controls=require('base/ui/controls')
+local i18n=require('base/i18n/i18n')
 local screen={}
 local categories={'all','classic','naruto','dragon-ball','bleach','one-piece','anime','gameplay'}
 local words={
@@ -137,6 +138,8 @@ local function github_poll(state)
    local received,total,phase,files=api('progress')
    g.fraction=(tonumber(total) or 0)>0 and (tonumber(received) or 0)/total or 0
    if phase==2 then g.status=w.gh_verify elseif phase==3 then g.status=w.gh_unpack..tostring(files or 0)
+   elseif (tonumber(received) or 0)==0 then
+    g.status=locale.id()=='pl' and 'Oczekiwanie na dane z GitHuba…' or 'Waiting for data from GitHub…'
    else g.status=w.gh_download..math.floor(g.fraction*100)..'% ('..size_label(received)..' / '..size_label(total)..')' end
   end
   return
@@ -317,7 +320,11 @@ function screen.draw(state,context)
   text((locale.id()=='pl' and 'Aktywny: ' or 'Active: ')..title,525,226,14,0x62b5ef,'center')
   local status=s.github.status or ''
   if s.github.multi and status==w.gh_ready then status=status..' '..w.queue_hint end
-  text(status,397,532,13,0xffdc82,'center')
+  local lines,size,spacing=i18n.fit(status,750,29,13,10)
+  for index,line in ipairs(lines) do
+   if index>2 then break end
+   if line~='' then text(line,397,550-#lines*spacing+(index-1)*spacing,size,0xffdc82,'center') end
+  end
   if s.github.busy=='install' then
    context.fill(302,424,446,12,122,157,255)
    context.fill(304,426,math.floor(442*math.min(1,s.github.fraction or 0)),8,255,220,130)

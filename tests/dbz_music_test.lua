@@ -5,3 +5,11 @@ assert(loadfile(root..'/content-packs/dbz/music.lua'))()(base)
 base.play('[MU]');base.play('[mu]');base.play('bgm/stage1.wma')
 assert(#calls==3 and calls[1][1]=='stop' and calls[2][1]=='stop')
 assert(calls[3][1]=='play' and calls[3][2]=='bgm/stage1.wma')
+
+local music=require('base/game/music')
+music.enabled=false
+music.resume()
+assert(#music.queue==0,'a match action must not resume music while it is off')
+music.enabled=true
+music.resume()
+assert(music.queue[1][1]=='resume')

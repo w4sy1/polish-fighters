@@ -47,9 +47,8 @@ assert(state.pf_map_page==2)
 click(1)
 assert(model.current().map==8,'second page retains original map indices')
 state.pf_panel='extras'
-click(6) -- Etap 1.14 / Zadanie 3.4: 'connection' row removed, touch shifted from 7 to 6
-assert(state.page=='hud' and state.hud.destination=='menu' and state.hud.values.hybrid)
-state.page='menu';state.hud=nil
+click(6)
+assert(state.page=='menu' and state.pf_panel=='history' and not state.hud,'the extras menu must not open the HUD editor')
 state.pf_message=nil;state.pf_panel='unlock'
 local presses={}
 for letter in ('POLISHFIGHTERS'):gmatch('.') do presses[#presses+1]=letter:byte() end

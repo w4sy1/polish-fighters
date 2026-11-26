@@ -63,7 +63,7 @@ function flow.create(options)
         launch = require("base/ui/launch").create({menu_seed = options.menu_seed, problem = settings.problem}),
         pointer_x = 0, pointer_y = 0, previous_button = false, volume_frames = 0,
         hybrid = hybrid.create(user_options.current().hybrid)}
-    music.play("bgm/main.wma")
+    if not options.profile_start and not options.profile_load_failed then music.play("bgm/main.wma") end
     -- A startup recording is already queued by the host; route consumes it on the first frame.
     if options.start_screen == "replay" then state.active = "title" end
     -- Developer entry points requested by the host; not part of the original flow.

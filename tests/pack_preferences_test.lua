@@ -22,7 +22,7 @@ assert(standalone,'excluding a module from the mixed pool hid its standalone pro
 local toggles=hub.rows({hub_mode='packs',hub_pack_edit=selected})
 local excluded=false;for _,row in ipairs(toggles) do if row[1]=='toggle_bleach' then excluded=true end end
 assert(excluded,'excluded modules must remain available in module settings')
-assert(#toggles==14)
+assert(#toggles==#hub.profiles+5)
 for _,entry in ipairs(hub.profiles) do selected[entry.id]=false end
 assert(not packs.save(hub.profiles,selected),'empty launcher selection allowed')
 selected.lf_two=true;fail=true

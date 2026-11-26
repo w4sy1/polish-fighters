@@ -41,7 +41,7 @@ local function row_ids(rows) local ids={} for _,row in ipairs(rows) do ids[row[1
 local desktop={}
 input_settings.open(desktop)
 assert(not row_ids(input_settings.rows(desktop,{})).hybrid_mode,'desktop must not expose hybrid_mode')
-assert(not row_ids(input_settings.rows(desktop,{})).hybrid_hud,'desktop must not expose hybrid_hud')
+assert(row_ids(input_settings.rows(desktop,{})).hybrid_hud,'desktop control settings must expose the HUD editor')
 
 local android={hub_android=true}
 input_settings.open(android)

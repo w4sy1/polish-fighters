@@ -74,7 +74,7 @@ return function(base)
         local title=require("polish-fighters/hub").title(require("base/game/catalog").profile_id)
         return {{"play","GRAJ W "..title:upper()},{"maps","WYBIERZ MAPE"},{"packs","PAKIETY I POSTACIE"},
             {"account","KONTO / GOSC"},{"options","USTAWIENIA"},
-            {"touch","STEROWANIE DOTYKOWE"},{"history","HISTORIA ROZGRYWEK"},{"combo-guide","STEROWANIE I PORADNIK"},
+            {"history","HISTORIA ROZGRYWEK"},
             {"unlock","ODBLOKOWANIE POSTACI"},{"close","POWROT DO LF2"}}
     end
     function base.create(value)
@@ -166,9 +166,6 @@ return function(base)
         elseif id=='native-account' then
             s.pf_panel=nil;s.hub_classic=nil;require('polish-fighters/online_screen').open(s)
         elseif id=="options" then s.pf_settings_parent=s.pf_panel;s.pf_panel=nil;s.page="options";s.options=options.current();s.options_focus=1
-        elseif id=="touch" then
-            s.pf_settings_parent=s.pf_panel;s.pf_panel=nil
-            s.hud=require("base/ui/hybrid_editor").create(options.current(),"menu");s.page="hud"
         elseif id:sub(1,4)=="map:" then
             local ok=model.save({map=tonumber(id:sub(5))})
             if not ok then s.pf_message={"NIE ZAPISANO MAPY","Sprawdz dostep do plikow ustawien."} end

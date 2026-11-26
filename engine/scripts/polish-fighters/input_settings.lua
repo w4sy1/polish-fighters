@@ -92,8 +92,8 @@ function screen.rows(state,input)
  rows[#rows+1]={"classic","NAZWY GRACZY / PANEL LF2",500,400,265,31}
  if state.hub_android then
   rows[#rows+1]={"hybrid_mode","RUCH: "..(state.hub_hybrid_mode=='stick' and "JOYSTICK" or "STRZAŁKI"),30,445,215,32}
-  rows[#rows+1]={"hybrid_hud","EDYTOR HUD",255,445,215,32}
  end
+ rows[#rows+1]={"hybrid_hud","EDYTOR HUD",255,445,215,32}
  rows[#rows+1]={"save","ZAPISZ",210,480,180,34}
  rows[#rows+1]={"cancel","ANULUJ",410,480,180,34}
  return rows

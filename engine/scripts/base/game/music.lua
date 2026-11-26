@@ -25,6 +25,7 @@ function music.stop()
     music.stopped = true
 end
 function music.resume()
+    if not music.enabled then return end
     music.queue[#music.queue + 1] = {"resume"}
     music.stopped = false
 end

@@ -47,6 +47,7 @@ constexpr std::size_t file_limit = 20000;
 
 std::mutex directory_lock;
 fs::path content_directory_value;
+fs::path bundled_directory_value;
 std::optional<fs::path> local_mod_file;
 
 struct Session {
@@ -516,9 +517,10 @@ Result<std::string> install_envelope(const fs::path& envelope, const fs::path& p
 }
 }
 
-void set_mod_content_directory(const fs::path& directory) {
+void set_mod_content_directory(const fs::path& directory, const fs::path& bundled_directory) {
     std::scoped_lock lock(directory_lock);
     content_directory_value = directory;
+    bundled_directory_value = bundled_directory;
 }
 fs::path mod_content_directory() {
     std::scoped_lock lock(directory_lock);
@@ -546,11 +548,16 @@ Result<std::string> import_signed_mod(const fs::path& file, ModInstallProgress& 
 bool github_mods_supported() noexcept { return true; }
 
 std::optional<std::string> github_mod_receipt(std::string_view id) {
-    const auto packs = mod_content_directory();
-    if (packs.empty() || !valid_id(id)) return std::nullopt;
-    const auto folder = packs / std::string(id);
+    if (!valid_id(id)) return std::nullopt;
+    std::scoped_lock lock(directory_lock);
+    if (content_directory_value.empty()) return std::nullopt;
+    auto folder = content_directory_value / std::string(id);
     std::error_code error;
-    if (!fs::is_regular_file(folder / "package.manifest", error)) return std::nullopt;
+    if (!fs::is_regular_file(folder / "package.manifest", error)) {
+        if (bundled_directory_value.empty()) return std::nullopt;
+        folder = bundled_directory_value / std::string(id);
+        if (!fs::is_regular_file(folder / "package.manifest", error)) return std::nullopt;
+    }
     std::ifstream file(folder / ".github-install", std::ios::binary);
     std::array<char, 128> buffer{};
     file.read(buffer.data(), buffer.size());
@@ -632,7 +639,7 @@ Result<std::string> github_mod_install(std::string_view verified_catalogue, std:
                 envelope.string() + "): " + std::error_code(code, std::generic_category()).message());
         }
         Sink sink{nullptr, &output, digest.get(), *size, offset, &progress};
-        auto fetched = transfer(*url, sink, 60, offset);
+        auto fetched = transfer(*url, sink, 30, offset);
         output.close();
         if (!fetched) {
             const bool interrupted = fetched.error().code == ErrorCode::io && output &&

@@ -20,7 +20,8 @@ struct ModInstallProgress {
     std::atomic<bool> cancelled{false};
 };
 // Where the engine reads content packs; set by the application before scripts run.
-void set_mod_content_directory(const std::filesystem::path& directory);
+void set_mod_content_directory(const std::filesystem::path& directory,
+                               const std::filesystem::path& bundled_directory = {});
 std::filesystem::path mod_content_directory();
 std::optional<std::string> github_mod_receipt(std::string_view id);
 // Downloads the catalogue and its Ed25519 signature; returns the verified JSON text.

@@ -99,7 +99,8 @@ return function(base)
   elseif id:sub(1,8)=="profile_" then
    local tag=id:sub(9)
    local audit=require('polish-fighters/module_inventory')[tag]
-   if (audit and audit.missing>0) or (state.hub_available and state.hub_available[tag]==false) then
+   local available=state.hub_available and state.hub_available[tag]
+   if available==false or (available==nil and audit and audit.missing>0) then
     state.hub_note="Brak lokalnego pakietu. Uruchom pełną paczkę Little Fighters.";return
    end
    if tag=='mixed' then

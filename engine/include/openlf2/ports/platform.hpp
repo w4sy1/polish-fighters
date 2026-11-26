@@ -200,6 +200,8 @@ class Platform {
 public:
     virtual ~Platform() = default;
     virtual InputSnapshot poll() = 0;
+    // Drop profile-owned audio and graphics while retaining the window and input devices.
+    virtual Result<void> reset_profile() { return {}; }
     // Commands are drawn in order over the viewport's clear color.
     virtual Result<void> present(std::span<const DrawCommand> commands, const Viewport& viewport) = 0;
     // Diagnostic screenshot after a software-rendered trace, without desktop capture.

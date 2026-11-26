@@ -24,7 +24,7 @@ local function back()
  shell.update(state,{keys={},gamepad={},pointer_x=0,pointer_y=0},context)
 end
 assert(#hub.rows(state)==8)
-click('guide');assert(state.hub_classic and state.pf_panel=='combo-guide')
+click('guide');assert(state.hub_classic and state.pf_panel=='combo-guide' and state.page=='menu' and not state.hud)
 state.hub_classic=nil;state.pf_panel=nil
 click('battle');assert(#hub.rows(state)==10)
 for _,mode in ipairs({'versus','stage','championship','team_championship','battle_setup'}) do
@@ -40,10 +40,11 @@ state.hub_mode='root';click('library');click('packs')
 for _,entry in ipairs(hub.profiles) do state.hub_pack_edit[entry.id]=false end
 click('packs_save');assert(state.hub_mode=='packs' and state.hub_note)
 state.hub_pack_edit.lf_two=true;click('packs_save');assert(state.hub_mode=='library' and document.little_fighters_packs.lf_two)
-assert(#hub.rows(state)==14,'mixed pool settings must not hide standalone modules')
+local library_rows=#hub.profiles+5
+assert(#hub.rows(state)==library_rows,'mixed pool settings must not hide standalone modules')
 state.hub_available={dragon_ball_super=true,fighter_hero=true,gf2=true,lf2_ns=true,sx2=true,lf2_sv=true,rn_lf2=true,lf_seed=true,wlf2_al=true,ce_lf2=true,ntsd_community=true,ntsd_ce_setup=true,killer_lf2=true}
-assert(#hub.rows(state)==15)
-click("optional_modules");assert(#hub.rows(state)==14)
+assert(#hub.rows(state)==library_rows+1)
+click("optional_modules");assert(#hub.rows(state)==#hub.optional_profiles+1)
 for _,entry in ipairs(hub.optional_profiles) do
  click('profile_'..entry.id);assert(requested=='profile_'..entry.id)
  assert(hub.title(entry.profile)==entry.title)
@@ -58,15 +59,15 @@ assert(modes.mode_versus and modes.campaign_unavailable and not modes.mode_stage
 game_catalog.stage_path=old_stage_path
 state.hub_mode='optional_modules'
 back();assert(state.hub_mode=="library")
-state.hub_android=true;assert(#hub.rows(state)==15)
+state.hub_android=true;assert(#hub.rows(state)==library_rows+1)
 click('optional_modules')
-click('profile_dragon_ball_super')
-assert(requested=='profile_dragon_ball_super' and document.little_fighters_start_profile=='dragon_ball_super')
+click('profile_fighter_hero')
+assert(requested=='profile_fighter_hero' and document.little_fighters_start_profile=='fighter_hero')
 document.little_fighters_start_profile=nil
 back();assert(state.hub_mode=='library')
 state.hub_android=nil
 state.hub_available.gf2=false
-click("optional_modules");assert(#hub.rows(state)==13)
+click("optional_modules");assert(#hub.rows(state)==#hub.optional_profiles)
 click("library")
 state.hub_available=nil
 local rows=hub.rows(state,'polish-originals')
@@ -95,6 +96,20 @@ state.hub_mode='remote';click('remote_wifi')
 assert(state.hub_online.lan)
 online.activate(state,'back',context)
 state.hub_mode='settings'
+click('controls')
+local input_settings=require('polish-fighters/input_settings')
+local hud_row
+for _,row in ipairs(input_settings.rows(state)) do
+ if row[1]=='hybrid_hud' then hud_row=row end
+end
+assert(hud_row,'the HUD editor belongs in desktop control settings')
+local editor=require('base/ui/hybrid_editor')
+local create_editor=editor.create
+editor.create=function(_,destination) return {destination=destination} end
+input_settings.activate(state,'hybrid_hud')
+editor.create=create_editor
+assert(state.page=='hud' and state.hud.destination=='menu' and state.hub_hybrid_pending_edit)
+state.page='menu';state.hud=nil;state.hub_hybrid_pending_edit=nil
 click('information');assert(state.hub_mode=='information')
 back();assert(state.hub_mode=='settings')
 state.hub_mode='library';state.hub_selected=nil;click('profile_dbz')
