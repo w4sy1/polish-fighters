@@ -1697,8 +1697,8 @@ int run_application(std::span<const std::string> arguments, const std::filesyste
         if (config->config_directory) {
             config->downloaded_content_directory = *config->config_directory / "content-packs";
         } else if (!config->headless) {
-            if (auto directory = settings_directory()) {
-                config->downloaded_content_directory = *directory / "content-packs";
+            if (auto user_settings = settings_directory()) {
+                config->downloaded_content_directory = *user_settings / "content-packs";
             }
         }
 #endif
