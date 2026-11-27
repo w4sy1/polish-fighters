@@ -83,6 +83,9 @@ class OpenLF2Conan(ConanFile):
             ffmpeg.with_videotoolbox = False
             ffmpeg.with_avfoundation = False
         if self.settings.os == "Android":
+            # Some legacy mods store MP3 music under a .wma resource name.
+            ffmpeg.enable_decoders = "wmav2,wmalossless,mp3"
+            ffmpeg.enable_demuxers = "asf,mp3"
             ffmpeg.with_jni = False
             ffmpeg.with_mediacodec = False
 

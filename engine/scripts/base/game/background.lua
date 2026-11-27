@@ -186,6 +186,14 @@ function background.paint(context, data, state, camera_x, bounds, wide)
                     first = math.min(first, layer.x + loops * layer.loop)
                     last = math.max(last, wide.right - offset)
                 end
+                -- Discard tiles the viewport would clip anyway, including one-pixel strips on long stages.
+                local view = bounds or wide
+                last = math.min(last, (view and view.right or screen_width) - offset - 1)
+                local width = bitmap_width(layer.resource)
+                if width and width > 0 then
+                    local leftmost = (view and view.left or 0) - offset - width + 1
+                    first = first + math.max(0, math.ceil((leftmost - first) / layer.loop)) * layer.loop
+                end
                 for x = first, last, layer.loop do
                     image(context, layer, offset + x)
                 end
