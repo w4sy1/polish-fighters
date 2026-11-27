@@ -3,6 +3,13 @@
 #include <iostream>
 #include <string>
 int main() {
+    const std::string path="mods/dragon-ball-super/background/012345.bmp";
+    auto long_paths=openlf2::background_data::parse(
+        "shadow: "+path+" shadowsize: 37 9\nlayer: "+path+" width: 2400 layer_end\n");
+    assert(long_paths && long_paths->shadow==path && long_paths->layers.size()==1);
+    assert(long_paths->layers[0].path==path && long_paths->layers[0].width==2400);
+    assert(long_paths->shadow_size[0]==37);
+
     std::string source="name: Extended\nwidth: 2400\nzboundary: 300 450\n";
     const std::string layer="layer:\n pic: test.bmp\n transparency: 1\n width: 2400\n x: 0\n y: 128\nlayer_end\n";
     for (int index=0; index<154; ++index) source+=layer;

@@ -4,7 +4,23 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+
+namespace {
+class ObjectResource final : public openlf2::ResourceSource {
+public:
+ openlf2::Result<openlf2::Bytes> read(std::string_view) const override {
+  const std::string text="<frame> 0 stand\nitr: kind: 0 y: 180000000000 w: 99999999999999999999 itr_end:\n<frame_end>\n";
+  return openlf2::Bytes(text.begin(),text.end());
+ }
+};
+}
+
 int main(int argc,char**argv){
+ ObjectResource resource;
+ auto community=openlf2::object_data::load(resource,"mods/ntsd-community/a/object.txt",999);
+ assert(community && community->frames[0].interactions[0].area.y==-388626432);
+ assert(community->frames[0].interactions[0].area.width==1661992959);
+ assert(!openlf2::object_data::load(resource,"mods/other/a/object.txt",999));
  auto extended="<bmp_begin>\nname: Extended\n<bmp_end>\n<frame> 998 final\n pic: 0 state: 0 wait: 1 next: 999\n<frame_end>\n";
  assert(!openlf2::object_data::parse(extended));
  auto dbz=openlf2::object_data::parse(extended,openlf2::object_data::extended_frame_count);

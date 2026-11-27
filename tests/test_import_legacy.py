@@ -44,6 +44,27 @@ class ImportTests(unittest.TestCase):
    (source/'data/hero.dat').write_bytes(legacy.encode('<bmp_begin>\nname: Hero\nhead: missing.bmp\n<bmp_end>',b'x'*123))
    report=legacy.convert(source,root/'pack','test-pack',allow_missing=True)
    self.assertIn('missing.bmp',report['missing_resources']);self.assertTrue(report['experimental'])
+ def test_mkc_bitmaps_are_imported_with_bmp_paths(self):
+  from PIL import Image
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);source=root/'source';(source/'data').mkdir(parents=True);(source/'sprite').mkdir()
+   (source/'data/data.txt').write_text('<object>\nid: 1 type: 0 file: data/hero.dat\n<object_end>\n<background>\n<background_end>')
+   hero='<bmp_begin>\nname: Hero\nhead: sprite/hero.mkc\nfile(0-0): sprite/hero.mkc w: 1 h: 1 row: 1 col: 1\n<bmp_end>'
+   (source/'data/hero.dat').write_bytes(legacy.encode(hero,b'x'*123))
+   (source/'data/stage.dat').write_bytes(legacy.encode('<stage> id: 0\n<stage_end>',b'x'*123))
+   sprite=source/'sprite/hero.mkc'
+   Image.new('RGB',(1,1)).save(sprite,format='BMP')
+   out=root/'pack'
+   report=legacy.convert(source,out,'test-pack',managed_import=True)
+   self.assertFalse(report['missing_resources'])
+   image=next((out/'assets').rglob('*.bmp'))
+   data='\n'.join(legacy.decode(p.read_bytes()) for p in (out/'assets').rglob('*.dat'))
+   self.assertIn('head: ./a/'+image.name,data)
+   self.assertNotIn('.mkc',data)
+   self.assertEqual(image.read_bytes(),sprite.read_bytes())
+   sprite.write_bytes(b'not a bitmap')
+   with self.assertRaisesRegex(ValueError,'Expected a BMP image'):
+    legacy.convert(source,root/'invalid','test-pack')
  def test_atomic_missing_resource(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);source=root/'source';(source/'data').mkdir(parents=True)

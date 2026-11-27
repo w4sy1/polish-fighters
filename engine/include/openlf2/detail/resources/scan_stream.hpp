@@ -37,7 +37,8 @@ inline std::int32_t wrapping_subtract(std::int32_t left, std::int32_t right) {
 class TokenStream {
 public:
     enum class Scan { value, mismatch, end };
-    explicit TokenStream(std::string_view text) : text_(text) {}
+    explicit TokenStream(std::string_view text, bool wrap_integers = false)
+        : text_(text), wrap_integers_(wrap_integers) {}
     [[nodiscard]] bool at_end() const { return end_reached_; }
     [[nodiscard]] std::size_t line() const { return line_; }
 
@@ -66,17 +67,16 @@ public:
             if (cursor != position_) unsupported("sign without digits");
             return Scan::mismatch;
         }
-        std::int64_t value = 0;
+        std::uint32_t value = 0;
+        const auto limit = static_cast<std::uint32_t>(std::numeric_limits<std::int32_t>::max()) + negative;
         while (cursor < text_.size() && is_digit(text_[cursor])) {
-            value = value * 10 + (text_[cursor++] - '0');
-            if (value > std::int64_t{std::numeric_limits<std::int32_t>::max()} + 1) {
+            const auto digit = static_cast<std::uint32_t>(text_[cursor++] - '0');
+            if (!wrap_integers_ && value > (limit - digit) / 10) {
                 unsupported("integer outside 32-bit range");
             }
+            value = value * 10 + digit;
         }
-        if (negative) value = -value;
-        if (value > std::numeric_limits<std::int32_t>::max()) {
-            unsupported("integer outside 32-bit range");
-        }
+        if (negative) value = 0u - value;
         finish(cursor);
         target = static_cast<std::int32_t>(value);
         return Scan::value;
@@ -142,6 +142,7 @@ private:
     std::size_t position_ = 0;
     std::size_t line_ = 1;
     bool end_reached_ = false;
+    bool wrap_integers_;
 };
 
 inline void add_token_checksum(std::int32_t& checksum, std::string_view word) {

@@ -18,7 +18,8 @@ constexpr std::size_t max_input = 4 * 1024 * 1024;
 
 class Parser {
 public:
-    explicit Parser(std::string_view text, std::int32_t frame_limit) : stream_(text), frame_limit_(frame_limit) {
+    explicit Parser(std::string_view text, std::int32_t frame_limit, bool wrap_integers)
+        : stream_(text, wrap_integers), frame_limit_(frame_limit) {
         data_.frames.resize(static_cast<std::size_t>(frame_limit));
     }
 
@@ -497,23 +498,28 @@ ScriptValue frame_value(const Frame& frame) {
     set_optional(result, "sound", frame.sound);
     return table(std::move(result));
 }
-}
-
-Result<ObjectData> parse(std::string_view text, std::int32_t frame_limit) {
+Result<ObjectData> parse_object(std::string_view text, std::int32_t frame_limit, bool wrap_integers) {
     if (frame_limit != frame_count && frame_limit != extended_frame_count)
         return fail(ErrorCode::unsupported, "unsupported object frame capacity");
-    Parser parser(text,frame_limit);
+    Parser parser(text, frame_limit, wrap_integers);
     try {
         return parser.run();
     } catch (const ParseFailure& failure) {
         return fail(failure.code, "line " + std::to_string(parser.line()) + ": " + failure.message);
     }
 }
+}
+
+Result<ObjectData> parse(std::string_view text, std::int32_t frame_limit) {
+    return parse_object(text, frame_limit, false);
+}
 
 Result<ObjectData> load(const ResourceSource& resources, std::string_view path, std::int32_t frame_limit) {
     auto bytes = read_data_text(resources, path, max_input);
     if (!bytes) return std::unexpected(bytes.error());
-    auto parsed = parse(std::string_view(bytes->data(), bytes->size()),frame_limit);
+    // NTSD Community DATs rely on the original x86 CRT's low 32 bits for %d.
+    const bool wrap_integers = path.starts_with("mods/ntsd-community/a/");
+    auto parsed = parse_object(std::string_view(bytes->data(), bytes->size()), frame_limit, wrap_integers);
     if (!parsed) parsed.error().message = std::string(path) + ": " + parsed.error().message;
     return parsed;
 }

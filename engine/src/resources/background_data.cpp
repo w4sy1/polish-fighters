@@ -10,6 +10,7 @@ namespace {
 using scanning::ParseFailure;
 using scanning::TokenStream;
 constexpr std::size_t word_capacity = 100;
+constexpr std::size_t asset_path_capacity = 4096;
 constexpr std::size_t max_diagnostics = 64;
 constexpr std::size_t max_input = 1024 * 1024;
 
@@ -78,7 +79,7 @@ private:
     void shadow() {
         std::string path;
         std::string ignored;
-        if (!stream_.word(path, 40)) return;
+        if (!stream_.word(path, asset_path_capacity)) return;
         data_.shadow = std::move(path);
         if (!stream_.word(ignored, word_capacity)) return;
         read_pair(data_.shadow_size);
@@ -89,7 +90,7 @@ private:
             throw ParseFailure{ErrorCode::unsupported, "more than " + std::to_string(max_layers) + " background layers"};
         }
         auto& layer = data_.layers.emplace_back();
-        if (!stream_.word(layer.path, 30)) unterminated();
+        if (!stream_.word(layer.path, asset_path_capacity)) unterminated();
         next_word();
         while (word_ != "layer_end") {
             if (word_ == "transparency:") read_int(layer.transparency);

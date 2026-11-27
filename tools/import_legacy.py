@@ -5,7 +5,7 @@ Keeps original IDs; does not merge packs, execute EXEs or emulate EXE patches.
 import argparse,hashlib,json,re,shutil
 from pathlib import Path,PurePosixPath
 KEY=b'SiuHungIsAGoodBearBecauseHeIsVeryGood'
-RESOURCE=re.compile(r'(?i)([a-z0-9_./\\-]+\.(?:bmp|png|wav|dat|wma|mp3|ogg))')
+RESOURCE=re.compile(r'(?i)([a-z0-9_./\\-]+\.(?:bmp|png|mkc|wav|dat|wma|mp3|ogg))')
 ROOT=Path(__file__).resolve().parents[1]
 def decode(data):
  if len(data)<123:raise ValueError('Truncated encrypted LF2 data')
@@ -108,7 +108,8 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   return path
  def register(path):
   path=resolve(path)
-  if path not in mapping:mapping[path]=f'a/{len(mapping):06d}'+Path(path).suffix
+  suffix=Path(path).suffix
+  if path not in mapping:mapping[path]=f'a/{len(mapping):06d}'+('.bmp' if suffix=='.mkc' else suffix)
   return prefix+mapping[path]
  queue=[p for _,_,p in records]+[p for _,p in bgs]
  if not no_campaign:queue.append('data/stage.dat')
@@ -148,14 +149,17 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
     virtual=register(resource)
     # Legacy image fields accept as few as 29 characters. Keep the full
     # namespace in the manifest and resolve these local references on read.
-    if managed_import and resource.endswith(('.bmp','.png')):
+    if managed_import and virtual.endswith(('.bmp','.png')):
      return './'+virtual[len(prefix):]
     return virtual
    # Frame labels are cosmetic, but the native reader retains the original 19-byte bound.
    text=re.sub(r'(?m)(<frame>\s+\d+\s+)(\S+)',lambda m:m[1]+m[2][:19],text)
    text=RESOURCE.sub(replace,text)
    converted[path]=encode(text,raw)
-  else:converted[path]=raw
+  else:
+   if path.endswith('.mkc') and not raw.startswith(b'BM'):
+    raise ValueError('Expected a BMP image in '+path)
+   converted[path]=raw
  if missing and not allow_missing:raise ValueError('Missing referenced resources: '+', '.join(sorted(missing)))
  for id_,kind,path in records:
   if kind==0:
