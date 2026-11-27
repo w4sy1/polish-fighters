@@ -1,4 +1,4 @@
-local updates={version='0.18.28',build=10030}
+local updates={version='0.18.29',build=10031}
 local function version(text)
  local a,b,c=tostring(text or ''):match('(%d+)%.(%d+)%.(%d+)')
  if not a then return 0 end
