@@ -517,8 +517,9 @@ Result<ObjectData> parse(std::string_view text, std::int32_t frame_limit) {
 Result<ObjectData> load(const ResourceSource& resources, std::string_view path, std::int32_t frame_limit) {
     auto bytes = read_data_text(resources, path, max_input);
     if (!bytes) return std::unexpected(bytes.error());
-    // NTSD Community DATs rely on the original x86 CRT's low 32 bits for %d.
-    const bool wrap_integers = path.starts_with("mods/ntsd-community/a/");
+    // These legacy packs rely on the original x86 CRT's low 32 bits for %d.
+    const bool wrap_integers = path.starts_with("mods/ntsd-community/a/") ||
+                               path.starts_with("mods/lf3/a/");
     auto parsed = parse_object(std::string_view(bytes->data(), bytes->size()), frame_limit, wrap_integers);
     if (!parsed) parsed.error().message = std::string(path) + ": " + parsed.error().message;
     return parsed;

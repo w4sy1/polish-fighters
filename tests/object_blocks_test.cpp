@@ -20,6 +20,8 @@ int main(int argc,char**argv){
  auto community=openlf2::object_data::load(resource,"mods/ntsd-community/a/object.txt",999);
  assert(community && community->frames[0].interactions[0].area.y==-388626432);
  assert(community->frames[0].interactions[0].area.width==1661992959);
+ auto lf3=openlf2::object_data::load(resource,"mods/lf3/a/object.txt",999);
+ assert(lf3 && lf3->frames[0].interactions[0].area.y==-388626432);
  assert(!openlf2::object_data::load(resource,"mods/other/a/object.txt",999));
  auto extended="<bmp_begin>\nname: Extended\n<bmp_end>\n<frame> 998 final\n pic: 0 state: 0 wait: 1 next: 999\n<frame_end>\n";
  assert(!openlf2::object_data::parse(extended));

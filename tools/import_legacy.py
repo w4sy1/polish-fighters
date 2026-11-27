@@ -58,6 +58,8 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
  catalog_bytes=files[catalog_path].read_bytes()
  catalog=catalog_bytes.decode('latin1').replace('\r\n','\n').replace('\r','\n')
  catalog_sha256=hashlib.sha256(catalog.encode('latin1')).hexdigest()
+ if pack_id=='lf3':
+  catalog=catalog.replace('\xc2\xa0',' ').replace('\xa0',' ')
  source_hash=hashlib.sha256(catalog_bytes).hexdigest()
  killer=pack_id=='killer-lf2' and source_hash=='fc0ac2c8da23df91e83c20ce82981a51cb6cdfbe585cba53144175da79e20c46'
  if catalog_path!='data/data.txt' and not killer:raise ValueError('Unknown Killer LF2 backup catalogue')
@@ -121,8 +123,8 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   if path in converted or path in missing:continue
   if path not in files:missing.add(path);continue
   raw=files[path].read_bytes()
-  if path.endswith('.dat'):
-   text=source_decode(raw)
+  if path.endswith('.dat') or (pack_id=='lf3' and path.endswith('.txt')):
+   text=raw.decode('latin1') if path.endswith('.txt') else source_decode(raw)
    if pack_id=='ntsd-community' and path=='data/stage.dat' and hashlib.sha256(raw).hexdigest()==(
        'c7ba49cc76a9ce2e9502058e2ede92584e757b3c47d786b243b495c714ba37d4'):
     # VC80 sscanf does not assign a value for the second x: - 250; keep x: 1200.
@@ -155,7 +157,7 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
    # Frame labels are cosmetic, but the native reader retains the original 19-byte bound.
    text=re.sub(r'(?m)(<frame>\s+\d+\s+)(\S+)',lambda m:m[1]+m[2][:19],text)
    text=RESOURCE.sub(replace,text)
-   converted[path]=encode(text,raw)
+   converted[path]=text.encode('latin1') if path.endswith('.txt') else encode(text,raw)
   else:
    if path.endswith('.mkc') and not raw.startswith(b'BM'):
     raise ValueError('Expected a BMP image in '+path)
@@ -165,7 +167,7 @@ def convert(source,destination,pack_id,png_aliases=False,catalog_markers=(),allo
   if kind==0:
    if path not in files:
     fighters.append({'id':id_,'name':'[missing]','path':path});continue
-   text=source_decode(files[path].read_bytes());name=re.search(r'\bname:\s*(\S+)',text)
+   text=(files[path].read_bytes().decode('latin1') if pack_id=='lf3' and path.endswith('.txt') else source_decode(files[path].read_bytes()));name=re.search(r'\bname:\s*(\S+)',text)
    fighters.append({'id':id_,'name':name[1] if name else '?','path':path})
  # All failures above leave no partially installed destination.
  destination.mkdir(parents=True)

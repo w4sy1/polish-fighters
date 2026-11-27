@@ -83,4 +83,16 @@ class ImportTests(unittest.TestCase):
    data='\n'.join(legacy.decode(p.read_bytes()) for p in (out/'assets').rglob('*.dat'))
    self.assertIn('mods/test-pack/a/',data);self.assertNotIn('x'*20,data)
    with self.assertRaises(ValueError):legacy.convert(source,out,'test-pack')
+ def test_lf3_plain_text_fighter_and_nonbreaking_spaces(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);source=root/'source';(source/'data').mkdir(parents=True)
+   (source/'data/data.txt').write_bytes(
+    b'<object>\nid: 1\xc2\xa0type: 0\xa0file: data/hero.txt\n<object_end>\n<background>\n<background_end>')
+   (source/'data/hero.txt').write_bytes(b'<bmp_begin>\nname: Hero\nhead: data/hero.bmp\n<bmp_end>')
+   (source/'data/hero.bmp').write_bytes(b'BM-test')
+   (source/'data/stage.dat').write_bytes(legacy.encode('<stage> id: 0\n<stage_end>',b'x'*123))
+   out=root/'pack';report=legacy.convert(source,out,'lf3')
+   self.assertEqual(report['fighters'][0]['name'],'Hero')
+   fighter=next(path for path in (out/'assets').rglob('*.txt') if b'name: Hero' in path.read_bytes())
+   self.assertRegex(fighter.read_text(), r'head: mods/lf3/a/[0-9]{6}[.]bmp')
 if __name__=='__main__':unittest.main()
